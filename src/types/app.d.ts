@@ -1,11 +1,10 @@
-import { Color } from "@/components/ColorSwatch"
+import { Color } from "@/types/ColorSwatch"
 
 export interface ICategory {
     id: string
     name: string
     color: Color
     description?: string
-    // budgets: Budget[]
 }
 
 export interface IBudget {
@@ -25,7 +24,8 @@ export interface IAbsoluteBudget extends IBudget {
 
 export interface IOccuranceBudget extends IBudget {
     type: 'occurance'
-    value: number
+    count: number
+    meanExpendature: number
 }
 
 export type Budget = IPercentageBudget | IAbsoluteBudget | IOccuranceBudget
@@ -33,6 +33,7 @@ export type Budget = IPercentageBudget | IAbsoluteBudget | IOccuranceBudget
 export interface IExpendature {
     amount: number
     categoryId: string
+    memo?: string
 }
 
 export type Color =

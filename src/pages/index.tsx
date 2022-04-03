@@ -17,17 +17,6 @@ import CategoryList from '@/components/CatagoryList'
 import ColorText from '@/components/ColorText'
 import ItemCreator from '@/components/ItemCreator'
 
-const categories : ICategory[] = [
-    { id: '0', name: 'Books', color: 'eucalyptus' },
-    { id: '1', name: 'Tuition', color: 'pre-teens' },
-    { id: '2', name: 'Restaurant & Takeout', color: 'yellow-red' },
-    { id: '3', name: 'Girlfriend Tax', color: 'coral' },
-    { id: '4', name: 'Groceries', color: 'blue' },
-    { id: '5', name: 'Misc.', color: 'twenty-twenty' },
-    { id: '6', name: 'Clothes', color: 'chocolate-banana' },
-    { id: '7', name: 'Gas', color: 'moss' },
-]
-
 const budgets: Budget[] = [
     { categoryId: '0', type: 'absolute', amount: 30 },
     { categoryId: '1', type: 'absolute', amount: 1600 },
@@ -56,6 +45,8 @@ const HomePage = () => {
     const [income, setIncome] = React.useState(4000)
     const [showBreakdown, setShowBreakdown] = React.useState(true)
 
+    const categories = []
+
     return (
         <div>
             <AppBar>Budgeting</AppBar>
@@ -79,7 +70,7 @@ const HomePage = () => {
             <Typography variant='h2'>{`-${makeDollars(1)}`}</Typography>
             <Typography variant='overline'>Savings</Typography>
             <Typography variant='h2'>{`≥${makeDollars(income - 1)}`}</Typography>
-            <CategoryList categories={categories} onChange={null} onCreate={null} />
+            <CategoryList />
 
             <ItemCreator />
         </div>

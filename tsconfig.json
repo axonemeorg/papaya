@@ -5,6 +5,7 @@
       "@/assets/*": ["assets/*"],
       "@/components/*": ["components/*"],
       "@/database/*": ["database/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/pages/*": ["pages/*"],
       "@/public/*": ["public/*"],
       "@/state/*": ["state/*"],

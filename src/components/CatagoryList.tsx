@@ -7,18 +7,15 @@ import {
     ListItemText
 } from '@mui/material'
 
+import { useDispatch, useSelector } from '@/hooks/state'
+import { create, get, update, destroy } from '@/state/slices/categorySlice'
 import { ICategory } from '@/types/app'
 
 import ColorSwatch from '@/components/ColorSwatch'
 
-interface ICategoryListProps {
-    categories: ICategory[]
-    onChange: (categories: ICategory[]) => void
-    onCreate: (name: string, color: string) => void
-}
-
-const CategoryList = (props: ICategoryListProps) => {
-    const { categories } = props
+const CategoryList = () => {
+    const dispatch = useDispatch()
+    const categories: ICategory[] = useSelector((state) => state.categories.categories)
 
     return (
         <List>
