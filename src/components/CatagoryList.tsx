@@ -7,9 +7,9 @@ import {
     ListItemText
 } from '@mui/material'
 
-import { ICategory } from '../types'
+import { ICategory } from '@/types/app'
 
-import ColorSwatch from './ColorSwatch'
+import ColorSwatch from '@/components/ColorSwatch'
 
 interface ICategoryListProps {
     categories: ICategory[]

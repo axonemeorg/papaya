@@ -11,12 +11,11 @@ import {
     Typography
 } from '@mui/material'
 
-import { Budget, IAbsoluteBudget, ICategory } from '../types'
-import CategoryList from '../components/CatagoryList'
-import ColorText from '../components/ColorText'
-import ItemCreator from '../components/ItemCreator'
+import { Budget, IAbsoluteBudget, ICategory } from '@/types/app'
 
-// import { colors } from '../components/ColorSwatch'
+import CategoryList from '@/components/CatagoryList'
+import ColorText from '@/components/ColorText'
+import ItemCreator from '@/components/ItemCreator'
 
 const categories : ICategory[] = [
     { id: '0', name: 'Books', color: 'eucalyptus' },
@@ -80,7 +79,7 @@ const HomePage = () => {
             <Typography variant='h2'>{`-${makeDollars(1)}`}</Typography>
             <Typography variant='overline'>Savings</Typography>
             <Typography variant='h2'>{`≥${makeDollars(income - 1)}`}</Typography>
-            <CategoryList categories={categories} />
+            <CategoryList categories={categories} onChange={null} onCreate={null} />
 
             <ItemCreator />
         </div>

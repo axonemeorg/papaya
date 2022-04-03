@@ -1,7 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import { Color } from './ColorSwatch'
+import { Color } from '@/types/app'
 
 interface IColorTextProps extends React.HTMLProps<HTMLSpanElement> {
     colorString: Color
