@@ -1,0 +1,67 @@
+.color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50px;
+    display: block;
+    background-color: #444;
+
+    &.--coral {
+        background-color: #EF5350;
+    }
+
+    &.--penelope {
+        background-color: #EC407A;
+    }
+
+    &.--sunday {
+        background-color: #AB47BC;
+    }
+
+    &.--grimace {
+        background-color: #7E57C2;
+    }
+
+    &.--blue {
+        background-color: #5C6BC0;
+    }
+
+    &.--ocean {
+        background-color: #42A5F5;
+    }
+
+    &.--pre-teens {
+        background-color: #26C6DA;
+    }
+
+    &.--eucalyptus {
+        background-color: #2E7D32;
+    }
+
+    &.--moss {
+        background-color: #9CCC65;
+    }
+
+    &.--sunshine {
+        background-color: #FFCA28;
+    }
+
+    &.--yellow-red {
+        background-color: #FFA726;
+    }
+
+    &.--ginger-beard {
+        background-color: #FF7043;
+    }
+
+    &.--chocolate-banana {
+        background-color: #8D6E63;
+    }
+
+    &.--matte {
+        background-color: #BDBDBD;
+    }
+
+    &.--twenty-twenty {
+        background-color: #78909C;
+    }
+}

@@ -1,0 +1,68 @@
+.color-text {
+    
+    background-image: $default-gradient;
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    &.--coral {
+        background-image: -webkit-linear-gradient(180deg, #E57373, #F44336);
+    }
+
+    &.--penelope {
+        background-image: -webkit-linear-gradient(180deg, #F06292, #E91E63);
+    }
+
+    &.--sunday {
+        background-image: -webkit-linear-gradient(180deg, #BA68C8, #8E24AA);
+    }
+
+    &.--grimace {
+        background-image: -webkit-linear-gradient(180deg, #BA68C8, #9C27B0);
+    }
+
+    &.--blue {
+        background-image: -webkit-linear-gradient(180deg, #7986CB, #3F51B5);
+    }
+
+    &.--ocean {
+        background-image: -webkit-linear-gradient(180deg, #000, #000);
+    }
+
+    &.--pre-teens {
+        background-image: -webkit-linear-gradient(180deg, #4DD0E1, #00ACC1);
+    }
+
+    &.--eucalyptus {
+        background-image: -webkit-linear-gradient(180deg, #388E3C, #1B5E20);
+    }
+
+    &.--moss {
+        background-image: -webkit-linear-gradient(180deg, #AED581, #8BC34A);
+    }
+
+    &.--sunshine {
+        background-image: -webkit-linear-gradient(180deg, #FFF176, #FFEB3B);
+    }
+
+    &.--yellow-red {
+        background-image: -webkit-linear-gradient(180deg, #FFB74D, #FF9800);
+    }
+
+    &.--ginger-beard {
+        background-image: -webkit-linear-gradient(180deg, #FF8A65, #FF5722);
+    }
+
+    &.--chocolate-banana {
+        background-image: -webkit-linear-gradient(180deg, #A1887F, #795548);
+    }
+
+    &.--matte {
+        background-image: -webkit-linear-gradient(180deg, #E0E0E0, #9E9E9E);
+    }
+
+    &.--twenty-twenty {
+        background-image: -webkit-linear-gradient(180deg, #90A4AE, #607D8B);
+    }
+
+}
