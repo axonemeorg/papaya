@@ -1,10 +1,13 @@
 import React from 'react'
 
 import {
+    Divider,
+    Icon,
     List,
     ListItem,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    MenuItem
 } from '@mui/material'
 
 import { useDispatch, useSelector } from '@/hooks/state'
@@ -20,11 +23,18 @@ const CategoryList = () => {
     return (
         <List>
             {categories.map((category: ICategory, index: number) => (
-                <ListItem key={index}>
-                    <ListItemIcon><ColorSwatch colorString={category.color} /></ListItemIcon>
+                <MenuItem key={index}>
+                    <ListItemIcon>
+                        <ColorSwatch colorString={category.color} square />
+                    </ListItemIcon>
                     <ListItemText primary={category.name} secondary={category.description}></ListItemText>
-                </ListItem>
+                </MenuItem>
             ))}
+            <Divider />
+            <MenuItem>
+                <ListItemIcon><Icon>add</Icon></ListItemIcon>
+                <ListItemText primary='Create Category' />
+            </MenuItem>
         </List>
     )
 }

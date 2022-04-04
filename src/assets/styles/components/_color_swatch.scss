@@ -1,9 +1,15 @@
 .color-swatch {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50px;
     display: block;
     background-color: #444;
+
+    &.--square {
+        border-radius: 4px;
+        width: 14px;
+        height: 14px;
+    }
 
     &.--coral {
         background-color: #EF5350;

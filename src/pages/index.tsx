@@ -12,27 +12,11 @@ import {
 } from '@mui/material'
 
 import { Budget, IAbsoluteBudget, ICategory } from '@/types/app'
+import { makeDollars } from '@/utils/string'
 
 import CategoryList from '@/components/CatagoryList'
 import ColorText from '@/components/ColorText'
 import ItemCreator from '@/components/ItemCreator'
-
-const budgets: Budget[] = [
-    { categoryId: '0', type: 'absolute', amount: 30 },
-    { categoryId: '1', type: 'absolute', amount: 1600 },
-    { categoryId: '2', type: 'absolute', amount: 240 },
-    { categoryId: '3', type: 'absolute', amount: 100 },
-    { categoryId: '4', type: 'absolute', amount: 200 },
-    { categoryId: '5', type: 'absolute', amount: 100 },
-    { categoryId: '6', type: 'absolute', amount: 50 },
-    { categoryId: '7', type: 'absolute', amount: 200 },
-]
-
-const makeDollars = (d: number): string => {
-    return d % 1 === 0
-        ? `$${d}`
-        : `$${Math.round(d * 100) / 100}`
-}
 
 const calculateSpending = (categoryId: string, budgets: Budget[]): number => {
     return budgets.filter((budget: Budget) => budget.categoryId === categoryId)
@@ -58,7 +42,7 @@ const HomePage = () => {
                     <li style={{ display: 'flex', alignItems: 'baseline'}}>
                         <Typography variant='h2'>
                             <ColorText colorString={category.color}>
-                                {`${makeDollars(calculateSpending(category.id, budgets))} `}
+                                {`${makeDollars(calculateSpending(category.id, []))} `}
                             </ColorText>
                         </Typography>
                         <Typography variant='h6' color='#999'>

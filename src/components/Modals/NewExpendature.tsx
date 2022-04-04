@@ -9,7 +9,7 @@ import {
     TextField
 } from '@mui/material'
 
-import { makeFormName } from '@/utils/makeFormName'
+import { makeFormName } from '@/utils/string'
 
 const NewExpendature = () => {
     const [newExpendature, setNewExpendature] = React.useState(null)

@@ -8,6 +8,7 @@ export interface ICategory {
 }
 
 export interface IBudget {
+    id: string
     categoryId: string
     memo?: string
 }
@@ -28,12 +29,32 @@ export interface IOccuranceBudget extends IBudget {
     meanExpendature: number
 }
 
-export type Budget = IPercentageBudget | IAbsoluteBudget | IOccuranceBudget
+export interface ISavingsBudget extends IBudget {
+    type: 'savings'
+    quota: number
+}
+
+export type Budget =
+    | IPercentageBudget
+    | IAbsoluteBudget
+    | IOccuranceBudget
+    | ISavingsBudget
+
+// export type BudgetType = Extract<Budget, 'type'>
 
 export interface IExpendature {
+    id: string
     amount: number
     categoryId: string
+    timestamp: Date
+    // againstCategoryId?: string
     memo?: string
+}
+
+export interface IInvestment {
+    id: string
+    categoryId: string
+    amount: number
 }
 
 export type Color =

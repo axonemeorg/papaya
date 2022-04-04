@@ -5,13 +5,17 @@ import { Color } from '@/types/app'
 
 interface IColorSwatchProps extends React.HTMLProps<HTMLDivElement> {
     colorString: Color
+    square?: boolean
 }
 
 const ColorSwatch = (props: IColorSwatchProps) => {
-    const { colorString, className, ...rest } = props
+    const { colorString, className, square, ...rest } = props
 
     return (
-        <div className={classNames('color-swatch', className, `--${colorString}`)} />
+        <div
+            className={classNames('color-swatch', className, `--${colorString}`, { '--square': square })}
+            {...rest}
+        />
     )
 }
 
