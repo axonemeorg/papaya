@@ -1,5 +1,6 @@
-import { DataTypes, Model } from 'sequelize'
-import connection from '..'
+import { DataTypes, Model, ModelAttributes } from 'sequelize'
+
+import connection from '@/database'
 
 interface IUserModel {
     id: string
@@ -11,7 +12,7 @@ interface IUserModel {
 
 export default class User extends Model<IUserModel> {}
 
-User.init({
+export const config: ModelAttributes<User, IUserModel> = {
     id: {
         type: DataTypes.UUIDV4,
         primaryKey: true,
@@ -34,7 +35,8 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false
     }
-}, {
-    sequelize: connection,
-    tableName: 'users'
-})
+}
+
+export const tableName: string = 'users'
+
+User.init(config, { sequelize: connection, tableName })
