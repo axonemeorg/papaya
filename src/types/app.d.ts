@@ -40,7 +40,7 @@ export type Budget =
     | IOccuranceBudget
     | ISavingsBudget
 
-// export type BudgetType = Extract<Budget, 'type'>
+export type BudgetType = Budget['type']
 
 export interface IExpendature {
     id: string
