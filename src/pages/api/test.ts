@@ -1,7 +1,7 @@
-import { dbConnection } from '@/database/connection'
+import connection from '@/database'
 
 export default (request, response) => {
-    dbConnection.authenticate()
+    connection.authenticate()
         .then(() => {
             response.json("Success!")
         })

@@ -5,6 +5,7 @@
       "@/assets/*": ["assets/*"],
       "@/components/*": ["components/*"],
       "@/database/*": ["database/*"],
+      "@/database": ["database/index.ts"],
       "@/hooks/*": ["hooks/*"],
       "@/pages/*": ["pages/*"],
       "@/public/*": ["public/*"],

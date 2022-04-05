@@ -91,3 +91,8 @@ export const colorNamess: Record<Color, string> = {
     'matte': 'Matte',
     'twenty-twenty': 'Twenty-Twenty'
 }
+
+export interface IUser {
+    id: string
+    name: string
+}
