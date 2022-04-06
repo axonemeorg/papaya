@@ -1,8 +1,8 @@
-import connection from '@/database'
+import { PrismaClient } from '@prisma/client'
 
-export default (request, response) => {
-    connection.authenticate()
-        .then(() => {
-            response.json("Success!")
-        })
+const client = new PrismaClient()
+
+export default async (request, response) => {
+    const users = await client.user.findMany()
+    response.json(users)
 }

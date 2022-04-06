@@ -40,6 +40,5 @@
   "exclude": [
     "node_modules",
     "src/**/*.spec.ts"
-  ],
-  "extends": "./tsconfig.json"
+  ]
 }
