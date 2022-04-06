@@ -11,9 +11,42 @@ datasource db {
 }
 
 model User {
-	id			String  @id @default(cuid())
+	id			Int  		@id @default(autoincrement())
 	name		String
   	phoneNumber	String
   	verified	Boolean
   	password	String
+	createdAt	DateTime 	@default(now())
+	updatedAt	DateTime 	@default(now())
+	categories	Category[]
 }
+
+model Category {
+	id			Int			@id @default(autoincrement())
+	name		String
+	color		String
+	description	String
+	user		User		@relation(fields: [userId], references: [id])
+	userId		Int
+	budgets		Budget[]
+	quotas		Quota[]
+}
+
+model Budget {
+	id			Int 		@id @default(autoincrement())
+	amount		Int
+	category 	Category	@relation(fields: [categoryId], references: [id])
+	categoryId	Int
+	memo		String
+}
+
+model Quota {
+	id			Int			@id @default(autoincrement())
+	category 	Category	@relation(fields: [categoryId], references: [id])
+	categoryId	Int
+	memo		String
+}
+
+model Investment {}
+
+model Expense {}
