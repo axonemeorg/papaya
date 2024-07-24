@@ -1,0 +1,32 @@
+{
+  "name": "zisk-core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "@types/pg": "^8.11.6",
+    "dotenv-cli": "^7.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "dotenv-expand": "^11.0.6",
+    "drizzle-kit": "^0.23.0",
+    "drizzle-orm": "^0.32.0",
+    "knex": "^3.1.0",
+    "pg": "^8.11.5",
+    "tsx": "^4.16.2"
+  },
+  "scripts": {
+    "migrate-latest": "NODE_OPTIONS='--loader ts-node/esm' dotenv -e ../.env -- knex migrate:latest --knexfile ./src/knexfile.ts",
+    "migrate-rollback": "NODE_OPTIONS='--loader ts-node/esm' dotenv -e ../.env -- knex migrate:rollback --knexfile ./src/knexfile.ts",
+    "seed": "knex seed:run --knexfile ./src/knexfile.ts",
+    "generate": "npx drizzle-kit generate",
+    "migrate": "npx tsx src/migrate.ts",
+    "test": "npx tsx src/test"
+  }
+}
