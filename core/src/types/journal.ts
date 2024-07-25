@@ -1,9 +1,8 @@
+import { getJournalEntries } from "api/actions/journal-actions";
+import { InferSelectModel } from "drizzle-orm";
 
 
-interface JournalEntry {
-    memo: string;
-    transactions: Transaction
-}
+// type JournalEntry = 
 
 enum TransactionType {
     DEBIT = 'DEBIT',
