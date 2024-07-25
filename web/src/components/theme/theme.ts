@@ -1,5 +1,6 @@
 'use client'
 
+import { montserrat } from "@/app/layout";
 import { createTheme } from "@mui/material";
 
 /**
@@ -13,7 +14,7 @@ const appTheme = createTheme({
         // }
     },
     typography: {
-        fontFamily: ['Montserrat', 'Arial', 'sans-serif'].join(', '),
+        fontFamily: montserrat.style.fontFamily
     }
 });
 

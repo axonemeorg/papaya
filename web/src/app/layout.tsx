@@ -1,26 +1,21 @@
-'use server'
-
+import {
+    Montserrat,
+} from 'next/font/google'
 import { CssBaseline, Stack, ThemeProvider } from '@mui/material'
 import type { PropsWithChildren } from 'react'
 import Header from '../components/header/Header'
 import appTheme from '../components/theme/theme'
 import BaseLayout from '../components/layout/BaseLayout'
 
-/**
- * The base layout for the application. With the Next.js app router, this
- * includes not only shared layout code, but also metadata tags used for the
- * HTML document. Notably, this layout imports fonts from Google Fonts.
- */
+export const montserrat = Montserrat({ subsets: ['latin'] });
+
 export default async (props: PropsWithChildren) => {
 	return (
-		<html lang='en'>
+		<html
+			lang='en'
+			className={montserrat.className}
+		>
 			<head>
-				<link rel="preconnect" href="https://fonts.googleapis.com" />
-				<link rel="preconnect" href="https://fonts.gstatic.com" />
-				<link
-					rel="stylesheet"
-					href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap"
-				/>
 				<title>Zisk</title>
 				<link rel="icon" href="favicon.ico" />
 			</head>
