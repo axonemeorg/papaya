@@ -8,9 +8,9 @@ import { createTheme } from "@mui/material";
 const appTheme = createTheme({
     palette: {
         mode: 'dark',
-        primary:{
-            main: 'rgb(255, 12, 12)'
-        }
+        // primary:{
+        //     // main: 'rgb(255, 12, 12)'
+        // }
     },
     typography: {
         fontFamily: ['Montserrat', 'Arial', 'sans-serif'].join(', '),
