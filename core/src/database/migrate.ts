@@ -1,4 +1,4 @@
-import { pool } from "client";
+import { pool } from "./client";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
@@ -7,7 +7,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
  */
 async function run() {
     await migrate(drizzle(pool), {
-        migrationsFolder: './migrations'
+        migrationsFolder: './src/database/migrations'
     });
 
     await pool.end();

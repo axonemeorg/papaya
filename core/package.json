@@ -26,7 +26,7 @@
     "migrate-rollback": "NODE_OPTIONS='--loader ts-node/esm' dotenv -e ../.env -- knex migrate:rollback --knexfile ./src/knexfile.ts",
     "seed": "knex seed:run --knexfile ./src/knexfile.ts",
     "generate": "npx drizzle-kit generate",
-    "migrate": "npx tsx src/migrate.ts",
+    "migrate": "npx tsx src/database/migrate.ts",
     "test": "npx tsx src/test"
   }
 }
