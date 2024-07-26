@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle, TextField } from "@mui/material";
 
 
-export default function TransactionMethod() {
+export default function TransactionMethodModal() {
     return (
         <Dialog open={false} fullWidth>
             <DialogTitle>Add Transaction Method</DialogTitle>

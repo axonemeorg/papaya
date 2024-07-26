@@ -18,6 +18,10 @@ export default async (props: PropsWithChildren) => {
 			<head>
 				<title>Zisk</title>
 				<link rel="icon" href="favicon.ico" />
+				<link
+					rel="stylesheet"
+					href="https://fonts.googleapis.com/icon?family=Material+Icons"
+				/>
 			</head>
 			<body>
 				<ThemeProvider theme={appTheme}>

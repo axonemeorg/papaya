@@ -20,9 +20,9 @@ export const createJournalEntry = async (memo: string, transactions: any[]) => {
 	// 	.values()	
 }
 
-// export const createTransaction = async () => {
+export const createTransaction = async () => {
 	
-// }
+}
 
 export const getJournalEntries = () => {
 	return db.query.JournalEntryTable.findMany({
