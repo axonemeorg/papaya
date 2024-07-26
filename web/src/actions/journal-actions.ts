@@ -1,5 +1,5 @@
-import db from 'database/client'
-import { JournalEntryTable } from 'database/schemas';
+import db from '@/database/client'
+import { JournalEntryTable } from '@/database/schemas';
 import { sql, and, eq, max } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 

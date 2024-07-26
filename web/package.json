@@ -28,6 +28,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "next -p 9475",
     "build": "next build",
-    "start": "next start -p 9475"
+    "start": "next start -p 9475",
+    "generate": "npx drizzle-kit generate",
+    "migrate": "npx tsx src/database/migrate.ts"
   }
 }

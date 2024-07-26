@@ -5,7 +5,7 @@ import { Button, Dialog, DialogActions, DialogContent,  DialogTitle} from "@mui/
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateJournalEntry } from 'core/src/types/journal'
+import { CreateJournalEntry } from '@/types/journal'
 
 
 export default function JournalEntryModal() {
