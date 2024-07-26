@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 import * as schema from './schemas'
+import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 
 const env = dotenv.config({ path: '../.env' });
 dotenvExpand.expand(env);
@@ -20,5 +21,8 @@ export const pool = new Pool({
     port,
 });
 
-export default drizzle(pool, { schema, logger: true });
+const db = drizzle(pool, { schema, logger: true });
 
+export const luciaAdapter = new DrizzlePostgreSQLAdapter(db, schema.SessionTable, schema.UserTable);
+
+export default db;
