@@ -25,7 +25,7 @@ export const TransactionTable = pgTable("transaction", {
     journalEntryId: integer('journal_entry_id').references(() => JournalEntryTable.journalEntryId),
     transactionType: TransactionType('transaction_type').notNull(),
     amount: integer('amount').notNull(),
-    memo: varchar('memo', { length: 1023 }),
+    memo: varchar('memo', { length: 1023 }), // Optional
     transactionMethodId: integer('transaction_method_id').references(() => TransactionMethodTable.transactionMethodId),
     ...timestamps
 });

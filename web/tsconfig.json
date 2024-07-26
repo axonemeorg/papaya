@@ -6,7 +6,8 @@
       "esnext"
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "core/*": ["../core/*"]
     },
     "allowJs": true,
     "skipLibCheck": true,

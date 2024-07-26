@@ -1,46 +1,38 @@
-import { getJournalEntries } from "api/actions/journal-actions";
-import { InferSelectModel } from "drizzle-orm";
+import { z } from "zod"
 
+export const TransactionType = z.enum([
+    'DEBIT',
+    'CREDIT'
+]);
+export type TransactionType = z.infer<typeof TransactionType>;
 
-// type JournalEntry = 
+export const PaymentType = z.enum([
+    'CASH',
+    'ETRANSFER',
+    'DEBIT',
+    'CREDIT',
+]);
+export type PaymentType = z.infer<typeof PaymentType>;
 
-enum TransactionType {
-    DEBIT = 'DEBIT',
-    CREDIT = 'CREDIT'
-}
+export const CreateTransaction = z.object({
+    type: TransactionType,
+    date: z.string().min(1, "A date is required"),
+    amount: z.number(),
+    memo: z.string().optional(),
+    paymentType: PaymentType,
+    transactionMethodId: z.number()
+});
+export type CreateTransaction = z.infer<typeof CreateTransaction>;
 
-interface Transaction {
-    type: TransactionType;
-    date: Date;
-    amount: number;
-    memo: string | null;
-    paymentType: PaymentType;
-    method: TransactionMethod;
-}
+export const CreateJournalEntry = z.object({
+    memo: z.string().min(1, "Add a description"),
+    transactions: z.array(CreateTransaction)
+});
+export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;
 
-enum PaymentType {
-    CASH = 'CASH',
-    ETRANSFER = 'ETRANSFER',
-    DEBIT = 'DEBIT',
-    CREDIT = 'CREDIT',
-}
-
-interface TransactionMethod {
-    label: string;
-    defaultPaymentType: PaymentType;
-    icon: string;
-}
-
-// const exampleTransactions: Transaction[] = [
-//     {
-//         type: TransactionType.DEBIT,
-//         amount: 2000,
-//         date: new Date(),
-//         paymentType: PaymentType.ETRANSFER,
-//         method: {
-//             label: 'Stephanie',
-//             defaultPaymentType: PaymentType.ETRANSFER,
-//             icon: ''
-//         }
-//     }
-// ]
+export const TransactionMethod = z.object({
+    label: z.string(),
+    defaultPaymentType: PaymentType,
+    // icon: string;
+});
+export type TransactionMethod = z.infer<typeof TransactionMethod>;
