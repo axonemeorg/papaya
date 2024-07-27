@@ -4,9 +4,11 @@ import {
     pgTable,
     timestamp,
     integer,
+    text,
 } from 'drizzle-orm/pg-core'
 
 import { PaymentType, TransactionType } from './enums';
+import { UserTable } from './auth';
 
 const timestamps = {
     createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -32,6 +34,9 @@ export const TransactionTable = pgTable("transaction", {
 
 export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: serial('journal_entry_id').primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => UserTable.id),
     memo: varchar('memo', { length: 1024 }).notNull(),
     ...timestamps
 });
