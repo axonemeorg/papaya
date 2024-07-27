@@ -14,7 +14,7 @@ export type Timestamps = z.infer<typeof Timestamps>;
 
 export const TransactionMethod = Timestamps.extend({
     transactionMethodId: z.number(),
-    userId: z.string(),
+    // userId: z.string(), // TODO ideally we should not fetch this.
     label: z.string(),
     defaultPaymentType: PaymentType
 });

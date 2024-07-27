@@ -1,16 +1,17 @@
 'use client';
 
-import { Grid, TextField } from "@mui/material";
-import { useState } from "react";
-import TransactionMethod from "../input/TransactionMethodAutocomplete";
+import { AutocompleteProps, Grid, TextField } from "@mui/material";
+import { useContext, useState } from "react";
 import { Add, Delete } from "@mui/icons-material";
 import DateTimePicker from "../date/DateTimePicker";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateTransactionMethod } from "@/types/post";
 import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
 import { PaymentType } from "@/types/enum";
+import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 
 export default function TransactionMethodForm() {
+    const { transactionMethods } = useContext(TransactionMethodContext);
     const { register, control, setValue } = useFormContext<CreateTransactionMethod>();
 
     return (

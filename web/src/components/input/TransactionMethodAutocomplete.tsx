@@ -2,14 +2,19 @@
 
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { CreditCard } from "@mui/icons-material";
-import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField } from "@mui/material";
+import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps } from "@mui/material";
 import { CSSProperties, useContext, useMemo } from "react";
+import { type TransactionMethod } from "@/types/get";
 
 interface IconWithGradientProps {
     icon: string;
     primaryColor: string;
     secondaryColor: string;
 }
+
+type TransactionMethodAutocompleteProps = 
+    & Omit<AutocompleteProps<TransactionMethod, false, false, false>, 'options'>
+    & Partial<Pick<AutocompleteProps<TransactionMethod, false, false, false>, 'options'>>
 
 const IconWithGradient = (props: IconWithGradientProps) => {
     const { icon, primaryColor, secondaryColor } = props;
@@ -25,22 +30,13 @@ const IconWithGradient = (props: IconWithGradientProps) => {
     )
 }
 
-export default function TransactionMethodAutocomplete() {
+export default function TransactionMethodAutocomplete(props: TransactionMethodAutocompleteProps) {
     const { transactionMethods } = useContext(TransactionMethodContext);
-
-    const transactionMethodOptions = useMemo(() => {
-        return transactionMethods.map((method) => {
-            return {
-                label: method.label
-            }
-        })
-    }, [transactionMethods]);
 
     return (
         <Autocomplete
-            options={transactionMethodOptions}
-            sx={{ flex: 1 }}
-            renderInput={(params) => <TextField {...params} label="Method" />}            
+            options={transactionMethods}
+            renderInput={(params) => <TextField {...params} label="Method" />}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
                 return (
@@ -61,6 +57,12 @@ export default function TransactionMethodAutocomplete() {
                         <ListItemText primary={option.label} />
                     </ListItem>
                 );
+            }}
+            getOptionLabel={(option) => option.label}
+            {...props}
+            sx={{
+                flex: 1,
+                ...props.sx
             }}
         />
     )

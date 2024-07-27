@@ -32,7 +32,7 @@ export const createJournalEntry = async (memo: string, transactions: CreateTrans
 				transactionType: transaction.transactionType,
 				memo: transaction.memo,
 				paymentType: transaction.transactionType,
-				transactionMethodId: transaction.transactionMethodId
+				transactionMethodId: transaction.transactionMethod.transactionMethodId
 			}
 		}))
 }
