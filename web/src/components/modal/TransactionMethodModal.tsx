@@ -1,3 +1,5 @@
+'use client'
+
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import TransactionMethodForm from "../form/TransactionMethodForm";
 import { Add } from "@mui/icons-material";
@@ -8,6 +10,7 @@ import { createTransactionMethod } from "@/actions/method-actions";
 import { FormProvider, useForm } from "react-hook-form";
 import { PaymentType } from "@/types/enum";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoadingButton } from "@mui/lab";
 
 interface TransactionMethodModalProps {
     open: boolean;
@@ -21,7 +24,7 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
         setSaving(true);
         createTransactionMethod(formData)
             .then(() => {
-
+                props.onClose();
             })
             .catch(() => {
 
@@ -39,12 +42,10 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
         resolver: zodResolver(CreateTransactionMethod)
     });
 
-    
-
     return (
         <FormProvider {...createTransactionMethodForm}>
-            <form onSubmit={createTransactionMethodForm.handleSubmit(handleCreateTransactionMethod)}>
-                <Dialog open={props.open} fullWidth onClose={props.onClose}>
+            <Dialog open={props.open} fullWidth onClose={props.onClose}>
+                <form onSubmit={createTransactionMethodForm.handleSubmit(handleCreateTransactionMethod)}>
                     <DialogTitle>Add Transaction Method</DialogTitle>
                     <DialogContent>
                         <DialogContentText mb={4}>Transaction methods indicate how your money is being spent.</DialogContentText>
@@ -52,10 +53,10 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => props.onClose()}>Cancel</Button>
-                        <Button type='submit' variant='contained' startIcon={<Add />}>Add</Button>
+                        <LoadingButton loading={saving} type='submit' variant='contained' startIcon={<Add />}>Add</LoadingButton>
                     </DialogActions>
-                </Dialog>
-            </form>
+                </form>
+            </Dialog>
         </FormProvider>
     )
 }

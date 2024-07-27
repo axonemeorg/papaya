@@ -1,3 +1,5 @@
+'use server'
+
 import db from "@/database/client"
 import { TransactionMethodTable } from "@/database/schemas"
 import { type CreateTransactionMethod } from "@/types/post";

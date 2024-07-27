@@ -5,12 +5,13 @@ import { useState } from "react";
 import TransactionMethod from "../input/TransactionMethod";
 import { Add, Delete } from "@mui/icons-material";
 import DateTimePicker from "../date/DateTimePicker";
-import PaymentType from "../input/PaymentType";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { CreateTransactionMethod } from "@/types/post";
+import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
+import { PaymentType } from "@/types/enum";
 
 export default function TransactionMethodForm() {
-    const { register } = useFormContext<CreateTransactionMethod>();
+    const { register, control, setValue } = useFormContext<CreateTransactionMethod>();
 
     return (
         <>
@@ -26,7 +27,18 @@ export default function TransactionMethodForm() {
                     />
                 </Grid>
                 <Grid item xs={1}>
-                    <PaymentType />
+                <Controller<CreateTransactionMethod>
+                    name='defaultPaymentType'
+                    control={control}
+                    render={({ field }) => (
+                        <PaymentTypeAutocomplete
+                            renderInput={(params) => <TextField {...params} label="Default Payment Type" />}
+                            {...field}
+                            value={field.value as PaymentType}
+                            onChange={(_event, newValue) => setValue(field.name, newValue)}                            
+                        />
+                    )}
+                />
                 </Grid>
             </Grid>
         </>
