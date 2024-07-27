@@ -1,24 +1,41 @@
+import { validateRequest } from '@/auth';
 import db from '@/database/client'
-import { JournalEntryTable } from '@/database/schemas';
-import { sql, and, eq, max } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { JournalEntryTable, TransactionTable } from '@/database/schemas';
+import { CreateTransaction } from '@/types/post';
+import { eq } from 'drizzle-orm';
 
-// export const createJournalEntry = async (memo: string, transactions: any[]) => {
-// 	const result = await db
-// 		.insert(JournalEntryTable)
-// 		.values({
-// 			memo
-// 		})
-// 		.returning({
-// 			journalEntryId: JournalEntryTable.journalEntryId
-// 		});
+export const createJournalEntry = async (memo: string, transactions: CreateTransaction[]) => {
+	const { user } = await validateRequest();
 
-// 	const { journalEntryId } = result[0];
+    if (!user) {
+        throw new Error('Not authorized.');
+    }
 
-// 	// await db
-// 	// 	.insert(Transaction)
-// 	// 	.values()	
-// }
+	const result = await db
+		.insert(JournalEntryTable)
+		.values({
+			userId: user.id,
+			memo,
+		})
+		.returning({
+			journalEntryId: JournalEntryTable.journalEntryId
+		});
+
+	const { journalEntryId } = result[0];
+
+	await db
+		.insert(TransactionTable)
+		.values(transactions.map((transaction) => {
+			return {
+				journalEntryId,
+				amount: transaction.amount,
+				transactionType: transaction.transactionType,
+				memo: transaction.memo,
+				paymentType: transaction.transactionType,
+				transactionMethodId: transaction.transactionMethodId
+			}
+		}))
+}
 
 export const createTransaction = async () => {
 	

@@ -2,9 +2,9 @@
 
 import { Box, Button, Collapse, Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import TransactionMethod from "../input/TransactionMethod";
 import { Add, Delete } from "@mui/icons-material";
 import DateTimePicker from "../date/DateTimePicker";
+import TransactionMethodAutocomplete from "../input/TransactionMethodAutocomplete";
 
 
 export default function JournalEntryForm() {
@@ -48,7 +48,7 @@ export default function JournalEntryForm() {
                         }}
                         sx={{ flex: 1 }}
                     />
-                    <TransactionMethod />
+                    <TransactionMethodAutocomplete />
                     <DateTimePicker />
                     {showAdvancedControls && (
                         <IconButton>

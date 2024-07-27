@@ -25,7 +25,7 @@ const IconWithGradient = (props: IconWithGradientProps) => {
     )
 }
 
-export default function TransactionMethod() {
+export default function TransactionMethodAutocomplete() {
     const { transactionMethods } = useContext(TransactionMethodContext);
 
     const transactionMethodOptions = useMemo(() => {

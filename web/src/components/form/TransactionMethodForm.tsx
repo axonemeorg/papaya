@@ -2,7 +2,7 @@
 
 import { Grid, TextField } from "@mui/material";
 import { useState } from "react";
-import TransactionMethod from "../input/TransactionMethod";
+import TransactionMethod from "../input/TransactionMethodAutocomplete";
 import { Add, Delete } from "@mui/icons-material";
 import DateTimePicker from "../date/DateTimePicker";
 import { Controller, useFormContext } from "react-hook-form";

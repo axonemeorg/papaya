@@ -1,13 +1,14 @@
 import { z } from "zod"
 import { PaymentType, TransactionType } from "./enum";
+import { TransactionMethod } from "./get";
 
 export const CreateTransaction = z.object({
-    type: TransactionType,
+    transactionType: TransactionType,
+    paymentType: PaymentType,
     date: z.string().min(1, "A date is required"),
     amount: z.number(),
     memo: z.string().optional(),
-    paymentType: PaymentType,
-    transactionMethodId: z.number()
+    transactionMethod: TransactionMethod
 });
 export type CreateTransaction = z.infer<typeof CreateTransaction>;
 
