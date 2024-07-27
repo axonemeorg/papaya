@@ -1,18 +1,5 @@
 import { z } from "zod"
-
-export const TransactionType = z.enum([
-    'DEBIT',
-    'CREDIT'
-]);
-export type TransactionType = z.infer<typeof TransactionType>;
-
-export const PaymentType = z.enum([
-    'CASH',
-    'ETRANSFER',
-    'DEBIT',
-    'CREDIT',
-]);
-export type PaymentType = z.infer<typeof PaymentType>;
+import { PaymentType, TransactionType } from "./enum";
 
 export const CreateTransaction = z.object({
     type: TransactionType,
@@ -30,9 +17,9 @@ export const CreateJournalEntry = z.object({
 });
 export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;
 
-export const TransactionMethod = z.object({
+export const CreateTransactionMethod = z.object({
     label: z.string(),
     defaultPaymentType: PaymentType,
     // icon: string;
 });
-export type TransactionMethod = z.infer<typeof TransactionMethod>;
+export type CreateTransactionMethod = z.infer<typeof CreateTransactionMethod>;

@@ -1,4 +1,10 @@
 DO $$ BEGIN
+ CREATE TYPE "public"."payment_type" AS ENUM('CASH', 'ETRANSFER', 'DEBIT', 'CREDIT');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."transaction_type" AS ENUM('DEBIT', 'CREDIT');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -19,15 +25,17 @@ CREATE TABLE IF NOT EXISTS "user" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "journal_entry" (
 	"journal_entry_id" serial PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
 	"memo" varchar(1024) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "transaction_method" (
-	"transaction_id" serial PRIMARY KEY NOT NULL,
-	"memo" varchar(1024),
-	"default_payment_type" "transaction_type" NOT NULL,
+	"transaction_method_id" serial PRIMARY KEY NOT NULL,
+	"user_id" text,
+	"label" varchar(128),
+	"default_payment_type" "payment_type" NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
@@ -50,13 +58,25 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "journal_entry" ADD CONSTRAINT "journal_entry_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "transaction_method" ADD CONSTRAINT "transaction_method_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "transaction" ADD CONSTRAINT "transaction_journal_entry_id_journal_entry_journal_entry_id_fk" FOREIGN KEY ("journal_entry_id") REFERENCES "public"."journal_entry"("journal_entry_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "transaction" ADD CONSTRAINT "transaction_transaction_method_id_transaction_method_transaction_id_fk" FOREIGN KEY ("transaction_method_id") REFERENCES "public"."transaction_method"("transaction_id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "transaction" ADD CONSTRAINT "transaction_transaction_method_id_transaction_method_transaction_method_id_fk" FOREIGN KEY ("transaction_method_id") REFERENCES "public"."transaction_method"("transaction_method_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
