@@ -1,7 +1,9 @@
+'use client'
+
+import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { CreditCard } from "@mui/icons-material";
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField } from "@mui/material";
-import { CSSProperties, useMemo } from "react";
-
+import { CSSProperties, useContext, useMemo } from "react";
 
 interface IconWithGradientProps {
     icon: string;
@@ -23,26 +25,16 @@ const IconWithGradient = (props: IconWithGradientProps) => {
     )
 }
 
-const GradientOpenWithIcon = () => (
-  <>
-    
-  </>
-)
-
-const EXAMPLE_TRANSACTION_METHODS = [
-    {
-        label: "Mastercard"
-    }
-]
-
 export default function TransactionMethod() {
+    const { transactionMethods } = useContext(TransactionMethodContext);
+
     const transactionMethodOptions = useMemo(() => {
-        return EXAMPLE_TRANSACTION_METHODS.map((method) => {
+        return transactionMethods.map((method) => {
             return {
                 label: method.label
             }
         })
-    }, [EXAMPLE_TRANSACTION_METHODS]);
+    }, [transactionMethods]);
 
     return (
         <Autocomplete

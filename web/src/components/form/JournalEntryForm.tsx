@@ -4,10 +4,11 @@ import { Box, Button, Collapse, Grid, Icon, IconButton, InputAdornment, Stack, T
 import { useState } from "react";
 import TransactionMethod from "../input/TransactionMethod";
 import { Add, Delete } from "@mui/icons-material";
+import DateTimePicker from "../date/DateTimePicker";
 
 
 export default function JournalEntryForm() {
-    const [formTab, setFormTab] = useState(0);
+    const [formTab, setFormTab] = useState(1);
 
     const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
       setFormTab(newValue);
@@ -48,6 +49,7 @@ export default function JournalEntryForm() {
                         sx={{ flex: 1 }}
                     />
                     <TransactionMethod />
+                    <DateTimePicker />
                     {showAdvancedControls && (
                         <IconButton>
                             <Delete />
