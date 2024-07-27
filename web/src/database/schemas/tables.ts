@@ -25,11 +25,12 @@ export const TransactionMethodTable = pgTable("transaction_method", {
 
 export const TransactionTable = pgTable("transaction", {
     transactionId: serial('transaction_id').primaryKey(),
-    journalEntryId: integer('journal_entry_id').references(() => JournalEntryTable.journalEntryId),
+    journalEntryId: integer('journal_entry_id').references(() => JournalEntryTable.journalEntryId).notNull(),
     transactionType: TransactionType('transaction_type').notNull(),
+    paymentType: PaymentType('payment_type').notNull(),
     amount: integer('amount').notNull(),
     memo: varchar('memo', { length: 1024 }),
-    transactionMethodId: integer('transaction_method_id').references(() => TransactionMethodTable.transactionMethodId),
+    transactionMethodId: integer('transaction_method_id').references(() => TransactionMethodTable.transactionMethodId).notNull(),
     ...timestamps
 });
 
