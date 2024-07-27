@@ -15,7 +15,7 @@ const timestamps = {
 
 export const TransactionMethodTable = pgTable("transaction_method", {
     transactionMethodId: serial('transaction_id').primaryKey(),
-    label: varchar('memo', { length: 1023 }),
+    label: varchar('memo', { length: 1024 }),
     defaultPaymentType: PaymentType('default_payment_type').notNull(),
     ...timestamps
 });
@@ -25,26 +25,13 @@ export const TransactionTable = pgTable("transaction", {
     journalEntryId: integer('journal_entry_id').references(() => JournalEntryTable.journalEntryId),
     transactionType: TransactionType('transaction_type').notNull(),
     amount: integer('amount').notNull(),
-    memo: varchar('memo', { length: 1023 }), // Optional
+    memo: varchar('memo', { length: 1024 }),
     transactionMethodId: integer('transaction_method_id').references(() => TransactionMethodTable.transactionMethodId),
     ...timestamps
 });
 
 export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: serial('journal_entry_id').primaryKey(),
-    memo: varchar('memo', { length: 1023 }).notNull(),
+    memo: varchar('memo', { length: 1024 }).notNull(),
     ...timestamps
 });
-
-// export const JournalTransactionTable = pgTable("journal_transactions", {
-//     journalEntryId: integer('journal_entry_id')
-//         .references(() => JournalEntryTable.journalEntryId)
-//         .notNull(),
-//     transactionId: integer('transaction_id')
-//         .references(() => TransactionTable.transactionId)
-//         .notNull(),
-// }, (_table) => ({
-//     pk: primaryKey({
-//         columns: [JournalEntryTable.journalEntryId, TransactionTable.transactionId]
-//     })
-// }));
