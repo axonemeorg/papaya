@@ -17,7 +17,7 @@ const timestamps = {
 
 export const TransactionMethodTable = pgTable("transaction_method", {
     transactionMethodId: serial('transaction_method_id').primaryKey(),
-    userId: text('user_id').references(() => UserTable.id),
+    userId: text('user_id').references(() => UserTable.id).notNull(),
     label: varchar('label', { length: 128 }).notNull(),
     defaultPaymentType: PaymentType('default_payment_type').notNull(),
     ...timestamps

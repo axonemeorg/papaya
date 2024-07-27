@@ -1,5 +1,6 @@
 'use server'
 
+import { validateRequest } from "@/auth";
 import db from "@/database/client"
 import { TransactionMethodTable } from "@/database/schemas"
 import { type CreateTransactionMethod } from "@/types/post";
@@ -12,7 +13,14 @@ export const getTransactionMethodsByUserId = async (userId: string) => {
 }
 
 export const createTransactionMethod = async (data: CreateTransactionMethod) => {
+    const { user } = await validateRequest();
+
+    if (!user) {
+        throw new Error('Not authorized.');
+    }
+
     const response = await db.insert(TransactionMethodTable).values({
+        userId: user.id,
         label: data.label,
         defaultPaymentType: data.defaultPaymentType
     }).returning({
