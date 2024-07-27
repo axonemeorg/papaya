@@ -18,7 +18,7 @@ export const CreateJournalEntry = z.object({
 export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;
 
 export const CreateTransactionMethod = z.object({
-    label: z.string(),
+    label: z.string().min(1, 'A label is required'),
     defaultPaymentType: PaymentType,
     // icon: string;
 });

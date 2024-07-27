@@ -1,0 +1,1 @@
+ALTER TABLE "transaction_method" ALTER COLUMN "label" SET NOT NULL;
