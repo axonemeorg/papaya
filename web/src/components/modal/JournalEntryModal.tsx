@@ -31,7 +31,7 @@ export default function JournalEntryModal() {
 
     return (
         <FormProvider {...formMethods}>
-            <Dialog open={true} fullWidth>
+            <Dialog open={false} fullWidth>
                 <DialogTitle>Add Entry</DialogTitle>
                 <DialogContent>
                     <JournalEntryForm />
