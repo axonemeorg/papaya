@@ -6,9 +6,9 @@ export const CreateTransaction = z.object({
     transactionType: TransactionType,
     paymentType: PaymentType,
     date: z.string().min(1, "A date is required"),
-    amount: z.number(),
+    amount: z.number().min(0, "A positive number is required"),
     memo: z.string().optional(),
-    transactionMethod: TransactionMethod
+    transactionMethod: TransactionMethod.pick({ transactionMethodId: true })
 });
 export type CreateTransaction = z.infer<typeof CreateTransaction>;
 

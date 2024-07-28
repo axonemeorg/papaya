@@ -7,8 +7,8 @@ import { PaymentType } from "./enum";
 // export type TransactionMethod = InferSelectModel<typeof TransactionMethodTable>
 
 const Timestamps = z.object({
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    createdAt: z.union([z.string(), z.date()]),
+    updatedAt: z.string().nullable(),
 });
 export type Timestamps = z.infer<typeof Timestamps>;
 

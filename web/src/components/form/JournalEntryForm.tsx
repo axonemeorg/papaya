@@ -5,16 +5,121 @@ import { useState } from "react";
 import { Add, Delete } from "@mui/icons-material";
 import DateTimePicker from "../date/DateTimePicker";
 import TransactionMethodAutocomplete from "../input/TransactionMethodAutocomplete";
+import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
+import { CreateJournalEntry } from "@/types/post";
+import { TransactionType } from "@/types/enum";
 
+interface JournalEntryTransactionRowProps {
+    index: number;
+    showAdvancedControls: boolean;
+    fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
+}
+
+const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
+    const { setValue, control } = useFormContext<CreateJournalEntry>();
+
+    return (
+        <Stack direction='row' spacing={1} alignItems='center'>
+            <Controller
+                control={control}
+                name={`transactions.${props.index}.amount` as const}
+                render={({ field }) => (
+                    <TextField
+                        label='Amount'
+                        {...field}
+                        onChange={(event) => {
+                            const value = event.target.value === ''
+                                ? undefined
+                                : Number(event.target.value);
+                            field.onChange(value);
+                        }}
+                        fullWidth
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }}
+                        sx={{ flex: 1 }}
+                    />
+                )}
+            />
+
+            <Controller
+                // TODO using a <Controller> here because whenever the value changes, we need to update this transaction's payment type to match the trnasaction method's default payment type.
+                control={control}
+                name={`transactions.${props.index}.transactionMethod` as const}
+                render={({ field }) => (
+                    <TransactionMethodAutocomplete
+                        {...field}
+                        value={field.value}
+                        onChange={(_event, newValue) => {
+                            setValue(field.name, newValue);
+                            setValue(`transactions.${props.index}.paymentType`, newValue.defaultPaymentType)
+                        }}
+                    />
+                )}
+            />
+            <DateTimePicker />
+            {props.showAdvancedControls && (
+                <IconButton
+                    onClick={() => props.fieldArray.remove(props.index)}
+                    disabled={props.fieldArray.fields.length <= 1}
+                >
+                    <Delete />
+                </IconButton>
+            )}
+        </Stack>
+    )
+}
 
 export default function JournalEntryForm() {
     const [formTab, setFormTab] = useState(1);
+
+    const { register, control, getValues } = useFormContext<CreateJournalEntry>();
+
+    const transactionsFieldArray = useFieldArray<CreateJournalEntry>({
+        name: 'transactions',
+        control
+    });
+
+    const addDebitTransaction = () => {
+        transactionsFieldArray.append({
+            amount: undefined,
+            date: new Date().toISOString(),
+            memo: '',
+            paymentType: undefined,
+            transactionMethod: undefined,
+            transactionType: TransactionType.Enum.DEBIT
+        });
+    }
+
+    const addCreditTransaction = () => {
+        transactionsFieldArray.append({
+            amount: undefined,
+            date: new Date().toISOString(),
+            memo: '',
+            paymentType: undefined,
+            transactionMethod: undefined,
+            transactionType: TransactionType.Enum.CREDIT
+        });
+    }
 
     const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
       setFormTab(newValue);
     };
 
     const showAdvancedControls = formTab === 1;
+
+    const transactions = getValues('transactions');
+    const transactionFields = transactionsFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
+        return [field, index]
+    });
+
+    const debitTransactionFields = transactionFields.filter(([_field, index])  => {
+        return transactions[index].transactionType === TransactionType.Enum.DEBIT
+    });
+
+    const creditTransactionFields = transactionFields.filter(([_field, index])  => {
+        return transactions[index].transactionType === TransactionType.Enum.CREDIT
+    });
 
     return (
         <>
@@ -27,6 +132,7 @@ export default function JournalEntryForm() {
             <TextField
                 name='memo'
                 label='Memo'
+                {...register('memo')}
                 fullWidth
                 multiline
                 maxRows={3}
@@ -37,32 +143,39 @@ export default function JournalEntryForm() {
                     <Typography variant='overline'>Money Out</Typography>
                 </Box>
             )}
-            <Stack mb={2}>
-                <Stack direction='row' spacing={1} alignItems='center'>
-                    <TextField
-                        name='amount'
-                        label='Amount'
-                        fullWidth
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        sx={{ flex: 1 }}
-                    />
-                    <TransactionMethodAutocomplete />
-                    <DateTimePicker />
-                    {showAdvancedControls && (
-                        <IconButton>
-                            <Delete />
-                        </IconButton>
-                    )}
-                </Stack>
+            <Stack mb={2} spacing={2}>
+                {debitTransactionFields.map(([field, index]) => {
+                    return (
+                        <JournalEntryTransactionRow
+                            key={field.id}
+                            index={index}
+                            fieldArray={transactionsFieldArray}
+                            showAdvancedControls={showAdvancedControls}
+                        />
+                    )
+                })}
             </Stack>
+            {showAdvancedControls && (
+                <Button startIcon={<Add />} onClick={() => addDebitTransaction()}>Add Transaction</Button>
+            )}
             {showAdvancedControls && (
                 <>
                     <Box mb={1}>
                         <Typography variant='overline'>Money In</Typography>
                     </Box>
-                    <Button startIcon={<Add />}>Add Transaction</Button>
+                    <Stack mb={2} spacing={2}>
+                        {creditTransactionFields.map(([field, index]) => {
+                            return (
+                                <JournalEntryTransactionRow
+                                    key={field.id}
+                                    index={index}
+                                    fieldArray={transactionsFieldArray}
+                                    showAdvancedControls={showAdvancedControls}
+                                />
+                            )
+                        })}
+                    </Stack>
+                    <Button startIcon={<Add />} onClick={() => addCreditTransaction()}>Add Transaction</Button>
                 </>
             )}
         </>

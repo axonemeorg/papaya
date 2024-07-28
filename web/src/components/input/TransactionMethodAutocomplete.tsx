@@ -13,8 +13,8 @@ interface IconWithGradientProps {
 }
 
 type TransactionMethodAutocompleteProps = 
-    & Omit<AutocompleteProps<TransactionMethod, false, false, false>, 'options'>
-    & Partial<Pick<AutocompleteProps<TransactionMethod, false, false, false>, 'options'>>
+    & Omit<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>
+    & Partial<Pick<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>>
 
 const IconWithGradient = (props: IconWithGradientProps) => {
     const { icon, primaryColor, secondaryColor } = props;
@@ -36,6 +36,7 @@ export default function TransactionMethodAutocomplete(props: TransactionMethodAu
     return (
         <Autocomplete
             options={transactionMethods}
+            isOptionEqualToValue={(option, value) => option.transactionMethodId === value.transactionMethodId}
             renderInput={(params) => <TextField {...params} label="Method" />}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
@@ -43,8 +44,6 @@ export default function TransactionMethodAutocomplete(props: TransactionMethodAu
                     <ListItem
                         dense
                         key={key}
-                        // component="li"
-                        // sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
                         {...optionProps}
                     >
                         <ListItemIcon>

@@ -3,8 +3,8 @@ import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, Au
 import { CSSProperties, useContext, useMemo } from "react";
 
 type PaymentTypeAutocompleteProps = 
-    & Omit<AutocompleteProps<PaymentType, false, false, false>, 'options'>
-    & Partial<Pick<AutocompleteProps<PaymentType, false, false, false>, 'options'>>
+    & Omit<AutocompleteProps<PaymentType, false, false, false>, 'options' | 'renderInput'>
+    & Partial<Pick<AutocompleteProps<PaymentType, false, false, false>, 'options' | 'renderInput'>>
 
 export default function PaymentTypeAutocomplete(props: PaymentTypeAutocompleteProps) {
     return (

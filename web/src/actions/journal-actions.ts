@@ -1,16 +1,20 @@
+'use server'
+
 import { validateRequest } from '@/auth';
 import db from '@/database/client'
 import { JournalEntryTable, TransactionTable } from '@/database/schemas';
-import { CreateTransaction } from '@/types/post';
+import { CreateJournalEntry, CreateTransaction } from '@/types/post';
 import { eq } from 'drizzle-orm';
 
-export const createJournalEntry = async (memo: string, transactions: CreateTransaction[]) => {
+export const createJournalEntry = async (formData: CreateJournalEntry) => {
+	console.log('createJournalEntry:', formData)
 	const { user } = await validateRequest();
-
+	
     if (!user) {
-        throw new Error('Not authorized.');
+		throw new Error('Not authorized.');
     }
 
+	const { memo, transactions } = formData;
 	const result = await db
 		.insert(JournalEntryTable)
 		.values({
@@ -30,7 +34,7 @@ export const createJournalEntry = async (memo: string, transactions: CreateTrans
 				journalEntryId,
 				amount: transaction.amount,
 				transactionType: transaction.transactionType,
-				memo: transaction.memo,
+				memo: transaction.memo ?? null,
 				paymentType: transaction.transactionType,
 				transactionMethodId: transaction.transactionMethod.transactionMethodId
 			}
