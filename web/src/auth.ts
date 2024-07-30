@@ -3,7 +3,7 @@ import type { Session, User } from "lucia";
 import { cache } from "react";
 import { cookies } from "next/headers";
 
-import { luciaAdapter } from "./database/client";
+import { luciaAdapter } from "@/database/lib/LuciaAdapter";
 
 export const lucia = new Lucia(luciaAdapter, {
 	sessionCookie: {
