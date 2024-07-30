@@ -13,7 +13,7 @@ migrate:
 seed:
 	cd ./web && bun run seed
 
-web:
+dev:
 	cd ./web && bun run dev
 
-.PHONY: clean, db, web, generate, migrate, seed
+.PHONY: clean, db, dev, generate, migrate, seed

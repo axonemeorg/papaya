@@ -8,6 +8,7 @@ import TransactionMethodAutocomplete from "../input/TransactionMethodAutocomplet
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionType } from "@/types/enum";
+import CategoryAutocomplete from "../input/CategoryAutocomplete";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -43,7 +44,6 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
             />
 
             <Controller
-                // TODO using a <Controller> here because whenever the value changes, we need to update this transaction's payment type to match the trnasaction method's default payment type.
                 control={control}
                 name={`transactions.${props.index}.transactionMethod` as const}
                 render={({ field }) => (
@@ -73,7 +73,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
 export default function JournalEntryForm() {
     const [formTab, setFormTab] = useState(1);
 
-    const { register, control, getValues } = useFormContext<CreateJournalEntry>();
+    const { register, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
 
     const transactionsFieldArray = useFieldArray<CreateJournalEntry>({
         name: 'transactions',
@@ -129,15 +129,34 @@ export default function JournalEntryForm() {
                     <Tab label="Advanced" />
                 </Tabs>
             </Box>
-            <TextField
-                name='memo'
-                label='Memo'
-                {...register('memo')}
-                fullWidth
-                multiline
-                maxRows={3}
-                sx={{ mb: 2 }}
-            />
+            <Grid container columns={2} spacing={1}>
+                <Grid item xs={1}>
+                    <TextField
+                        name='memo'
+                        label='Memo'
+                        {...register('memo')}
+                        fullWidth
+                        multiline
+                        maxRows={3}
+                        sx={{ mb: 2 }}
+                    />
+                </Grid>
+                <Grid item xs={1}>
+                    <Controller
+                        control={control}
+                        name='category'
+                        render={({ field }) => (
+                            <CategoryAutocomplete
+                                {...field}
+                                value={field.value}
+                                onChange={(_event, newValue) => {
+                                    setValue(field.name, newValue);
+                                }}
+                            />
+                        )}
+                    />
+                </Grid>
+            </Grid>
             {showAdvancedControls && (
                 <Box mb={1}>
                     <Typography variant='overline'>Money Out</Typography>

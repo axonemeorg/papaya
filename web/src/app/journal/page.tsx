@@ -1,3 +1,4 @@
+import { getCategoriesByUserId } from "@/actions/category-actions";
 import { getJournalEntriesByUserId } from "@/actions/journal-actions";
 import { getTransactionMethodsByUserId } from "@/actions/method-actions";
 import { validateRequest } from "@/auth";
@@ -14,12 +15,14 @@ export default async function JournalPage() {
 
     const transactionMethods = await getTransactionMethodsByUserId(user.id);
     const journalEntries = await getJournalEntriesByUserId(user.id);
+    const categories = await getCategoriesByUserId(user.id);
 
     return (
         <div>
             <JournalEntries
                 journalEntries={journalEntries}
                 transactionMethods={transactionMethods}
+                categories={categories}
             />
         </div>
     )

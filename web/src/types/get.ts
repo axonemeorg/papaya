@@ -20,8 +20,12 @@ export const TransactionMethod = Timestamps.extend({
 });
 export type TransactionMethod = z.infer<typeof TransactionMethod>;
 
-
-
+export const Category = Timestamps.extend({
+    categoryId: z.number(),
+    // userId: z.string(), // TODO ideally we should not fetch this.
+    label: z.string(),
+});
+export type Category = z.infer<typeof Category>;
 
 
 // Table models (deprecated)

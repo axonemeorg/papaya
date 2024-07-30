@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { PaymentType, TransactionType } from "./enum";
-import { TransactionMethod } from "./get";
+import { Category, TransactionMethod } from "./get";
 
 export const CreateTransaction = z.object({
     transactionType: TransactionType,
@@ -14,6 +14,7 @@ export type CreateTransaction = z.infer<typeof CreateTransaction>;
 
 export const CreateJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),
+    category: Category.pick({ categoryId: true }),
     transactions: z.array(CreateTransaction)
 });
 export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;

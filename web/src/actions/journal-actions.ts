@@ -2,9 +2,9 @@
 
 import { validateRequest } from '@/auth';
 import db from '@/database/client'
-import { JournalEntryTable, TransactionTable } from '@/database/schemas';
-import { CreateJournalEntry, CreateTransaction } from '@/types/post';
-import { eq } from 'drizzle-orm';
+import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
+import { CreateJournalEntry } from '@/types/post';
+import { and, eq } from 'drizzle-orm';
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
 	console.log('createJournalEntry:', formData)
@@ -14,11 +14,27 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 		throw new Error('Not authorized.');
     }
 
-	const { memo, transactions } = formData;
+	const { memo, transactions, category } = formData;
+
+	if (category) {
+		// Ensure that the given category belongs to the user
+		const categoryResult = await db.query.CategoryTable.findFirst({
+			where: and(
+				eq(CategoryTable.userId, user.id),
+				eq(CategoryTable.categoryId, category.categoryId)
+			)
+		})
+
+		if (!categoryResult) {
+			throw new Error('Category could not be found.')
+		}
+	}
+
 	const result = await db
 		.insert(JournalEntryTable)
 		.values({
 			userId: user.id,
+			categoryId: category?.categoryId ?? null,
 			memo,
 		})
 		.returning({
@@ -36,13 +52,9 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 				transactionType: transaction.transactionType,
 				memo: transaction.memo ?? null,
 				paymentType: transaction.transactionType,
-				transactionMethodId: transaction.transactionMethod.transactionMethodId
+				transactionMethodId: transaction.transactionMethod.transactionMethodId,
 			}
 		}))
-}
-
-export const createTransaction = async () => {
-	
 }
 
 export const getJournalEntriesByUserId = (userId: string) => {
