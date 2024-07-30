@@ -9,6 +9,8 @@ import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFo
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionType } from "@/types/enum";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
+import { findMostSimilarCategory } from "@/actions/category-actions";
+import { debounce } from "@/utils/Utils";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -73,7 +75,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
 export default function JournalEntryForm() {
     const [formTab, setFormTab] = useState(1);
 
-    const { register, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
+    const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
 
     const transactionsFieldArray = useFieldArray<CreateJournalEntry>({
         name: 'transactions',
@@ -121,6 +123,11 @@ export default function JournalEntryForm() {
         return transactions[index].transactionType === TransactionType.Enum.CREDIT
     });
 
+    const handleDetectCategoryWithAi = debounce(async (memo) => {
+        const category = await findMostSimilarCategory(memo);
+        setValue('category', category);
+    }, 500)
+
     return (
         <>
             <Box mb={2}>
@@ -131,14 +138,26 @@ export default function JournalEntryForm() {
             </Box>
             <Grid container columns={2} spacing={1}>
                 <Grid item xs={1}>
-                    <TextField
+                    <Controller
+                        control={control}
                         name='memo'
-                        label='Memo'
-                        {...register('memo')}
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        sx={{ mb: 2 }}
+                        render={({ field }) => (
+                            <TextField
+                                name='memo'
+                                label='Memo'
+                                {...field}
+                                value={field.value}
+                                onChange={(event) => {
+                                    const value = event.target.value;
+                                    handleDetectCategoryWithAi(value);
+                                    setValue(field.name, value);
+                                }}
+                                fullWidth
+                                multiline
+                                maxRows={3}
+                                sx={{ mb: 2 }}
+                            />
+                        )}
                     />
                 </Grid>
                 <Grid item xs={1}>
@@ -148,7 +167,7 @@ export default function JournalEntryForm() {
                         render={({ field }) => (
                             <CategoryAutocomplete
                                 {...field}
-                                value={field.value}
+                                value={watch('category')}
                                 onChange={(_event, newValue) => {
                                     setValue(field.name, newValue);
                                 }}

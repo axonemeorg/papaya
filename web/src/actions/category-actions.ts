@@ -1,3 +1,5 @@
+'use server'
+
 import { validateRequest } from "@/auth";
 import db from "@/database/client";
 import { CategoryTable } from "@/database/schemas";
@@ -29,10 +31,9 @@ export const findMostSimilarCategory = async (memo: string) => {
 		})
 		.from(CategoryTable)
 		.where(eq(CategoryTable.userId, user.id))
-		.orderBy((t) => t.similarity)
-		.limit(2);
+		.orderBy((t) => desc(t.similarity))
+		.limit(1);
 
-	console.log('result:', result);
-
+	delete result[0].similarity;
 	return result[0];
 }
