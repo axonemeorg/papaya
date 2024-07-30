@@ -7,6 +7,8 @@ import Header from '../components/header/Header'
 import appTheme from '../components/theme/theme'
 import BaseLayout from '../components/layout/BaseLayout'
 
+import '@/styles/main.scss';
+
 export const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default async (props: PropsWithChildren) => {
