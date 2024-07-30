@@ -31,6 +31,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@types/node": "20.14.0",
     "@types/react": "18.3.3",
     "typescript": "5.4.5"
@@ -41,6 +42,7 @@
     "build": "next build",
     "start": "next start -p 9475",
     "generate": "npx drizzle-kit generate",
-    "migrate": "npx tsx src/database/migrate.ts"
+    "migrate": "npx tsx src/database/migrate.ts",
+    "seed": "npx tsx src/database/seed.ts"
   }
 }
