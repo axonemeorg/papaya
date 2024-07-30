@@ -1,7 +1,6 @@
 import { PaymentType } from "@/types/enum";
 import DatabaseTableSeeder from "../lib/DatabaseTableSeeder";
 import { TransactionMethodTable, UserTable } from "../schemas";
-import { type CreateTransactionMethod } from "@/types/post";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
 
@@ -16,11 +15,11 @@ export default class TransactionMethodsTableSeeder extends DatabaseTableSeeder {
                 acc.push({
                     userId: user.id,
                     defaultPaymentType: faker.helpers.arrayElement(PaymentType.options),
-                    label: faker.lorem.word({ length: { min: 1, max: 3 }})
+                    label: faker.lorem.words(2)
                 });
-
-                return acc;
             }
+
+            return acc;
         }, [])
 
         await this.transaction.insert(TransactionMethodTable).values(transactionMethods)        

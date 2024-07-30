@@ -20,6 +20,7 @@ export const TransactionMethodTable = pgTable("transaction_method", {
     userId: text('user_id').references(() => UserTable.id).notNull(),
     label: varchar('label', { length: 128 }).notNull(),
     defaultPaymentType: PaymentType('default_payment_type').notNull(),
+
     ...timestamps
 });
 
@@ -31,14 +32,28 @@ export const TransactionTable = pgTable("transaction", {
     amount: integer('amount').notNull(),
     memo: varchar('memo', { length: 1024 }),
     transactionMethodId: integer('transaction_method_id').references(() => TransactionMethodTable.transactionMethodId).notNull(),
+
     ...timestamps
 });
 
+export const CategoryTable = pgTable("category", {
+    categoryId: serial('category_id').primaryKey(),
+    label: varchar('label', { length: 128 })
+        .notNull(),
+    userId: text('user_id')
+        .references(() => UserTable.id)
+        .notNull(),
+
+    ...timestamps,
+})
+
 export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: serial('journal_entry_id').primaryKey(),
+    memo: varchar('memo', { length: 1024 }).notNull(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => UserTable.id),
-    memo: varchar('memo', { length: 1024 }).notNull(),
+    categoryId: integer('category_id')
+        .references(() => CategoryTable.categoryId),
     ...timestamps
 });

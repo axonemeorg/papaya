@@ -4,6 +4,7 @@ import * as schema from '@/database/schemas';
 import DatabaseTableSeeder from "./lib/DatabaseTableSeeder";
 import UsersTableSeeder from "@/database/seeds/UsersTableSeeder";
 import TransactionMethodsTableSeeder from "./seeds/TransactionMethodsTableSeeder";
+import CategoriesTableSeeder from "./seeds/CategoriesTableSeeder";
 
 
 /**
@@ -15,6 +16,7 @@ async function run() {
     const seeders: DatabaseTableSeeder[] = [
         new UsersTableSeeder(db),
         new TransactionMethodsTableSeeder(db),
+        new CategoriesTableSeeder(db),
     ];
 
     console.log(`Running ${seeders.length} database seeder(s)...\n`);
