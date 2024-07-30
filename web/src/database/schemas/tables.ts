@@ -4,8 +4,12 @@ import {
     pgTable,
     timestamp,
     integer,
+    index,
     text,
+    vector,
 } from 'drizzle-orm/pg-core'
+
+const EMBEDDING_NUM_DIMENSIONS = 1536 as const;
 
 import { PaymentType, TransactionType } from './enums';
 import { UserTable } from './auth';
@@ -40,12 +44,16 @@ export const CategoryTable = pgTable("category", {
     categoryId: serial('category_id').primaryKey(),
     label: varchar('label', { length: 128 })
         .notNull(),
+    labelEmbedding: vector('label_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS })
+        .notNull(),
     userId: text('user_id')
         .references(() => UserTable.id)
         .notNull(),
 
     ...timestamps,
-})
+}, (table) => ({
+    embeddingIndex: index('embedding_index').using('hnsw', table.labelEmbedding.op('vector_cosine_ops'))
+}));
 
 export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: serial('journal_entry_id').primaryKey(),

@@ -15,6 +15,20 @@
       "when": 1722299076189,
       "tag": "0001_cooing_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1722369386488,
+      "tag": "0002_giant_lilith",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1722373172791,
+      "tag": "0003_late_zarek",
+      "breakpoints": true
     }
   ]
 }

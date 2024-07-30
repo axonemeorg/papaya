@@ -1,4 +1,5 @@
-FROM postgres:latest
+# FROM postgres:latest
+FROM ankane/pgvector:latest
 
 # RUN apt-get update && apt-get install -y \
 #     postgresql-server-dev-all \

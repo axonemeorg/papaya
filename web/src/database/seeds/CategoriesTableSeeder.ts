@@ -1,9 +1,8 @@
+import { generateEmbedding } from "@/actions/embeddings";
 import DatabaseTableSeeder from "../lib/DatabaseTableSeeder";
 import { CategoryTable, TransactionMethodTable, UserTable } from "../schemas";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
-
-const NUM_CATEGORIES_PER_USER = 5 as const;
 
 const EXAMPLE_CATEGORIES = [
     "Groceries",
@@ -36,10 +35,23 @@ const EXAMPLE_CATEGORIES = [
     "Legal Fees",
     "Professional Development",
     "Miscellaneous"
-]
+];
+
+const NUM_CATEGORIES_PER_USER: number = EXAMPLE_CATEGORIES.length;
 
 export default class CategoriesTableSeeder extends DatabaseTableSeeder {
     async seed(): Promise<void> {
+
+        const embeddedCategoryEntries: [string, number[]][] = await Promise.all(
+            EXAMPLE_CATEGORIES.map(async (label) => {
+                return [label, await generateEmbedding(label)]
+            })
+        );
+
+        
+        const embeddedCategories = Object.fromEntries(embeddedCategoryEntries);
+        console.log(embeddedCategories);
+
         const users = await this.transaction.query.UserTable.findMany() as InferSelectModel<typeof UserTable>[];
 
         const categoryLabels = faker.helpers.uniqueArray(EXAMPLE_CATEGORIES, NUM_CATEGORIES_PER_USER)
@@ -48,7 +60,8 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
             categoryLabels.forEach((label) => {
                 acc.push({
                     userId: user.id,
-                    label,     
+                    label,
+                    labelEmbedding: embeddedCategories[label]
                 });
             });
 
