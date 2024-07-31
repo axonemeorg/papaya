@@ -19,8 +19,8 @@ async function run() {
     const db = drizzle(pool, { schema, logger: false });
 
     const seeders: DatabaseTableSeeder[] = [
-        // new UsersTableSeeder(db),
-        // new TransactionMethodsTableSeeder(db),
+        new UsersTableSeeder(db),
+        new TransactionMethodsTableSeeder(db),
         new CategoriesTableSeeder(db),
     ];
 

@@ -22,6 +22,9 @@ export type TransactionMethod = z.infer<typeof TransactionMethod>;
 
 export const Category = Timestamps.extend({
     categoryId: z.number(),
+    icon: z.string(),
+    color: z.string(),
+    description: z.string(),
     // userId: z.string(), // TODO ideally we should not fetch this.
     label: z.string(),
 });

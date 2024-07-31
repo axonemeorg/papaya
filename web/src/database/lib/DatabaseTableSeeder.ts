@@ -19,6 +19,7 @@ abstract class DatabaseTableSeeder {
         try {
             await this.seed();
         } catch (error) {
+            console.log(error)
             statusIndicator = '❌'
             seedError = error;
         } finally {

@@ -44,7 +44,13 @@ export const CategoryTable = pgTable("category", {
     categoryId: serial('category_id').primaryKey(),
     label: varchar('label', { length: 128 })
         .notNull(),
-    labelEmbedding: vector('label_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS })
+    icon: varchar('icon', { length: 1023 })
+        .notNull(),
+    color: varchar('color', { length: 64 })
+        .notNull(),
+    description: varchar('description', { length: 1024 })
+        .notNull(),
+    descriptionEmbedding: vector('description_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS })
         .notNull(),
     userId: text('user_id')
         .references(() => UserTable.id)
@@ -52,7 +58,7 @@ export const CategoryTable = pgTable("category", {
 
     ...timestamps,
 }, (table) => ({
-    embeddingIndex: index('embedding_index').using('hnsw', table.labelEmbedding.op('vector_cosine_ops'))
+    embeddingIndex: index('embedding_index').using('hnsw', table.descriptionEmbedding.op('vector_cosine_ops'))
 }));
 
 export const JournalEntryTable = pgTable("journal_entry", {

@@ -47,10 +47,8 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
                 return [label, await generateEmbedding(label)]
             })
         );
-
         
         const embeddedCategories = Object.fromEntries(embeddedCategoryEntries);
-        console.log(embeddedCategories);
 
         const users = await this.transaction.query.UserTable.findMany() as InferSelectModel<typeof UserTable>[];
 
@@ -61,7 +59,10 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
                 acc.push({
                     userId: user.id,
                     label,
-                    labelEmbedding: embeddedCategories[label]
+                    icon: 'shopping_bag',
+                    color: 'purple.500',
+                    description: label,
+                    descriptionEmbedding: embeddedCategories[label]
                 });
             });
 

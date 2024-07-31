@@ -21,7 +21,7 @@ export const findMostSimilarCategory = async (memo: string) => {
 
 	const memoEmbedding = await generateEmbedding(memo);
 
-	const similarity = sql<number>`1 - (${cosineDistance(CategoryTable.labelEmbedding, memoEmbedding)})`;
+	const similarity = sql<number>`1 - (${cosineDistance(CategoryTable.descriptionEmbedding, memoEmbedding)})`;
 
 	const result = await db
 		.select({
