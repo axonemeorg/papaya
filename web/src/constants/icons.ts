@@ -1,4 +1,4 @@
-[
+export default [
   {
     "name": "10k",
     "popularity": 1261,
@@ -45242,4 +45242,4 @@
       "zoom"
     ]
   }
-]
+];

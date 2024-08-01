@@ -39,9 +39,9 @@ export default function JournalEntries(props: JournalEntriesProps) {
             <TransactionMethodContext.Provider value={{ transactionMethods }}>
                 <JournalEntryContext.Provider value={{ journalEntries }}>
                     
-                    <DataGrid
+                    {/* <DataGrid
                         rows={}
-                    />
+                    /> */}
 
                     <JournalEntryModal
                         open={showJournalEntryModal}
