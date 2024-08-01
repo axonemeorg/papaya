@@ -1,5 +1,8 @@
-import { Box, colors, Grid, Paper, Popover, Popper, Stack, Tooltip } from '@mui/material';
+'use client';
+
+import { Box, Button, colors, Grid, MenuItem, Paper, Popover, Popper, Select, Stack, Tooltip } from '@mui/material';
 import * as muiColors from '@mui/material/colors';
+import { useState } from 'react';
 
 const colorGroups = [
     [
@@ -62,30 +65,36 @@ interface SwatchProps {
     onClick?: () => void;
 }
 
+const sortedColors = colorGroups.reduce((colors: [string, number][], colorGroup: string[]) => {
+    colorShades.forEach((shade) => {
+        colorGroup.forEach((colorName) => {
+            colors.push([colorName, shade])
+        })
+    });
+
+    return colors;
+}, []);
+
 export const Swatch = (props: SwatchProps) => {
-    const onClickStyles = props.onClick ? {
-        '&:not(:hover)': {
-            boxShadow: 'none !important',
-        },
-        '&:hover': {
-            width: '22px',
-            height: '22px',
-            margin: 0
-        },
-        cursor: 'pointer'
-    } : {};
+    // const onClickStyles = props.onClick ? {
+
+    //     cursor: 'pointer'
+    // } : {};
 
     const Children = (
         <Paper
-            component={props.onClick ? 'a' : 'i'}
+            className='swatch'
+            component={'i'}
             onClick={props.onClick}
             sx={{
+                display: 'block',
                 m: 0.25,
                 width: '18px',
                 height: '18px',
                 borderRadius: '50%',
                 backgroundColor: props.color,
-                ...onClickStyles
+                transition: 'all 0.2s',
+                // ...onClickStyles
             }}
             elevation={props.onClick ? 3 : 0}
         />
@@ -95,19 +104,20 @@ export const Swatch = (props: SwatchProps) => {
         return (
             <Tooltip
                 title={props.name}
-                // placement='top'
-                // slotProps={{
-                //     popper: {
-                //       modifiers: [
-                //         {
-                //           name: 'offset',
-                //           options: {
-                //             offset: [0, -14],
-                //           },
-                //         },
-                //       ],
-                //     },
-                // }}
+                disableInteractive
+                placement='top'
+                slotProps={{
+                    popper: {
+                      modifiers: [
+                        {
+                          name: 'offset',
+                          options: {
+                            offset: [0, -14],
+                          },
+                        },
+                      ],
+                    },
+                }}
             >
                 {Children}
             </Tooltip>
@@ -118,48 +128,81 @@ export const Swatch = (props: SwatchProps) => {
 }
 
 interface ColorPickerProps {
-    open: boolean;
-    anchorEl: any;
-    onClose: () => void;
+    color: string;
     onChange: (color: string) => void;
+}
+
+export const getMuiColor = (color: string) => {
+    const [colorName, colorShade] = color.split('.');
+    return muiColors[colorName][colorShade];
 }
 
 export default function ColorPicker(props: ColorPickerProps) {
     return (
-        <Popover id='color-picker' open={props.open} anchorEl={props.anchorEl} onClose={props.onClose} >
-            <Stack p={2}>
-                {colorGroups.map((colorGroup) => {
+        <>
+            <Select
+                size='small'
+                value={props.color}
+                onChange={(event) => {
+                    props.onChange(event.target.value)
+                }}
+                renderValue={(value: string) => {
+                    const color = getMuiColor(value);
+                    console.log('color:', color)
+                    return (
+                        <Swatch color={color} />
+                    )
+                }}
+                MenuProps={{
+                    MenuListProps: {
+                        sx: {
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(7, 1fr)'
+                        },
+                    }
+                }}
+            >
+                {sortedColors.map(([colorName, shade]) => {
+                    const color = [colorName, shade].join('.');
+                    const colorNameParts = [colorShadeLabels[shade], colorNameLabels[colorName]]
+                        .filter(Boolean);
+                    if (colorNameParts[1]) {
+                        colorNameParts[1] = String(colorNameParts[1]).toLowerCase()
+                    }
+
                     return (
                         
-                        <Box display='grid' gridTemplateColumns={'repeat(7, 1fr)'}>
-                            {colorShades.map((shade) => {
-                                return (
-                                    <>
-                                        {colorGroup.map((colorName) => {
-                                            const color = [colorName, shade].join('.');
-                                            const colorNameParts = [colorShadeLabels[shade], colorNameLabels[colorName]]
-                                                .filter(Boolean);
-                                            if (colorNameParts[1]) {
-                                                colorNameParts[1] = String(colorNameParts[1]).toLowerCase()
-                                            }
-                                            
-                                            return (
-                                                <Swatch
-                                                    color={muiColors[colorName][shade]}
-                                                    name={colorNameParts.join(' ')}
-                                                    onClick={() => props.onChange(color)}
-                                                />
-                                            )
-                                        })}
-                                    </>
-
-                                )
-                            })}
-                        </Box>
-                    );
+                            <MenuItem
+                                value={color}
+                                key={color}
+                                disableTouchRipple
+                                sx={{
+                                    p: 0,
+                                    '&:hover, &:focus, &.Mui-selected': {
+                                        background: 'none !important', // Disable background color change
+                                        color: 'inherit', // Disable color change
+                                    },
+                                    '&:not(:hover) .swatch': {
+                                        boxShadow: 'none !important',
+                                    },
+                                    '&:hover .swatch, &.Mui-focusVisible .swatch': {
+                                        width: '22px',
+                                        height: '22px',
+                                        margin: 0
+                                    },
+                                }}
+                            >
+                                <Tooltip title='hello'>
+                                <Swatch
+                                    color={muiColors[colorName][shade]}
+                                    name={colorNameParts.join(' ')}
+                                    // onClick={() => {}}
+                                />
+                        </Tooltip>
+                            </MenuItem>
+                    )
                 })}
-                
-            </Stack>
-        </Popover>
+            </Select>
+        </>
     )
 }
