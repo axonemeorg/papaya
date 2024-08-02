@@ -1,29 +1,13 @@
-import { getCategoriesByUserId } from "@/actions/category-actions";
-import { getJournalEntriesByUserId } from "@/actions/journal-actions";
-import { getTransactionMethodsByUserId } from "@/actions/method-actions";
-import { validateRequest } from "@/auth";
-import JournalEntries from "@/components/journal/JournalEntries";
-import { redirect } from "next/navigation";
+'use server'
 
+import Journal from "@/components/journal/Journal";
+import dayjs from "dayjs";
 
-export default async function JournalPage() {
-    const { user, session } = await validateRequest();
-
-    if (!user) {
-        redirect('/login');
-    }
-
-    const transactionMethods = await getTransactionMethodsByUserId(user.id);
-    const journalEntries = await getJournalEntriesByUserId(user.id);
-    const categories = await getCategoriesByUserId(user.id);
+export default async function() {
+    const year = Number(dayjs().format('YYYY'));
+    const month = Number(dayjs().format('M'));
 
     return (
-        <div>
-            <JournalEntries
-                journalEntries={journalEntries}
-                transactionMethods={transactionMethods}
-                categories={categories}
-            />
-        </div>
+        <Journal month={month} year={year} />
     )
 }

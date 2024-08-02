@@ -3,9 +3,9 @@ import {
 } from 'next/font/google'
 import { CssBaseline, Stack, ThemeProvider } from '@mui/material'
 import type { PropsWithChildren } from 'react'
-import Header from '../components/header/Header'
-import appTheme from '../components/theme/theme'
-import BaseLayout from '../components/layout/BaseLayout'
+import Header from '@/components/header/Header'
+import appTheme from '@/components/theme/theme'
+import BaseLayout from '@/components/layout/BaseLayout'
 
 import '@/styles/main.scss';
 

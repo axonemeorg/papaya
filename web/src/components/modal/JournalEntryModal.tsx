@@ -61,7 +61,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
             <Dialog open={props.open} fullWidth onClose={props.onClose} maxWidth='md'>
                 <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateTransactionMethod)}>
                     <DialogTitle>Add Entry</DialogTitle>
-                    <DialogContent>
+                    <DialogContent sx={{ overflow: "initial" }}>
                         {/* <DialogContentText>{JSON.stringify(createJournalEntryForm.getValues())}</DialogContentText> */}
                         <JournalEntryForm/>
                     </DialogContent>
