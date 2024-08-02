@@ -4,6 +4,9 @@ import { CategoryTable, TransactionMethodTable, UserTable } from "../schemas";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
 
+import icons from '@/constants/icons';
+import { colorNameLabels, colorShadeLabels } from "@/components/color/ColorPicker";
+
 const EXAMPLE_CATEGORIES = [
     "Groceries",
     "Rent/Mortgage",
@@ -41,6 +44,8 @@ const NUM_CATEGORIES_PER_USER: number = EXAMPLE_CATEGORIES.length;
 
 export default class CategoriesTableSeeder extends DatabaseTableSeeder {
     async seed(): Promise<void> {
+        const colorNames = Object.keys(colorNameLabels)
+        const shades = Object.keys(colorShadeLabels)
 
         const embeddedCategoryEntries: [string, number[]][] = await Promise.all(
             EXAMPLE_CATEGORIES.map(async (label) => {
@@ -56,11 +61,15 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
 
         const categories = users.reduce((acc, user) => {
             categoryLabels.forEach((label) => {
+                const iconIndex = Math.floor(Math.random() * icons.length);
+                const shadeIndex = Math.floor(Math.random() * shades.length);
+                const colorNameIndex = Math.floor(Math.random() * colorNames.length);
+
                 acc.push({
                     userId: user.id,
                     label,
-                    icon: 'shopping_bag',
-                    color: 'purple.500',
+                    icon: icons[iconIndex].name,
+                    color: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
                     description: label,
                     descriptionEmbedding: embeddedCategories[label]
                 });

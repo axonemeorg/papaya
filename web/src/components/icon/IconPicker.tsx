@@ -1,9 +1,12 @@
 
-import { Box, Button, Grid, Icon, Popover, Stack, TextField } from '@mui/material';
+import { Box, Button, Icon, InputAdornment, Popover, Stack, TextField } from '@mui/material';
+import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { useState } from 'react';
 import ColorPicker, { getMuiColor } from '../color/ColorPicker';
+import { Search, Shuffle } from '@mui/icons-material';
+import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 
 interface IconPickerProps {
     color: string;
@@ -16,9 +19,18 @@ export default function IconPicker(props: IconPickerProps) {
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const open = Boolean(anchorEl)
 
+    const scrollbarWidth = useScrollbarWidth();
+
     const iconColor = getMuiColor(props.color);
 
-    console.log('iconColor:', iconColor)
+    const columnCount = 10;
+    const rowCount = Math.ceil(icons.length / columnCount);
+    const cellSize = 40;
+
+    const handleShuffle = () => {
+        const iconIndex = Math.floor(Math.random() * icons.length);
+        props.onChangeIcon(icons[iconIndex].name);
+    }
 
     return (
         <>
@@ -29,28 +41,72 @@ export default function IconPicker(props: IconPickerProps) {
                 open={open}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center'
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
             >
-                <Stack direction='row'>
-                    <TextField />
+                <Stack direction='row' p={2} mb={2} gap={1} alignItems='center'>
+                    <TextField
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position='start'>
+                                    <Search />
+                                </InputAdornment>
+                            )
+                        }}
+                        placeholder='Filter'
+                        variant='outlined'
+                        size='small'
+                    />
+                    <Button
+                        onClick={() => handleShuffle()}
+                        variant='outlined'
+                        size='small'
+                    >
+                        <Shuffle />
+                    </Button>
                     <ColorPicker color={props.color} onChange={props.onChangeColor} />
                 </Stack>
-                <Box
-                    sx={{
-                        display:  'grid',
-                        gridTemplateColumns: 'repeat(10, 1fr)',
-                        '& span': {
-                            color: `${iconColor} !important`,
-                        }
-                    }}
-                >
-                    {(icons as unknown as any[]).map((icon) => {
-                        return (
-                            <Button size='small' sx={{ minWidth: 'unset' }}>
-                                <Icon>{icon.name}</Icon>
-                            </Button>
-                        )
-                    })}
+                <Box pl={2}>
+                    <FixedSizeGrid
+                        columnCount={columnCount}
+                        columnWidth={cellSize}
+                        height={cellSize * 8}
+                        rowCount={rowCount}
+                        rowHeight={cellSize}
+                        width={(cellSize * columnCount) + scrollbarWidth}
+                        style={{ overflowX: 'hidden' }}
+                    >
+                        {({ columnIndex, rowIndex, style }) => {
+                            const index = rowIndex * columnCount + columnIndex;
+                            const icon = icons[index];
 
+                            return (
+                                icon && (
+                                    <Button
+                                        key={index}
+                                        onClick={() => props.onChangeIcon(icon.name)}
+                                        size="small"
+                                        sx={{ 
+                                            minWidth: 'unset',
+                                            '& span': { color: `${iconColor} !important` }
+                                            
+                                        }}
+                                        style={{
+                                            ...style,
+                                        }}
+                                    >
+                                        <Icon style={{ fontSize: '36px' }}>{icon.name}</Icon>
+                                    </Button>
+                                )
+                            );
+                        }}
+                    </FixedSizeGrid>
                 </Box>
             </Popover>
         </>

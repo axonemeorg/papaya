@@ -30,7 +30,7 @@ const colorGroups = [
     ]
 ];
 
-const colorNameLabels = {
+export const colorNameLabels = {
     'red': 'Red',
     'pink': 'Pink',
     'purple': 'Purple',
@@ -53,7 +53,7 @@ const colorShades = [
     800
 ]
 
-const colorShadeLabels = {
+export const colorShadeLabels = {
     [200]: 'Light',
     [400]: '',
     [800]: 'Deep'
@@ -76,11 +76,6 @@ const sortedColors = colorGroups.reduce((colors: [string, number][], colorGroup:
 }, []);
 
 export const Swatch = (props: SwatchProps) => {
-    // const onClickStyles = props.onClick ? {
-
-    //     cursor: 'pointer'
-    // } : {};
-
     const Children = (
         <Paper
             className='swatch'
@@ -94,7 +89,6 @@ export const Swatch = (props: SwatchProps) => {
                 borderRadius: '50%',
                 backgroundColor: props.color,
                 transition: 'all 0.2s',
-                // ...onClickStyles
             }}
             elevation={props.onClick ? 3 : 0}
         />
