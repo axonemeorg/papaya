@@ -12,7 +12,10 @@ export interface IBreadcrumb {
 }
 
 const breadcrumbMatchers =  [
-
+    {
+        pattern: /\/journal\??/,
+        label: 'Journal'
+    },
 ]
 
 /**
