@@ -1,0 +1,1 @@
+ALTER TABLE "journal_entry" ADD COLUMN "date" timestamp NOT NULL;

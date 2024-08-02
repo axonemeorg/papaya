@@ -64,6 +64,7 @@ export const CategoryTable = pgTable("category", {
 export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: serial('journal_entry_id').primaryKey(),
     memo: varchar('memo', { length: 1024 }).notNull(),
+    date: timestamp('date').notNull(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => UserTable.id),

@@ -13,6 +13,8 @@ const user = process.env.DB_USER as string;
 const password = process.env.DB_PASSWORD as string;
 const port = Number(process.env.DB_PORT as string);
 
+const enableLogger = process.env.ENABLE_DB_LOGGER === 'true';
+
 export const pool = new Pool({
     database,
     user,
@@ -20,7 +22,7 @@ export const pool = new Pool({
     port,
 });
 
-const db = drizzle(pool, { schema, logger: true });
+const db = drizzle(pool, { schema, logger: enableLogger });
 
 export type DbClient = typeof db;
 

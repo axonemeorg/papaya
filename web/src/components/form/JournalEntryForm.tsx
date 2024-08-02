@@ -59,7 +59,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                     />
                 )}
             />
-            <DateTimePicker />
+            {/* <DateTimePicker /> */}
             {props.showAdvancedControls && (
                 <IconButton
                     onClick={() => props.fieldArray.remove(props.index)}
@@ -130,12 +130,12 @@ export default function JournalEntryForm() {
 
     return (
         <>
-            <Box mb={2}>
+            {/* <Box mb={2}>
                 <Tabs value={formTab} onChange={handleChangeTab} centered>
                     <Tab label="Quick" />
                     <Tab label="Advanced" />
                 </Tabs>
-            </Box>
+            </Box> */}
             <Grid container columns={2} spacing={1}>
                 <Grid item xs={1}>
                     <Controller

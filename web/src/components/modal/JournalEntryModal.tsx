@@ -62,8 +62,8 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
                 <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateTransactionMethod)}>
                     <DialogTitle>Add Entry</DialogTitle>
                     <DialogContent>
-                        <DialogContentText>{JSON.stringify(createJournalEntryForm.getValues())}</DialogContentText>
-                        <JournalEntryForm />
+                        {/* <DialogContentText>{JSON.stringify(createJournalEntryForm.getValues())}</DialogContentText> */}
+                        <JournalEntryForm/>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => props.onClose()}>Cancel</Button>
