@@ -8,7 +8,7 @@ import HeaderTabs from "./HeaderTabs";
  */
 export default function Header() {
     return (
-        <Box sx={{ backgroundColor: 'rgba(255, 12, 12, 0.075)' }}>
+        <Box>
             <BaseContainer>
                 <Stack
                     direction='row'
@@ -22,7 +22,6 @@ export default function Header() {
                 >
                     <HeaderBreadcrumbs />
                 </Stack>
-                <HeaderTabs />
             </BaseContainer>
         </Box>
     )    

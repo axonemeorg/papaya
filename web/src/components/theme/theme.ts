@@ -8,7 +8,7 @@ import { createTheme } from "@mui/material";
  */
 const appTheme = createTheme({
     palette: {
-        mode: 'dark',
+        // mode: 'dark',
         // primary:{
         //     // main: 'rgb(255, 12, 12)'
         // }
