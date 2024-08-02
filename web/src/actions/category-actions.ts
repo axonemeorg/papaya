@@ -7,9 +7,16 @@ import { eq, cosineDistance, desc, sql } from "drizzle-orm";
 import { generateEmbedding } from "./embeddings";
 
 export const getCategoriesByUserId = async (userId: string) => {
-	return db.query.CategoryTable.findMany({
-		where: eq(CategoryTable.userId, userId)
-	});
+	return db
+		.select({
+			categoryId: CategoryTable.categoryId,
+			label: CategoryTable.label,
+			icon: CategoryTable.icon,
+			color: CategoryTable.color,
+			description: CategoryTable.description
+		})
+		.from(CategoryTable)
+		.where(eq(CategoryTable.userId, userId))
 }
 
 export const findMostSimilarCategory = async (memo: string) => {
