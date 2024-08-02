@@ -1,12 +1,13 @@
 
-import { Box, Button, Icon, InputAdornment, Popover, Stack, TextField } from '@mui/material';
+import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, TextField } from '@mui/material';
 import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ColorPicker, { getMuiColor } from '../color/ColorPicker';
 import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
+import Fuse from 'fuse.js';
 
 interface IconPickerProps {
     color: string;
@@ -15,22 +16,53 @@ interface IconPickerProps {
     onChangeIcon: (icon: string) => void;
 }
 
+const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
+
+const fuseOptions = {
+    keys: ['name', 'tags'], // Fields to search in
+    includeScore: true, // Include the score of how good each match is
+    threshold: 0.2, // Tolerance for fuzzy matching
+    minMatchCharLength: 2 // Minimum number of characters that must match
+};
+
+// Create a new Fuse instance
+const fuse = new Fuse(sortedIcons, fuseOptions);
+
+const COLUMN_COUNT = 10;
+const CELL_SIZE = 40;
+
+
+console.log('sortedIcons[0]', sortedIcons[0])
+
 export default function IconPicker(props: IconPickerProps) {
     const [anchorEl, setAnchorEl] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const open = Boolean(anchorEl)
 
     const scrollbarWidth = useScrollbarWidth();
 
     const iconColor = getMuiColor(props.color);
-
-    const columnCount = 10;
-    const rowCount = Math.ceil(icons.length / columnCount);
-    const cellSize = 40;
+    
 
     const handleShuffle = () => {
-        const iconIndex = Math.floor(Math.random() * icons.length);
-        props.onChangeIcon(icons[iconIndex].name);
+        const iconIndex = Math.floor(Math.random() * sortedIcons.length);
+        props.onChangeIcon(sortedIcons[iconIndex].name);
     }
+
+    // Search for an icon
+    const results = useMemo(() => {
+        if (!searchQuery) {
+            return sortedIcons;
+        }
+
+        return fuse.search(searchQuery).map((result) => result.item)
+    }, [searchQuery]);
+
+    const rowCount = useMemo(() => {
+        return Math.ceil(results.length / COLUMN_COUNT);
+    }, [results]);
+
+    console.log(JSON.stringify(results))
 
     return (
         <>
@@ -38,6 +70,7 @@ export default function IconPicker(props: IconPickerProps) {
                 <Icon sx={{ color: iconColor }}>{props.icon}</Icon>
             </Button>
             <Popover
+                TransitionComponent={Fade}
                 open={open}
                 anchorEl={anchorEl}
                 onClose={() => setAnchorEl(null)}
@@ -62,6 +95,8 @@ export default function IconPicker(props: IconPickerProps) {
                         placeholder='Filter'
                         variant='outlined'
                         size='small'
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
                     />
                     <Button
                         onClick={() => handleShuffle()}
@@ -74,17 +109,17 @@ export default function IconPicker(props: IconPickerProps) {
                 </Stack>
                 <Box pl={2}>
                     <FixedSizeGrid
-                        columnCount={columnCount}
-                        columnWidth={cellSize}
-                        height={cellSize * 8}
+                        columnCount={COLUMN_COUNT}
+                        columnWidth={CELL_SIZE}
+                        height={CELL_SIZE * 8}
                         rowCount={rowCount}
-                        rowHeight={cellSize}
-                        width={(cellSize * columnCount) + scrollbarWidth}
+                        rowHeight={CELL_SIZE}
+                        width={(CELL_SIZE * COLUMN_COUNT) + scrollbarWidth}
                         style={{ overflowX: 'hidden' }}
                     >
                         {({ columnIndex, rowIndex, style }) => {
-                            const index = rowIndex * columnCount + columnIndex;
-                            const icon = icons[index];
+                            const index = rowIndex * COLUMN_COUNT + columnIndex;
+                            const icon = results[index];
 
                             return (
                                 icon && (
