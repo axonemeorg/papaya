@@ -6,11 +6,11 @@ import { getTransactionMethodsByUserId } from "@/actions/method-actions";
 import { validateRequest } from "@/auth";
 import JournalEntries from "@/components/journal/JournalEntries";
 import { redirect } from "next/navigation";
+import BaseLayout from "../layout/BaseLayout";
+import JournalHeaderActions from "./JournalHeaderActions";
+import { JournalDate } from "@/types/calendar";
 
-interface JournalProps {
-    month: number;
-    year: number;
-}
+interface JournalProps extends JournalDate {}
 
 export default async function Journal(props: JournalProps) {
     const { user } = await validateRequest();
@@ -24,12 +24,13 @@ export default async function Journal(props: JournalProps) {
     const categories = await getCategoriesByUserId(user.id);
 
     return (
-        <div>
+        <BaseLayout headerChildren={<JournalHeaderActions month={props.month} year={props.year} />}>
             <JournalEntries
                 journalEntries={journalEntries}
                 transactionMethods={transactionMethods}
                 categories={categories}
             />
-        </div>
+            
+        </BaseLayout>
     )
 }

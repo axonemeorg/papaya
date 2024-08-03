@@ -14,6 +14,7 @@ export type CreateTransaction = z.infer<typeof CreateTransaction>;
 
 export const CreateJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),
+    date: z.date(),
     category: Category.pick({ categoryId: true }),
     transactions: z.array(CreateTransaction)
 });

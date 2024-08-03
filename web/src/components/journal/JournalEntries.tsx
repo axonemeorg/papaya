@@ -44,12 +44,12 @@ const groupedExampleJournalEntries: JournalEntryGroup[]  = [
                 ]
             },
             {
-                journalEntryId: 1,
+                journalEntryId: 2,
                 memo: 'Treats for Vinny',
                 categoryId: 2,
                 transactions: [
                     {
-                        journalEntryId: 1,
+                        journalEntryId: 2,
                         amount: 40.70,
                         paymentType: "CREDIT",
                         transactionMethod: {
@@ -65,12 +65,12 @@ const groupedExampleJournalEntries: JournalEntryGroup[]  = [
         date: '2024-08-02',
         entries: [
             {
-                journalEntryId: 1,
+                journalEntryId: 3,
                 memo: 'Brunch at Shine Cafe',
                 categoryId: 1,
                 transactions: [
                     {
-                        journalEntryId: 1,
+                        journalEntryId: 3,
                         amount: 58.60,
                         paymentType: "CREDIT",
                         transactionMethod: {
@@ -81,12 +81,12 @@ const groupedExampleJournalEntries: JournalEntryGroup[]  = [
                 ]
             },
             {
-                journalEntryId: 1,
+                journalEntryId: 4,
                 memo: 'Treats for Vinny',
                 categoryId: 2,
                 transactions: [
                     {
-                        journalEntryId: 1,
+                        journalEntryId: 4,
                         amount: 40.70,
                         paymentType: "CREDIT",
                         transactionMethod: {
@@ -126,6 +126,7 @@ const JournalEntryDate = ({ date }: { date: string })  => {
 export default function JournalEntries(props: JournalEntriesProps) {
     const { journalEntries, transactionMethods, categories } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
+    // const [createEntryInitialDate, setCreateEntryInitialDate] = useState<
 
     const rows = journalEntries.map((entry) => {
         return {
@@ -136,6 +137,7 @@ export default function JournalEntries(props: JournalEntriesProps) {
 
         }
     })
+
 
     // const columns: GridColDef<Type>[] = [
     //     {
@@ -158,7 +160,7 @@ export default function JournalEntries(props: JournalEntriesProps) {
                         <TableBody>
                             {groupedExampleJournalEntries.map((group) => {
                                 return (
-                                    <TableRow>
+                                    <TableRow key={group.date}>
                                         <TableCell width='180px'>
                                             <JournalEntryDate date={group.date} />
                                         </TableCell>
@@ -168,7 +170,7 @@ export default function JournalEntries(props: JournalEntriesProps) {
                                                     const category = categories[2];
                                                     const categoryColor = getMuiColor(category.color);
                                                     return (
-                                                        <MenuItem sx={{ borderRadius: '64px' }}>
+                                                        <MenuItem key={entry.journalEntryId} sx={{ borderRadius: '64px' }}>
                                                             {/* <Stack direction='row' alignItems='center'> */}
                                                                 <ListItemIcon>
                                                                     <Icon sx={{ color: categoryColor}}>{category.icon}</Icon>
@@ -199,6 +201,7 @@ export default function JournalEntries(props: JournalEntriesProps) {
                     <JournalEntryModal
                         open={showJournalEntryModal}
                         onClose={() => setShowJournalEntryModal(false)}
+                        initialDate={new Date()}
                     />
                     <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
                         <Add />

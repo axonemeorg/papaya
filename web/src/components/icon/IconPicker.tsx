@@ -62,8 +62,6 @@ export default function IconPicker(props: IconPickerProps) {
         return Math.ceil(results.length / COLUMN_COUNT);
     }, [results]);
 
-    console.log(JSON.stringify(results))
-
     return (
         <>
             <Button onClick={(event) => setAnchorEl(event.currentTarget)} size='small' sx={{ minWidth: 'unset' }}>

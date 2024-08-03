@@ -34,6 +34,9 @@ export const findMostSimilarCategory = async (memo: string) => {
 		.select({
 			categoryId: CategoryTable.categoryId,
 			label: CategoryTable.label,
+			icon: CategoryTable.icon,
+			color: CategoryTable.color,
+			description: CategoryTable.description,
 			similarity,
 		})
 		.from(CategoryTable)

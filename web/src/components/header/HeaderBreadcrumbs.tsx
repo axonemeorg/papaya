@@ -52,13 +52,13 @@ export default function HeaderBreadcrumbs() {
     return (
         <Breadcrumbs aria-label="breadcrumb">
             <AppLogo />
-            {breadcrumbs.map((breadcrumb) => {
+            {/* {breadcrumbs.map((breadcrumb) => {
                 return (
                     <Link key={breadcrumb.label} component={NextLink} underline="hover" color="inherit" href={breadcrumb.href}>
                         {breadcrumb.label}
                     </Link>
                 )
-            })}
+            })} */}
         </Breadcrumbs>
     )
 }

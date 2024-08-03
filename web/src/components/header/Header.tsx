@@ -1,12 +1,13 @@
-import { Box, Stack } from "@mui/material";
+import { Avatar, Box, Stack } from "@mui/material";
 import HeaderBreadcrumbs from "./HeaderBreadcrumbs";
 import BaseContainer from "../layout/BaseContainer";
 import HeaderTabs from "./HeaderTabs";
+import { PropsWithChildren } from "react";
 
 /**
  * Header component used by the app
  */
-export default function Header() {
+export default function Header(props: PropsWithChildren) {
     return (
         <Box>
             <BaseContainer>
@@ -21,6 +22,8 @@ export default function Header() {
                     }}
                 >
                     <HeaderBreadcrumbs />
+                    {props.children}
+                    <Avatar />
                 </Stack>
             </BaseContainer>
         </Box>

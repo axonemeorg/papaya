@@ -1,16 +1,12 @@
 'use server'
 
+import { getJournalDateUrl } from "@/utils/Utils";
 import dayjs from "dayjs";
 import { redirect } from "next/navigation";
 
-export default async function() {
-    const urlParts = [
-        '',
-        'journal',
-        dayjs().format('YYYY'),
-        1,
-    ];
+export default async function({ params }) {
+    const year = Number(params.year);
+    const month = 1;
 
-    redirect(urlParts.join('/'));
-    // redirect('/');
+    redirect(getJournalDateUrl({ month, year }));
 }

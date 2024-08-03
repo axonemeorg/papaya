@@ -7,12 +7,13 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateJournalEntry } from '@/types/post'
 import { PaymentType, TransactionType } from "@/types/enum";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
 
 interface JournalEntryModalProps {
     open: boolean;
+    initialDate: Date;
     onClose: () => void;
 }
 
@@ -36,6 +37,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
     const createJournalEntryForm = useForm<CreateJournalEntry>({
         defaultValues: {
             memo: '',
+            date: props.initialDate,
             transactions: [
                 {
                     transactionType: TransactionType.Enum.DEBIT,
@@ -51,6 +53,10 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
         resolver: zodResolver(CreateJournalEntry)
     });
 
+    useEffect(() => {
+        createJournalEntryForm.setValue('date', props.initialDate);
+    }, [props.initialDate]);
+
     const { formState: { errors} } = createJournalEntryForm
     console.log('errors:', errors)
 
@@ -62,7 +68,6 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
                 <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateTransactionMethod)}>
                     <DialogTitle>Add Entry</DialogTitle>
                     <DialogContent sx={{ overflow: "initial" }}>
-                        {/* <DialogContentText>{JSON.stringify(createJournalEntryForm.getValues())}</DialogContentText> */}
                         <JournalEntryForm/>
                     </DialogContent>
                     <DialogActions>

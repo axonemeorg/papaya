@@ -22,43 +22,56 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     const { setValue, control } = useFormContext<CreateJournalEntry>();
 
     return (
-        <Stack direction='row' spacing={1} alignItems='center'>
-            <Controller
-                control={control}
-                name={`transactions.${props.index}.amount` as const}
-                render={({ field }) => (
+        <Stack direction='row' gap={1} alignItems='center'>
+            <Grid container columns={12} spacing={1}>
+                <Grid item xs={2}>
+                    <Controller
+                        control={control}
+                        name={`transactions.${props.index}.amount` as const}
+                        render={({ field }) => (
+                            <TextField
+                                label='Amount'
+                                {...field}
+                                onChange={(event) => {
+                                    const value = event.target.value === ''
+                                        ? undefined
+                                        : Number(event.target.value);
+                                    field.onChange(value);
+                                }}
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                }}
+                                sx={{ flex: 1 }}
+                            />
+                        )}
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <Controller
+                        control={control}
+                        name={`transactions.${props.index}.transactionMethod` as const}
+                        render={({ field }) => (
+                            <TransactionMethodAutocomplete
+                                {...field}
+                                ref={null}
+                                value={field.value}
+                                onChange={(_event, newValue) => {
+                                    setValue(field.name, newValue);
+                                    setValue(`transactions.${props.index}.paymentType`, newValue.defaultPaymentType)
+                                }}
+                            />
+                        )}
+                    />
+                </Grid>
+                <Grid item xs={6}>
                     <TextField
-                        label='Amount'
-                        {...field}
-                        onChange={(event) => {
-                            const value = event.target.value === ''
-                                ? undefined
-                                : Number(event.target.value);
-                            field.onChange(value);
-                        }}
+                        label='Memo (Optional)'
                         fullWidth
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                        }}
-                        sx={{ flex: 1 }}
                     />
-                )}
-            />
+                </Grid>
+            </Grid>
 
-            <Controller
-                control={control}
-                name={`transactions.${props.index}.transactionMethod` as const}
-                render={({ field }) => (
-                    <TransactionMethodAutocomplete
-                        {...field}
-                        value={field.value}
-                        onChange={(_event, newValue) => {
-                            setValue(field.name, newValue);
-                            setValue(`transactions.${props.index}.paymentType`, newValue.defaultPaymentType)
-                        }}
-                    />
-                )}
-            />
             {/* <DateTimePicker /> */}
             {props.showAdvancedControls && (
                 <IconButton
@@ -74,6 +87,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
 
 export default function JournalEntryForm() {
     const [formTab, setFormTab] = useState(1);
+    const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
 
     const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
 
@@ -124,6 +138,10 @@ export default function JournalEntryForm() {
     });
 
     const handleDetectCategoryWithAi = debounce(async (memo) => {
+        if (memo.length < 2) {
+            return
+        }
+
         const category = await findMostSimilarCategory(memo);
         setValue('category', category);
     }, 500)
@@ -136,26 +154,16 @@ export default function JournalEntryForm() {
                     <Tab label="Advanced" />
                 </Tabs>
             </Box> */}
-            <Grid container columns={2} spacing={1}>
+            <Grid container columns={2} spacing={1} mb={2}>
                 <Grid item xs={1}>
                     <Controller
                         control={control}
-                        name='memo'
+                        name='date'
                         render={({ field }) => (
                             <TextField
-                                name='memo'
-                                label='Memo'
+                                label='Date'
                                 {...field}
-                                value={field.value}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    handleDetectCategoryWithAi(value);
-                                    setValue(field.name, value);
-                                }}
                                 fullWidth
-                                multiline
-                                maxRows={3}
-                                sx={{ mb: 2 }}
                             />
                         )}
                     />
@@ -167,8 +175,10 @@ export default function JournalEntryForm() {
                         render={({ field }) => (
                             <CategoryAutocomplete
                                 {...field}
-                                value={watch('category')}
+                                ref={null}
+                                value={watch('category') ?? null}
                                 onChange={(_event, newValue) => {
+                                    setManuallySetCategory(Boolean(newValue))
                                     setValue(field.name, newValue);
                                 }}
                             />
@@ -176,9 +186,33 @@ export default function JournalEntryForm() {
                     />
                 </Grid>
             </Grid>
+            <Controller
+                control={control}
+                name='memo'
+                render={({ field }) => (
+                    <TextField
+                        label='Memo'
+                        autoFocus
+                        {...field}
+                        ref={null}
+                        value={field.value}
+                        onChange={(event) => {
+                            const value = event.target.value;
+                            setValue(field.name, value);
+                            if (!manuallySetCategory) {
+                                handleDetectCategoryWithAi(value);
+                            }
+                        }}
+                        fullWidth
+                        multiline
+                        maxRows={3}
+                        sx={{ mb: 2 }}
+                    />
+                )}
+            />
             {showAdvancedControls && (
                 <Box mb={1}>
-                    <Typography variant='overline'>Money Out</Typography>
+                    <Typography variant='overline'><strong>Money Out</strong></Typography>
                 </Box>
             )}
             <Stack mb={2} spacing={2}>
@@ -199,7 +233,7 @@ export default function JournalEntryForm() {
             {showAdvancedControls && (
                 <>
                     <Box mb={1}>
-                        <Typography variant='overline'>Money In</Typography>
+                        <Typography variant='overline'><strong>Money In</strong></Typography>
                     </Box>
                     <Stack mb={2} spacing={2}>
                         {creditTransactionFields.map(([field, index]) => {
