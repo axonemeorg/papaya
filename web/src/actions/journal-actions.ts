@@ -64,6 +64,7 @@ export const getJournalEntriesByUserId = (userId: string) => {
 		where: eq(JournalEntryTable.userId, userId),
 		with: {
 			transactions: true
-		}
+		},
+		orderBy: [JournalEntryTable.date, JournalEntryTable.time],
 	});
 }

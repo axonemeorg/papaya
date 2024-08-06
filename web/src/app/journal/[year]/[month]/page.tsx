@@ -1,6 +1,6 @@
 'use server'
 
-import Journal from "@/components/journal/Journal";
+import JournalPageContent from "@/components/journal/JournalPage";
 import { useParams } from "next/navigation";
 
 export default async function JournalPage({ params }) {
@@ -8,6 +8,6 @@ export default async function JournalPage({ params }) {
     const year = Number(params.year);
 
     return (
-        <Journal month={month} year={year} />
+        <JournalPageContent month={month} year={year} />
     )
 }

@@ -1,15 +1,14 @@
-'use server'
-
 import { JournalDate } from "@/types/calendar";
 import { getJournalDateUrl, getNextYearMonth, getPreviousYearMonth, getTodayYearAndMonth } from "@/utils/Utils";
 import { Apps, ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Button, ButtonBase, IconButton, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import Link from "next/link";
+import { PropsWithChildren } from "react";
 
+type JournalHeaderProps = PropsWithChildren<JournalDate>;
 
-
-export default async function JournalHeaderActions({ month, year }: JournalDate) {
+export default function JournalHeader({ month, year, children }: JournalHeaderProps) {
     return (
         <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center'>
             <Stack direction='row' alignItems='center' gap={1}>
@@ -31,7 +30,9 @@ export default async function JournalHeaderActions({ month, year }: JournalDate)
                         </IconButton>
                     </Link>
                 </Stack>
-                <Typography variant='h4'>{dayjs([year, month].join('-')).format('MMMM YYYY')}</Typography>
+                <Typography variant='h5' sx={{ fontWeight: 500 }}>
+                    {dayjs([year, month].join('-')).format('MMMM YYYY')}
+                </Typography>
                 {/* <DateCalendar
                     defaultValue={dayjs('2022-04-17')}
                     views={['month', 'year']}
@@ -39,7 +40,7 @@ export default async function JournalHeaderActions({ month, year }: JournalDate)
                 /> */}
             </Stack>
             <Stack direction='row'>
-                <IconButton size="large"><Apps /></IconButton>
+                {children}
             </Stack>
         </Stack>
     )

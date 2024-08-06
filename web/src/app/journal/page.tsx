@@ -1,6 +1,6 @@
 'use server'
 
-import Journal from "@/components/journal/Journal";
+import JournalPage from "@/components/journal/JournalPage";
 import { getTodayYearAndMonth } from "@/utils/Utils";
 import dayjs from "dayjs";
 
@@ -8,6 +8,6 @@ export default async function() {
     const { year, month } = getTodayYearAndMonth();
 
     return (
-        <Journal month={month} year={year} />
+        <JournalPage month={month} year={year} />
     )
 }
