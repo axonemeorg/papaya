@@ -23,82 +23,82 @@ interface JournalEntryGroup {
     entries: JournalEntry[]
 }
 
-const groupedExampleJournalEntries: JournalEntryGroup[]  = [
-    {
-        date: '2024-08-01',
-        entries: [
-            {
-                journalEntryId: 1,
-                memo: 'Brunch at Shine Cafe',
-                categoryId: 1,
-                transactions: [
-                    {
-                        journalEntryId: 1,
-                        amount: 58.60,
-                        paymentType: "CREDIT",
-                        transactionMethod: {
-                            transactionMethodId: 1,
-                            label: 'My Mastercard'
-                        }
-                    }
-                ]
-            },
-            {
-                journalEntryId: 2,
-                memo: 'Treats for Vinny',
-                categoryId: 2,
-                transactions: [
-                    {
-                        journalEntryId: 2,
-                        amount: 40.70,
-                        paymentType: "CREDIT",
-                        transactionMethod: {
-                            transactionMethodId: 1,
-                            label: 'My Mastercard'
-                        }
-                    }
-                ]
-            },
-        ]
-    },
-    {
-        date: '2024-08-02',
-        entries: [
-            {
-                journalEntryId: 3,
-                memo: 'Brunch at Shine Cafe',
-                categoryId: 1,
-                transactions: [
-                    {
-                        journalEntryId: 3,
-                        amount: 58.60,
-                        paymentType: "CREDIT",
-                        transactionMethod: {
-                            transactionMethodId: 1,
-                            label: 'My Mastercard'
-                        }
-                    }
-                ]
-            },
-            {
-                journalEntryId: 4,
-                memo: 'Treats for Vinny',
-                categoryId: 2,
-                transactions: [
-                    {
-                        journalEntryId: 4,
-                        amount: 40.70,
-                        paymentType: "CREDIT",
-                        transactionMethod: {
-                            transactionMethodId: 1,
-                            label: 'My Mastercard'
-                        }
-                    }
-                ]
-            },
-        ]
-    }
-]
+// const groupedExampleJournalEntries: JournalEntryGroup[]  = [
+//     {
+//         date: '2024-08-01',
+//         entries: [
+//             {
+//                 journalEntryId: 1,
+//                 memo: 'Brunch at Shine Cafe',
+//                 categoryId: 1,
+//                 transactions: [
+//                     {
+//                         journalEntryId: 1,
+//                         amount: 58.60,
+//                         paymentType: "CREDIT",
+//                         transactionMethod: {
+//                             transactionMethodId: 1,
+//                             label: 'My Mastercard'
+//                         }
+//                     }
+//                 ]
+//             },
+//             {
+//                 journalEntryId: 2,
+//                 memo: 'Treats for Vinny',
+//                 categoryId: 2,
+//                 transactions: [
+//                     {
+//                         journalEntryId: 2,
+//                         amount: 40.70,
+//                         paymentType: "CREDIT",
+//                         transactionMethod: {
+//                             transactionMethodId: 1,
+//                             label: 'My Mastercard'
+//                         }
+//                     }
+//                 ]
+//             },
+//         ]
+//     },
+//     {
+//         date: '2024-08-02',
+//         entries: [
+//             {
+//                 journalEntryId: 3,
+//                 memo: 'Brunch at Shine Cafe',
+//                 categoryId: 1,
+//                 transactions: [
+//                     {
+//                         journalEntryId: 3,
+//                         amount: 58.60,
+//                         paymentType: "CREDIT",
+//                         transactionMethod: {
+//                             transactionMethodId: 1,
+//                             label: 'My Mastercard'
+//                         }
+//                     }
+//                 ]
+//             },
+//             {
+//                 journalEntryId: 4,
+//                 memo: 'Treats for Vinny',
+//                 categoryId: 2,
+//                 transactions: [
+//                     {
+//                         journalEntryId: 4,
+//                         amount: 40.70,
+//                         paymentType: "CREDIT",
+//                         transactionMethod: {
+//                             transactionMethodId: 1,
+//                             label: 'My Mastercard'
+//                         }
+//                     }
+//                 ]
+//             },
+//         ]
+//     }
+// ]
 
 const JournalEntryDate = ({ date }: { date: string })  => {
     const day = dayjs(date);
@@ -126,24 +126,17 @@ const JournalEntryDate = ({ date }: { date: string })  => {
 export default function JournalEntries(props: JournalEntriesProps) {
     const { journalEntries, transactionMethods, categories } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
-    // const [createEntryInitialDate, setCreateEntryInitialDate] = useState<
 
-    const rows = journalEntries.map((entry) => {
-        return {
-            id: entry.categoryId,
-            memo: entry.memo,
-            date: entry.transactions[0].createdAt,
-            category: entry
-
+    const journal = journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+        const { date } = entry;
+        if (acc[date]) {
+            acc[date].push(entry);
+        } else {
+            acc[date] = [entry];
         }
-    })
 
-
-    // const columns: GridColDef<Type>[] = [
-    //     {
-
-    //     }
-    // ]
+        return acc;
+    }, {});
 
     return (
         <CategoryContext.Provider value={{ categories }}>
@@ -158,16 +151,16 @@ export default function JournalEntries(props: JournalEntriesProps) {
                             <TableCell>Method</TableCell>
                         </TableHead> */}
                         <TableBody>
-                            {groupedExampleJournalEntries.map((group) => {
+                            {Object.entries(journal).map(([date, entries]) => {
                                 return (
-                                    <TableRow key={group.date}>
+                                    <TableRow key={date}>
                                         <TableCell width='180px'>
-                                            <JournalEntryDate date={group.date} />
+                                            <JournalEntryDate date={date} />
                                         </TableCell>
                                         <TableCell>
                                             <List>
-                                                {group.entries.map((entry) => {
-                                                    const category = categories[2];
+                                                {entries.map((entry) => {
+                                                    const category = categories.find((c) => c.categoryId === entry.categoryId);
                                                     const categoryColor = getMuiColor(category.color);
                                                     return (
                                                         <MenuItem key={entry.journalEntryId} sx={{ borderRadius: '64px' }}>
@@ -201,7 +194,7 @@ export default function JournalEntries(props: JournalEntriesProps) {
                     <JournalEntryModal
                         open={showJournalEntryModal}
                         onClose={() => setShowJournalEntryModal(false)}
-                        initialDate={new Date()}
+                        initialDate={dayjs().format('YYYY-MM-DD')}
                     />
                     <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
                         <Add />
