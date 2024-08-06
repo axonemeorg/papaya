@@ -1,0 +1,2 @@
+ALTER TABLE "category" ADD COLUMN "label_embedding" vector(1536) NOT NULL;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "embedding_index" ON "category" USING hnsw ("label_embedding" vector_cosine_ops);
