@@ -1,104 +1,16 @@
 'use client'
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
-import { alpha, Avatar, Button, Chip, Fab, Icon, List, ListItem, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { alpha, Avatar, Box, Button, Chip, Fab, Icon, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { CategoryContext } from "@/contexts/CategoryContext";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import { getMuiColor } from "../color/ColorPicker";
-
-type JournalEntriesProps =
-    & JournalEntryContext
-    & TransactionMethodContext
-    & CategoryContext;
-
-
-interface JournalEntryGroup {
-    date: string;
-    entries: JournalEntry[]
-}
-
-// const groupedExampleJournalEntries: JournalEntryGroup[]  = [
-//     {
-//         date: '2024-08-01',
-//         entries: [
-//             {
-//                 journalEntryId: 1,
-//                 memo: 'Brunch at Shine Cafe',
-//                 categoryId: 1,
-//                 transactions: [
-//                     {
-//                         journalEntryId: 1,
-//                         amount: 58.60,
-//                         paymentType: "CREDIT",
-//                         transactionMethod: {
-//                             transactionMethodId: 1,
-//                             label: 'My Mastercard'
-//                         }
-//                     }
-//                 ]
-//             },
-//             {
-//                 journalEntryId: 2,
-//                 memo: 'Treats for Vinny',
-//                 categoryId: 2,
-//                 transactions: [
-//                     {
-//                         journalEntryId: 2,
-//                         amount: 40.70,
-//                         paymentType: "CREDIT",
-//                         transactionMethod: {
-//                             transactionMethodId: 1,
-//                             label: 'My Mastercard'
-//                         }
-//                     }
-//                 ]
-//             },
-//         ]
-//     },
-//     {
-//         date: '2024-08-02',
-//         entries: [
-//             {
-//                 journalEntryId: 3,
-//                 memo: 'Brunch at Shine Cafe',
-//                 categoryId: 1,
-//                 transactions: [
-//                     {
-//                         journalEntryId: 3,
-//                         amount: 58.60,
-//                         paymentType: "CREDIT",
-//                         transactionMethod: {
-//                             transactionMethodId: 1,
-//                             label: 'My Mastercard'
-//                         }
-//                     }
-//                 ]
-//             },
-//             {
-//                 journalEntryId: 4,
-//                 memo: 'Treats for Vinny',
-//                 categoryId: 2,
-//                 transactions: [
-//                     {
-//                         journalEntryId: 4,
-//                         amount: 40.70,
-//                         paymentType: "CREDIT",
-//                         transactionMethod: {
-//                             transactionMethodId: 1,
-//                             label: 'My Mastercard'
-//                         }
-//                     }
-//                 ]
-//             },
-//         ]
-//     }
-// ]
+import { TransactionType } from "@/types/enum";
 
 const JournalEntryDate = ({ date }: { date: string })  => {
     const day = dayjs(date);
@@ -106,7 +18,7 @@ const JournalEntryDate = ({ date }: { date: string })  => {
 
     return (
         <Button color='inherit'>
-            <Stack direction='row' alignItems='center' gap={1}>
+            <Stack direction='row' alignItems='flex-end' gap={0.5}>
                 <Avatar
                     sx={(theme) => ({
                         background: isToday ? theme.palette.primary.main : 'transparent',
@@ -115,7 +27,7 @@ const JournalEntryDate = ({ date }: { date: string })  => {
                 >
                     {day.format('D')}
                 </Avatar>
-                <Typography variant='inherit' color={isToday ? 'primary' : undefined}>
+                <Typography mb={0.75} variant='inherit' color={isToday ? 'primary' : undefined}>
                     {day.format('MMM, ddd')}
                 </Typography>
             </Stack>
@@ -123,8 +35,10 @@ const JournalEntryDate = ({ date }: { date: string })  => {
     )
 }
 
-export default function JournalEntries(props: JournalEntriesProps) {
-    const { journalEntries, transactionMethods, categories } = props;
+export default function JournalEntries() {
+    const { journalEntries } = useContext(JournalEntryContext);
+    const { transactionMethods } = useContext(TransactionMethodContext);
+    const { categories } = useContext(CategoryContext);
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
 
     const journal = journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
@@ -138,69 +52,94 @@ export default function JournalEntries(props: JournalEntriesProps) {
         return acc;
     }, {});
 
-    return (
-        <CategoryContext.Provider value={{ categories }}>
-            <TransactionMethodContext.Provider value={{ transactionMethods }}>
-                <JournalEntryContext.Provider value={{ journalEntries }}>
-                    
-                    <Table>
-                        {/* <TableHead>
-                            <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap' }}>Date</TableCell>
-                            <TableCell>Entries</TableCell>
-                            <TableCell>Category</TableCell>
-                            <TableCell>Method</TableCell>
-                        </TableHead> */}
-                        <TableBody>
-                            {Object.entries(journal).map(([date, entries]) => {
-                                return (
-                                    <TableRow key={date}>
-                                        <TableCell width='180px'>
-                                            <JournalEntryDate date={date} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <List>
-                                                {entries.map((entry) => {
-                                                    const category = categories.find((c) => c.categoryId === entry.categoryId);
-                                                    const categoryColor = getMuiColor(category.color);
-                                                    return (
-                                                        <MenuItem key={entry.journalEntryId} sx={{ borderRadius: '64px' }}>
-                                                            {/* <Stack direction='row' alignItems='center'> */}
-                                                                <ListItemIcon>
-                                                                    <Icon sx={{ color: categoryColor}}>{category.icon}</Icon>
-                                                                </ListItemIcon>
-                                                                <ListItemText>{entry.memo}</ListItemText>
-                                                                <Chip
-                                                                    size='small'
-                                                                    sx={{
-                                                                        color: categoryColor,
-                                                                        background: alpha(categoryColor, 0.125),
-                                                                        fontWeight: 500
-                                                                    }}
-                                                                    // icon={<Icon color={categoryColor}>{category.icon}</Icon>}
-                                                                    label={category.label}
-                                                                />
-                                                            {/* </Stack> */}
-                                                        </MenuItem>
-                                                    )
-                                                })}
-                                            </List>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })}
-                        </TableBody>
-                    </Table>
+    console.log(journal)
+    console.log('methods:', transactionMethods)
 
-                    <JournalEntryModal
-                        open={showJournalEntryModal}
-                        onClose={() => setShowJournalEntryModal(false)}
-                        initialDate={dayjs().format('YYYY-MM-DD')}
-                    />
-                    <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
-                        <Add />
-                    </Fab>
-                </JournalEntryContext.Provider>
-            </TransactionMethodContext.Provider>
-        </CategoryContext.Provider>
+    return (
+        <>
+            <Table size='small'>
+                {/* <TableHead>
+                    <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap' }}>Date</TableCell>
+                    <TableCell>Entries</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Method</TableCell>
+                </TableHead> */}
+                <TableBody>
+                    {Object.entries(journal).map(([date, entries]) => {
+                        return (
+                            <TableRow key={date}>
+                                <TableCell width='180px' sx={{ verticalAlign: 'top' }}>
+                                    <JournalEntryDate date={date} />
+                                </TableCell>
+                                <TableCell sx={{ verticalAlign: 'top' }}>
+                                    <List>
+                                        {entries.map((entry) => {
+                                            const category = categories.find((c) => c.categoryId === entry.categoryId);
+                                            const categoryColor = getMuiColor(category.color);
+                                            const { netAmount, methods } = entry.transactions.reduce(({ netAmount, methods }, transaction) => {
+                                                if (transaction.transactionType === TransactionType.Enum.CREDIT) {
+                                                    netAmount += transaction.amount;
+                                                } else if (transaction.transactionType === TransactionType.Enum.DEBIT) {
+                                                    netAmount -= transaction.amount;
+                                                }
+                                                const method = transactionMethods.find((m) => m.transactionMethodId === transaction.transactionMethodId);
+                                                if (method && !methods.some((m) => m.transactionMethodId === method.transactionMethodId)) {
+                                                    methods.push(method);
+                                                }
+
+                                                return { netAmount, methods };
+                                            }, { netAmount: 0, methods: [] })
+                                            return (
+                                                <MenuItem key={entry.journalEntryId} sx={{ borderRadius: '64px' }}>
+                                                    <Stack direction='row' alignItems='center' gap={4}>
+                                                        <Stack direction='row' alignItems='center'>
+                                                            <ListItemIcon>
+                                                                <Icon sx={{ color: categoryColor}}>{category.icon}</Icon>
+                                                            </ListItemIcon>
+                                                            <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
+                                                        </Stack>
+                                                        <ListItemText sx={{ width: 100 , textAlign: 'right' }}>
+                                                            ${netAmount}
+                                                        </ListItemText>
+                                                        <Box width={200}>
+                                                            <Chip
+                                                                size='small'
+                                                                sx={{
+                                                                    color: categoryColor,
+                                                                    background: alpha(categoryColor, 0.125),
+                                                                    fontWeight: 500
+                                                                }}
+                                                                // icon={<Icon color={categoryColor}>{category.icon}</Icon>}
+                                                                label={category.label}
+                                                            />
+                                                        </Box>
+                                                        <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
+                                                            {methods.map((method) => {
+                                                                return (
+                                                                    <Chip label={method.label} />
+                                                                )
+                                                            })}
+                                                        </Stack>
+                                                    </Stack>
+                                                </MenuItem>
+                                            )
+                                        })}
+                                    </List>
+                                </TableCell>
+                            </TableRow>
+                        )
+                    })}
+                </TableBody>
+            </Table>
+
+            <JournalEntryModal
+                open={showJournalEntryModal}
+                onClose={() => setShowJournalEntryModal(false)}
+                initialDate={dayjs().format('YYYY-MM-DD')}
+            />
+            <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
+                <Add />
+            </Fab>
+        </>
     )
 }
