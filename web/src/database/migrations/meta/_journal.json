@@ -43,6 +43,13 @@
       "when": 1722621856632,
       "tag": "0005_tearful_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1722925400417,
+      "tag": "0006_graceful_oracle",
+      "breakpoints": true
     }
   ]
 }

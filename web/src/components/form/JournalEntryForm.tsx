@@ -3,7 +3,7 @@
 import { Box, Button, Collapse, Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Add, Delete } from "@mui/icons-material";
-import DateTimePicker from "../date/DateTimePicker";
+import CustomDatePicker from "../date/CustomDatePicker";
 import TransactionMethodAutocomplete from "../input/TransactionMethodAutocomplete";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
@@ -11,6 +11,9 @@ import { TransactionType } from "@/types/enum";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { findMostSimilarCategory } from "@/actions/category-actions";
 import { debounce } from "@/utils/Utils";
+import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from "dayjs";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -72,7 +75,6 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                 </Grid>
             </Grid>
 
-            {/* <DateTimePicker /> */}
             {props.showAdvancedControls && (
                 <IconButton
                     onClick={() => props.fieldArray.remove(props.index)}
@@ -154,21 +156,62 @@ export default function JournalEntryForm() {
                     <Tab label="Advanced" />
                 </Tabs>
             </Box> */}
-            <Grid container columns={2} spacing={1} mb={2}>
-                <Grid item xs={1}>
+            <Grid container columns={12} spacing={1} mb={2}>
+                <Grid item xs={4}>
                     <Controller
                         control={control}
                         name='date'
                         render={({ field }) => (
-                            <TextField
-                                label='Date'
-                                {...field}
-                                fullWidth
-                            />
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    {...field}
+                                    value={dayjs(field.value)}
+                                    onChange={(value) => {
+                                        setValue(field.name, value.format('YYYY-MM-DD'));
+                                    }}
+                                    format='dddd, MMMM D'
+                                    label='Date'
+                                    slotProps={{
+                                        textField:  {
+                                            fullWidth: true
+                                        }
+                                    }}
+                                />
+                            </LocalizationProvider>
                         )}
                     />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={4}>
+                    <Controller
+                        control={control}
+                        name='time'
+                        render={({ field }) => {
+                            const value = dayjs([
+                                dayjs(watch('date')).format('YYYY-MM-DD'),
+                                field.value
+                            ].join(' '));
+
+                            return (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        {...field}
+                                        value={value}
+                                        onChange={(value) => {
+                                            setValue(field.name, value.format('HH:mm:ss'));
+                                        }}
+                                        label='Time'
+                                        slotProps={{
+                                            textField:  {
+                                                fullWidth: true
+                                            }
+                                        }}
+                                    />
+                                </LocalizationProvider>
+                            );
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={4}>
                     <Controller
                         control={control}
                         name='category'

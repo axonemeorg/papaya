@@ -10,10 +10,11 @@ import { PaymentType, TransactionType } from "@/types/enum";
 import { useEffect, useState } from "react";
 import { createJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
+import dayjs from "dayjs";
 
 interface JournalEntryModalProps {
     open: boolean;
-    initialDate: Date;
+    initialDate: string;
     onClose: () => void;
 }
 
@@ -38,6 +39,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
         defaultValues: {
             memo: '',
             date: props.initialDate,
+            time: dayjs().format("HH:mm:ss"),
             transactions: [
                 {
                     transactionType: TransactionType.Enum.DEBIT,

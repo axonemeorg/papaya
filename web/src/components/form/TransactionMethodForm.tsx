@@ -2,8 +2,6 @@
 
 import { AutocompleteProps, Grid, TextField } from "@mui/material";
 import { useContext, useState } from "react";
-import { Add, Delete } from "@mui/icons-material";
-import DateTimePicker from "../date/DateTimePicker";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateTransactionMethod } from "@/types/post";
 import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";

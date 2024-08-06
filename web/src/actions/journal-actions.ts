@@ -14,7 +14,7 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 		throw new Error('Not authorized.');
     }
 
-	const { memo, transactions, category } = formData;
+	const { memo, transactions, category, date, time } = formData;
 
 	if (category) {
 		// Ensure that the given category belongs to the user
@@ -36,6 +36,8 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 			userId: user.id,
 			categoryId: category?.categoryId ?? null,
 			memo,
+			date,
+			time,
 		})
 		.returning({
 			journalEntryId: JournalEntryTable.journalEntryId
