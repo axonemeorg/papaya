@@ -16,7 +16,7 @@ type TransactionMethodAutocompleteProps =
     & Omit<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>
     & Partial<Pick<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>>
 
-const IconWithGradient = (props: IconWithGradientProps) => {
+export const IconWithGradient = (props: IconWithGradientProps) => {
     const { icon, primaryColor, secondaryColor } = props;
 
     return (

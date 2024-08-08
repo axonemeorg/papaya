@@ -8,8 +8,9 @@ import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { CategoryContext } from "@/contexts/CategoryContext";
 import { useState } from "react";
-import { Drawer, IconButton } from "@mui/material";
+import { Divider, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { CreditCard } from "@mui/icons-material";
+import ManageTransactionMethods from "./ManageTransactionMethods";
 
 type JournalProps = 
     & JournalDate
@@ -43,7 +44,11 @@ export default function Journal(props: JournalProps) {
                             <>
                                 <JournalEntries />
                                 <Drawer anchor='right' open={methodsDrawerOpen} onClose={() => setMethodsDrawerOpen(false)}>
-                                    Hello world
+                                    <Stack sx={(theme) => ({ height: theme.spacing(11) })} alignItems='center'>
+                                        <Typography variant='h6'>Transaction Methods</Typography>
+                                    </Stack>
+                                    <Divider />
+                                    <ManageTransactionMethods />
                                 </Drawer>
                             </>
                     </JournalEntryContext.Provider>
