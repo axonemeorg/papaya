@@ -1,6 +1,6 @@
 'use client'
 
-import { montserrat } from "@/app/layout";
+import { montserrat } from "@/fonts/montserrat";
 import { createTheme } from "@mui/material";
 
 /**
