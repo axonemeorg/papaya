@@ -5,50 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1722119392345,
-      "tag": "0000_medical_young_avengers",
+      "when": 1725403969254,
+      "tag": "0000_icy_roxanne_simpson",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1722299076189,
-      "tag": "0001_cooing_blizzard",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1722369386488,
-      "tag": "0002_giant_lilith",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1722373172791,
-      "tag": "0003_late_zarek",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1722448041703,
-      "tag": "0004_tranquil_nocturne",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1722621856632,
-      "tag": "0005_tearful_warlock",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1722925400417,
-      "tag": "0006_graceful_oracle",
+      "when": 1725403981882,
+      "tag": "0001_optimal_leopardon",
       "breakpoints": true
     }
   ]
