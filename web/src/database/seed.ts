@@ -1,5 +1,5 @@
 import { pool } from "./client";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/libsql";
 import dotenv from 'dotenv';
 import dotenvExpand from 'dotenv-expand';
 

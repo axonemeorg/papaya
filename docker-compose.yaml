@@ -1,18 +1,29 @@
 version: '3.8'
 
 services:
-  postgres:
-    build:
-      context: ./database
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+  db:
+    image: ghcr.io/tursodatabase/libsql-server:latest
+    platform: linux/amd64
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT}:8080"
+      - "5001:5001"
+    # environment:
+    #   - SQLD_NODE=primary
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data/libsql:/var/lib/sqld
+
+  # postgres:
+  #   build:
+  #     context: ./database
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     POSTGRES_DB: ${DB_NAME}
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   ports:
+  #     - "${DB_PORT}:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:

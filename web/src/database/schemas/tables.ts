@@ -1,19 +1,12 @@
 import {
-    serial,
-    varchar,
-    pgTable,
-    date,
-    time,
-    timestamp,
+    sqliteTable,
     integer,
     index,
     text,
-    vector,
-} from 'drizzle-orm/pg-core'
+} from 'drizzle-orm/sqlite-core'
 
 const EMBEDDING_NUM_DIMENSIONS = 1536 as const;
 
-import { PaymentType, TransactionType } from './enums';
 import { UserTable } from './auth';
 
 const timestamps = {

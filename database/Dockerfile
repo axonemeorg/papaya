@@ -1,12 +1,11 @@
-# FROM postgres:latest
-FROM ankane/pgvector:latest
+# Use the official LibSQL Server image from GitHub Container Registry
+FROM ghcr.io/tursodatabase/libsql-server:latest
 
-# RUN apt-get update && apt-get install -y \
-#     postgresql-server-dev-all \
-#     build-essential \
-#     && rm -rf /var/lib/apt/lists/*
+# Set environment variable for SQLD_NODE
+ENV SQLD_NODE=primary
 
-# RUN git clone https://github.com/pgvector/pgvector.git /usr/src/pgvector && \
-#     cd /usr/src/pgvector && \
-#     make && make install && \
-#     rm -rf /usr/src/pgvector
+# Expose port 8080
+EXPOSE 8080
+
+# Command to run the server
+CMD ["libsql-server"]
