@@ -4,7 +4,7 @@ import { validateRequest } from '@/auth';
 import db from '@/database/client'
 import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
 import { CreateJournalEntry } from '@/types/post';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, InferInsertModel } from 'drizzle-orm';
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
 	console.log('createJournalEntry:', formData)
@@ -34,11 +34,11 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 		.insert(JournalEntryTable)
 		.values({
 			userId: user.id,
-			categoryId: category?.categoryId ?? null,
+			categoryId: category?.categoryId ?? undefined,
 			memo,
 			date,
 			time,
-		})
+		} as InferInsertModel<typeof JournalEntryTable>)
 		.returning({
 			journalEntryId: JournalEntryTable.journalEntryId
 		});
