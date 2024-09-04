@@ -15,6 +15,16 @@ const appTheme = createTheme({
     },
     typography: {
         fontFamily: montserrat.style.fontFamily
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 28,
+                    textTransform: 'unset'
+                }
+            }
+        }
     }
 });
 
