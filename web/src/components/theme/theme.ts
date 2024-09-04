@@ -1,6 +1,6 @@
 'use client'
 
-import { montserrat } from "@/app/layout";
+import { montserrat } from "@/fonts/montserrat";
 import { createTheme } from "@mui/material";
 
 /**
@@ -8,13 +8,23 @@ import { createTheme } from "@mui/material";
  */
 const appTheme = createTheme({
     palette: {
-        // mode: 'dark',
-        // primary:{
-        //     // main: 'rgb(255, 12, 12)'
-        // }
+        mode: 'dark',
+        primary:{
+            main: 'rgb(251, 202, 4)'
+        }
     },
     typography: {
         fontFamily: montserrat.style.fontFamily
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 28,
+                    textTransform: 'unset'
+                }
+            }
+        }
     }
 });
 
