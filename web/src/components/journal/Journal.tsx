@@ -23,7 +23,8 @@ export default function Journal(props: JournalProps) {
         categories,
         journalEntries,
         transactionMethods,
-        month, year
+        month,
+        year
     } = props;
     
     const [methodsDrawerOpen, setMethodsDrawerOpen] = useState<boolean>(false);

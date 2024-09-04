@@ -13,7 +13,7 @@ const Timestamps = z.object({
 export type Timestamps = z.infer<typeof Timestamps>;
 
 export const TransactionMethod = Timestamps.extend({
-    transactionMethodId: z.number(),
+    transactionMethodId: z.string().uuid(),
     // userId: z.string(), // TODO ideally we should not fetch this.
     label: z.string(),
     defaultPaymentType: PaymentType
@@ -21,7 +21,7 @@ export const TransactionMethod = Timestamps.extend({
 export type TransactionMethod = z.infer<typeof TransactionMethod>;
 
 export const Category = Timestamps.extend({
-    categoryId: z.number(),
+    categoryId: z.string().uuid(),
     icon: z.string(),
     color: z.string(),
     description: z.string(),
