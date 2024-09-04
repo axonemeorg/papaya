@@ -8,10 +8,10 @@ import { createTheme } from "@mui/material";
  */
 const appTheme = createTheme({
     palette: {
-        // mode: 'dark',
-        // primary:{
-        //     // main: 'rgb(255, 12, 12)'
-        // }
+        mode: 'dark',
+        primary:{
+            main: 'rgb(251, 202, 4)'
+        }
     },
     typography: {
         fontFamily: montserrat.style.fontFamily
