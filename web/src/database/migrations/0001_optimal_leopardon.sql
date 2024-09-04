@@ -23,16 +23,31 @@ CREATE TABLE IF NOT EXISTS "user" (
 	CONSTRAINT "user_username_unique" UNIQUE("username")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "journal_entry" (
-	"journal_entry_id" serial PRIMARY KEY NOT NULL,
+CREATE TABLE IF NOT EXISTS "category" (
+	"category_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"label" varchar(128) NOT NULL,
+	"icon" varchar(1023) NOT NULL,
+	"color" varchar(64) NOT NULL,
+	"description" varchar(1024) NOT NULL,
+	"description_embedding" vector(1536) NOT NULL,
 	"user_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "journal_entry" (
+	"journal_entry_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"memo" varchar(1024) NOT NULL,
+	"date" date NOT NULL,
+	"time" time NOT NULL,
+	"user_id" text NOT NULL,
+	"category_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "transaction_method" (
-	"transaction_method_id" serial PRIMARY KEY NOT NULL,
+	"transaction_method_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
 	"label" varchar(128) NOT NULL,
 	"default_payment_type" "payment_type" NOT NULL,
@@ -41,13 +56,13 @@ CREATE TABLE IF NOT EXISTS "transaction_method" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "transaction" (
-	"transaction_id" serial PRIMARY KEY NOT NULL,
-	"journal_entry_id" integer NOT NULL,
+	"transaction_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"journal_entry_id" uuid NOT NULL,
 	"transaction_type" "transaction_type" NOT NULL,
 	"payment_type" "payment_type" NOT NULL,
 	"amount" integer NOT NULL,
 	"memo" varchar(1024),
-	"transaction_method_id" integer NOT NULL,
+	"transaction_method_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
@@ -59,7 +74,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "category" ADD CONSTRAINT "category_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "journal_entry" ADD CONSTRAINT "journal_entry_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "journal_entry" ADD CONSTRAINT "journal_entry_category_id_category_category_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."category"("category_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -81,3 +108,5 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "embedding_index" ON "category" USING hnsw ("description_embedding" vector_cosine_ops);

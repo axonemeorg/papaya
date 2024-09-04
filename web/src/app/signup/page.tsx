@@ -34,15 +34,15 @@ async function signup(formData: FormData): Promise<ActionResult> {
 		username.length > 31 ||
 		!/^[a-z0-9_-]+$/.test(username)
 	) {
-		return {
+		return Promise.reject({
 			error: "Invalid username"
-		};
+		});
 	}
 	const password = formData.get("password");
 	if (typeof password !== "string" || password.length < 6 || password.length > 255) {
-		return {
+		return Promise.reject({
 			error: "Invalid password"
-		};
+		});
 	}
 
     const userId = generateIdFromEntropySize(10); // 16 characters long
