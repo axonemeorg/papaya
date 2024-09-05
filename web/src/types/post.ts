@@ -6,7 +6,7 @@ export const CreateTransaction = z.object({
     transactionType: TransactionType,
     paymentType: PaymentType,
     date: z.string().min(1, "A date is required"),
-    amount: z.number().min(0, "A positive number is required"),
+    amount: z.string().min(0, "A positive number is required"),
     memo: z.string().optional(),
     transactionMethod: TransactionMethod.pick({ transactionMethodId: true })
 });

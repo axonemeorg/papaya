@@ -47,12 +47,14 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 
 	const { journalEntryId } = result[0];
 
+	console.log('transactions:', transactions)
+
 	await db
 		.insert(TransactionTable)
 		.values(transactions.map((transaction) => {
 			return {
 				journalEntryId,
-				amount: transaction.amount,
+				amount: Number.parseInt(String(100 * Number.parseFloat(transaction.amount))),
 				transactionType: transaction.transactionType,
 				memo: transaction.memo ?? null,
 				paymentType: transaction.transactionType,

@@ -93,8 +93,9 @@ export default function JournalEntries() {
                                     <List>
                                         {entries.map((entry) => {
                                             const { category } = entry;
-                                            
                                             const { netAmount, methods } = entry;
+                                            const isNetPositive = netAmount > 0;
+
                                             return (
                                                 <MenuItem
                                                     key={entry.journalEntryId}
@@ -108,8 +109,13 @@ export default function JournalEntries() {
                                                             </ListItemIcon>
                                                             <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
                                                         </Stack>
-                                                        <ListItemText sx={{ width: 100 , textAlign: 'right' }}>
-                                                            ${netAmount}
+                                                        <ListItemText
+                                                            sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
+                                                        >
+                                                            {isNetPositive
+                                                                ? `+$${Number(netAmount / 100).toFixed(2)}`
+                                                                : `$${Number(netAmount / -100).toFixed(2)}`
+                                                            }
                                                         </ListItemText>
                                                         <Box width={200}>
                                                             <CategoryChip category={category} />

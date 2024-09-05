@@ -36,10 +36,11 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                                 label='Amount'
                                 {...field}
                                 onChange={(event) => {
-                                    const value = event.target.value === ''
-                                        ? undefined
-                                        : Number(event.target.value);
-                                    field.onChange(value);
+                                    const value = event.target.value;
+                                    const newValue = value.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
+                                        .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
+                                        .replace(/(\.\d{2})\d+/g, '$1'); // Limit to two decimal places
+                                    field.onChange(newValue);
                                 }}
                                 fullWidth
                                 InputProps={{

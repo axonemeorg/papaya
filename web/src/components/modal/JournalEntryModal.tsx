@@ -70,7 +70,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
                 <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateTransactionMethod)}>
                     <DialogTitle>Add Entry</DialogTitle>
                     <DialogContent sx={{ overflow: "initial" }}>
-                        <JournalEntryForm/>
+                        <JournalEntryForm />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => props.onClose()}>Cancel</Button>
