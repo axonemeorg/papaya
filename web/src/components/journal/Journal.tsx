@@ -8,7 +8,7 @@ import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { CategoryContext } from "@/contexts/CategoryContext";
 import { useState } from "react";
-import { Divider, Drawer, IconButton, Stack, Typography } from "@mui/material";
+import { Box, DialogContent, Divider, Drawer, IconButton, Stack, Typography } from "@mui/material";
 import { CreditCard } from "@mui/icons-material";
 import ManageTransactionMethods from "./ManageTransactionMethods";
 
@@ -45,9 +45,9 @@ export default function Journal(props: JournalProps) {
                             <>
                                 <JournalEntries />
                                 <Drawer anchor='right' open={methodsDrawerOpen} onClose={() => setMethodsDrawerOpen(false)}>
-                                    <Stack sx={(theme) => ({ height: theme.spacing(11) })} alignItems='center'>
-                                        <Typography variant='h6'>Transaction Methods</Typography>
-                                    </Stack>
+                                    <Box py={5} px={3}>
+                                        <Typography variant='h5'>Transaction Methods</Typography>
+                                    </Box>
                                     <Divider />
                                     <ManageTransactionMethods />
                                 </Drawer>

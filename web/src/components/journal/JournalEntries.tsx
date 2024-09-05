@@ -17,8 +17,8 @@ const JournalEntryDate = ({ date }: { date: string })  => {
     const isToday = day.isSame(dayjs(), 'day');
 
     return (
-        <Button color='inherit'>
-            <Stack direction='row' alignItems='flex-end' gap={0.5}>
+        <Button color='inherit' sx={{ borderRadius: 1 }}>
+            <Stack direction='row' alignItems='flex-end' gap={0.75}>
                 <Avatar
                     sx={(theme) => ({
                         background: isToday ? theme.palette.primary.main : 'transparent',
@@ -27,7 +27,7 @@ const JournalEntryDate = ({ date }: { date: string })  => {
                 >
                     {day.format('D')}
                 </Avatar>
-                <Typography mb={0.75} variant='inherit' color={isToday ? 'primary' : undefined}>
+                <Typography mb={0.25} variant='overline' color={isToday ? 'primary' : undefined}>
                     {day.format('MMM, ddd')}
                 </Typography>
             </Stack>
