@@ -94,19 +94,7 @@ export default function JournalEntries() {
                                         {entries.map((entry) => {
                                             const { category } = entry;
                                             
-                                            const { netAmount, methods } = entry.transactions.reduce(({ netAmount, methods }, transaction) => {
-                                                if (transaction.transactionType === TransactionType.Enum.CREDIT) {
-                                                    netAmount += transaction.amount;
-                                                } else if (transaction.transactionType === TransactionType.Enum.DEBIT) {
-                                                    netAmount -= transaction.amount;
-                                                }
-                                                const method = transactionMethods.find((m) => m.transactionMethodId === transaction.transactionMethodId);
-                                                if (method && !methods.some((m) => m.transactionMethodId === method.transactionMethodId)) {
-                                                    methods.push(method);
-                                                }
-
-                                                return { netAmount, methods };
-                                            }, { netAmount: 0, methods: [] })
+                                            const { netAmount, methods } = entry;
                                             return (
                                                 <MenuItem
                                                     key={entry.journalEntryId}

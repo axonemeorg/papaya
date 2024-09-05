@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { CategoryTable, JournalEntryTable, TransactionTable } from "./tables";
+import { CategoryTable, JournalEntryTable, TransactionMethodTable, TransactionTable } from "./tables";
 
 export const JournalEntryTableRelations = relations(JournalEntryTable, ({ one, many }) => {
     return {
@@ -16,6 +16,10 @@ export const TransactionTableRelations = relations(TransactionTable, ({ one, man
         journalEntry: one(JournalEntryTable, {
             fields: [TransactionTable.journalEntryId],
             references: [JournalEntryTable.journalEntryId]
-        })
+        }),
+        method: one(TransactionMethodTable, {
+            fields: [TransactionTable.transactionMethodId],
+            references: [TransactionMethodTable.transactionMethodId]
+        }),
     }
 });

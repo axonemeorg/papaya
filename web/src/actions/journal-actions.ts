@@ -4,6 +4,7 @@ import { validateRequest } from '@/auth';
 import db from '@/database/client'
 import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
 import JournalRepository from '@/server/repositories/JournalRepository';
+import JournalService from '@/server/services/JournalService';
 import { CreateJournalEntry } from '@/types/post';
 import { and, eq, InferInsertModel } from 'drizzle-orm';
 
@@ -61,5 +62,5 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 }
 
 export const getJournalEntriesByUserId = (userId: string) => {
-	return JournalRepository.getUserJournalEntries(userId);
+	return JournalService.getUserJournalEntries(userId);
 }

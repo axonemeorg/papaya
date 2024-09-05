@@ -1,5 +1,5 @@
 import db from "@/database/client";
-import { CategoryTable, JournalEntryTable } from "@/database/schemas";
+import { CategoryTable, JournalEntryTable, TransactionTable } from "@/database/schemas";
 import { eq } from "drizzle-orm";
 
 export default class JournalRepository {
@@ -8,20 +8,30 @@ export default class JournalRepository {
             where: eq(JournalEntryTable.userId, userId),
             orderBy: [JournalEntryTable.date, JournalEntryTable.time],
             columns: {
-                [JournalEntryTable.journalEntryId.name]: true,
-                [JournalEntryTable.memo.name]: true,
-                [JournalEntryTable.date.name]: true,
-                [JournalEntryTable.time.name]: true,
+                journalEntryId: true,
+                memo: true,
+                date: true,
+                time: true,
             },
             with: {
-                transactions: true,
+                transactions: {
+                    with: {
+                        method: true,
+                    },
+                    columns: {
+                        transactionId: true,
+                        amount: true,
+                        transactionType: true,
+                    }
+                },
                 category: {
                     columns: {
-                        [CategoryTable.categoryId.name]: true,
-                        [CategoryTable.label.name]: true,
-                        [CategoryTable.icon.name]: true,
-                        [CategoryTable.color.name]: true,
-                    }
+                        categoryId: true,
+                        label: true,
+                        icon: true,
+                        color: true,
+                    },
+                    
                 },
             },
         });
