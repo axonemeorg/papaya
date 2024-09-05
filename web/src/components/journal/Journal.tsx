@@ -26,6 +26,8 @@ export default function Journal(props: JournalProps) {
         month,
         year
     } = props;
+
+    console.log('Journal Entries:', journalEntries);
     
     const [methodsDrawerOpen, setMethodsDrawerOpen] = useState<boolean>(false);
 

@@ -1,6 +1,7 @@
 import { JournalEntry } from "@/types/get";
 import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
 import { Box, Icon, IconButton, Paper, Popover, Stack, Typography } from "@mui/material";
+import CategoryIcon from "../icon/CategoryIcon";
 
 interface JournalEntryCard {
     anchorEl: HTMLElement;
@@ -36,7 +37,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                     <Stack sx={{ textAlign: 'center' }} alignItems='center'>
                         <Typography variant='h3' mb={0.5}>$12.15</Typography>
                         <Stack direction='row' gap={1}>
-                            <Icon><LocalPizza /></Icon>
+                            <CategoryIcon category={props.entry.category} />
                             <Typography>{props.entry.memo}</Typography>
                         </Stack>
                     </Stack>

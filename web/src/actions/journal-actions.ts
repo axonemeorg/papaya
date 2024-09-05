@@ -3,6 +3,7 @@
 import { validateRequest } from '@/auth';
 import db from '@/database/client'
 import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
+import JournalRepository from '@/server/repositories/JournalRepository';
 import { CreateJournalEntry } from '@/types/post';
 import { and, eq, InferInsertModel } from 'drizzle-orm';
 
@@ -60,11 +61,5 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 }
 
 export const getJournalEntriesByUserId = (userId: string) => {
-	return db.query.JournalEntryTable.findMany({
-		where: eq(JournalEntryTable.userId, userId),
-		with: {
-			transactions: true
-		},
-		orderBy: [JournalEntryTable.date, JournalEntryTable.time],
-	});
+	return JournalRepository.getUserJournalEntries(userId);
 }

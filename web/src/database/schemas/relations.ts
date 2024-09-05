@@ -1,9 +1,13 @@
 import { relations } from "drizzle-orm";
-import { JournalEntryTable, TransactionTable } from "./tables";
+import { CategoryTable, JournalEntryTable, TransactionTable } from "./tables";
 
 export const JournalEntryTableRelations = relations(JournalEntryTable, ({ one, many }) => {
     return {
-        transactions: many(TransactionTable)
+        transactions: many(TransactionTable),
+        category: one(CategoryTable, {
+            fields: [JournalEntryTable.categoryId],
+            references: [CategoryTable.categoryId]
+        }),
     }
 });
 

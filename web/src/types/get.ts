@@ -39,4 +39,5 @@ export type Transaction = InferSelectModel<typeof TransactionTable> & {
 
 export type JournalEntry = InferSelectModel<typeof JournalEntryTable> & {
     transactions: Transaction[]
+    category: Category
 }

@@ -2,7 +2,7 @@
 
 import { MouseEvent, useContext, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
-import { alpha, Avatar, Box, Button, Chip, Fab, Icon, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
@@ -13,6 +13,8 @@ import { getMuiColor } from "../color/ColorPicker";
 import { TransactionType } from "@/types/enum";
 import JournalEntryCard from "./JournalEntryCard";
 import { set } from "zod";
+import CategoryIcon from "../icon/CategoryIcon";
+import CategoryChip from "../icon/CategoryChip";
 
 const JournalEntryDate = ({ date }: { date: string })  => {
     const day = dayjs(date);
@@ -90,8 +92,8 @@ export default function JournalEntries() {
                                 <TableCell sx={{ verticalAlign: 'top' }}>
                                     <List>
                                         {entries.map((entry) => {
-                                            const category = categories.find((c) => c.categoryId === entry.categoryId);
-                                            const categoryColor = getMuiColor(category.color);
+                                            const { category } = entry;
+                                            
                                             const { netAmount, methods } = entry.transactions.reduce(({ netAmount, methods }, transaction) => {
                                                 if (transaction.transactionType === TransactionType.Enum.CREDIT) {
                                                     netAmount += transaction.amount;
@@ -114,7 +116,7 @@ export default function JournalEntries() {
                                                     <Stack direction='row' alignItems='center' gap={4}>
                                                         <Stack direction='row' alignItems='center'>
                                                             <ListItemIcon>
-                                                                <Icon sx={{ color: categoryColor}}>{category.icon}</Icon>
+                                                                <CategoryIcon category={category} />
                                                             </ListItemIcon>
                                                             <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
                                                         </Stack>
@@ -122,16 +124,7 @@ export default function JournalEntries() {
                                                             ${netAmount}
                                                         </ListItemText>
                                                         <Box width={200}>
-                                                            <Chip
-                                                                size='small'
-                                                                sx={{
-                                                                    color: categoryColor,
-                                                                    background: alpha(categoryColor, 0.125),
-                                                                    fontWeight: 500
-                                                                }}
-                                                                // icon={<Icon color={categoryColor}>{category.icon}</Icon>}
-                                                                label={category.label}
-                                                            />
+                                                            <CategoryChip category={category} />
                                                         </Box>
                                                         <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
                                                             {methods.map((method) => {
