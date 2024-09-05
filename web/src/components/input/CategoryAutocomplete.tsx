@@ -16,7 +16,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 
     return (
         <Autocomplete<Category>
-            className='ai-effect'
+            // className='ai-effect'
             options={categories}
             isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
             renderInput={(params) => <TextField {...params} label="Category" />}

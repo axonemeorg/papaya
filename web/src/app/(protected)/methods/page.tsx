@@ -6,11 +6,7 @@ import TransactionMethodModal from "@/components/modal/TransactionMethodModal";
 import { redirect } from "next/navigation";
 
 export default async function MethodsTestPage() {
-    const { user, session } = await validateRequest();
-
-    if (!user) {
-        redirect('/login');
-    }
+    const { user } = await validateRequest();
 
     const transactionMethods = await getTransactionMethodsByUserId(user.id);
 

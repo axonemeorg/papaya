@@ -17,10 +17,6 @@ export default async function JournalPage(props: JournalPageProps) {
     const { month, year } = props;
     const { user } = await validateRequest();
 
-    if (!user) {
-        redirect('/login');
-    }
-
     const transactionMethods = await getTransactionMethodsByUserId(user.id);
     const journalEntries = await getJournalEntriesByUserId(user.id);
     const categories = await getCategoriesByUserId(user.id);
