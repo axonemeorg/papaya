@@ -14,6 +14,13 @@ export const PaymentType = z.enum([
 ]);
 export type PaymentType = z.infer<typeof PaymentType>;
 
+export const TransactionMethodIconVariant = z.enum([
+    'TEXT',
+    'PICTORIAL',
+    'IMAGE',
+]);
+export type TransactionMethodIconVariant = z.infer<typeof TransactionMethodIconVariant>;
+
 export const PAYMENT_TYPE_NAMES: Record<PaymentType, string> = {
     CASH: 'Cash',
     ETRANSFER: 'e-Transfer',

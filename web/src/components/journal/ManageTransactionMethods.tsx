@@ -9,7 +9,7 @@ import TransactionMethodModal from "../modal/TransactionMethodModal";
 
 export default function ManageTransactionMethods() {
     const { transactionMethods } = useContext(TransactionMethodContext);
-    const [showTransactionMethodModal, setShowTransactionMethodModal] = useState<boolean>(false);
+    const [showTransactionMethodModal, setShowTransactionMethodModal] = useState<boolean>(true);
 
     return (
         <>

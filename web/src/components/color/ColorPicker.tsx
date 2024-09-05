@@ -121,9 +121,9 @@ export const Swatch = (props: SwatchProps) => {
     return Children;
 }
 
-interface ColorPickerProps {
-    color: string;
-    onChange: (color: string) => void;
+export interface ColorPickerProps {
+    color?: string;
+    onChange?: (color: string) => void;
 }
 
 export const getMuiColor = (color: string) => {
@@ -131,14 +131,18 @@ export const getMuiColor = (color: string) => {
     return muiColors[colorName][colorShade];
 }
 
+const DEFAULT_COLOR = 'red.400'
+
 export default function ColorPicker(props: ColorPickerProps) {
+    const color = props.color || DEFAULT_COLOR;
+
     return (
         <>
             <Select
                 size='small'
-                value={props.color}
+                value={color}
                 onChange={(event) => {
-                    props.onChange(event.target.value)
+                    props.onChange?.(event.target.value)
                 }}
                 renderValue={(value: string) => {
                     const color = getMuiColor(value);

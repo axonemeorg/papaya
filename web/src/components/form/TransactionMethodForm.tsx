@@ -18,7 +18,7 @@ export default function TransactionMethodForm() {
             <Avatar />
             <IconPicker
                 icon={''}
-                color={''}
+                onChangeIcon={(icon) => setValue('icon', icon)}
             />
             <Grid container direction='row' columns={2} spacing={1} alignItems='center'>
                 <Grid item xs={1}>

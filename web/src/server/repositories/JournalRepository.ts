@@ -16,7 +16,15 @@ export default class JournalRepository {
             with: {
                 transactions: {
                     with: {
-                        method: true,
+                        method: {
+                            columns: {
+                                label: true,
+                                iconContent: true,
+                                iconVariant: true,
+                                iconPrimaryColor: true,
+                                iconSecondaryColor: true,
+                            }
+                        }
                     },
                     columns: {
                         transactionId: true,

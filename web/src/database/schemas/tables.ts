@@ -13,7 +13,7 @@ import {
 
 const EMBEDDING_NUM_DIMENSIONS = 1536 as const;
 
-import { PaymentType, TransactionType } from './enums';
+import { PaymentTypeEnum, TransactionMethodIconVariantEnum, TransactionTypeEnum } from './enums';
 import { UserTable } from './auth';
 
 const timestamps = {
@@ -31,8 +31,15 @@ export const TransactionMethodTable = pgTable("transaction_method", {
         .notNull(),
     label: varchar('label', { length: 128 })
         .notNull(),
-    defaultPaymentType: PaymentType('default_payment_type')
+    defaultPaymentType: PaymentTypeEnum('default_payment_type')
         .notNull(),
+    iconContent: varchar('icon_content', { length: 512 })
+        .notNull(),
+    iconVariant: TransactionMethodIconVariantEnum('icon_variant')
+        .notNull(),
+    iconPrimaryColor: varchar('icon_primary_color', { length: 64 })
+        .notNull(),
+    iconSecondaryColor: varchar('icon_secondary_color', { length: 64 }),
 
     ...timestamps
 });
@@ -44,9 +51,9 @@ export const TransactionTable = pgTable("transaction", {
     journalEntryId: uuid('journal_entry_id')
         .references(() => JournalEntryTable.journalEntryId)
         .notNull(),
-    transactionType: TransactionType('transaction_type')
+    transactionType: TransactionTypeEnum('transaction_type')
         .notNull(),
-    paymentType: PaymentType('payment_type')
+    paymentType: PaymentTypeEnum('payment_type')
         .notNull(),
     amount: integer('amount')
         .notNull(),

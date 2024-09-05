@@ -4,19 +4,17 @@ import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { useMemo, useState } from 'react';
-import ColorPicker, { getMuiColor } from '../color/ColorPicker';
+import ColorPicker, { ColorPickerProps, getMuiColor } from '../color/ColorPicker';
 import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
 
 const DEFAULT_ICON = 'home'
-const DEFAULT_COLOR = 'red.400'
 
 interface IconPickerProps {
-    color?: string;
     icon?: string;
-    onChangeColor?: (color: string) => void;
     onChangeIcon?: (icon: string) => void;
+    ColorPickerProps?: ColorPickerProps;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -34,10 +32,9 @@ const fuse = new Fuse(sortedIcons, fuseOptions);
 const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
-
 export default function IconPicker(props: IconPickerProps) {
-    const icon = props.icon || DEFAULT_ICON;
-    const color = props.color || DEFAULT_COLOR;
+    const icon: string = props.icon || DEFAULT_ICON;
+    const color: string | undefined = props.ColorPickerProps?.color ?? undefined
 
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -45,8 +42,7 @@ export default function IconPicker(props: IconPickerProps) {
 
     const scrollbarWidth = useScrollbarWidth();
 
-    const iconColor = getMuiColor(color);
-    
+    const iconColor: string | undefined = color ? getMuiColor(color) : undefined;
 
     const handleShuffle = () => {
         const iconIndex = Math.floor(Math.random() * sortedIcons.length);
@@ -69,7 +65,7 @@ export default function IconPicker(props: IconPickerProps) {
     return (
         <>
             <Button onClick={(event) => setAnchorEl(event.currentTarget)} size='small' sx={{ minWidth: 'unset' }}>
-                <Icon sx={{ color: iconColor }}>{icon}</Icon>
+                <Icon sx={(theme) => ({ color: iconColor ?? theme.palette.text.primary })}>{icon}</Icon>
             </Button>
             <Popover
                 TransitionComponent={Fade}
@@ -94,9 +90,10 @@ export default function IconPicker(props: IconPickerProps) {
                                 </InputAdornment>
                             )
                         }}
-                        placeholder='Filter'
+                        placeholder='Find icon...'
                         variant='outlined'
                         size='small'
+                        fullWidth
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
                     />
@@ -107,7 +104,12 @@ export default function IconPicker(props: IconPickerProps) {
                     >
                         <Shuffle />
                     </Button>
-                    <ColorPicker color={color} onChange={(newColor) => props.onChangeColor?.(newColor)} />
+                    {props.ColorPickerProps && (
+                        <ColorPicker
+                            color={color}
+                            onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
+                        />
+                    )}
                 </Stack>
                 <Box pl={2}>
                     <FixedSizeGrid
@@ -129,11 +131,11 @@ export default function IconPicker(props: IconPickerProps) {
                                         key={index}
                                         onClick={() => props.onChangeIcon(icon.name)}
                                         size="small"
-                                        sx={{ 
+                                        sx={(theme) => ({ 
                                             minWidth: 'unset',
-                                            '& span': { color: `${iconColor} !important` }
+                                            '& span': { color: `${iconColor ?? theme.palette.text.primary} !important` }
                                             
-                                        }}
+                                        })}
                                         style={{
                                             ...style,
                                         }}

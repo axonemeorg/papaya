@@ -15,6 +15,13 @@
       "when": 1725403981882,
       "tag": "0001_optimal_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1725571282995,
+      "tag": "0002_young_sunspot",
+      "breakpoints": true
     }
   ]
 }
