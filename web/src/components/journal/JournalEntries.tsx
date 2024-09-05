@@ -1,6 +1,6 @@
 'use client'
 
-import { useContext, useState } from "react";
+import { MouseEvent, useContext, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, Icon, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
@@ -11,6 +11,8 @@ import { JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import { getMuiColor } from "../color/ColorPicker";
 import { TransactionType } from "@/types/enum";
+import JournalEntryCard from "./JournalEntryCard";
+import { set } from "zod";
 
 const JournalEntryDate = ({ date }: { date: string })  => {
     const day = dayjs(date);
@@ -40,6 +42,9 @@ export default function JournalEntries() {
     const { transactionMethods } = useContext(TransactionMethodContext);
     const { categories } = useContext(CategoryContext);
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
+    
+    const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+    const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
 
     const journal = journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
         const { date } = entry;
@@ -52,11 +57,22 @@ export default function JournalEntries() {
         return acc;
     }, {});
 
-    console.log(journal)
-    console.log('methods:', transactionMethods)
+    const handleClickListItem = (event: MouseEvent<HTMLLIElement, MouseEvent>, entry: JournalEntry) => {
+        setSelectedEntryAnchorEl(event.currentTarget);
+        setSelectedEntry(entry);
+    }
+    // console.log(journal)
+    // console.log('methods:', transactionMethods)
 
     return (
         <>
+            {selectedEntry && (
+                <JournalEntryCard
+                    entry={selectedEntry}
+                    onClose={() => setSelectedEntryAnchorEl(null)}
+                    anchorEl={selectedEntryAnchorEl}
+                />
+            )}
             <Table size='small'>
                 {/* <TableHead>
                     <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap' }}>Date</TableCell>
@@ -90,7 +106,11 @@ export default function JournalEntries() {
                                                 return { netAmount, methods };
                                             }, { netAmount: 0, methods: [] })
                                             return (
-                                                <MenuItem key={entry.journalEntryId} sx={{ borderRadius: '64px' }}>
+                                                <MenuItem
+                                                    key={entry.journalEntryId}
+                                                    sx={{ borderRadius: '64px' }}
+                                                    onClick={(event) => handleClickListItem(event, entry)}
+                                                >
                                                     <Stack direction='row' alignItems='center' gap={4}>
                                                         <Stack direction='row' alignItems='center'>
                                                             <ListItemIcon>

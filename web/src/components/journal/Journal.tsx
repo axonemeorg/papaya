@@ -55,7 +55,6 @@ export default function Journal(props: JournalProps) {
                     </JournalEntryContext.Provider>
                 </TransactionMethodContext.Provider>
             </CategoryContext.Provider>
-                
         </BaseLayout>
     )
 }
