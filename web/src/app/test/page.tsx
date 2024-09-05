@@ -7,8 +7,8 @@ import { useState } from "react";
 
 
 export default function TestPage() {
-    const [icon, setIcon] = useState<string>('home');
-    const [color, setColor] = useState<string>('red.400');
+    const [icon, setIcon] = useState<string>('');
+    const [color, setColor] = useState<string>('');
 
     return (
         <div>

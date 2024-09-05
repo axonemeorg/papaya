@@ -142,12 +142,17 @@ export default function ColorPicker(props: ColorPickerProps) {
                 }}
                 renderValue={(value: string) => {
                     const color = getMuiColor(value);
-                    console.log('color:', color)
                     return (
                         <Swatch color={color} />
                     )
                 }}
                 MenuProps={{
+
+                    slotProps: {
+                        paper: {
+                            sx: { px: 1, py: 0.5 }
+                        },
+                    },
                     MenuListProps: {
                         sx: {
                             display: 'grid',
@@ -165,35 +170,33 @@ export default function ColorPicker(props: ColorPickerProps) {
                     }
 
                     return (
-                        
-                            <MenuItem
-                                value={color}
-                                key={color}
-                                disableTouchRipple
-                                sx={{
-                                    p: 0,
-                                    '&:hover, &:focus, &.Mui-selected': {
-                                        background: 'none !important', // Disable background color change
-                                        color: 'inherit', // Disable color change
-                                    },
-                                    '&:not(:hover) .swatch': {
-                                        boxShadow: 'none !important',
-                                    },
-                                    '&:hover .swatch, &.Mui-focusVisible .swatch': {
-                                        width: '22px',
-                                        height: '22px',
-                                        margin: 0
-                                    },
-                                }}
-                            >
-                                <Tooltip title='hello'>
+                        <MenuItem
+                            value={color}
+                            key={color}
+                            disableTouchRipple
+                            sx={{
+                                p: 0,
+                                '&:hover, &:focus, &.Mui-selected': {
+                                    background: 'none !important', // Disable background color change
+                                    color: 'inherit', // Disable color change
+                                },
+                                '&:not(:hover) .swatch': {
+                                    boxShadow: 'none !important',
+                                },
+                                '&:hover .swatch, &.Mui-focusVisible .swatch': {
+                                    width: '22px',
+                                    height: '22px',
+                                    margin: 0
+                                },
+                            }}
+                        >
+                            <Tooltip title='hello'>
                                 <Swatch
                                     color={muiColors[colorName][shade]}
                                     name={colorNameParts.join(' ')}
-                                    // onClick={() => {}}
                                 />
-                        </Tooltip>
-                            </MenuItem>
+                            </Tooltip>
+                        </MenuItem>
                     )
                 })}
             </Select>

@@ -1,19 +1,25 @@
 'use client';
 
-import { AutocompleteProps, Grid, TextField } from "@mui/material";
+import { AutocompleteProps, Avatar, Box, Grid, TextField } from "@mui/material";
 import { useContext, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateTransactionMethod } from "@/types/post";
 import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
 import { PaymentType } from "@/types/enum";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
+import IconPicker from "../icon/IconPicker";
 
 export default function TransactionMethodForm() {
     const { transactionMethods } = useContext(TransactionMethodContext);
     const { register, control, setValue } = useFormContext<CreateTransactionMethod>();
 
     return (
-        <>
+        <Box>
+            <Avatar />
+            <IconPicker
+                icon={''}
+                color={''}
+            />
             <Grid container direction='row' columns={2} spacing={1} alignItems='center'>
                 <Grid item xs={1}>
                     <TextField
@@ -40,6 +46,6 @@ export default function TransactionMethodForm() {
                 />
                 </Grid>
             </Grid>
-        </>
+        </Box>
     )
 }

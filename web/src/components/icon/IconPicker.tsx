@@ -9,11 +9,14 @@ import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
 
+const DEFAULT_ICON = 'home'
+const DEFAULT_COLOR = 'red.400'
+
 interface IconPickerProps {
-    color: string;
-    icon: string;
-    onChangeColor: (color: string) => void;
-    onChangeIcon: (icon: string) => void;
+    color?: string;
+    icon?: string;
+    onChangeColor?: (color: string) => void;
+    onChangeIcon?: (icon: string) => void;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -32,21 +35,22 @@ const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
 
-console.log('sortedIcons[0]', sortedIcons[0])
-
 export default function IconPicker(props: IconPickerProps) {
+    const icon = props.icon || DEFAULT_ICON;
+    const color = props.color || DEFAULT_COLOR;
+
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const open = Boolean(anchorEl)
 
     const scrollbarWidth = useScrollbarWidth();
 
-    const iconColor = getMuiColor(props.color);
+    const iconColor = getMuiColor(color);
     
 
     const handleShuffle = () => {
         const iconIndex = Math.floor(Math.random() * sortedIcons.length);
-        props.onChangeIcon(sortedIcons[iconIndex].name);
+        props.onChangeIcon?.(sortedIcons[iconIndex].name);
     }
 
     // Search for an icon
@@ -65,7 +69,7 @@ export default function IconPicker(props: IconPickerProps) {
     return (
         <>
             <Button onClick={(event) => setAnchorEl(event.currentTarget)} size='small' sx={{ minWidth: 'unset' }}>
-                <Icon sx={{ color: iconColor }}>{props.icon}</Icon>
+                <Icon sx={{ color: iconColor }}>{icon}</Icon>
             </Button>
             <Popover
                 TransitionComponent={Fade}
@@ -103,7 +107,7 @@ export default function IconPicker(props: IconPickerProps) {
                     >
                         <Shuffle />
                     </Button>
-                    <ColorPicker color={props.color} onChange={props.onChangeColor} />
+                    <ColorPicker color={color} onChange={(newColor) => props.onChangeColor?.(newColor)} />
                 </Stack>
                 <Box pl={2}>
                     <FixedSizeGrid
