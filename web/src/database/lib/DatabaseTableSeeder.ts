@@ -1,4 +1,6 @@
 
+import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
 import db, { DbClient } from '@/database/client'
 
 abstract class DatabaseTableSeeder {
@@ -11,6 +13,9 @@ abstract class DatabaseTableSeeder {
     abstract seed(): Promise<void>;
 
     async _run(): Promise<void> {
+        const env = dotenv.config({ path: '../.env' });
+        dotenvExpand.expand(env);
+
         const startTime = Date.now();
         let endTime = Date.now();
         let statusIndicator = '✅'

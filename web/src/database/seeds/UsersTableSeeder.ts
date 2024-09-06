@@ -5,14 +5,18 @@ import { hash } from "@node-rs/argon2";
 
 export default class UsersTableSeeder extends DatabaseTableSeeder {
     async seed(): Promise<void> {
-        const usernames = [
-            'curtis'
+        
+        const credentials = [
+            {
+                username: process.env.DEFAULT_USER_NAME,
+                passwordText: process.env.DEFAULT_USER_PASSWORD,
+            }
         ];
 
-        const users = await Promise.all(usernames.map(async (username) => {
+        const users = await Promise.all(credentials.map(async ({ username, passwordText }) => {
             const userId = generateIdFromEntropySize(10);
             // Default password is their username.
-            const passwordHash = await hash(username, {
+            const passwordHash = await hash(passwordText, {
                 memoryCost: 19456,
                 timeCost: 2,
                 outputLen: 64,
