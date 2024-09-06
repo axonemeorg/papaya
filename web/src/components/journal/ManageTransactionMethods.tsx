@@ -5,11 +5,12 @@ import { Box, Button, DialogTitle, Divider, ListItemIcon, ListItemText, MenuItem
 import { useContext, useState } from "react";
 import { IconWithGradient } from "../input/TransactionMethodAutocomplete";
 import TransactionMethodModal from "../modal/TransactionMethodModal";
+import { getMuiColor } from "../color/ColorPicker";
 
 
 export default function ManageTransactionMethods() {
     const { transactionMethods } = useContext(TransactionMethodContext);
-    const [showTransactionMethodModal, setShowTransactionMethodModal] = useState<boolean>(true);
+    const [showTransactionMethodModal, setShowTransactionMethodModal] = useState<boolean>(false);
 
     return (
         <>
@@ -24,9 +25,9 @@ export default function ManageTransactionMethods() {
                         
                             <ListItemIcon>
                                 <IconWithGradient
-                                    icon='credit_card'
-                                    primaryColor="#EB001B"
-                                    secondaryColor="#F79E1B"
+                                    icon={transactionMethod.iconContent}
+                                    primaryColor={getMuiColor(transactionMethod.iconPrimaryColor)}
+                                    secondaryColor={getMuiColor(transactionMethod.iconSecondaryColor ?? transactionMethod.iconPrimaryColor) }
                                 />
                             </ListItemIcon>
                             <ListItemText primary={transactionMethod.label} />

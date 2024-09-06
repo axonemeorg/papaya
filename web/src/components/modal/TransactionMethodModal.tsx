@@ -39,8 +39,8 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
             label: '',
             defaultPaymentType: PaymentType.Enum.CREDIT,
             iconContent: 'credit_card',
-            iconPrimaryColor: '',
-            iconSecondaryColor: '',
+            iconPrimaryColor: 'red.400',
+            iconSecondaryColor: 'red.400',
             iconVariant: 'PICTORIAL',
         },
         resolver: zodResolver(CreateTransactionMethod)

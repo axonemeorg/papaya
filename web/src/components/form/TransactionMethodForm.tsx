@@ -9,18 +9,23 @@ import { PaymentType, TransactionMethodIconVariant } from "@/types/enum";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import IconPicker from "../icon/IconPicker";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
-import ColorPicker from "../color/ColorPicker";
+import ColorPicker, { getMuiColor } from "../color/ColorPicker";
 
 export default function TransactionMethodForm() {
     const { transactionMethods } = useContext(TransactionMethodContext);
     const { register, control, setValue, watch } = useFormContext<CreateTransactionMethod>();
 
+    const primaryColor = getMuiColor(watch('iconPrimaryColor'));
+    const secondaryColor = getMuiColor(watch('iconSecondaryColor'));
+
     return (
         <Box>
             <Stack alignItems='center' sx={{ width: '100%' }} gap={0.5}>
-                <Avatar>
+                <Avatar
+                    sx={{ width: 48, height: 48, background: `linear-gradient(60deg, ${primaryColor} 20%, ${secondaryColor} 90%)` }}
+                >
                     {watch('iconVariant') === 'PICTORIAL' ? (
-                        <Icon>{watch('iconContent')}</Icon>
+                        <Icon fontSize="large">{watch('iconContent')}</Icon>
                     ) : (
                         <Typography variant='inherit'>
                             {watch('iconContent')}
@@ -31,8 +36,8 @@ export default function TransactionMethodForm() {
                     <Typography>&zwnj;{watch('label')}</Typography>
                 </Fade>
             </Stack>
-            <InputLabel sx={{ mb: 0.5 }}>Icon Type</InputLabel>
-            <Controller<CreateTransactionMethod>
+            <InputLabel sx={{ mb: 0.5 }}>Icon</InputLabel>
+            {/* <Controller<CreateTransactionMethod>
                 name='iconVariant'
                 control={control}
                 render={({ field }) => (
@@ -55,8 +60,8 @@ export default function TransactionMethodForm() {
                         </ToggleButton>
                     </ToggleButtonGroup>
                 )}
-            />
-            <Stack direction='row'>
+            /> */}
+            <Stack direction='row' gap={1} mb={2}>
                 <Controller<CreateTransactionMethod>
                     name='iconContent'
                     control={control}
