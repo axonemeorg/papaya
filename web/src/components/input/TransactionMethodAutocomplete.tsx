@@ -5,30 +5,13 @@ import { CreditCard } from "@mui/icons-material";
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps } from "@mui/material";
 import { CSSProperties, useContext, useMemo } from "react";
 import { type TransactionMethod } from "@/types/get";
+import { IconWithGradient } from "../icon/IconWithGradient";
 
-interface IconWithGradientProps {
-    icon: string;
-    primaryColor: string;
-    secondaryColor: string;
-}
+
 
 type TransactionMethodAutocompleteProps = 
     & Omit<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>
     & Partial<Pick<AutocompleteProps<TransactionMethod, false, false, false>, 'options' | 'renderInput'>>
-
-export const IconWithGradient = (props: IconWithGradientProps) => {
-    const { icon, primaryColor, secondaryColor } = props;
-
-    return (
-        <Icon
-            style={{
-                background: `-webkit-linear-gradient(left, ${primaryColor} 25%, ${secondaryColor} 75%)`,
-                '-webkit-background-clip': 'text',
-                '-webkit-text-fill-color': 'transparent',
-            } as CSSProperties}
-        >{icon}</Icon>
-    )
-}
 
 export default function TransactionMethodAutocomplete(props: TransactionMethodAutocompleteProps) {
     const { transactionMethods } = useContext(TransactionMethodContext);
@@ -48,10 +31,11 @@ export default function TransactionMethodAutocomplete(props: TransactionMethodAu
                     >
                         <ListItemIcon>
                             <IconWithGradient
-                                icon='credit_card'
                                 primaryColor="#EB001B"
                                 secondaryColor="#F79E1B"
-                            />
+                            >
+                                credit_card
+                            </IconWithGradient>
                         </ListItemIcon>
                         <ListItemText primary={option.label} />
                     </ListItem>

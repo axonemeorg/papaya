@@ -3,9 +3,9 @@ import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { Add } from "@mui/icons-material";
 import { Box, Button, DialogTitle, Divider, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
 import { useContext, useState } from "react";
-import { IconWithGradient } from "../input/TransactionMethodAutocomplete";
 import TransactionMethodModal from "../modal/TransactionMethodModal";
 import { getMuiColor } from "../color/ColorPicker";
+import { IconWithGradient } from "../icon/IconWithGradient";
 
 
 export default function ManageTransactionMethods() {
@@ -25,10 +25,11 @@ export default function ManageTransactionMethods() {
                         
                             <ListItemIcon>
                                 <IconWithGradient
-                                    icon={transactionMethod.iconContent}
                                     primaryColor={getMuiColor(transactionMethod.iconPrimaryColor)}
                                     secondaryColor={getMuiColor(transactionMethod.iconSecondaryColor ?? transactionMethod.iconPrimaryColor) }
-                                />
+                                >
+                                    {transactionMethod.iconContent}
+                                </IconWithGradient>
                             </ListItemIcon>
                             <ListItemText primary={transactionMethod.label} />
                         </MenuItem>
