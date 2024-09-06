@@ -37,7 +37,11 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
     const createTransactionMethodForm = useForm<CreateTransactionMethod>({
         defaultValues: {
             label: '',
-            defaultPaymentType: PaymentType.Enum.CREDIT
+            defaultPaymentType: PaymentType.Enum.CREDIT,
+            iconContent: 'credit_card',
+            iconPrimaryColor: '',
+            iconSecondaryColor: '',
+            iconVariant: 'PICTORIAL',
         },
         resolver: zodResolver(CreateTransactionMethod)
     });

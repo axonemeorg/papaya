@@ -3,7 +3,7 @@ import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, TextField } fr
 import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
-import { useMemo, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import ColorPicker, { ColorPickerProps, getMuiColor } from '../color/ColorPicker';
 import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
@@ -15,6 +15,7 @@ interface IconPickerProps {
     icon?: string;
     onChangeIcon?: (icon: string) => void;
     ColorPickerProps?: ColorPickerProps;
+    renderButton?: (icon: string) => ReactNode;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
