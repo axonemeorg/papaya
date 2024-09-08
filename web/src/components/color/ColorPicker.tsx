@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, colors, Grid, MenuItem, Paper, Popover, Popper, Select, Stack, Tooltip } from '@mui/material';
+import { Box, Button, colors, FormControl, Grid, InputLabel, MenuItem, Paper, Popover, Popper, Select, Stack, Tooltip } from '@mui/material';
 import * as muiColors from '@mui/material/colors';
 import { useState } from 'react';
 
@@ -122,6 +122,8 @@ export const Swatch = (props: SwatchProps) => {
 }
 
 export interface ColorPickerProps {
+    id: string;
+    label?: string;
     color?: string;
     onChange?: (color: string) => void;
 }
@@ -137,9 +139,15 @@ export default function ColorPicker(props: ColorPickerProps) {
     const color = props.color || DEFAULT_COLOR;
 
     return (
-        <>
+        <FormControl>
+            {props.label && (
+                <InputLabel id={`${props.id}-label`}>
+                    {props.label}
+                </InputLabel>
+            )}
             <Select
                 size='small'
+                label={props.label}
                 value={color}
                 onChange={(event) => {
                     props.onChange?.(event.target.value)
@@ -150,8 +158,14 @@ export default function ColorPicker(props: ColorPickerProps) {
                         <Swatch color={color} />
                     )
                 }}
+                slotProps={{
+                    input: {
+                        sx: {
+                            minWidth: 60,
+                        }
+                    }
+                }}
                 MenuProps={{
-
                     slotProps: {
                         paper: {
                             sx: { px: 1, py: 0.5 }
@@ -194,16 +208,14 @@ export default function ColorPicker(props: ColorPickerProps) {
                                 },
                             }}
                         >
-                            <Tooltip title='hello'>
-                                <Swatch
-                                    color={muiColors[colorName][shade]}
-                                    name={colorNameParts.join(' ')}
-                                />
-                            </Tooltip>
+                            <Swatch
+                                color={muiColors[colorName][shade]}
+                                name={colorNameParts.join(' ')}
+                            />
                         </MenuItem>
                     )
                 })}
             </Select>
-        </>
+        </FormControl>
     )
 }

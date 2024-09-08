@@ -16,7 +16,11 @@ export const TransactionMethod = Timestamps.extend({
     transactionMethodId: z.string().uuid(),
     // userId: z.string(), // TODO ideally we should not fetch this.
     label: z.string(),
-    defaultPaymentType: PaymentType
+    defaultPaymentType: PaymentType,
+    iconContent: z.string(),
+    iconVariant: z.string(),
+    iconPrimaryColor: z.string(),
+    iconSecondaryColor: z.string().nullable(),
 });
 export type TransactionMethod = z.infer<typeof TransactionMethod>;
 

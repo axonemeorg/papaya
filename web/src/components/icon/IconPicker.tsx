@@ -1,13 +1,14 @@
 
-import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, TextField } from '@mui/material';
+import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { ReactNode, useMemo, useState } from 'react';
 import ColorPicker, { ColorPickerProps, getMuiColor } from '../color/ColorPicker';
-import { Search, Shuffle } from '@mui/icons-material';
+import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
+import { IconWithGradient } from './IconWithGradient';
 
 const DEFAULT_ICON = 'home'
 
@@ -43,6 +44,8 @@ export default function IconPicker(props: IconPickerProps) {
 
     const scrollbarWidth = useScrollbarWidth();
 
+    const iconPrimaryColor = '#FF0000';
+    const iconSecondaryColor = '#00FF00';
     const iconColor: string | undefined = color ? getMuiColor(color) : undefined;
 
     const handleShuffle = () => {
@@ -82,7 +85,15 @@ export default function IconPicker(props: IconPickerProps) {
                     horizontal: 'center'
                 }}
             >
-                <Stack direction='row' p={2} mb={2} gap={1} alignItems='center'>
+                <Box px={2} pt={1}>
+                    <Tabs value={0}>
+                        <Tab label='Icon'/>
+                        <Tab label='Emoji' />
+                        <Tab label='Letters' />
+                        <Tab label='Image' />
+                    </Tabs>
+                </Box>
+                <Stack direction='row' p={2} gap={1} alignItems='center'>
                     <TextField
                         InputProps={{
                             startAdornment: (
@@ -105,14 +116,38 @@ export default function IconPicker(props: IconPickerProps) {
                     >
                         <Shuffle />
                     </Button>
-                    {props.ColorPickerProps && (
+                </Stack>
+                {props.ColorPickerProps && (
+                    <Stack direction='row' p={2} gap={1} mt={2}>
                         <ColorPicker
+                            id='primary-color-picker'
+                            label='Primary'
                             color={color}
                             onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
                         />
-                    )}
-                </Stack>
-                <Box pl={2}>
+                        <ColorPicker
+                            id='secondary-color-picker'
+                            label='Secondary'
+                            color={color}
+                            onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
+                        />
+                        <Button
+                            // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
+                            variant='outlined'
+                            size='small'
+                        >
+                            <Add />
+                        </Button>
+                        <Button
+                            // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
+                            variant='outlined'
+                            size='small'
+                        >
+                            <FormatColorReset />
+                        </Button>
+                    </Stack>
+                )}
+                <Box pl={2} mt={2}>
                     <FixedSizeGrid
                         columnCount={COLUMN_COUNT}
                         columnWidth={CELL_SIZE}
@@ -141,7 +176,9 @@ export default function IconPicker(props: IconPickerProps) {
                                             ...style,
                                         }}
                                     >
-                                        <Icon style={{ fontSize: '36px' }}>{icon.name}</Icon>
+                                        <IconWithGradient style={{ fontSize: '36px' }} primaryColor={iconPrimaryColor} secondaryColor={iconSecondaryColor}>
+                                            {icon.name}
+                                        </IconWithGradient>
                                     </Button>
                                 )
                             );

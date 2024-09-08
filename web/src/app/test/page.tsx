@@ -15,9 +15,12 @@ export default function TestPage() {
 
             <IconPicker
                 icon={icon}
-                color={color}
                 onChangeIcon={setIcon}
-                onChangeColor={setColor}
+                ColorPickerProps={{
+                    id: 'test-id',
+                    color: color,
+                    onChange: setColor,
+                }}
             />
         </div>
     )

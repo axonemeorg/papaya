@@ -30,3 +30,11 @@ export const CreateTransactionMethod = z.object({
     iconSecondaryColor: z.string().optional(),
 });
 export type CreateTransactionMethod = z.infer<typeof CreateTransactionMethod>;
+
+export const CreateCategory = z.object({
+    label: z.string().min(1, 'A label is required'),
+    description: z.string().min(1, 'A description is required'),
+    icon: z.string(),
+    color: z.string(),
+});
+export type CreateCategory = z.infer<typeof CreateCategory>;
