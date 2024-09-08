@@ -24,12 +24,12 @@ const timestamps = {
 }
 
 const avatar = {
-    content: varchar('avatar_content', { length: 1024 })
+    avatarContent: varchar('avatar_content', { length: 1024 })
         .notNull(),
-    variant: AvatarVariantEnum('avatar_variant')
+    avatarVariant: AvatarVariantEnum('avatar_variant')
         .notNull(),
-    primaryColor: varchar('avatar_primary_color', { length: 64 }),
-    secondaryColor: varchar('avatar_secondary_color', { length: 64 }),
+    avatarPrimaryColor: varchar('avatar_primary_color', { length: 64 }),
+    avatarSecondaryColor: varchar('avatar_secondary_color', { length: 64 }),
 }
 
 export const TransactionMethodTable = pgTable("transaction_method", {
@@ -43,6 +43,7 @@ export const TransactionMethodTable = pgTable("transaction_method", {
     defaultPaymentType: PaymentTypeEnum('default_payment_type')
         .notNull(),
 
+    ...avatar,
     ...timestamps
 });
 
@@ -85,6 +86,7 @@ export const CategoryTable = pgTable("category", {
         .references(() => UserTable.id)
         .notNull(),
 
+    ...avatar,
     ...timestamps,
 }, (table) => ({
     embeddingIndex: index('embedding_index')

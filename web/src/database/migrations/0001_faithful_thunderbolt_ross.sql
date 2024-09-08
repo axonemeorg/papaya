@@ -1,4 +1,10 @@
 DO $$ BEGIN
+ CREATE TYPE "public"."avatar_variant" AS ENUM('TEXT', 'PICTORIAL', 'IMAGE');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."payment_type" AS ENUM('CASH', 'ETRANSFER', 'DEBIT', 'CREDIT');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -31,6 +37,10 @@ CREATE TABLE IF NOT EXISTS "category" (
 	"description" varchar(1024) NOT NULL,
 	"description_embedding" vector(1536) NOT NULL,
 	"user_id" text NOT NULL,
+	"avatar_content" varchar(1024) NOT NULL,
+	"avatar_variant" "avatar_variant" NOT NULL,
+	"avatar_primary_color" varchar(64),
+	"avatar_secondary_color" varchar(64),
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
@@ -51,6 +61,10 @@ CREATE TABLE IF NOT EXISTS "transaction_method" (
 	"user_id" text NOT NULL,
 	"label" varchar(128) NOT NULL,
 	"default_payment_type" "payment_type" NOT NULL,
+	"avatar_content" varchar(1024) NOT NULL,
+	"avatar_variant" "avatar_variant" NOT NULL,
+	"avatar_primary_color" varchar(64),
+	"avatar_secondary_color" varchar(64),
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );

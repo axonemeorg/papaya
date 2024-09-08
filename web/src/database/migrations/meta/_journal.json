@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1725403969254,
-      "tag": "0000_icy_roxanne_simpson",
+      "when": 1725819272833,
+      "tag": "0000_marvelous_wasp",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1725403981882,
-      "tag": "0001_optimal_leopardon",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1725571282995,
-      "tag": "0002_young_sunspot",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1725758090220,
-      "tag": "0003_amazing_luckman",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1725817493945,
-      "tag": "0004_abnormal_pet_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1725817536343,
-      "tag": "0005_violet_crusher_hogan",
+      "when": 1725819291977,
+      "tag": "0001_faithful_thunderbolt_ross",
       "breakpoints": true
     }
   ]

@@ -24,10 +24,10 @@ export default class TransactionMethodsTableSeeder extends DatabaseTableSeeder {
                     userId: user.id,
                     defaultPaymentType: faker.helpers.arrayElement(PaymentType.options),
                     label: faker.lorem.words(2),
-                    iconVariant: 'PICTORIAL',
-                    iconContent: icons[iconIndex].name,
-                    iconPrimaryColor: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
-                    iconSecondaryColor: undefined,
+                    avatarVariant: 'PICTORIAL',
+                    avatarContent: icons[iconIndex].name,
+                    avatarPrimaryColor: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
+                    avatarSecondaryColor: undefined,
                 });
             }
 

@@ -1,6 +1,6 @@
 {
-  "id": "acb85832-7e6c-4aff-bfd5-7cb9b9df6311",
-  "prevId": "cc0039cf-3e2f-4176-b110-245726da0eee",
+  "id": "9a1792a0-1973-46c2-aa17-8130d097f5c7",
+  "prevId": "b953b796-eb20-4bbf-9903-c0f370511586",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -128,6 +128,31 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "avatar_content": {
+          "name": "avatar_content",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_variant": {
+          "name": "avatar_variant",
+          "type": "avatar_variant",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_primary_color": {
+          "name": "avatar_primary_color",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_secondary_color": {
+          "name": "avatar_secondary_color",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -296,6 +321,31 @@
           "primaryKey": false,
           "notNull": true
         },
+        "avatar_content": {
+          "name": "avatar_content",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_variant": {
+          "name": "avatar_variant",
+          "type": "avatar_variant",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "avatar_primary_color": {
+          "name": "avatar_primary_color",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_secondary_color": {
+          "name": "avatar_secondary_color",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -426,6 +476,15 @@
     }
   },
   "enums": {
+    "public.avatar_variant": {
+      "name": "avatar_variant",
+      "schema": "public",
+      "values": [
+        "TEXT",
+        "PICTORIAL",
+        "IMAGE"
+      ]
+    },
     "public.payment_type": {
       "name": "payment_type",
       "schema": "public",

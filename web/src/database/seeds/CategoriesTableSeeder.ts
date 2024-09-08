@@ -1,6 +1,6 @@
 import { generateEmbedding } from "@/actions/embeddings";
 import DatabaseTableSeeder from "../lib/DatabaseTableSeeder";
-import { CategoryTable, TransactionMethodTable, UserTable } from "../schemas";
+import { AvatarVariantEnum, CategoryTable, TransactionMethodTable, UserTable } from "../schemas";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
 
@@ -68,10 +68,11 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
                 acc.push({
                     userId: user.id,
                     label,
-                    icon: icons[iconIndex].name,
-                    color: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
                     description: label,
-                    descriptionEmbedding: embeddedCategories[label]
+                    descriptionEmbedding: embeddedCategories[label],
+                    avatarVariant: 'PICTORIAL',
+                    avatarContent: icons[iconIndex].name,
+                    avatarPrimaryColor: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
                 });
             });
 
