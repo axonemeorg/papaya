@@ -23,6 +23,10 @@ const timestamps = {
     updatedAt: timestamp('updated_at'),
 }
 
+const avatar = {
+
+}
+
 export const TransactionMethodTable = pgTable("transaction_method", {
     transactionMethodId: uuid('transaction_method_id')
         .defaultRandom()
@@ -110,11 +114,11 @@ export const AvatarTable = pgTable("avatar", {
         .primaryKey(),
     userId: text('user_id')
         .notNull(),
-    content: varchar('content', { length: 1024 })
+    content: varchar('avatar_content', { length: 1024 })
         .notNull(),
-    variant: AvatarVariantEnum('variant')
+    variant: AvatarVariantEnum('avatar_variant')
         .notNull(),
-    primaryColor: varchar('primary_color', { length: 64 }),
-    secondaryColor: varchar('secondary_color', { length: 64 }),
+    primaryColor: varchar('avatar_primary_color', { length: 64 }),
+    secondaryColor: varchar('avatar_secondary_color', { length: 64 }),
     ...timestamps,
 });
