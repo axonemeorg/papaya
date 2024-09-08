@@ -74,10 +74,6 @@ export const CategoryTable = pgTable("category", {
         .primaryKey(),
     label: varchar('label', { length: 128 })
         .notNull(),
-    icon: varchar('icon', { length: 1023 })
-        .notNull(),
-    color: varchar('color', { length: 64 })
-        .notNull(),
     description: varchar('description', { length: 1024 })
         .notNull(),
     descriptionEmbedding: vector('description_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS })

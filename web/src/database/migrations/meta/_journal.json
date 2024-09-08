@@ -15,6 +15,13 @@
       "when": 1725819291977,
       "tag": "0001_faithful_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1725820206612,
+      "tag": "0002_absurd_slyde",
+      "breakpoints": true
     }
   ]
 }
