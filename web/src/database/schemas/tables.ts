@@ -13,7 +13,7 @@ import {
 
 const EMBEDDING_NUM_DIMENSIONS = 1536 as const;
 
-import { PaymentTypeEnum, TransactionMethodIconVariantEnum, TransactionTypeEnum } from './enums';
+import { AvatarVariantEnum, PaymentTypeEnum, TransactionTypeEnum } from './enums';
 import { UserTable } from './auth';
 
 const timestamps = {
@@ -33,13 +33,8 @@ export const TransactionMethodTable = pgTable("transaction_method", {
         .notNull(),
     defaultPaymentType: PaymentTypeEnum('default_payment_type')
         .notNull(),
-    iconContent: varchar('icon_content', { length: 512 })
-        .notNull(),
-    iconVariant: TransactionMethodIconVariantEnum('icon_variant')
-        .notNull(),
-    iconPrimaryColor: varchar('icon_primary_color', { length: 64 })
-        .notNull(),
-    iconSecondaryColor: varchar('icon_secondary_color', { length: 64 }),
+    iconId: uuid('icon_id')
+        .references(() => AvatarTable.avatarId),
 
     ...timestamps
 });
@@ -106,4 +101,20 @@ export const JournalEntryTable = pgTable("journal_entry", {
         .references(() => CategoryTable.categoryId),
 
     ...timestamps
+});
+
+export const AvatarTable = pgTable("avatar", {
+    avatarId: uuid('avatar_id')
+        .defaultRandom()
+        .notNull()
+        .primaryKey(),
+    userId: text('user_id')
+        .notNull(),
+    content: varchar('content', { length: 1024 })
+        .notNull(),
+    variant: AvatarVariantEnum('variant')
+        .notNull(),
+    primaryColor: varchar('primary_color', { length: 64 }),
+    secondaryColor: varchar('secondary_color', { length: 64 }),
+    ...timestamps,
 });
