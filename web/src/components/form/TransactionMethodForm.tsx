@@ -5,7 +5,7 @@ import { useContext, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateTransactionMethod } from "@/types/post";
 import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
-import { PaymentType, TransactionMethodIconVariant } from "@/types/enum";
+import { PaymentType } from "@/types/enum";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import IconPicker from "../icon/IconPicker";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
@@ -15,8 +15,8 @@ export default function TransactionMethodForm() {
     const { transactionMethods } = useContext(TransactionMethodContext);
     const { register, control, setValue, watch } = useFormContext<CreateTransactionMethod>();
 
-    const primaryColor = getMuiColor(watch('iconPrimaryColor'));
-    const secondaryColor = getMuiColor(watch('iconSecondaryColor'));
+    const primaryColor = getMuiColor(watch('avatarPrimaryColor'));
+    const secondaryColor = getMuiColor(watch('avatarSecondaryColor'));
 
     return (
         <Box>
@@ -24,11 +24,11 @@ export default function TransactionMethodForm() {
                 <Avatar
                     sx={{ width: 48, height: 48, background: `linear-gradient(60deg, ${primaryColor} 20%, ${secondaryColor} 90%)` }}
                 >
-                    {watch('iconVariant') === 'PICTORIAL' ? (
-                        <Icon fontSize="large">{watch('iconContent')}</Icon>
+                    {watch('avatarVariant') === 'PICTORIAL' ? (
+                        <Icon fontSize="large">{watch('avatarContent')}</Icon>
                     ) : (
                         <Typography variant='inherit'>
-                            {watch('iconContent')}
+                            {watch('avatarContent')}
                         </Typography>
                     )}
                 </Avatar>
@@ -63,7 +63,7 @@ export default function TransactionMethodForm() {
             /> */}
             <Stack direction='row' gap={1} mb={2}>
                 <Controller<CreateTransactionMethod>
-                    name='iconContent'
+                    name='avatarContent'
                     control={control}
                     render={({ field }) => (
                         <IconPicker
@@ -78,7 +78,7 @@ export default function TransactionMethodForm() {
                     )}
                 />
                 <Controller<CreateTransactionMethod>
-                    name='iconPrimaryColor'
+                    name='avatarPrimaryColor'
                     control={control}
                     render={({ field }) => (
                         <ColorPicker
@@ -88,7 +88,7 @@ export default function TransactionMethodForm() {
                     )}
                 />
                 <Controller<CreateTransactionMethod>
-                    name='iconSecondaryColor'
+                    name='avatarSecondaryColor'
                     control={control}
                     render={({ field }) => (
                         <ColorPicker

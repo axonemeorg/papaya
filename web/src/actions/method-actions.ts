@@ -22,10 +22,10 @@ export const createTransactionMethod = async (method: CreateTransactionMethod) =
         userId: user.id,
         label: method.label,
         defaultPaymentType: method.defaultPaymentType,
-        iconVariant: method.iconVariant,
-        iconContent: method.iconContent,
-        iconPrimaryColor: method.iconPrimaryColor,
-        iconSecondaryColor: method.iconSecondaryColor,
+        avatarVariant: method.avatarVariant,
+        avatarContent: method.avatarContent,
+        avatarPrimaryColor: method.avatarPrimaryColor,
+        avatarSecondaryColor: method.avatarSecondaryColor,
     }).returning({
         transactionMethodId: TransactionMethodTable.transactionMethodId,
     });

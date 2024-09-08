@@ -1,7 +1,7 @@
 import { CategoryContext } from "@/contexts/CategoryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { Add } from "@mui/icons-material";
-import { Box, Button, DialogTitle, Divider, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
+import { Box, Button, DialogTitle, Divider, Icon, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
 import { useContext, useState } from "react";
 import TransactionMethodModal from "../modal/TransactionMethodModal";
 import { getMuiColor } from "../color/ColorPicker";
@@ -14,22 +14,20 @@ export default function ManageTransactionMethods() {
 
     return (
         <>
-            <TransactionMethodModal
+            {/* <TransactionMethodModal
                 open={showTransactionMethodModal}
                 onClose={() => setShowTransactionMethodModal(false)}
-            />
+            /> */}
             <Box>
                 <MenuList>
                     {transactionMethods.map((transactionMethod) => (
                         <MenuItem key={transactionMethod.transactionMethodId}>
-                        
                             <ListItemIcon>
-                                <IconWithGradient
-                                    primaryColor={getMuiColor(transactionMethod.iconPrimaryColor)}
-                                    secondaryColor={getMuiColor(transactionMethod.iconSecondaryColor ?? transactionMethod.iconPrimaryColor) }
+                                <Icon
+                                    sx={{ color: transactionMethod.avatarPrimaryColor }}
                                 >
-                                    {transactionMethod.iconContent}
-                                </IconWithGradient>
+                                    {transactionMethod.avatarContent}
+                                </Icon>
                             </ListItemIcon>
                             <ListItemText primary={transactionMethod.label} />
                         </MenuItem>

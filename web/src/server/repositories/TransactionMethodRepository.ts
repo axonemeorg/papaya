@@ -9,10 +9,10 @@ export default class TransactionMethodRepository {
             columns: {
                 transactionMethodId: true,
                 label: true,
-                iconContent: true,
-                iconVariant: true,
-                iconPrimaryColor: true,
-                iconSecondaryColor: true,
+                avatarContent: true,
+                avatarVariant: true,
+                avatarPrimaryColor: true,
+                avatarSecondaryColor: true,
             }
         });
     }

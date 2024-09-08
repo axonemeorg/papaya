@@ -16,4 +16,7 @@ seed:
 dev:
 	cd ./web && bun run dev
 
+custom-migration:
+	cd ./web && npx drizzle-kit generate --custom
+
 .PHONY: clean, db, dev, generate, migrate, seed

@@ -38,10 +38,10 @@ export default function TransactionMethodModal(props: TransactionMethodModalProp
         defaultValues: {
             label: '',
             defaultPaymentType: PaymentType.Enum.CREDIT,
-            iconContent: 'credit_card',
-            iconPrimaryColor: 'red.400',
-            iconSecondaryColor: 'red.400',
-            iconVariant: 'PICTORIAL',
+            avatarContent: 'credit_card',
+            avatarPrimaryColor: 'red.400',
+            avatarSecondaryColor: 'red.400',
+            avatarVariant: 'PICTORIAL',
         },
         resolver: zodResolver(CreateTransactionMethod)
     });

@@ -11,9 +11,11 @@ export const getCategoriesByUserId = async (userId: string) => {
 		.select({
 			categoryId: CategoryTable.categoryId,
 			label: CategoryTable.label,
-			icon: CategoryTable.icon,
-			color: CategoryTable.color,
-			description: CategoryTable.description
+			description: CategoryTable.description,
+			avatarVariant: CategoryTable.avatarVariant,
+			avatarContent: CategoryTable.avatarContent,
+			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
+			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
 		})
 		.from(CategoryTable)
 		.where(eq(CategoryTable.userId, userId))
@@ -34,10 +36,12 @@ export const findMostSimilarCategory = async (memo: string) => {
 		.select({
 			categoryId: CategoryTable.categoryId,
 			label: CategoryTable.label,
-			icon: CategoryTable.icon,
-			color: CategoryTable.color,
 			description: CategoryTable.description,
 			similarity,
+			avatarVariant: CategoryTable.avatarVariant,
+			avatarContent: CategoryTable.avatarContent,
+			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
+			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
 		})
 		.from(CategoryTable)
 		.where(eq(CategoryTable.userId, user.id))

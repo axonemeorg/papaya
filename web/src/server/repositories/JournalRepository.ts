@@ -19,10 +19,10 @@ export default class JournalRepository {
                         method: {
                             columns: {
                                 label: true,
-                                iconContent: true,
-                                iconVariant: true,
-                                iconPrimaryColor: true,
-                                iconSecondaryColor: true,
+                                avatarContent: true,
+                                avatarVariant: true,
+                                avatarPrimaryColor: true,
+                                avatarSecondaryColor: true,
                             }
                         }
                     },
@@ -36,8 +36,10 @@ export default class JournalRepository {
                     columns: {
                         categoryId: true,
                         label: true,
-                        icon: true,
-                        color: true,
+                        avatarContent: true,
+                        avatarVariant: true,
+                        avatarPrimaryColor: true,
+                        avatarSecondaryColor: true,
                     },
                     
                 },
