@@ -16,7 +16,7 @@ export default function Header(props: PropsWithChildren) {
             <BaseContainer>
                 <Stack
                     direction='row'
-                    gap={1}
+                    gap={5}
                     alignItems='center'
                     sx={{
                         py: 3,
@@ -26,8 +26,10 @@ export default function Header(props: PropsWithChildren) {
                 >
                     {/* <HeaderBreadcrumbs /> */}
                     <AppLogo />
-                    {props.children}
-                    <Avatar />
+                    <Stack direction='row' gap={1} alignItems='center' sx={{ flex: 1 }}>
+                        {props.children}
+                        <Avatar />
+                    </Stack>
                 </Stack>
             </BaseContainer>
         </Box>
