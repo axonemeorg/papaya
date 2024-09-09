@@ -16,11 +16,11 @@ type JournalProps =
     & JournalDate
     & JournalEntryContext
     // & TransactionMethodContext
-    & CategoryContext;
+    // & CategoryContext;
 
 export default function Journal(props: JournalProps) {
     const {
-        categories,
+        // categories,
         journalEntries,
         // transactionMethods,
         month,
@@ -39,7 +39,7 @@ export default function Journal(props: JournalProps) {
                 </JournalHeader>
             }
         >
-            <CategoryContext.Provider value={{ categories }}>
+            {/* <CategoryContext.Provider value={{ categories }}> */}
                     {/* <TransactionMethodContext.Provider value={{ transactionMethods }}> */}
                         <JournalEntryContext.Provider value={{ journalEntries }}>
                             <>
@@ -54,7 +54,7 @@ export default function Journal(props: JournalProps) {
                             </>
                     </JournalEntryContext.Provider>
                 {/* </TransactionMethodContext.Provider> */}
-            </CategoryContext.Provider>
+            {/* </CategoryContext.Provider> */}
         </BaseLayout>
     )
 }
