@@ -3,8 +3,7 @@ import JournalRepository from "../repositories/JournalRepository";
 
 
 export default class JournalService {
-    static async getUserJournalEntries(userId: string) {
-        const results = await JournalRepository.getUserJournalEntries(userId);
+    static async _santizeJournalEntries(results) {
         return results.map((journalEntry) => {
 
             const methods = journalEntry
@@ -36,6 +35,17 @@ export default class JournalService {
                 netAmount,
             }
         })
-        // return results;
+    }
+
+    static async getUserJournalEntries(userId: string) {
+        const results = await JournalRepository.getUserJournalEntries(userId);
+        
+        return this._santizeJournalEntries(results);
+    }
+
+    static async getUserJournalEntriesByMonthAndYear(userId: string, month: string | number, year: string | number) {
+        const results = await JournalRepository.getUserJournalEntriesByMonthAndYear(userId, month, year);
+        
+        return this._santizeJournalEntries(results);
     }
 }

@@ -66,3 +66,7 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 export const getJournalEntriesByUserId = (userId: string) => {
 	return JournalService.getUserJournalEntries(userId);
 }
+
+export const getUserJournalEntriesByMonthAndYear = (userId: string, month: string | number, year: string | number) => {
+	return JournalService.getUserJournalEntriesByMonthAndYear(userId, month, year);
+}
