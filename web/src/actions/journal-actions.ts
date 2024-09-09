@@ -58,7 +58,7 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 				transactionType: transaction.transactionType,
 				memo: transaction.memo ?? null,
 				paymentType: transaction.transactionType,
-				transactionMethodId: transaction.transactionMethod.transactionMethodId,
+				transactionMethodId: transaction.transactionMethod?.transactionMethodId,
 			}
 		}))
 }

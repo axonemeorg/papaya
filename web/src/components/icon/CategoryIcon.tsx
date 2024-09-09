@@ -4,13 +4,13 @@ import { Icon } from "@mui/material";
 
 
 interface CategoryIconProps {
-	category: Category;
+	category?: Category;
 }
 
 export default function CategoryIcon(props: CategoryIconProps) {
-	const categoryColor = getMuiColor(props.category.color);
+	const categoryColor = props.category?.avatarPrimaryColor ? getMuiColor(props.category.avatarPrimaryColor) : undefined
 
 	return (
-		<Icon sx={{ color: categoryColor}}>{props.category.icon}</Icon>
+		<Icon sx={{ color: categoryColor}}>{props.category?.avatarContent}</Icon>
 	);
 }

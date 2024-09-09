@@ -4,11 +4,17 @@ import { Category, ItemAvatar, TransactionMethod } from "./get";
 
 export const CreateTransaction = z.object({
     transactionType: TransactionType,
-    paymentType: PaymentType,
     date: z.string().min(1, "A date is required"),
     amount: z.string().min(0, "A positive number is required"),
-    memo: z.string().optional(),
+    memo: z.string()
+        .optional()
+        .nullable(),
+    paymentType: PaymentType
+        .optional()
+        .nullable(),
     transactionMethod: TransactionMethod.pick({ transactionMethodId: true })
+        .optional()
+        .nullable(),
 });
 export type CreateTransaction = z.infer<typeof CreateTransaction>;
 
@@ -16,8 +22,10 @@ export const CreateJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),
     date: z.string(),
     time: z.string(),
-    category: Category.pick({ categoryId: true }),
-    transactions: z.array(CreateTransaction)
+    category: Category.pick({ categoryId: true })
+        .optional()
+        .nullable(),
+    transactions: z.array(CreateTransaction),
 });
 export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;
 

@@ -56,14 +56,12 @@ export const TransactionTable = pgTable("transaction", {
         .notNull(),
     transactionType: TransactionTypeEnum('transaction_type')
         .notNull(),
-    paymentType: PaymentTypeEnum('payment_type')
-        .notNull(),
+    paymentType: PaymentTypeEnum('payment_type'),
     amount: integer('amount')
         .notNull(),
     memo: varchar('memo', { length: 1024 }),
     transactionMethodId: uuid('transaction_method_id')
-        .references(() => TransactionMethodTable.transactionMethodId)
-        .notNull(),
+        .references(() => TransactionMethodTable.transactionMethodId),
 
     ...timestamps
 });
