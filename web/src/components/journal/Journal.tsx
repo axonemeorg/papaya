@@ -15,19 +15,17 @@ import ManageTransactionMethods from "./ManageTransactionMethods";
 type JournalProps = 
     & JournalDate
     & JournalEntryContext
-    & TransactionMethodContext
+    // & TransactionMethodContext
     & CategoryContext;
 
 export default function Journal(props: JournalProps) {
     const {
         categories,
         journalEntries,
-        transactionMethods,
+        // transactionMethods,
         month,
         year
     } = props;
-
-    console.log('Journal Entries:', journalEntries);
     
     const [methodsDrawerOpen, setMethodsDrawerOpen] = useState<boolean>(false);
 
@@ -42,7 +40,7 @@ export default function Journal(props: JournalProps) {
             }
         >
             <CategoryContext.Provider value={{ categories }}>
-                    <TransactionMethodContext.Provider value={{ transactionMethods }}>
+                    {/* <TransactionMethodContext.Provider value={{ transactionMethods }}> */}
                         <JournalEntryContext.Provider value={{ journalEntries }}>
                             <>
                                 <JournalEntries />
@@ -55,7 +53,7 @@ export default function Journal(props: JournalProps) {
                                 </Drawer>
                             </>
                     </JournalEntryContext.Provider>
-                </TransactionMethodContext.Provider>
+                {/* </TransactionMethodContext.Provider> */}
             </CategoryContext.Provider>
         </BaseLayout>
     )

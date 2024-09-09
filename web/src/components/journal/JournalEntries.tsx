@@ -15,6 +15,7 @@ import JournalEntryCard from "./JournalEntryCard";
 import { set } from "zod";
 import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
+import { getPriceString } from "@/utils/Utils";
 
 const JournalEntryDate = ({ date }: { date: string })  => {
     const day = dayjs(date);
@@ -112,13 +113,17 @@ export default function JournalEntries() {
                                                         <ListItemText
                                                             sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
                                                         >
-                                                            {isNetPositive
-                                                                ? `+$${Number(netAmount / 100).toFixed(2)}`
-                                                                : `$${Number(netAmount / -100).toFixed(2)}`
-                                                            }
+                                                            {getPriceString(netAmount)}
                                                         </ListItemText>
                                                         <Box width={200}>
-                                                            <CategoryChip category={category} />
+                                                            {category ? (
+                                                                <CategoryChip category={category} />
+                                                            ) : (
+                                                                <Chip
+                                                                    sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
+                                                                    label='Uncategorized'
+                                                                />
+                                                            )}
                                                         </Box>
                                                         <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
                                                             {methods.map((method) => {

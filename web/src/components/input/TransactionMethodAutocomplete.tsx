@@ -18,6 +18,7 @@ export default function TransactionMethodAutocomplete(props: TransactionMethodAu
 
     return (
         <Autocomplete
+            disabled
             options={transactionMethods}
             isOptionEqualToValue={(option, value) => option.transactionMethodId === value.transactionMethodId}
             renderInput={(params) => <TextField {...params} label="Method" />}

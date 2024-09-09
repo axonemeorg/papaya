@@ -16,7 +16,7 @@ export default function Header(props: PropsWithChildren) {
             <BaseContainer>
                 <Stack
                     direction='row'
-                    gap={5}
+                    gap={8}
                     alignItems='center'
                     sx={{
                         py: 3,

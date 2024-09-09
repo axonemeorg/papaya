@@ -91,6 +91,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
 export default function JournalEntryForm() {
     const [formTab, setFormTab] = useState(1);
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
+    const enableAutoDetectCategory = false;
 
     const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
 
@@ -243,7 +244,7 @@ export default function JournalEntryForm() {
                         onChange={(event) => {
                             const value = event.target.value;
                             setValue(field.name, value);
-                            if (!manuallySetCategory) {
+                            if (!manuallySetCategory && enableAutoDetectCategory) {
                                 handleDetectCategoryWithAi(value);
                             }
                         }}
