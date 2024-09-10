@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import db from "@/database/client";
 import { eq } from "drizzle-orm";
 import { UserTable } from "@/database/schemas";
-import { lucia } from "@/auth";
+import { lucia, validateRequest } from "@/auth";
 
 interface ActionResult {
 	error: string;
@@ -68,4 +68,15 @@ export const login = async (formData: FormData): Promise<ActionResult> => {
 	cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
     return redirect("/");
+}
+
+export const logout = async () => {
+	const { session } = await validateRequest();
+	if (session) {
+		await lucia.invalidateSession(session.id);
+		const sessionCookie = lucia.createBlankSessionCookie();
+		cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+	}
+
+	return redirect("/login");
 }
