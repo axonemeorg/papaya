@@ -8,7 +8,7 @@ export const Timestamps = z.object({
     createdAt: z.union([z.string(), z.date()]),
     updatedAt: z.string().nullable(),
 });
-export type Timestamps = z.infer<typeof Timestamps>;
+export type Timestamps = z.output<typeof Timestamps>;
 
 export const ItemAvatar = z.object({
     avatarContent: z.string(),
@@ -16,7 +16,7 @@ export const ItemAvatar = z.object({
     avatarPrimaryColor: z.string(),
     avatarSecondaryColor: z.string(),
 });
-export type ItemAvatar = z.infer<typeof ItemAvatar>;
+export type ItemAvatar = z.output<typeof ItemAvatar>;
 
 export const TransactionMethod = Timestamps
     .merge(ItemAvatar)
@@ -25,7 +25,7 @@ export const TransactionMethod = Timestamps
         label: z.string(),
         defaultPaymentType: PaymentType,
     });
-export type TransactionMethod = z.infer<typeof TransactionMethod>;
+export type TransactionMethod = z.output<typeof TransactionMethod>;
 
 export const Category = Timestamps
     .merge(ItemAvatar)
@@ -36,5 +36,7 @@ export const Category = Timestamps
         description: z.string(),
         label: z.string(),
     });
-export type Category = z.infer<typeof Category>;
+export type Category = z.output<typeof Category>;
 
+export const JournalEntry = z.any();
+export type JournalEntry = z.output<typeof JournalEntry>;

@@ -16,7 +16,7 @@ export const CreateTransaction = z.object({
         .optional()
         .nullable(),
 });
-export type CreateTransaction = z.infer<typeof CreateTransaction>;
+export type CreateTransaction = z.output<typeof CreateTransaction>;
 
 export const CreateJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),
@@ -27,13 +27,13 @@ export const CreateJournalEntry = z.object({
         .nullable(),
     transactions: z.array(CreateTransaction),
 });
-export type CreateJournalEntry = z.infer<typeof CreateJournalEntry>;
+export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
 export const CreateTransactionMethod = ItemAvatar.extend({
     label: z.string().min(1, 'A label is required'),
     defaultPaymentType: PaymentType,
 });
-export type CreateTransactionMethod = z.infer<typeof CreateTransactionMethod>;
+export type CreateTransactionMethod = z.output<typeof CreateTransactionMethod>;
 
 export const CreateCategory = z.object({
     label: z.string().min(1, 'A label is required'),
@@ -41,4 +41,4 @@ export const CreateCategory = z.object({
     icon: z.string(),
     color: z.string(),
 });
-export type CreateCategory = z.infer<typeof CreateCategory>;
+export type CreateCategory = z.output<typeof CreateCategory>;

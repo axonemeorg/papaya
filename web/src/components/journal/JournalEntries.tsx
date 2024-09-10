@@ -1,18 +1,12 @@
 'use client'
 
-import { MouseEvent, useContext, useState } from "react";
+import { MouseEvent, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { JournalEntryContext } from "@/contexts/JournalEntryContext";
-import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
-import { CategoryContext } from "@/contexts/CategoryContext";
 import { JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
-import { getMuiColor } from "../color/ColorPicker";
-import { TransactionType } from "@/types/enum";
 import JournalEntryCard from "./JournalEntryCard";
-import { set } from "zod";
 import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
@@ -42,8 +36,6 @@ const JournalEntryDate = ({ date }: { date: string })  => {
 
 export default function JournalEntries(props) {
     const { journalEntries } = props;
-    // const { transactionMethods } = useContext(TransactionMethodContext);
-    // const { categories } = useContext(CategoryContext);
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
@@ -64,8 +56,6 @@ export default function JournalEntries(props) {
         setSelectedEntryAnchorEl(event.currentTarget);
         setSelectedEntry(entry);
     }
-    // console.log(journal)
-    // console.log('methods:', transactionMethods)
 
     return (
         <>
@@ -77,12 +67,6 @@ export default function JournalEntries(props) {
                 />
             )}
             <Table size='small'>
-                {/* <TableHead>
-                    <TableCell sx={{ width: 'auto', whiteSpace: 'nowrap' }}>Date</TableCell>
-                    <TableCell>Entries</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell>Method</TableCell>
-                </TableHead> */}
                 <TableBody>
                     {Object.entries(journal).map(([date, entries]) => {
                         return (

@@ -11,6 +11,8 @@ interface JournalEntryCard {
 }
 
 export default function JournalEntryCard(props: JournalEntryCard) {
+    const isNetPositive = props.entry.netAmount > 0;
+
     return (
         <Popover
             anchorEl={props.anchorEl}
@@ -36,7 +38,14 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                         </IconButton>
                     </Stack>
                     <Stack sx={{ textAlign: 'center' }} alignItems='center'>
-                        <Typography variant='h3' mb={0.5}>{getPriceString(props.entry.netAmount)}</Typography>
+                        <Typography
+                            variant='h3'
+                            sx={(theme) => ({
+                                color: isNetPositive ? theme.palette.success.main : undefined,
+                                mb: 0.5
+                            })}
+                        >
+                            {getPriceString(props.entry.netAmount)}</Typography>
                         <Stack direction='row' gap={1}>
                             <CategoryIcon category={props.entry.category} />
                             <Typography>{props.entry.memo}</Typography>
