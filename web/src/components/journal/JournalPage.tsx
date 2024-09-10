@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import { JournalDate } from "@/types/calendar";
-import Journal from "./Journal";
+import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 
 interface JournalPageProps extends JournalDate {}
 
@@ -22,12 +22,20 @@ export default async function JournalPage(props: JournalPageProps) {
     // const categories = await getCategoriesByUserId(user.id);
 
     return (
-        <Journal
-            journalEntries={journalEntries}
-            // transactionMethods={transactionMethods}
-            // categories={categories}
-            month={month}
-            year={year}
-        />            
+        <BaseLayout
+            headerChildren={
+                <JournalHeader month={month} year={year} />
+            }
+            user={user}
+        >
+            {/* <CategoryContext.Provider value={{ categories }}> */}
+                    {/* <TransactionMethodContext.Provider value={{ transactionMethods }}> */}
+                        
+                    <JournalEntries journalEntries={journalEntries} />
+                        
+                    
+                {/* </TransactionMethodContext.Provider> */}
+            {/* </CategoryContext.Provider> */}
+        </BaseLayout>        
     )
 }

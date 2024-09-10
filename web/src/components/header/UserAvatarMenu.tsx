@@ -21,6 +21,7 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
         // return logout();
     }
 
+    console.log('props!', props)
     
 
     return (
@@ -29,8 +30,8 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
                 setAnchorEl(event.currentTarget);
             }}>
                 <MenuIcon />
-                <Badge color='primary' badgeContent={1}>
-                    <Avatar sx={{ ml: 1 }}>
+                <Badge>
+                    <Avatar sx={(theme) => ({ background: theme.palette.common.black, ml: 1 })}>
                         {'HW'}
                     </Avatar>
                 </Badge>

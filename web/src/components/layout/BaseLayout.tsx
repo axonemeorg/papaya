@@ -2,15 +2,17 @@ import { Paper, Stack } from "@mui/material";
 import { PropsWithChildren, ReactNode } from "react";
 import Header from '@/components/header/Header'
 import BaseContainer from "./BaseContainer";
+import { User } from "lucia";
 
 interface BaseLayoutProps extends PropsWithChildren {
 	headerChildren: ReactNode;
+	user: User;
 }
 
 export default (props: BaseLayoutProps) => {
 	return (
 		<>
-			<Header>
+			<Header user={props.user}>
 				{props.headerChildren}
 			</Header>
 			<Stack component={Paper} square variant="outlined" sx={{ flex: 1, borderLeft: 0, borderRight: 0 }}>

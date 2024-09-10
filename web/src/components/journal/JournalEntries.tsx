@@ -40,10 +40,10 @@ const JournalEntryDate = ({ date }: { date: string })  => {
     )
 }
 
-export default function JournalEntries() {
-    const { journalEntries } = useContext(JournalEntryContext);
-    const { transactionMethods } = useContext(TransactionMethodContext);
-    const { categories } = useContext(CategoryContext);
+export default function JournalEntries(props) {
+    const { journalEntries } = props;
+    // const { transactionMethods } = useContext(TransactionMethodContext);
+    // const { categories } = useContext(CategoryContext);
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
@@ -125,13 +125,13 @@ export default function JournalEntries() {
                                                                 />
                                                             )}
                                                         </Box>
-                                                        <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
+                                                        {/* <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
                                                             {methods.map((method) => {
                                                                 return (
                                                                     <Chip label={method.label} />
                                                                 )
                                                             })}
-                                                        </Stack>
+                                                        </Stack> */}
                                                     </Stack>
                                                 </MenuItem>
                                             )

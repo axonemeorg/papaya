@@ -6,11 +6,14 @@ import BaseContainer from "../layout/BaseContainer";
 import HeaderTabs from "./HeaderTabs";
 import { PropsWithChildren } from "react";
 import AppLogo from "./AppLogo";
+import UserAvatarMenu from "./UserAvatarMenu";
+import { User } from "lucia";
 
-/**
- * Header component used by the app
- */
-export default function Header(props: PropsWithChildren) {
+type HeaderProps = PropsWithChildren<{
+    user: User;
+}>;
+
+export default function Header(props: HeaderProps) {
     return (
         <Box>
             <BaseContainer>
@@ -28,7 +31,7 @@ export default function Header(props: PropsWithChildren) {
                     <AppLogo />
                     <Stack direction='row' gap={1} alignItems='center' sx={{ flex: 1 }}>
                         {props.children}
-                        <Avatar />
+                        <UserAvatarMenu user={props.user} />
                     </Stack>
                 </Stack>
             </BaseContainer>
