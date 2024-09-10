@@ -23,15 +23,16 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
 
     console.log('props!', props)
     
+    const initials = null;
 
     return (
         <>
-            <Button sx={{ borderRadius: 56 }} onClick={(event) => {
+            <Button sx={(theme) => ({ borderRadius: 56, color: theme.palette.secondary.main, ml: 1 })} onClick={(event) => {
                 setAnchorEl(event.currentTarget);
             }}>
-                <MenuIcon />
+                <MenuIcon sx={(theme) => ({ color: theme.palette.grey[500] })} />
                 <Badge>
-                    <Avatar sx={(theme) => ({ background: theme.palette.common.black, ml: 1 })}>
+                    <Avatar sx={(theme) => ({ background: theme.palette.secondary.main, ml: 1 })}>
                         {'HW'}
                     </Avatar>
                 </Badge>
@@ -54,9 +55,9 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
                 onClose={handleClose}
                 anchorEl={anchorEl}
             >
-                {/* <MenuItem onClick={handleLogout}>
+                <MenuItem onClick={handleLogout}>
                     Logout
-                </MenuItem> */}
+                </MenuItem>
             </Menu>
         </>
     );
