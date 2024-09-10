@@ -33,9 +33,9 @@ export default function Journal(props: JournalProps) {
         <BaseLayout
             headerChildren={
                 <JournalHeader month={month} year={year}>
-                    <IconButton onClick={() => setMethodsDrawerOpen(true)}>
+                    {/* <IconButton onClick={() => setMethodsDrawerOpen(true)}>
                         <CreditCard />
-                    </IconButton>
+                    </IconButton> */}
                 </JournalHeader>
             }
         >
