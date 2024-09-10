@@ -1,6 +1,6 @@
 'use client'
 
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
@@ -11,10 +11,7 @@ import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
 
-const JournalEntryDate = ({ date }: { date: string })  => {
-    const day = dayjs(date);
-    const isToday = day.isSame(dayjs(), 'day');
-
+const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     return (
         <Button color='inherit' sx={{ borderRadius: 1 }}>
             <Stack direction='row' alignItems='flex-end' gap={0.75}>
@@ -41,16 +38,21 @@ export default function JournalEntries(props) {
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
     const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
 
-    const journal = journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
-        const { date } = entry;
-        if (acc[date]) {
-            acc[date].push(entry);
-        } else {
-            acc[date] = [entry];
-        }
+    const journal = useMemo(() => {
+        
+        return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+            const { date } = entry;
+            if (acc[date]) {
+                acc[date].push(entry);
+            } else {
+                acc[date] = [entry];
+            }
 
-        return acc;
-    }, {});
+            return acc;
+        }, {
+            [dayjs().format('YYYY-MM-DD')]: [],
+        });
+    }, [journalEntries]);
 
     const handleClickListItem = (event: MouseEvent<HTMLLIElement, MouseEvent>, entry: JournalEntry) => {
         setSelectedEntryAnchorEl(event.currentTarget);
@@ -68,63 +70,79 @@ export default function JournalEntries(props) {
             )}
             <Table size='small'>
                 <TableBody>
-                    {Object.entries(journal).map(([date, entries]) => {
-                        return (
-                            <TableRow key={date}>
-                                <TableCell width='180px' sx={{ verticalAlign: 'top' }}>
-                                    <JournalEntryDate date={date} />
-                                </TableCell>
-                                <TableCell sx={{ verticalAlign: 'top' }}>
-                                    <List>
-                                        {entries.map((entry) => {
-                                            const { category } = entry;
-                                            const { netAmount, methods } = entry;
-                                            const isNetPositive = netAmount > 0;
+                    {Object
+                        .entries(journal)
+                        .sort(([dateA, _a], [dateB, _b]) => {
+                            return new Date(dateA).getTime() - new Date(dateB).getTime()
+                        })
+                        .map(([date, entries]) => {
+                            const day = dayjs(date);
+                            const isToday = day.isSame(dayjs(), 'day');
 
-                                            return (
-                                                <MenuItem
-                                                    key={entry.journalEntryId}
-                                                    sx={{ borderRadius: '64px' }}
-                                                    onClick={(event) => handleClickListItem(event, entry)}
-                                                >
-                                                    <Stack direction='row' alignItems='center' gap={4}>
-                                                        <Stack direction='row' alignItems='center'>
-                                                            <ListItemIcon>
-                                                                <CategoryIcon category={category} />
-                                                            </ListItemIcon>
-                                                            <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
-                                                        </Stack>
-                                                        <ListItemText
-                                                            sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
+                            return (
+                                <TableRow key={date}>
+                                    <TableCell width='180px' sx={{ verticalAlign: 'top' }}>
+                                        <JournalEntryDate day={day} isToday={isToday} />
+                                    </TableCell>
+                                    <TableCell sx={{ verticalAlign: 'top' }}>
+                                        {entries.length > 0 && (
+
+                                            
+                                            <List>
+                                                {entries.map((entry) => {
+                                                    const { category } = entry;
+                                                    const { netAmount, methods } = entry;
+                                                    const isNetPositive = netAmount > 0;
+
+                                                    return (
+                                                        <MenuItem
+                                                            key={entry.journalEntryId}
+                                                            sx={{ borderRadius: '64px' }}
+                                                            onClick={(event) => handleClickListItem(event, entry)}
                                                         >
-                                                            {getPriceString(netAmount)}
-                                                        </ListItemText>
-                                                        <Box width={200}>
-                                                            {category ? (
-                                                                <CategoryChip category={category} />
-                                                            ) : (
-                                                                <Chip
-                                                                    sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
-                                                                    label='Uncategorized'
-                                                                />
-                                                            )}
-                                                        </Box>
-                                                        {/* <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
-                                                            {methods.map((method) => {
-                                                                return (
-                                                                    <Chip label={method.label} />
-                                                                )
-                                                            })}
-                                                        </Stack> */}
-                                                    </Stack>
-                                                </MenuItem>
-                                            )
-                                        })}
-                                    </List>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    })}
+                                                            <Stack direction='row' alignItems='center' gap={4}>
+                                                                <Stack direction='row' alignItems='center'>
+                                                                    <ListItemIcon>
+                                                                        <CategoryIcon category={category} />
+                                                                    </ListItemIcon>
+                                                                    <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
+                                                                </Stack>
+                                                                <ListItemText
+                                                                    sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
+                                                                >
+                                                                    {getPriceString(netAmount)}
+                                                                </ListItemText>
+                                                                <Box width={200}>
+                                                                    {category ? (
+                                                                        <CategoryChip category={category} />
+                                                                    ) : (
+                                                                        <Chip
+                                                                            sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
+                                                                            label='Uncategorized'
+                                                                        />
+                                                                    )}
+                                                                </Box>
+                                                                {/* <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
+                                                                    {methods.map((method) => {
+                                                                        return (
+                                                                            <Chip label={method.label} />
+                                                                        )
+                                                                    })}
+                                                                </Stack> */}
+                                                            </Stack>
+                                                        </MenuItem>
+                                                    )
+                                                })}
+                                            </List>
+                                        )}
+                                        {isToday && (
+                                            <Button startIcon={<Add />}>New Entry</Button>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })
+                    }
                 </TableBody>
             </Table>
 
