@@ -52,7 +52,7 @@ export const TransactionTable = pgTable("transaction", {
         .defaultRandom()
         .primaryKey(),
     journalEntryId: uuid('journal_entry_id')
-        .references(() => JournalEntryTable.journalEntryId)
+        .references(() => JournalEntryTable.journalEntryId, { onDelete: 'cascade' })
         .notNull(),
     transactionType: TransactionTypeEnum('transaction_type')
         .notNull(),
