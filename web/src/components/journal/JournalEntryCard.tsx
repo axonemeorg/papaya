@@ -34,7 +34,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                 <Box p={1} mb={2}>
                     <Stack direction='row' justifyContent='flex-end' gap={0.5} sx={{ mb: 2 }}>
                         <IconButton size='small'><Edit fontSize="small"/></IconButton>
-                        <form action={deleteJournalEntry}>
+                        <form action={deleteJournalEntry} onSubmit={() => props.onClose()}>
                             <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
                             <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
                         </form>

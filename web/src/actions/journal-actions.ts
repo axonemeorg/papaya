@@ -8,6 +8,7 @@ import JournalService from '@/server/services/JournalService';
 import { JournalEntry } from '@/types/get';
 import { CreateJournalEntry } from '@/types/post';
 import { and, eq, InferInsertModel } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
 	console.log('createJournalEntry:', formData)
@@ -62,6 +63,8 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 				transactionMethodId: transaction.transactionMethod?.transactionMethodId,
 			}
 		}))
+
+	revalidatePath('/journal')
 }
 
 export const deleteJournalEntry = async (formData: FormData) => {
@@ -72,7 +75,9 @@ export const deleteJournalEntry = async (formData: FormData) => {
 		throw new Error('Not authorized.');
     }
 
-	return JournalService.deleteUserJournalEntryById(user.id, journalEntryId);
+	const response = JournalService.deleteUserJournalEntryById(user.id, journalEntryId);
+	revalidatePath('/journal')
+	return response;
 }
 
 export const getJournalEntriesByUserId = (userId: string) => {
