@@ -4,7 +4,7 @@ import { getCategoriesByUserId } from "@/actions/category-actions";
 import { getJournalEntriesByUserId, getUserJournalEntriesByMonthAndYear } from "@/actions/journal-actions";
 import { getTransactionMethodsByUserId } from "@/actions/method-actions";
 import { validateRequest } from "@/auth";
-import JournalEntries from "@/components/journal/JournalEntries";
+import JournalEditor from "@/components/journal/JournalEditor";
 import { redirect } from "next/navigation";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
@@ -30,10 +30,7 @@ export default async function JournalPage(props: JournalPageProps) {
         >
             {/* <CategoryContext.Provider value={{ categories }}> */}
                     {/* <TransactionMethodContext.Provider value={{ transactionMethods }}> */}
-                        
-                    <JournalEntries journalEntries={journalEntries} />
-                        
-                    
+                    <JournalEditor journalEntries={journalEntries} />
                 {/* </TransactionMethodContext.Provider> */}
             {/* </CategoryContext.Provider> */}
         </BaseLayout>        

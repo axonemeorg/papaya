@@ -2,7 +2,7 @@
 
 import { MouseEvent, useMemo, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
-import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
@@ -31,7 +31,7 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
     )
 }
 
-export default function JournalEntries(props) {
+export default function JournalEditor(props) {
     const { journalEntries } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     
@@ -137,6 +137,22 @@ export default function JournalEntries(props) {
                                                 })}
                                             </List>
                                         )}
+                                        <Stack direction='row' pl={2}>
+                                            <Box sx={{ width: '200px', px: 2, boxSizing: 'content-box' }}>
+                                                <TextField
+                                                    label='Memo'
+                                                    size='small'
+                                                    fullWidth
+                                                />
+                                            </Box>
+                                            <Box sx={{ width: '100px', px: 2, boxSizing: 'content-box' }}>
+                                                <TextField
+                                                    label='Price'
+                                                    size='small'
+                                                    fullWidth
+                                                />
+                                            </Box>
+                                        </Stack>
                                         {isToday && (
                                             <Button startIcon={<Add />}>New Entry</Button>
                                         )}
