@@ -4,12 +4,13 @@ import { MouseEvent, useMemo, useState } from "react";
 import JournalEntryModal from "../modal/JournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { JournalEntry } from "@/types/get";
+import { Category, JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import JournalEntryCard from "./JournalEntryCard";
 import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
+import { CategoryContext } from "@/contexts/CategoryContext";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     return (
@@ -31,7 +32,12 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
     )
 }
 
-export default function JournalEditor(props) {
+interface JournalEditorProps {
+    journalEntries: JournalEntry[];
+    categories: Category[];
+}
+
+export default function JournalEditor(props: JournalEditorProps) {
     const { journalEntries } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     
@@ -62,7 +68,7 @@ export default function JournalEditor(props) {
     }
 
     return (
-        <>
+        <CategoryContext.Provider value={{ categories: props.categories }}>
             {selectedEntry && (
                 <JournalEntryCard
                     entry={selectedEntry}
@@ -172,6 +178,6 @@ export default function JournalEditor(props) {
             <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
                 <Add />
             </Fab>
-        </>
+        </CategoryContext.Provider>
     )
 }
