@@ -1,7 +1,7 @@
 'use client'
 
 import { MouseEvent, useMemo, useState } from "react";
-import JournalEntryModal from "../modal/JournalEntryModal";
+import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { Category, JournalEntry } from "@/types/get";
@@ -156,7 +156,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                 </TableBody>
             </Table>
 
-            <JournalEntryModal
+            <CreateJournalEntryModal
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
                 initialDate={currentDayString}

@@ -2,7 +2,7 @@ import { getJournalEntriesByUserId } from "@/actions/journal-actions";
 import { getTransactionMethodsByUserId } from "@/actions/method-actions";
 import { validateRequest } from "@/auth";
 import TransactionMethods from "@/components/journal/TransactionMethods";
-import TransactionMethodModal from "@/components/modal/TransactionMethodModal";
+import CreateTransactionMethodModal from "@/components/modal/CreateTransactionMethodModal";
 import { redirect } from "next/navigation";
 
 export default async function MethodsTestPage() {

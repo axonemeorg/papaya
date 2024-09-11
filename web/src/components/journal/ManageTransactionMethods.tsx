@@ -3,7 +3,7 @@ import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { Add } from "@mui/icons-material";
 import { Box, Button, DialogTitle, Divider, Icon, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
 import { useContext, useState } from "react";
-import TransactionMethodModal from "../modal/TransactionMethodModal";
+import CreateTransactionMethodModal from "../modal/CreateTransactionMethodModal";
 import { getMuiColor } from "../color/ColorPicker";
 import { IconWithGradient } from "../icon/IconWithGradient";
 
@@ -14,7 +14,7 @@ export default function ManageTransactionMethods() {
 
     return (
         <>
-            {/* <TransactionMethodModal
+            {/* <CreateTransactionMethodModal
                 open={showTransactionMethodModal}
                 onClose={() => setShowTransactionMethodModal(false)}
             /> */}

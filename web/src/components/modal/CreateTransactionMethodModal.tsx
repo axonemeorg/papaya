@@ -17,7 +17,7 @@ interface TransactionMethodModalProps {
     onClose: () => void;
 }
 
-export default function TransactionMethodModal(props: TransactionMethodModalProps) {
+export default function CreateTransactionMethodModal(props: TransactionMethodModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
 
     const handleCreateTransactionMethod = (formData: CreateTransactionMethod) => {

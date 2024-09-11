@@ -18,7 +18,7 @@ interface JournalEntryModalProps {
     onClose: () => void;
 }
 
-export default function JournalEntryModal(props: JournalEntryModalProps) {
+export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
 
     const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
