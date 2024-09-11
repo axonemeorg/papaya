@@ -5,8 +5,9 @@ import db from '@/database/client'
 import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
 import JournalRepository from '@/server/repositories/JournalRepository';
 import JournalService from '@/server/services/JournalService';
+import { TransactionType } from '@/types/enum';
 import { JournalEntry } from '@/types/get';
-import { CreateJournalEntry } from '@/types/post';
+import { CreateJournalEntry, CreateQuickJournalEntry } from '@/types/post';
 import { and, eq, InferInsertModel } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
@@ -63,6 +64,56 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 				transactionMethodId: transaction.transactionMethod?.transactionMethodId,
 			}
 		}))
+
+	revalidatePath('/journal')
+}
+
+export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
+	const { user } = await validateRequest();
+	
+    if (!user) {
+		throw new Error('Not authorized.');
+    }
+
+	const { memo, amount, category } = formData;
+
+	if (category) {
+		// Ensure that the given category belongs to the user
+		const categoryResult = await db.query.CategoryTable.findFirst({
+			where: and(
+				eq(CategoryTable.userId, user.id),
+				eq(CategoryTable.categoryId, category.categoryId)
+			)
+		})
+
+		if (!categoryResult) { 
+			throw new Error('Category could not be found.')
+		}
+	}
+
+	const result = await db
+		.insert(JournalEntryTable)
+		.values({
+			userId: user.id,
+			categoryId: category?.categoryId ?? undefined,
+			memo,
+		} as InferInsertModel<typeof JournalEntryTable>)
+		.returning({
+			journalEntryId: JournalEntryTable.journalEntryId
+		});
+
+	const { journalEntryId } = result[0];
+
+	await db
+		.insert(TransactionTable)
+		.values({
+			journalEntryId,
+			amount: Number.parseInt(String(100 * Number.parseFloat(amount))),
+			transactionType: TransactionType.Enum.DEBIT,
+			memo: null,
+			paymentType: null,
+			transactionMethodId: null,
+		});
 
 	revalidatePath('/journal')
 }

@@ -35,7 +35,6 @@ export const CreateQuickJournalEntry = z.object({
         .optional()
         .nullable(),
     amount: z.string().min(0, "A positive number is required"),
-    date: z.string(),
 });
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;
 

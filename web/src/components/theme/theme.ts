@@ -20,7 +20,7 @@ const appTheme = createTheme({
         MuiButton: {
             styleOverrides: {
                 root: {
-                    borderRadius: 28,
+                    // borderRadius: 28,
                     textTransform: 'unset'
                 }
             }

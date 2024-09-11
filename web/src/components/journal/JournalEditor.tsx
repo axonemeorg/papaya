@@ -146,7 +146,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                         )}
                                         
                                         {isToday && (
-                                            <QuickJournalEditor date={date} />
+                                            <QuickJournalEditor />
                                         )}
                                     </TableCell>
                                 </TableRow>

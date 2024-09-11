@@ -21,7 +21,7 @@ interface JournalEntryModalProps {
 export default function JournalEntryModal(props: JournalEntryModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
 
-    const handleCreateTransactionMethod = (formData: CreateJournalEntry) => {
+    const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
         setSaving(true);
         createJournalEntry(formData)
             .then(() => {
@@ -68,7 +68,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
     return (
         <FormProvider {...createJournalEntryForm}>
             <Dialog open={props.open} fullWidth onClose={props.onClose} maxWidth='md'>
-                <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateTransactionMethod)}>
+                <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateJournalEntry)}>
                     <DialogTitle>Add Entry</DialogTitle>
                     <DialogContent sx={{ overflow: "initial" }}>
                         <JournalEntryForm />
