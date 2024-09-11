@@ -22,8 +22,6 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
     const handleLogout = () => {
         // return logout();
     }
-
-    console.log('props!', props)
     
     const initials = props.user.username?.slice(0, 1)?.toUpperCase?.() ?? undefined;
 

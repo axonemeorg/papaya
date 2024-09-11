@@ -48,6 +48,7 @@ export default class JournalRepository {
     }
 
     static async getUserJournalEntriesByMonthAndYear(userId: string, month: string | number, year: string | number) {
+        console.log({ month, year })
         const formattedMonth = (`0${month}`).slice(-2);
         const formattedNextMonth = (`0${Number(month)  + 1}`).slice(-2);
         const minDate = `${year}-${formattedMonth}-01`;
@@ -97,6 +98,22 @@ export default class JournalRepository {
                 },
             },
         });
+    }
+
+    static async deleteUserJournalEntryById(userId: string, journalEntryId: string) {
+        console.log('deleteUserJournalEntryById', userId, journalEntryId)
+        const response = await db.delete(JournalEntryTable)
+            .where(
+                and(
+                    eq(JournalEntryTable.userId, userId),
+                    eq(JournalEntryTable.journalEntryId, journalEntryId)
+                )
+            )
+            .returning({
+                journalEntryId: JournalEntryTable.journalEntryId
+            });
+
+        return response;
     }
 
     // static async getUserJournalEntriesByMonthAndYear(userId: string, month: number, year: number) {

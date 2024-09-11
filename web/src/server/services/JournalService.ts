@@ -48,4 +48,8 @@ export default class JournalService {
         
         return this._santizeJournalEntries(results);
     }
+
+    static async deleteUserJournalEntryById(userId: string, journalEntryId: string) {
+        return JournalRepository.deleteUserJournalEntryById(userId, journalEntryId);
+    }
 }

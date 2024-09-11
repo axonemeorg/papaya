@@ -5,6 +5,7 @@ import db from '@/database/client'
 import { CategoryTable, JournalEntryTable, TransactionTable } from '@/database/schemas';
 import JournalRepository from '@/server/repositories/JournalRepository';
 import JournalService from '@/server/services/JournalService';
+import { JournalEntry } from '@/types/get';
 import { CreateJournalEntry } from '@/types/post';
 import { and, eq, InferInsertModel } from 'drizzle-orm';
 
@@ -61,6 +62,17 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 				transactionMethodId: transaction.transactionMethod?.transactionMethodId,
 			}
 		}))
+}
+
+export const deleteJournalEntry = async (formData: FormData) => {
+    const journalEntryId = String(formData.get('journalEntryId'));
+	const { user } = await validateRequest();
+	
+    if (!user) {
+		throw new Error('Not authorized.');
+    }
+
+	return JournalService.deleteUserJournalEntryById(user.id, journalEntryId);
 }
 
 export const getJournalEntriesByUserId = (userId: string) => {

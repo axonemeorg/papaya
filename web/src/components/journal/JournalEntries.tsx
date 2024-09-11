@@ -38,6 +38,8 @@ export default function JournalEntries(props) {
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
     const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
 
+    const currentDayString = dayjs().format('YYYY-MM-DD');
+
     const journal = useMemo(() => {
         
         return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
@@ -50,7 +52,7 @@ export default function JournalEntries(props) {
 
             return acc;
         }, {
-            [dayjs().format('YYYY-MM-DD')]: [],
+            [currentDayString]: [],
         });
     }, [journalEntries]);
 
@@ -149,7 +151,7 @@ export default function JournalEntries(props) {
             <JournalEntryModal
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
-                initialDate={dayjs().format('YYYY-MM-DD')}
+                initialDate={currentDayString}
             />
             <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)}>
                 <Add />

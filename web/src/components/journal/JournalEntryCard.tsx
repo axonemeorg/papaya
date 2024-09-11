@@ -3,6 +3,7 @@ import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
 import { Box, Icon, IconButton, Paper, Popover, Stack, Typography } from "@mui/material";
 import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/Utils";
+import { deleteJournalEntry } from "@/actions/journal-actions";
 
 interface JournalEntryCard {
     anchorEl: HTMLElement;
@@ -12,6 +13,8 @@ interface JournalEntryCard {
 
 export default function JournalEntryCard(props: JournalEntryCard) {
     const isNetPositive = props.entry.netAmount > 0;
+
+    console.log('props.entry:', props.entry)
 
     return (
         <Popover
@@ -31,7 +34,10 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                 <Box p={1} mb={2}>
                     <Stack direction='row' justifyContent='flex-end' gap={0.5} sx={{ mb: 2 }}>
                         <IconButton size='small'><Edit fontSize="small"/></IconButton>
-                        <IconButton size='small'><Delete fontSize="small" /></IconButton>
+                        <form action={deleteJournalEntry}>
+                            <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
+                            <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
+                        </form>
                         <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
                         <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
                             <Close fontSize="small" />
