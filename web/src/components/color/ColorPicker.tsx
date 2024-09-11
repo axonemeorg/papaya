@@ -128,12 +128,12 @@ export interface ColorPickerProps {
     onChange?: (color: string) => void;
 }
 
-export const getMuiColor = (color: string) => {
-    const [colorName, colorShade] = color.split('.');
+const getMuiColor = (colorLabel: string) => {
+    const [colorName, colorShade] = colorLabel.split('.');
     return muiColors[colorName][colorShade];
 }
 
-const DEFAULT_COLOR = 'red.400'
+const DEFAULT_COLOR = muiColors['red'][400];
 
 export default function ColorPicker(props: ColorPickerProps) {
     const color = props.color || DEFAULT_COLOR;

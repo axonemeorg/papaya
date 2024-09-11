@@ -22,7 +22,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
             getOptionLabel={(option) => option.label}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
-                const [colorName, colorShade] = option.color.split('.');
+                const { avatarPrimaryColor, avatarContent } = option;
 
                 return (
                     <ListItem
@@ -31,7 +31,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
                         {...optionProps}
                     >
                         <ListItemIcon>
-                            <Icon sx={{ color: colors[colorName][colorShade] }}>{option.icon}</Icon>
+                            <Icon sx={{ color: avatarPrimaryColor }}>{avatarContent}</Icon>
                         </ListItemIcon>
                         <ListItemText primary={option.label} />
                     </ListItem>

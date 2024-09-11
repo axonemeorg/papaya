@@ -1,5 +1,4 @@
 import { alpha, Chip } from "@mui/material";
-import { getMuiColor } from "../color/ColorPicker";
 import { Category } from "@/types/get";
 
 interface CategoryChipProps {
@@ -7,7 +6,7 @@ interface CategoryChipProps {
 }
 
 export default function CategoryChip(props: CategoryChipProps) {
-    const categoryColor = props.category?.avatarPrimaryColor ? getMuiColor(props.category.avatarPrimaryColor) : undefined;
+    const categoryColor = props.category?.avatarPrimaryColor;
 
     return (
         <Chip

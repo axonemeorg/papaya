@@ -3,6 +3,7 @@ import DatabaseTableSeeder from "../lib/DatabaseTableSeeder";
 import { AvatarVariantEnum, CategoryTable, TransactionMethodTable, UserTable } from "../schemas";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
+import * as muiColors from '@mui/material/colors';
 
 import icons from '@/constants/icons';
 import { colorNameLabels, colorShadeLabels } from "@/components/color/ColorPicker";
@@ -72,7 +73,8 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
                     descriptionEmbedding: embeddedCategories[label],
                     avatarVariant: 'PICTORIAL',
                     avatarContent: icons[iconIndex].name,
-                    avatarPrimaryColor: [colorNames[colorNameIndex], shades[shadeIndex]].join('.'),
+                    avatarPrimaryColor: faker.color.rgb(),
+                    // avatarPrimaryColor: muiColors[[colorNames[colorNameIndex], shades[shadeIndex]].join('.')],
                 });
             });
 
