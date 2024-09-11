@@ -94,8 +94,10 @@ export const JournalEntryTable = pgTable("journal_entry", {
     memo: varchar('memo', { length: 1024 })
         .notNull(),
     date: date('date')
+        .defaultNow()
         .notNull(),
     time: time('time')
+        .defaultNow()
         .notNull(),
 	userId: text("user_id")
 		.notNull()
