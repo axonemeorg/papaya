@@ -29,6 +29,16 @@ export const CreateJournalEntry = z.object({
 });
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
+export const CreateQuickJournalEntry = z.object({
+    memo: z.string().min(1, "Add a description"),
+    category: Category.pick({ categoryId: true })
+        .optional()
+        .nullable(),
+    amount: z.string().min(0, "A positive number is required"),
+    date: z.string(),
+});
+export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;
+
 export const CreateTransactionMethod = ItemAvatar.extend({
     label: z.string().min(1, 'A label is required'),
     defaultPaymentType: PaymentType,

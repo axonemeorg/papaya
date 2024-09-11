@@ -39,6 +39,7 @@ export default function JournalEntryModal(props: JournalEntryModalProps) {
         defaultValues: {
             memo: '',
             date: props.initialDate,
+            category: undefined,
             time: dayjs().format("HH:mm:ss"),
             transactions: [
                 {

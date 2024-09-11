@@ -11,6 +11,7 @@ import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
 import { CategoryContext } from "@/contexts/CategoryContext";
+import QuickJournalEditor from "./QuickJournalEditor";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     return (
@@ -143,24 +144,9 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                 })}
                                             </List>
                                         )}
-                                        <Stack direction='row' pl={2}>
-                                            <Box sx={{ width: '200px', px: 2, boxSizing: 'content-box' }}>
-                                                <TextField
-                                                    label='Memo'
-                                                    size='small'
-                                                    fullWidth
-                                                />
-                                            </Box>
-                                            <Box sx={{ width: '100px', px: 2, boxSizing: 'content-box' }}>
-                                                <TextField
-                                                    label='Price'
-                                                    size='small'
-                                                    fullWidth
-                                                />
-                                            </Box>
-                                        </Stack>
+                                        
                                         {isToday && (
-                                            <Button startIcon={<Add />}>New Entry</Button>
+                                            <QuickJournalEditor date={date} />
                                         )}
                                     </TableCell>
                                 </TableRow>

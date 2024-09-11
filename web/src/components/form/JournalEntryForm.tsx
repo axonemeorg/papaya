@@ -17,7 +17,6 @@ import dayjs from "dayjs";
 
 interface JournalEntryTransactionRowProps {
     index: number;
-    showAdvancedControls: boolean;
     fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
 }
 
@@ -75,21 +74,18 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                     />
                 </Grid>
             </Grid>
-
-            {props.showAdvancedControls && (
-                <IconButton
-                    onClick={() => props.fieldArray.remove(props.index)}
-                    disabled={props.fieldArray.fields.length <= 1}
-                >
-                    <Delete />
-                </IconButton>
-            )}
+        
+            <IconButton
+                onClick={() => props.fieldArray.remove(props.index)}
+                disabled={props.fieldArray.fields.length <= 1}
+            >
+                <Delete />
+            </IconButton>
         </Stack>
     )
 }
 
 export default function JournalEntryForm() {
-    const [formTab, setFormTab] = useState(1);
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
     const enableAutoDetectCategory = false;
 
@@ -121,12 +117,6 @@ export default function JournalEntryForm() {
             transactionType: TransactionType.Enum.CREDIT
         });
     }
-
-    const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
-      setFormTab(newValue);
-    };
-
-    const showAdvancedControls = formTab === 1;
 
     const transactions = getValues('transactions');
     const transactionFields = transactionsFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
@@ -255,11 +245,10 @@ export default function JournalEntryForm() {
                     />
                 )}
             />
-            {showAdvancedControls && (
-                <Box mb={1}>
-                    <Typography variant='overline'><strong>Money Out</strong></Typography>
-                </Box>
-            )}
+
+            <Box mb={1}>
+                <Typography variant='overline'><strong>Money Out</strong></Typography>
+            </Box>
             <Stack mb={2} spacing={2}>
                 {debitTransactionFields.map(([field, index]) => {
                     return (
@@ -267,34 +256,28 @@ export default function JournalEntryForm() {
                             key={field.id}
                             index={index}
                             fieldArray={transactionsFieldArray}
-                            showAdvancedControls={showAdvancedControls}
                         />
                     )
                 })}
             </Stack>
-            {showAdvancedControls && (
-                <Button startIcon={<Add />} onClick={() => addDebitTransaction()}>Add Transaction</Button>
-            )}
-            {showAdvancedControls && (
-                <>
-                    <Box mb={1}>
-                        <Typography variant='overline'><strong>Money In</strong></Typography>
-                    </Box>
-                    <Stack mb={2} spacing={2}>
-                        {creditTransactionFields.map(([field, index]) => {
-                            return (
-                                <JournalEntryTransactionRow
-                                    key={field.id}
-                                    index={index}
-                                    fieldArray={transactionsFieldArray}
-                                    showAdvancedControls={showAdvancedControls}
-                                />
-                            )
-                        })}
-                    </Stack>
-                    <Button startIcon={<Add />} onClick={() => addCreditTransaction()}>Add Transaction</Button>
-                </>
-            )}
+            
+            <Button startIcon={<Add />} onClick={() => addDebitTransaction()}>Add Transaction</Button>
+        
+            <Box mb={1}>
+                <Typography variant='overline'><strong>Money In</strong></Typography>
+            </Box>
+            <Stack mb={2} spacing={2}>
+                {creditTransactionFields.map(([field, index]) => {
+                    return (
+                        <JournalEntryTransactionRow
+                            key={field.id}
+                            index={index}
+                            fieldArray={transactionsFieldArray}
+                        />
+                    )
+                })}
+            </Stack>
+            <Button startIcon={<Add />} onClick={() => addCreditTransaction()}>Add Transaction</Button>
         </>
     )
 }
