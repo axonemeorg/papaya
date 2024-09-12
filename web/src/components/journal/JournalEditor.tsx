@@ -16,6 +16,7 @@ import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import { User } from "lucia";
+import SettingsDrawer from "./categories/SettingsDrawer";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     return (
@@ -48,6 +49,7 @@ interface JournalEditorProps {
 export default function JournalEditor(props: JournalEditorProps) {
     const { journalEntries } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
+    const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
     
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
     const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
@@ -78,6 +80,15 @@ export default function JournalEditor(props: JournalEditorProps) {
     return (
         <CategoryContext.Provider value={{ categories: props.categories }}>
             <NotificationsProvider>
+                <CreateJournalEntryModal
+                    open={showJournalEntryModal}
+                    onClose={() => setShowJournalEntryModal(false)}
+                    initialDate={currentDayString}
+                />
+                <SettingsDrawer
+                    open={showSettingsDrawer}
+                    onClose={() => setShowSettingsDrawer(false)}
+                />
                 <BaseLayout
                     headerChildren={
                         <JournalHeader month={props.month} year={props.year}>
@@ -88,7 +99,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                             <Button
                                 variant='outlined'
                                 startIcon={<Settings />}
-                                onClick={() => {}}
+                                onClick={() => setShowSettingsDrawer(true)}
                             >
                                 Settings
                             </Button>
@@ -178,12 +189,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                             }
                         </TableBody>
                     </Table>
-
-                    <CreateJournalEntryModal
-                        open={showJournalEntryModal}
-                        onClose={() => setShowJournalEntryModal(false)}
-                        initialDate={currentDayString}
-                    />
                 </BaseLayout>
             </NotificationsProvider>
         </CategoryContext.Provider>

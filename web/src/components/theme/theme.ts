@@ -38,11 +38,20 @@ const appTheme = createTheme({
                     // Target the backdrop of the dialog
                     '& .MuiBackdrop-root': {
                         backdropFilter: 'blur(8px)',
-                        backgroundColor: 'rgba(0, 0, 0, 0.125)',
+                        // backgroundColor: 'rgba(0, 0, 0, 0.125)',
                     }
                 }
             }
         },
+        MuiDrawer: {
+            styleOverrides: {
+                root: {
+                    '& .MuiBackdrop-root': {
+                        backdropFilter: 'blur(8px)', // Apply blur directly to the drawer content
+                    }
+                }
+            }
+        }
     }
 });
 
