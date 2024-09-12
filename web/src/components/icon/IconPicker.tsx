@@ -4,7 +4,7 @@ import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { ReactNode, useMemo, useState } from 'react';
-import ColorPicker, { ColorPickerProps, getMuiColor } from '../color/ColorPicker';
+import ColorPicker, { ColorPickerProps } from '../color/ColorPicker';
 import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
@@ -46,7 +46,7 @@ export default function IconPicker(props: IconPickerProps) {
 
     const iconPrimaryColor = '#FF0000';
     const iconSecondaryColor = '#00FF00';
-    const iconColor: string | undefined = color ? getMuiColor(color) : undefined;
+    const iconColor: string | undefined = undefined;
 
     const handleShuffle = () => {
         const iconIndex = Math.floor(Math.random() * sortedIcons.length);

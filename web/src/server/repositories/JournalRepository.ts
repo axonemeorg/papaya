@@ -48,7 +48,6 @@ export default class JournalRepository {
     }
 
     static async getUserJournalEntriesByMonthAndYear(userId: string, month: string | number, year: string | number) {
-        console.log({ month, year })
         const formattedMonth = (`0${month}`).slice(-2);
         const formattedNextMonth = (`0${Number(month)  + 1}`).slice(-2);
         const minDate = `${year}-${formattedMonth}-01`;

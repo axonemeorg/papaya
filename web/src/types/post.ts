@@ -44,10 +44,8 @@ export const CreateTransactionMethod = ItemAvatar.extend({
 });
 export type CreateTransactionMethod = z.output<typeof CreateTransactionMethod>;
 
-export const CreateCategory = z.object({
+export const CreateCategory = ItemAvatar.extend({
     label: z.string().min(1, 'A label is required'),
     description: z.string().min(1, 'A description is required'),
-    icon: z.string(),
-    color: z.string(),
 });
 export type CreateCategory = z.output<typeof CreateCategory>;
