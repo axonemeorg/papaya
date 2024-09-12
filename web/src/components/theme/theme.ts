@@ -24,7 +24,25 @@ const appTheme = createTheme({
                     textTransform: 'unset'
                 }
             }
-        }
+        },
+        MuiFab: {
+            styleOverrides: {
+                root: {
+                    textTransform: 'unset'
+                }
+            }
+        },
+        MuiDialog: {
+            styleOverrides: {
+                root: {
+                    // Target the backdrop of the dialog
+                    '& .MuiBackdrop-root': {
+                        backdropFilter: 'blur(8px)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.125)',
+                    }
+                }
+            }
+        },
     }
 });
 

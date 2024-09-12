@@ -9,7 +9,7 @@ interface BaseLayoutProps extends PropsWithChildren {
 	user: User;
 }
 
-export default (props: BaseLayoutProps) => {
+export default function BaseLayout(props: BaseLayoutProps) {
 	return (
 		<>
 			<Header user={props.user}>

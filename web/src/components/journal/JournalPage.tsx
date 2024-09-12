@@ -22,20 +22,12 @@ export default async function JournalPage(props: JournalPageProps) {
     const categories = await getCategoriesByUserId(user.id);
 
     return (
-        <BaseLayout
-            headerChildren={
-                <JournalHeader month={month} year={year} />
-            }
+        <JournalEditor
             user={user}
-        >
-            {/* <CategoryContext.Provider value={{ categories }}> */}
-                    {/* <TransactionMethodContext.Provider value={{ transactionMethods }}> */}
-                    <JournalEditor
-                        journalEntries={journalEntries}
-                        categories={categories}
-                    />
-                {/* </TransactionMethodContext.Provider> */}
-            {/* </CategoryContext.Provider> */}
-        </BaseLayout>        
+            month={month}
+            year={year}
+            journalEntries={journalEntries}
+            categories={categories}
+        />
     )
 }
