@@ -1,3 +1,5 @@
+'use client';
+
 import { JournalEntry } from "@/types/get";
 import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
 import { Box, Icon, IconButton, Paper, Popover, Stack, Typography } from "@mui/material";
@@ -5,7 +7,8 @@ import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/Utils";
 import { deleteJournalEntry } from "@/actions/journal-actions";
 import EditJournalEntryModal from "../modal/EditJournalEntryModal";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 interface JournalEntryCard {
     anchorEl: HTMLElement;
@@ -17,7 +20,14 @@ export default function JournalEntryCard(props: JournalEntryCard) {
     const [showEditDialog, setShowEditDialog] = useState<boolean>(false);
     const isNetPositive = props.entry.netAmount > 0;
 
-    console.log('props.entry:', props.entry)
+    const { snackbar } = useContext(NotificationsContext);
+
+    const handleDeleteEntry = () => {
+        snackbar({
+            message: 'Deleted 1 entry.'
+        });
+        props.onClose();
+    }
 
     return (
         <>
@@ -45,7 +55,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                             <IconButton size='small' onClick={() => setShowEditDialog(true)}>
                                 <Edit fontSize="small"/>
                             </IconButton>
-                            <form action={deleteJournalEntry} onSubmit={() => props.onClose()}>
+                            <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
                                 <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
                                 <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
                             </form>

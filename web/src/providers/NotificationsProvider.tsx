@@ -78,7 +78,7 @@ const NotificationsProvider = (props: PropsWithChildren) => {
 						</IconButton>
 					</>
 				)}
-				message='Howdy!'
+				message={snackbarNotification?.message}
 			/>
 
 		</NotificationsContext.Provider>

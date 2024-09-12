@@ -73,7 +73,7 @@ export default function QuickJournalEntryForm() {
                     )}
                 />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={5}>
                 <Controller
                     control={control}
                     name='category'
