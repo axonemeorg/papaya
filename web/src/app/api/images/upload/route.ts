@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { IncomingForm } from 'formidable';
 import { S3Client, PutObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
-import { readFileSync } from 'fs';
-import path from 'path';
 import { validateRequest } from '@/auth';
 import db from '@/database/client';
 import { UserFileUploads } from '@/database/schemas';
@@ -75,7 +72,7 @@ export async function POST(request: NextRequest) {
 		await s3Client.send(command);
 
 		// Insert the file into the database
-		const record = await db
+		const records = await db
 			.insert(UserFileUploads)
 			.values({
 				userId: user.id,
@@ -90,7 +87,7 @@ export async function POST(request: NextRequest) {
 				s3Key: UserFileUploads.s3Key,
 			})
 		
-		return NextResponse.json(record, { status: 200 });
+		return NextResponse.json(records[0], { status: 200 });
 	} catch (error) {
 		console.error('Error uploading file:', error);
 		return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });

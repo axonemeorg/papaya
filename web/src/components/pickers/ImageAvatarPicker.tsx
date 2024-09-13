@@ -8,6 +8,7 @@ import { useState } from "react";
 export default function ImageAvatarPicker() {
     const [uploading, setUploading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -27,11 +28,16 @@ export default function ImageAvatarPicker() {
                     body: formData,
                 });
 
-                if (!response.ok) {
-                    throw new Error('Upload failed');
-                }
+                const data = await response.json();
 
-                alert('File uploaded successfully!');
+                console.log('data:', data)
+                console.log('process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL:', process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL)
+                
+                setImageSrc([
+                    process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
+                    data.s3Key
+                ].join('/'));
+
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -55,6 +61,7 @@ export default function ImageAvatarPicker() {
                     Choose File
                 </button> */}
             </label>
+            {imageSrc && <img src={`https://${imageSrc}`} alt="Image avatar" />}
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </Box>
     );
