@@ -4,6 +4,8 @@ import { S3Client, PutObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { validateRequest } from '@/auth';
+import db from '@/database/client';
+import { UserFileUploads } from '@/database/schemas';
 
 export const config = {
 	api: {
@@ -72,10 +74,23 @@ export async function POST(request: NextRequest) {
 		const command = new PutObjectCommand(s3Params);
 		await s3Client.send(command);
 
-		// Generate a public URL for the uploaded file
-		const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${fileS3Key}`;
+		// Insert the file into the database
+		const record = await db
+			.insert(UserFileUploads)
+			.values({
+				userId: user.id,
+				fileName,
+				originalFileName,
+				mimeType,
+				s3Key: fileS3Key,
+				fileUploadType: 'IMAGE_AVATAR',
+			})
+			.returning({
+				userFileUploadId: UserFileUploads.userId,
+				s3Key: UserFileUploads.s3Key,
+			})
 		
-		return NextResponse.json({ success: true, fileUrl }, { status: 200 });
+		return NextResponse.json(record, { status: 200 });
 	} catch (error) {
 		console.error('Error uploading file:', error);
 		return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
