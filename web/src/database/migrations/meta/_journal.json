@@ -43,6 +43,13 @@
       "when": 1726086857375,
       "tag": "0005_tiresome_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1726245694966,
+      "tag": "0006_furry_genesis",
+      "breakpoints": true
     }
   ]
 }

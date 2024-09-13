@@ -13,7 +13,7 @@ import {
 
 const EMBEDDING_NUM_DIMENSIONS = 1536 as const;
 
-import { AvatarVariantEnum, PaymentTypeEnum, TransactionTypeEnum } from './enums';
+import { AvatarVariantEnum, PaymentTypeEnum, TransactionTypeEnum, UserFileUploadTypeEnum } from './enums';
 import { UserTable } from './auth';
 
 const timestamps = {
@@ -106,4 +106,25 @@ export const JournalEntryTable = pgTable("journal_entry", {
         .references(() => CategoryTable.categoryId),
 
     ...timestamps
+});
+
+export const UserFileUploads = pgTable("user_file_uploads", {
+    userFileUploadId: uuid('user_file_upload_id')
+        .defaultRandom()
+        .primaryKey(),
+    userId: text("user_id")
+		.notNull()
+		.references(() => UserTable.id),
+    fileUploadType: UserFileUploadTypeEnum('file_upload_type')
+        .notNull(),
+    originalFileName: varchar('original_file_name', { length: 260 })
+        .notNull(),
+    mimeType: varchar('mime_type', { length: 256 })
+        .notNull(),
+    fileName: varchar('file_name', { length: 256 })
+        .notNull(),
+    s3Key: varchar('s3_key', { length: 2048 })
+        .notNull(),
+    
+    ...timestamps,
 });
