@@ -1,3 +1,5 @@
+'use client';
+
 import { LoadingButton } from "@mui/lab";
 import { Box } from "@mui/material";
 import { useState } from "react";
@@ -16,6 +18,8 @@ export default function ImageAvatarPicker() {
             try {
                 const formData = new FormData();
                 formData.append('file', file);
+
+                console.log('the file:', file)
 
                 // Send the file to your API endpoint
                 const response = await fetch('/api/images/upload', {
@@ -43,11 +47,13 @@ export default function ImageAvatarPicker() {
                     type="file"
                     onChange={handleFileChange}
                     disabled={uploading}
-                    style={{ display: 'none' }}
+                    // style={{ display: 'none' }}
                 />
-                <LoadingButton loading={uploading}>
+                {/* <button
+                    // loading={uploading}
+                >
                     Choose File
-                </LoadingButton>
+                </button> */}
             </label>
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </Box>

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { IncomingForm } from 'formidable';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
 import { readFileSync } from 'fs';
 import path from 'path';
+import { validateRequest } from '@/auth';
 
 export const config = {
 	api: {
@@ -10,13 +11,17 @@ export const config = {
 	},
 };
 
-const s3Config = {
+const s3Config: S3ClientConfig = {
 	region: process.env.AWS_S3_REGION ?? '',
 	credentials: {
         accessKeyId: process.env.AWS_S3_ACCESS_KEY ?? '',
         secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY ?? ''
     }
 }
+
+const s3Client = new S3Client(s3Config);
+
+const bucketName = process.env.AWS_S3_BUCKET_NAME ?? '';
 
 const generateRandomFilename  = (length: number) => {
     const chars = '-_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -30,35 +35,49 @@ const generateRandomFilename  = (length: number) => {
 }
 
 export async function POST(request: NextRequest) {
-	const form = new IncomingForm();
+	const { user } = await validateRequest();
+	
+	if (!user) {
+		return NextResponse.json({ error: 'Must be authenticated' }, { status: 401 });
+	}
+	
+	const formData = await request.formData();
+	const file = formData.get('file') as File | null;
+	
+	if (!file) {
+		return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+	}
+	
+	const mimeType = file.type;
+	const originalFileName = String(file.name ?? '');
+	const originalFileNameParts = originalFileName.split('.');
+	const originalFileExtension = originalFileNameParts.at(-1);;
+	const fileName = [
+		generateRandomFilename(32),
+		originalFileExtension
+	].join('.');
+	
+	
+	try {
+		// Upload the file to S3
+		const fileBuffer = await file.arrayBuffer();
+		const fileS3Key = `uploads/${fileName}`
+		const s3Params = {
+			Bucket: bucketName,
+			Key: fileS3Key,
+			Body: Buffer.from(fileBuffer),
+			ContentType: mimeType,
+		};
 
-	return new Promise((resolve, reject) => {
-		form.parse(request, async (err, fields, files) => {
-			if (err) {
-				reject(err);
-				return;
-			}
+		const command = new PutObjectCommand(s3Params);
+		await s3Client.send(command);
 
-			const file = files.file[0];
-			const data = readFileSync(file.filepath);
-
-			const fileName = generateRandomFilename(32);
-
-			// Upload the file to S3
-			const bucketName = process.env.AWS_BUCKET_NAME;
-			const s3Params = {
-				Bucket: bucketName,
-				Key: `uploads/${file.originalFilename}`,
-				Body: data,
-				ContentType: file.mimetype,
-			};
-
-			const command = new PutObjectCommand(s3Params);
-			await s3Client.send(command);
-
-			// Generate a public URL for the uploaded file
-			const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/uploads/${file.originalFilename}`;
-
-		});
-	});
+		// Generate a public URL for the uploaded file
+		const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${fileS3Key}`;
+		
+		return NextResponse.json({ success: true, fileUrl }, { status: 200 });
+	} catch (error) {
+		console.error('Error uploading file:', error);
+		return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+	}
 }
