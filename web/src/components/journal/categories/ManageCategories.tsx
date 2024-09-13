@@ -107,16 +107,20 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             {formState === ManageCategoriesFormState.EDIT && (
                 <FormProvider {...categoryForm}>
                     <form>
-                        <CategoryForm />
-                        <Button type='submit' variant='contained' startIcon={<Save />}>Save</Button>
+                        <Stack gap={2} pt={2}>
+                            <CategoryForm />
+                            <Button type='submit' variant='contained' startIcon={<Save />}>Save</Button>
+                        </Stack>
                     </form>
                 </FormProvider>
             )}
             {formState === ManageCategoriesFormState.CREATE && (
                 <FormProvider {...categoryForm}>
                     <form>
-                        <CategoryForm />
-                        <Button type='submit' variant='contained' startIcon={<Add />}>Create</Button>
+                        <Stack gap={2} pt={2}>
+                            <CategoryForm />
+                            <Button type='submit' variant='contained' startIcon={<Add />}>Create</Button>
+                        </Stack>
                     </form>
                 </FormProvider>
             )}

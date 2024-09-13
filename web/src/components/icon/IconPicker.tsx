@@ -16,7 +16,6 @@ interface IconPickerProps {
     icon?: string;
     onChangeIcon?: (icon: string) => void;
     ColorPickerProps?: ColorPickerProps;
-    renderButton?: (icon: string) => ReactNode;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -38,9 +37,7 @@ export default function IconPicker(props: IconPickerProps) {
     const icon: string = props.icon || DEFAULT_ICON;
     const color: string | undefined = props.ColorPickerProps?.color ?? undefined
 
-    const [anchorEl, setAnchorEl] = useState<any>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const open = Boolean(anchorEl)
 
     const scrollbarWidth = useScrollbarWidth();
 
@@ -68,124 +65,98 @@ export default function IconPicker(props: IconPickerProps) {
 
     return (
         <>
-            <Button onClick={(event) => setAnchorEl(event.currentTarget)} size='small' sx={{ minWidth: 'unset' }}>
-                <Icon sx={(theme) => ({ color: iconColor ?? theme.palette.text.primary })}>{icon}</Icon>
-            </Button>
-            <Popover
-                TransitionComponent={Fade}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={() => setAnchorEl(null)}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center'
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center'
-                }}
-            >
-                <Box px={2} pt={1}>
-                    <Tabs value={0}>
-                        <Tab label='Icon'/>
-                        <Tab label='Emoji' />
-                        <Tab label='Letters' />
-                        <Tab label='Image' />
-                    </Tabs>
-                </Box>
-                <Stack direction='row' p={2} gap={1} alignItems='center'>
-                    <TextField
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position='start'>
-                                    <Search />
-                                </InputAdornment>
-                            )
-                        }}
-                        placeholder='Find icon...'
-                        variant='outlined'
-                        size='small'
-                        fullWidth
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
+            <Stack direction='row' p={2} gap={1} alignItems='center'>
+                <TextField
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position='start'>
+                                <Search />
+                            </InputAdornment>
+                        )
+                    }}
+                    placeholder='Find icon...'
+                    variant='outlined'
+                    size='small'
+                    fullWidth
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                />
+                <Button
+                    onClick={() => handleShuffle()}
+                    variant='outlined'
+                    size='small'
+                >
+                    <Shuffle />
+                </Button>
+            </Stack>
+            {props.ColorPickerProps && (
+                <Stack direction='row' p={2} gap={1} mt={2}>
+                    <ColorPicker
+                        id='primary-color-picker'
+                        label='Primary'
+                        color={color}
+                        onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
+                    />
+                    <ColorPicker
+                        id='secondary-color-picker'
+                        label='Secondary'
+                        color={color}
+                        onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
                     />
                     <Button
-                        onClick={() => handleShuffle()}
+                        // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
                         variant='outlined'
                         size='small'
                     >
-                        <Shuffle />
+                        <Add />
+                    </Button>
+                    <Button
+                        // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
+                        variant='outlined'
+                        size='small'
+                    >
+                        <FormatColorReset />
                     </Button>
                 </Stack>
-                {props.ColorPickerProps && (
-                    <Stack direction='row' p={2} gap={1} mt={2}>
-                        <ColorPicker
-                            id='primary-color-picker'
-                            label='Primary'
-                            color={color}
-                            onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
-                        />
-                        <ColorPicker
-                            id='secondary-color-picker'
-                            label='Secondary'
-                            color={color}
-                            onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
-                        />
-                        <Button
-                            // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
-                            variant='outlined'
-                            size='small'
-                        >
-                            <Add />
-                        </Button>
-                        <Button
-                            // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
-                            variant='outlined'
-                            size='small'
-                        >
-                            <FormatColorReset />
-                        </Button>
-                    </Stack>
-                )}
-                <Box pl={2} mt={2}>
-                    <FixedSizeGrid
-                        columnCount={COLUMN_COUNT}
-                        columnWidth={CELL_SIZE}
-                        height={CELL_SIZE * 8}
-                        rowCount={rowCount}
-                        rowHeight={CELL_SIZE}
-                        width={(CELL_SIZE * COLUMN_COUNT) + scrollbarWidth}
-                        style={{ overflowX: 'hidden' }}
-                    >
-                        {({ columnIndex, rowIndex, style }) => {
-                            const index = rowIndex * COLUMN_COUNT + columnIndex;
-                            const icon = results[index];
+            )}
+            <Box pl={2} mt={2}>
+                <FixedSizeGrid
+                    columnCount={COLUMN_COUNT}
+                    columnWidth={CELL_SIZE}
+                    height={CELL_SIZE * 8}
+                    rowCount={rowCount}
+                    rowHeight={CELL_SIZE}
+                    width={(CELL_SIZE * COLUMN_COUNT) + scrollbarWidth}
+                    style={{ overflowX: 'hidden' }}
+                >
+                    {({ columnIndex, rowIndex, style }) => {
+                        const index = rowIndex * COLUMN_COUNT + columnIndex;
+                        const icon = results[index];
 
-                            return (
-                                icon && (
-                                    <Button
-                                        key={index}
-                                        onClick={() => props.onChangeIcon(icon.name)}
-                                        size="small"
-                                        sx={(theme) => ({ 
-                                            minWidth: 'unset',
-                                            '& span': { color: `${iconColor ?? theme.palette.text.primary} !important` }
-                                            
-                                        })}
-                                        style={{
-                                            ...style,
-                                        }}
-                                    >
-                                        <IconWithGradient style={{ fontSize: '36px' }} primaryColor={iconPrimaryColor} secondaryColor={iconSecondaryColor}>
-                                            {icon.name}
-                                        </IconWithGradient>
-                                    </Button>
-                                )
-                            );
-                        }}
-                    </FixedSizeGrid>
-                </Box>
-            </Popover>
+                        return (
+                            icon && (
+                                <Button
+                                    key={index}
+                                    onClick={() => props.onChangeIcon(icon.name)}
+                                    size="small"
+                                    sx={(theme) => ({ 
+                                        minWidth: 'unset',
+                                        '& span': { color: `${iconColor ?? theme.palette.text.primary} !important` }
+                                        
+                                    })}
+                                    style={{
+                                        ...style,
+                                    }}
+                                >
+                                    <IconWithGradient style={{ fontSize: '36px' }} primaryColor={iconPrimaryColor} secondaryColor={iconSecondaryColor}>
+                                        {icon.name}
+                                    </IconWithGradient>
+                                </Button>
+                            )
+                        );
+                    }}
+                </FixedSizeGrid>
+            </Box>
         </>
     )
 }

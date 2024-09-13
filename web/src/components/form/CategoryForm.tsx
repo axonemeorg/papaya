@@ -10,6 +10,7 @@ import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import IconPicker from "../icon/IconPicker";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
 import { UpdateCategory } from "@/types/put";
+import AvatarPicker from "../avatar/AvatarPicker";
 
 export default function CategoryForm() {
     const { register, control, setValue, watch } = useFormContext<CreateCategory | UpdateCategory>();
@@ -40,17 +41,16 @@ export default function CategoryForm() {
                     </ToggleButtonGroup>
                 )}
             /> */}
-            <Stack gap={1}>
-                <Stack direction='row' alignItems='center' gap={1}>
+            <Stack gap={2}>
+                <Stack direction='row' alignItems='center' gap={2}>
                     <TextField
                         {...register('label')}
                         label='Label'
                         placeholder="Groceries"
                         fullWidth
                         multiline
-                        maxRows={3}
                     />
-                    <IconPicker
+                    <AvatarPicker
     
                     />
                 </Stack>
@@ -60,7 +60,7 @@ export default function CategoryForm() {
                     placeholder="Groceries and household foodstuffs"
                     fullWidth
                     multiline
-                    maxRows={3}
+                    rows={3}
                 />
             </Stack>
         </Box>
