@@ -6,7 +6,7 @@ import { InferSelectModel } from "drizzle-orm";
 import * as muiColors from '@mui/material/colors';
 
 import icons from '@/constants/icons';
-import { colorNameLabels, colorShadeLabels } from "@/components/color/ColorPicker";
+import { colorNameLabels, colorShadeLabels } from "@/components/pickers/ColorPicker";
 
 const EXAMPLE_CATEGORIES = [
     "Groceries",

@@ -7,10 +7,9 @@ import { CreateCategory, CreateTransactionMethod } from "@/types/post";
 import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
 import { PaymentType } from "@/types/enum";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
-import IconPicker from "../icon/IconPicker";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
 import { UpdateCategory } from "@/types/put";
-import AvatarPicker from "../avatar/AvatarPicker";
+import AvatarPicker from "../pickers/AvatarPicker";
 
 export default function CategoryForm() {
     const { register, control, setValue, watch } = useFormContext<CreateCategory | UpdateCategory>();

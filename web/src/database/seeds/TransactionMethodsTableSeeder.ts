@@ -4,7 +4,7 @@ import DatabaseTableSeeder from "../lib/DatabaseTableSeeder";
 import { TransactionMethodTable, UserTable } from "../schemas";
 import { faker } from '@faker-js/faker'
 import { InferSelectModel } from "drizzle-orm";
-import { colorNameLabels, colorShadeLabels } from "@/components/color/ColorPicker";
+import { colorNameLabels, colorShadeLabels } from "@/components/pickers/ColorPicker";
 
 const NUM_METHODS_PER_USER = 3 as const;
 

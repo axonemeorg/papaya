@@ -1,6 +1,6 @@
 'use client'
 
-import ColorPicker from "@/components/color/ColorPicker";
+import ColorPicker from "@/components/pickers/ColorPicker";
 import IconPicker from "@/components/icon/IconPicker";
 import { InputBase, OutlinedInput, Select } from "@mui/material";
 import { useState } from "react";

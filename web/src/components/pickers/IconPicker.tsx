@@ -4,11 +4,11 @@ import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { ReactNode, useMemo, useState } from 'react';
-import ColorPicker, { ColorPickerProps } from '../color/ColorPicker';
+import ColorPicker, { ColorPickerProps } from '../pickers/ColorPicker';
 import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
-import { IconWithGradient } from './IconWithGradient';
+import { IconWithGradient } from '../icon/IconWithGradient';
 
 const DEFAULT_ICON = 'home'
 

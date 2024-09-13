@@ -4,11 +4,12 @@ import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
 import { ReactNode, useMemo, useState } from 'react';
-import ColorPicker, { ColorPickerProps } from '../color/ColorPicker';
+import ColorPicker, { ColorPickerProps } from './ColorPicker';
 import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
-import IconPicker from '../icon/IconPicker';
+import IconPicker from './IconPicker';
+import ImageAvatarPicker from './ImageAvatarPicker';
 
 interface AvatarPickerProps {
     icon?: string;
@@ -63,13 +64,16 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                 <Box px={2} pt={1}>
                     <Tabs value={currentTab} onChange={(_event, newValue) => setCurrentTab(newValue)}>
                         <Tab label='Icon'/>
-                        <Tab label='Emoji' />
-                        <Tab label='Letters' />
+                        <Tab disabled label='Emoji' />
+                        <Tab disabled label='Letters' />
                         <Tab label='Image' />
                     </Tabs>
                 </Box>
                 {currentTab === 0 && (
                     <IconPicker />
+                )}
+                {currentTab === 3 && (
+                    <ImageAvatarPicker />
                 )}
             </Popover>
         </>

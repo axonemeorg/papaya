@@ -9,7 +9,7 @@ import { PaymentType } from "@/types/enum";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import IconPicker from "../icon/IconPicker";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
-import ColorPicker, { getMuiColor } from "../color/ColorPicker";
+import ColorPicker, { getMuiColor } from "../pickers/ColorPicker";
 
 export default function TransactionMethodForm() {
     const { transactionMethods } = useContext(TransactionMethodContext);
