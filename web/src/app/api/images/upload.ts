@@ -10,6 +10,25 @@ export const config = {
 	},
 };
 
+const s3Config = {
+	region: process.env.AWS_S3_REGION ?? '',
+	credentials: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY ?? '',
+        secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY ?? ''
+    }
+}
+
+const generateRandomFilename  = (length: number) => {
+    const chars = '-_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let symbols: string[] = [];
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        symbols.push(chars[randomIndex]);
+    }
+
+    return symbols.join('');
+}
+
 export async function POST(request: NextRequest) {
 	const form = new IncomingForm();
 
@@ -23,12 +42,14 @@ export async function POST(request: NextRequest) {
 			const file = files.file[0];
 			const data = readFileSync(file.filepath);
 
+			const fileName = generateRandomFilename(32);
+
 			// Upload the file to S3
 			const bucketName = process.env.AWS_BUCKET_NAME;
 			const s3Params = {
 				Bucket: bucketName,
 				Key: `uploads/${file.originalFilename}`,
-				Body: fileData,
+				Body: data,
 				ContentType: file.mimetype,
 			};
 
