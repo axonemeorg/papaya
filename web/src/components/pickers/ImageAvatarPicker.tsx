@@ -1,5 +1,6 @@
 'use client';
 
+import { useUserImageAvatarHistoryStore } from "@/store/useUserImageUploadStore";
 import { LoadingButton } from "@mui/lab";
 import { Box } from "@mui/material";
 import { useState } from "react";
@@ -9,6 +10,10 @@ export default function ImageAvatarPicker() {
     const [uploading, setUploading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+    const history = useUserImageAvatarHistoryStore((state) => state.history);
+
+    console.log('history:', history)
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
