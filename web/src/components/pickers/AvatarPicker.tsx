@@ -1,39 +1,15 @@
 
-import { Box, Button, colors, Fade, Icon, InputAdornment, Popover, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { FixedSizeGrid } from 'react-window';
-
-import icons from '@/constants/icons';
-import { ReactNode, useMemo, useState } from 'react';
-import ColorPicker, { ColorPickerProps } from './ColorPicker';
-import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
-import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
-import Fuse from 'fuse.js';
+import { Box, Button, colors, Fade, Icon, InputAdornment, OutlinedInput, Popover, Select, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { useState } from 'react';
 import IconPicker from './IconPicker';
-import ImageAvatarPicker from './ImageAvatarPicker';
+import ImageAvatarPicker, { ImageAvatar } from './ImageAvatarPicker';
 import { ItemAvatar } from '@/types/get';
 import { AvatarVariant } from '@/types/enum';
 
 interface AvatarPickerProps {
-    icon?: string;
-    onChangeIcon?: (icon: string) => void;
-    ColorPickerProps?: ColorPickerProps;
-    renderButton?: (icon: string) => ReactNode;
+    value: ItemAvatar | null;
+    onChange: (avatar: ItemAvatar | null) => void;
 }
-
-const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
-
-const fuseOptions = {
-    keys: ['name', 'tags'], // Fields to search in
-    includeScore: true, // Include the score of how good each match is
-    threshold: 0.2, // Tolerance for fuzzy matching
-    minMatchCharLength: 2 // Minimum number of characters that must match
-};
-
-// Create a new Fuse instance
-const fuse = new Fuse(sortedIcons, fuseOptions);
-
-const COLUMN_COUNT = 10;
-const CELL_SIZE = 40;
 
 const DEFAULT_AVATAR: ItemAvatar = {
     avatarContent: 'layers',
@@ -41,24 +17,42 @@ const DEFAULT_AVATAR: ItemAvatar = {
     avatarPrimaryColor: colors.grey[500],
 };
 
+const renderAvatarItem = (avatar: ItemAvatar) => {
+    switch (avatar.avatarVariant) {
+        case AvatarVariant.Enum.PICTORIAL:
+            return (
+                <Icon sx={{ color: avatar.avatarPrimaryColor }}>
+                    {avatar.avatarContent}
+                </Icon>
+            );
+        case AvatarVariant.Enum.IMAGE:
+            return (
+                <ImageAvatar avatar={avatar} sx={{ my: -0.5, width: '32px', height: '32px' }} />
+            )
+        default:
+            return null;
+    }
+}
+
 export default function AvatarPicker(props: AvatarPickerProps) {
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const [currentTab, setCurrentTab] = useState<number>(0);
 
-    const [currentIcon, setCurrentIcon] = useState<ItemAvatar | null>(null);
-
-    const displayIcon = currentIcon ?? DEFAULT_AVATAR;
-
-    // const scrollbarWidth = useScrollbarWidth();
-
+    const displayIcon: ItemAvatar = props.value ?? DEFAULT_AVATAR;
     const open = Boolean(anchorEl);
 
     return (
         <>
-            <Button onClick={(event) => setAnchorEl(event.currentTarget)} size='small' sx={{ minWidth: 'unset' }}>
-                {/* <Icon sx={(theme) => ({ color: iconColor ?? theme.palette.text.primary })}>{icon}</Icon> */}
-                <Icon>alarm</Icon>
-            </Button>
+            <Select
+                onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation()
+                    setAnchorEl(event.currentTarget)
+                }}
+                value={displayIcon}
+                renderValue={renderAvatarItem}
+                readOnly
+            />            
             <Popover
                 TransitionComponent={Fade}
                 open={open}
@@ -87,7 +81,7 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                 {currentTab === 3 && (
                     <ImageAvatarPicker
                         value={displayIcon}
-                        onChange={setCurrentIcon}
+                        onChange={props.onChange}
                     />
                 )}
             </Popover>

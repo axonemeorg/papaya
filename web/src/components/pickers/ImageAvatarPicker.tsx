@@ -4,12 +4,34 @@ import { AvatarVariant } from "@/types/enum";
 import { ItemAvatar } from "@/types/get";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Avatar, Box, Button, FormHelperText, Stack } from "@mui/material";
+import { Avatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 
 interface ImageAvatarPicker {
     value: ItemAvatar;
     onChange: (avatar: ItemAvatar) => void;
+}
+
+
+interface ImageAvatarProps extends AvatarProps {
+    avatar: ItemAvatar;
+}
+
+export const ImageAvatar = (props: ImageAvatarProps) => {
+    const { avatar, ...rest } = props;
+    const imageSrc = [
+        'https:/',
+        process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
+        avatar.avatarContent
+    ].join('/');
+
+    return (
+        <Avatar
+            variant="rounded"
+            src={imageSrc}
+            {...rest}
+        />
+    )
 }
 
 export default function ImageAvatarPicker(props: ImageAvatarPicker) {
@@ -32,18 +54,6 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
             props.value?.avatarVariant === AvatarVariant.Enum.IMAGE,
         ].every(Boolean);
     }, [props.value]);
-
-    const currentImageSrc: string | null = useMemo(() => {
-        if (hasImageIcon) {
-            return [
-                'https:/',
-                process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
-                props.value.avatarContent
-            ].join('/');
-        }
-
-        return null;
-    }, [props.value, hasImageIcon]);
 
     const handleRemoveImage = () => {
         props.onChange(null);
@@ -89,11 +99,10 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
                 ref={fileInputRef}
             />
             <Stack direction='row' sx={{ mb: 1 }} gap={2}>
-                {currentImageSrc && (
+                {hasImageIcon && (
                     <>
-                        <Avatar
-                            variant="rounded"
-                            src={currentImageSrc}
+                        <ImageAvatar
+                            avatar={props.value}
                             sx={uploading ? {
                                 filter: 'blur(2px)',
                                 opacity: 0.5,
