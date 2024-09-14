@@ -1,6 +1,6 @@
 'use client';
 
-import { createCategory } from "@/actions/category-actions";
+import { createCategory, updateCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
@@ -65,8 +65,11 @@ export default function ManageCategories(props: ManageCategoriesProps) {
     }
 
     const handleCreateCategory = (formData: CreateCategory) => {
-        console.log('create category', formData);
         createCategory(formData);
+    }
+
+    const handleUpdateCategory = (formData: UpdateCategory) => {
+        updateCategory(formData);
     }
 
     const handleCancel = () => {
@@ -116,7 +119,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             )}
             {formState === ManageCategoriesFormState.EDIT && (
                 <FormProvider {...updateCategoryForm}>
-                    <form>
+                    <form onSubmit={updateCategoryForm.handleSubmit(handleUpdateCategory)}>
                         <Stack gap={2} pt={2}>
                             <CategoryForm />
                             <Button type='submit' variant='contained' startIcon={<Save />}>Save</Button>

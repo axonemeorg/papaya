@@ -3,9 +3,10 @@
 import { validateRequest } from "@/auth";
 import db from "@/database/client";
 import { CategoryTable } from "@/database/schemas";
-import { eq, cosineDistance, desc, sql } from "drizzle-orm";
+import { eq, cosineDistance, desc, sql, and } from "drizzle-orm";
 import { generateEmbedding } from "./embeddings";
 import { CreateCategory } from "@/types/post";
+import { UpdateCategory } from "@/types/put";
 
 export const getCategoriesByUserId = async (userId: string) => {
 	return db
@@ -75,6 +76,43 @@ export const createCategory = async (category: CreateCategory) => {
 			avatarPrimaryColor: category.avatarPrimaryColor,
 			avatarSecondaryColor: category.avatarSecondaryColor,
 		})
+		.returning({
+			categoryId: CategoryTable.categoryId,
+			label: CategoryTable.label,
+			description: CategoryTable.description,
+			avatarVariant: CategoryTable.avatarVariant,
+			avatarContent: CategoryTable.avatarContent,
+			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
+			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
+		});
+}
+
+export const updateCategory = async (category: UpdateCategory) => {
+	const { user } = await validateRequest();
+
+	if (!user) {
+		throw new Error('Not authorized.');
+	}
+
+	const descriptionEmbedding = await generateEmbedding(category.description);
+
+	return db
+		.update(CategoryTable)
+		.set({
+			label: category.label,
+			description: category.description,
+			descriptionEmbedding,
+			avatarVariant: category.avatarVariant,
+			avatarContent: category.avatarContent,
+			avatarPrimaryColor: category.avatarPrimaryColor,
+			avatarSecondaryColor: category.avatarSecondaryColor,
+		})
+		.where(
+			and(
+				eq(CategoryTable.userId, user.id),
+				eq(CategoryTable.categoryId, category.categoryId)
+			)
+		)
 		.returning({
 			categoryId: CategoryTable.categoryId,
 			label: CategoryTable.label,
