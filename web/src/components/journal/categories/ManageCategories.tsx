@@ -5,6 +5,7 @@ import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { CategoryContext } from "@/contexts/CategoryContext";
+import { useCategoryStore } from "@/store/useCategoriesStore";
 import { Category } from "@/types/get";
 import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
@@ -38,7 +39,8 @@ const formTitles: Record<ManageCategoriesFormState, string> = {
 
 export default function ManageCategories(props: ManageCategoriesProps) {
     const [formState, setFormState] = useState<ManageCategoriesFormState>(ManageCategoriesFormState.VIEW);
-    const { categories } = useContext(CategoryContext);
+
+    const categories = useCategoryStore((state) => state.categories);
 
     const formTitle = formTitles[formState] ?? 'Categories';
 

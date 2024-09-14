@@ -1,6 +1,6 @@
 'use client'
 
-import { MouseEvent, useMemo, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Add, Settings } from "@mui/icons-material";
@@ -17,6 +17,7 @@ import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import { User } from "lucia";
 import SettingsDrawer from "./categories/SettingsDrawer";
+import { useCategoryStore } from "@/store/useCategoriesStore";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     return (
@@ -57,7 +58,6 @@ export default function JournalEditor(props: JournalEditorProps) {
     const currentDayString = dayjs().format('YYYY-MM-DD');
 
     const journal = useMemo(() => {
-        
         return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
             const { date } = entry;
             if (acc[date]) {
@@ -76,6 +76,12 @@ export default function JournalEditor(props: JournalEditorProps) {
         setSelectedEntryAnchorEl(event.currentTarget);
         setSelectedEntry(entry);
     }
+
+    const setCategories = useCategoryStore((state) => state.setCategories);
+
+    useEffect(() => {
+        setCategories(props.categories);
+    }, []);
 
     return (
         <CategoryContext.Provider value={{ categories: props.categories }}>
