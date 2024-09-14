@@ -4,7 +4,6 @@ import { createCategory, updateCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
-import { CategoryContext } from "@/contexts/CategoryContext";
 import { useCategoryStore } from "@/store/useCategoriesStore";
 import { Category } from "@/types/get";
 import { CreateCategory } from "@/types/post";
@@ -39,7 +38,6 @@ const formTitles: Record<ManageCategoriesFormState, string> = {
 
 export default function ManageCategories(props: ManageCategoriesProps) {
     const [formState, setFormState] = useState<ManageCategoriesFormState>(ManageCategoriesFormState.VIEW);
-
     const categories = useCategoryStore((state) => state.categories);
 
     const formTitle = formTitles[formState] ?? 'Categories';
@@ -66,11 +64,15 @@ export default function ManageCategories(props: ManageCategoriesProps) {
         setFormState(ManageCategoriesFormState.CREATE)
     }
 
-    const handleCreateCategory = (formData: CreateCategory) => {
-        createCategory(formData);
+    const handleCreateCategory = async (formData: CreateCategory) => {
+        try {
+            await createCategory(formData);
+        } catch {
+            //
+        }
     }
 
-    const handleUpdateCategory = (formData: UpdateCategory) => {
+    const handleUpdateCategory = async (formData: UpdateCategory) => {
         updateCategory(formData);
     }
 

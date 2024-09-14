@@ -5,15 +5,15 @@ import * as colors from '@mui/material/colors';
 import { CSSProperties, useContext, useMemo } from "react";
 
 import { type Category } from "@/types/get";
-import { CategoryContext } from "@/contexts/CategoryContext";
 import CategoryIcon from "../icon/CategoryIcon";
+import { useCategoryStore } from "@/store/useCategoriesStore";
 
 type CategoryAutocompleteProps = 
     & Omit<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>
     & Partial<Pick<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>>
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
-    const { categories } = useContext(CategoryContext);
+    const categories = useCategoryStore((state) => state.categories)
 
     return (
         <Autocomplete<Category>

@@ -10,7 +10,6 @@ import JournalEntryCard from "./JournalEntryCard";
 import CategoryIcon from "../icon/CategoryIcon";
 import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
-import { CategoryContext } from "@/contexts/CategoryContext";
 import QuickJournalEditor from "./QuickJournalEditor";
 import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
@@ -84,119 +83,117 @@ export default function JournalEditor(props: JournalEditorProps) {
     }, []);
 
     return (
-        <CategoryContext.Provider value={{ categories: props.categories }}>
-            <NotificationsProvider>
-                <CreateJournalEntryModal
-                    open={showJournalEntryModal}
-                    onClose={() => setShowJournalEntryModal(false)}
-                    initialDate={currentDayString}
-                />
-                <SettingsDrawer
-                    open={showSettingsDrawer}
-                    onClose={() => setShowSettingsDrawer(false)}
-                />
-                <BaseLayout
-                    headerChildren={
-                        <JournalHeader month={props.month} year={props.year}>
-                            <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)} variant='extended'>
-                                <Add />
-                                Add
-                            </Fab>
-                            <Button
-                                variant='outlined'
-                                startIcon={<Settings />}
-                                onClick={() => setShowSettingsDrawer(true)}
-                            >
-                                Settings
-                            </Button>
-                        </JournalHeader>
-                    }
-                    user={props.user}
-                >
-                    {selectedEntry && (
-                        <JournalEntryCard
-                            entry={selectedEntry}
-                            onClose={() => setSelectedEntryAnchorEl(null)}
-                            anchorEl={selectedEntryAnchorEl}
-                        />
-                    )}
-                    <Table size='small'>
-                        <TableBody>
-                            {Object
-                                .entries(journal)
-                                .sort(([dateA, _a], [dateB, _b]) => {
-                                    return new Date(dateA).getTime() - new Date(dateB).getTime()
-                                })
-                                .map(([date, entries]) => {
-                                    const day = dayjs(date);
-                                    const isToday = day.isSame(dayjs(), 'day');
+        <NotificationsProvider>
+            <CreateJournalEntryModal
+                open={showJournalEntryModal}
+                onClose={() => setShowJournalEntryModal(false)}
+                initialDate={currentDayString}
+            />
+            <SettingsDrawer
+                open={showSettingsDrawer}
+                onClose={() => setShowSettingsDrawer(false)}
+            />
+            <BaseLayout
+                headerChildren={
+                    <JournalHeader month={props.month} year={props.year}>
+                        <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)} variant='extended'>
+                            <Add />
+                            Add
+                        </Fab>
+                        <Button
+                            variant='outlined'
+                            startIcon={<Settings />}
+                            onClick={() => setShowSettingsDrawer(true)}
+                        >
+                            Settings
+                        </Button>
+                    </JournalHeader>
+                }
+                user={props.user}
+            >
+                {selectedEntry && (
+                    <JournalEntryCard
+                        entry={selectedEntry}
+                        onClose={() => setSelectedEntryAnchorEl(null)}
+                        anchorEl={selectedEntryAnchorEl}
+                    />
+                )}
+                <Table size='small'>
+                    <TableBody>
+                        {Object
+                            .entries(journal)
+                            .sort(([dateA, _a], [dateB, _b]) => {
+                                return new Date(dateA).getTime() - new Date(dateB).getTime()
+                            })
+                            .map(([date, entries]) => {
+                                const day = dayjs(date);
+                                const isToday = day.isSame(dayjs(), 'day');
 
-                                    return (
-                                        <TableRow key={date}>
-                                            <TableCell width='180px' sx={{ verticalAlign: 'top' }}>
-                                                <JournalEntryDate day={day} isToday={isToday} />
-                                            </TableCell>
-                                            <TableCell sx={{ verticalAlign: 'top' }}>
-                                                {entries.length > 0 && (
-                                                    <List>
-                                                        {entries.map((entry) => {
-                                                            const { category } = entry;
-                                                            const { netAmount, methods } = entry;
-                                                            const isNetPositive = netAmount > 0;
+                                return (
+                                    <TableRow key={date}>
+                                        <TableCell width='180px' sx={{ verticalAlign: 'top' }}>
+                                            <JournalEntryDate day={day} isToday={isToday} />
+                                        </TableCell>
+                                        <TableCell sx={{ verticalAlign: 'top' }}>
+                                            {entries.length > 0 && (
+                                                <List>
+                                                    {entries.map((entry) => {
+                                                        const { category } = entry;
+                                                        const { netAmount, methods } = entry;
+                                                        const isNetPositive = netAmount > 0;
 
-                                                            return (
-                                                                <MenuItem
-                                                                    key={entry.journalEntryId}
-                                                                    sx={{ borderRadius: '64px' }}
-                                                                    onClick={(event) => handleClickListItem(event, entry)}
-                                                                >
-                                                                    <Stack direction='row' alignItems='center' gap={4}>
-                                                                        <Stack direction='row' alignItems='center'>
-                                                                            <ListItemIcon>
-                                                                                <CategoryIcon category={category} />
-                                                                            </ListItemIcon>
-                                                                            <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
-                                                                        </Stack>
-                                                                        <ListItemText
-                                                                            sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
-                                                                        >
-                                                                            {getPriceString(netAmount)}
-                                                                        </ListItemText>
-                                                                        <Box width={200}>
-                                                                            {category ? (
-                                                                                <CategoryChip category={category} />
-                                                                            ) : (
-                                                                                <Chip
-                                                                                    sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
-                                                                                    label='Uncategorized'
-                                                                                />
-                                                                            )}
-                                                                        </Box>
-                                                                        {/* <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
-                                                                            {methods.map((method) => {
-                                                                                return (
-                                                                                    <Chip label={method.label} />
-                                                                                )
-                                                                            })}
-                                                                        </Stack> */}
+                                                        return (
+                                                            <MenuItem
+                                                                key={entry.journalEntryId}
+                                                                sx={{ borderRadius: '64px' }}
+                                                                onClick={(event) => handleClickListItem(event, entry)}
+                                                            >
+                                                                <Stack direction='row' alignItems='center' gap={4}>
+                                                                    <Stack direction='row' alignItems='center'>
+                                                                        <ListItemIcon>
+                                                                            <CategoryIcon category={category} />
+                                                                        </ListItemIcon>
+                                                                        <ListItemText sx={{ width: 200 }}>{entry.memo}</ListItemText>
                                                                     </Stack>
-                                                                </MenuItem>
-                                                            )
-                                                        })}
-                                                    </List>
-                                                )}
-                                                {isToday && (
-                                                    <QuickJournalEditor />
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })
-                            }
-                        </TableBody>
-                    </Table>
-                </BaseLayout>
-            </NotificationsProvider>
-        </CategoryContext.Provider>
+                                                                    <ListItemText
+                                                                        sx={(theme) => ({ width: 100, textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
+                                                                    >
+                                                                        {getPriceString(netAmount)}
+                                                                    </ListItemText>
+                                                                    <Box width={200}>
+                                                                        {category ? (
+                                                                            <CategoryChip category={category} />
+                                                                        ) : (
+                                                                            <Chip
+                                                                                sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
+                                                                                label='Uncategorized'
+                                                                            />
+                                                                        )}
+                                                                    </Box>
+                                                                    {/* <Stack direction='row' sx={{ width: 300 }} gap={0.5}>
+                                                                        {methods.map((method) => {
+                                                                            return (
+                                                                                <Chip label={method.label} />
+                                                                            )
+                                                                        })}
+                                                                    </Stack> */}
+                                                                </Stack>
+                                                            </MenuItem>
+                                                        )
+                                                    })}
+                                                </List>
+                                            )}
+                                            {isToday && (
+                                                <QuickJournalEditor />
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        }
+                    </TableBody>
+                </Table>
+            </BaseLayout>
+        </NotificationsProvider>
     )
 }

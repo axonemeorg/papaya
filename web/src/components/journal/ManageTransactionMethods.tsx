@@ -1,12 +1,7 @@
-import { CategoryContext } from "@/contexts/CategoryContext";
 import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { Add } from "@mui/icons-material";
 import { Box, Button, DialogTitle, Divider, Icon, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
 import { useContext, useState } from "react";
-import CreateTransactionMethodModal from "../modal/CreateTransactionMethodModal";
-import { getMuiColor } from "../pickers/ColorPicker";
-import { IconWithGradient } from "../icon/IconWithGradient";
-
 
 export default function ManageTransactionMethods() {
     const { transactionMethods } = useContext(TransactionMethodContext);
