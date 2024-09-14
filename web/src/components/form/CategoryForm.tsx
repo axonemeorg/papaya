@@ -1,6 +1,6 @@
 'use client';
 
-import { AutocompleteProps, Avatar, Box, Button, ButtonGroup, Fade, Grid, Icon, InputLabel, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { AutocompleteProps, Avatar, Box, Button, ButtonGroup, Fade, FormHelperText, Grid, Icon, InputLabel, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateCategory, CreateTransactionMethod } from "@/types/post";
@@ -63,11 +63,15 @@ export default function CategoryForm() {
                 <TextField
                     {...register('description')}
                     label='Description'
-                    placeholder="Groceries and household foodstuffs"
+                    placeholder="Groceries or household foodstuffs"
                     fullWidth
                     multiline
                     rows={3}
+                    // helperText=''
                 />
+                <FormHelperText>
+                    The description is used by our AI to categorize your transactions, so be descriptive.
+                </FormHelperText>
             </Stack>
         </Box>
     )
