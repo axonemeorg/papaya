@@ -1,5 +1,5 @@
 
-import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Button, colors, Fade, Icon, InputAdornment, Popover, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
@@ -10,6 +10,8 @@ import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
 import IconPicker from './IconPicker';
 import ImageAvatarPicker from './ImageAvatarPicker';
+import { ItemAvatar } from '@/types/get';
+import { AvatarVariant } from '@/types/enum';
 
 interface AvatarPickerProps {
     icon?: string;
@@ -33,11 +35,21 @@ const fuse = new Fuse(sortedIcons, fuseOptions);
 const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
+const DEFAULT_AVATAR: ItemAvatar = {
+    avatarContent: 'layers',
+    avatarVariant: AvatarVariant.Enum.PICTORIAL,
+    avatarPrimaryColor: colors.grey[500],
+};
+
 export default function AvatarPicker(props: AvatarPickerProps) {
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const [currentTab, setCurrentTab] = useState<number>(0);
 
-    const scrollbarWidth = useScrollbarWidth();
+    const [currentIcon, setCurrentIcon] = useState<ItemAvatar | null>(null);
+
+    const displayIcon = currentIcon ?? DEFAULT_AVATAR;
+
+    // const scrollbarWidth = useScrollbarWidth();
 
     const open = Boolean(anchorEl);
 
@@ -73,7 +85,10 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                     <IconPicker />
                 )}
                 {currentTab === 3 && (
-                    <ImageAvatarPicker />
+                    <ImageAvatarPicker
+                        value={displayIcon}
+                        onChange={setCurrentIcon}
+                    />
                 )}
             </Popover>
         </>
