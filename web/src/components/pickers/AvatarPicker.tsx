@@ -41,18 +41,27 @@ export default function AvatarPicker(props: AvatarPickerProps) {
     const displayIcon: ItemAvatar = props.value ?? DEFAULT_AVATAR;
     const open = Boolean(anchorEl);
 
+    const handleChange = (avatar: ItemAvatar | null) => {
+        props.onChange(avatar ?? DEFAULT_AVATAR);
+    }
+
     return (
         <>
             <Select
                 onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation()
                     setAnchorEl(event.currentTarget)
                 }}
-                value={displayIcon}
-                renderValue={renderAvatarItem}
+                multiple
                 readOnly
-            />            
+                value={displayIcon}
+                renderValue={(value) => {
+                    return (
+                        <Box sx={{ '& > *': { my: -0.5 } }}>
+                            {renderAvatarItem(value)}
+                        </Box>
+                    );
+                }}
+            />
             <Popover
                 TransitionComponent={Fade}
                 open={open}
@@ -70,22 +79,21 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                 <Box px={2} pt={1}>
                     <Tabs value={currentTab} onChange={(_event, newValue) => setCurrentTab(newValue)}>
                         <Tab label='Icon'/>
-                        <Tab disabled label='Emoji' />
-                        <Tab disabled label='Letters' />
+                        {/* <Tab disabled label='Emoji' />
+                        <Tab disabled label='Letters' /> */}
                         <Tab label='Image' />
                     </Tabs>
                 </Box>
                 {currentTab === 0 && (
                     <IconPicker
-                        color={displayIcon.avatarPrimaryColor}
-                        onChangeColor={(color) => props.onChange({ ...displayIcon, avatarPrimaryColor: color })}
-                        onChangeIcon={(icon) => props.onChange({ ...displayIcon, avatarContent: icon })}
+                        value={displayIcon.avatarVariant === 'IMAGE' ? DEFAULT_AVATAR : displayIcon}
+                        onChange={handleChange}
                     />
                 )}
-                {currentTab === 3 && (
+                {currentTab === 1 && (
                     <ImageAvatarPicker
                         value={displayIcon}
-                        onChange={props.onChange}
+                        onChange={handleChange}
                     />
                 )}
             </Popover>

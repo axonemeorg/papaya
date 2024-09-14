@@ -15,6 +15,8 @@ import { ItemAvatar } from "@/types/get";
 export default function CategoryForm() {
     const { register, control, setValue, watch } = useFormContext<CreateCategory | UpdateCategory>();
 
+    console.log('w:', watch())
+
     const currentIcon: ItemAvatar | null = useMemo(() => {
         const {
             avatarContent,
@@ -35,7 +37,7 @@ export default function CategoryForm() {
         return null;
     }, [watch()]);
 
-    const handleChangeIcon = (avatar: ItemAvatar) => {
+    const handleChangeIcon = (avatar: ItemAvatar | null) => {
         setValue('avatarContent', avatar.avatarContent);
         setValue('avatarPrimaryColor', avatar.avatarPrimaryColor);
         setValue('avatarVariant', avatar.avatarVariant);

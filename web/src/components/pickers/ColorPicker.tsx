@@ -162,6 +162,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                             sx: { px: 1, py: 0.5 }
                         },
                     },
+                    
                     MenuListProps: {
                         sx: {
                             display: 'grid',
@@ -169,9 +170,16 @@ export default function ColorPicker(props: ColorPickerProps) {
                         },
                     }
                 }}
+                slotProps={{
+                    input: {
+                        sx: {
+                            minWidth: 60,
+                        }
+                    }
+                }}
             >
                 {sortedColors.map(([colorName, shade]) => {
-                    const color = [colorName, shade].join('.');
+                    const color = muiColors[colorName][shade];
                     const colorNameParts = [colorShadeLabels[shade], colorNameLabels[colorName]]
                         .filter(Boolean);
                     if (colorNameParts[1]) {

@@ -9,13 +9,14 @@ import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
 import { IconWithGradient } from '../icon/IconWithGradient';
+import { ItemAvatar } from '@/types/get';
+import { AvatarVariant } from '@/types/enum';
 
-const DEFAULT_ICON = 'home'
+// const DEFAULT_ICON = 'home'
 
 interface IconPickerProps {
-    onChangeIcon?: (icon: string) => void;
-    color?: string;
-    onChangeColor?: (color: string) => void;
+    value: ItemAvatar;
+    onChange: (avatar: ItemAvatar) => void;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -34,7 +35,7 @@ const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
 export default function IconPicker(props: IconPickerProps) {
-    const color: string | undefined = props.color ?? undefined
+    const color: string | undefined = props.value.avatarPrimaryColor ?? undefined
 
     const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -46,7 +47,28 @@ export default function IconPicker(props: IconPickerProps) {
 
     const handleShuffle = () => {
         const iconIndex = Math.floor(Math.random() * sortedIcons.length);
-        props.onChangeIcon?.(sortedIcons[iconIndex].name);
+        const newIcon = sortedIcons[iconIndex].name;
+        props.onChange({
+            ...props.value,
+            avatarContent: newIcon,
+            avatarVariant: AvatarVariant.Enum.PICTORIAL
+        });
+    }
+
+    const handleChangeColor = (color: string) => {
+        props.onChange({
+            ...props.value,
+            avatarVariant: AvatarVariant.Enum.PICTORIAL,
+            avatarPrimaryColor: color,
+        });
+    }
+
+    const handleChangeIcon = (icon: string) => {
+        props.onChange({
+            ...props.value,
+            avatarVariant: AvatarVariant.Enum.PICTORIAL,
+            avatarContent: icon,
+        });
     }
 
     // Search for an icon
@@ -61,6 +83,8 @@ export default function IconPicker(props: IconPickerProps) {
     const rowCount = useMemo(() => {
         return Math.ceil(results.length / COLUMN_COUNT);
     }, [results]);
+
+    console.log('iconPicker.props:', props)
 
     return (
         <>
@@ -82,7 +106,7 @@ export default function IconPicker(props: IconPickerProps) {
                 />
                 <ColorPicker
                     color={color}
-                    onChange={(newColor) => props.onChangeColor?.(newColor)}
+                    onChange={handleChangeColor}
                 />
                 <Button
                     onClick={() => handleShuffle()}
@@ -110,7 +134,7 @@ export default function IconPicker(props: IconPickerProps) {
                             icon && (
                                 <Button
                                     key={index}
-                                    onClick={() => props.onChangeIcon(icon.name)}
+                                    onClick={() => handleChangeIcon(icon.name)}
                                     size="small"
                                     sx={(theme) => ({ 
                                         minWidth: 'unset',
