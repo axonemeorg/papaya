@@ -14,7 +14,9 @@ export const ItemAvatar = z.object({
     avatarContent: z.string(),
     avatarVariant: AvatarVariant,
     avatarPrimaryColor: z.string(),
-    avatarSecondaryColor: z.string(),
+    avatarSecondaryColor: z.string()
+        .optional()
+        .nullable(),
 });
 export type ItemAvatar = z.output<typeof ItemAvatar>;
 

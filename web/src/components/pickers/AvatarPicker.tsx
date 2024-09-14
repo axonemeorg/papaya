@@ -11,7 +11,7 @@ interface AvatarPickerProps {
     onChange: (avatar: ItemAvatar | null) => void;
 }
 
-const DEFAULT_AVATAR: ItemAvatar = {
+export const DEFAULT_AVATAR: ItemAvatar = {
     avatarContent: 'layers',
     avatarVariant: AvatarVariant.Enum.PICTORIAL,
     avatarPrimaryColor: colors.grey[500],

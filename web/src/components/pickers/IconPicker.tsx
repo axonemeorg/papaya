@@ -84,8 +84,6 @@ export default function IconPicker(props: IconPickerProps) {
         return Math.ceil(results.length / COLUMN_COUNT);
     }, [results]);
 
-    console.log('iconPicker.props:', props)
-
     return (
         <>
             <Stack direction='row' p={2} gap={1} alignItems='center'>

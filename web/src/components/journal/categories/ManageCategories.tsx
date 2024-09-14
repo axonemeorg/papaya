@@ -1,7 +1,9 @@
 'use client';
 
+import { createCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
+import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { CategoryContext } from "@/contexts/CategoryContext";
 import { Category } from "@/types/get";
 import { CreateCategory } from "@/types/post";
@@ -22,10 +24,10 @@ interface ManageCategoriesProps {
     onClose: () => void;
 }
 
-const categoryFormCreateValues = {
-    categoryId: '',
+const categoryFormCreateValues: CreateCategory = {
     label: '',
     description: '',
+    ...DEFAULT_AVATAR,
 }
 
 const formTitles: Record<ManageCategoriesFormState, string> = {
@@ -40,19 +42,31 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 
     const formTitle = formTitles[formState] ?? 'Categories';
 
-    const categoryForm = useForm<CreateCategory | UpdateCategory>({
+    const createCategoryForm = useForm<CreateCategory>({
+        defaultValues: categoryFormCreateValues,
+        resolver: zodResolver(CreateCategory)
+    });
+
+    const updateCategoryForm = useForm<UpdateCategory>({
         defaultValues: categoryFormCreateValues,
         resolver: zodResolver(UpdateCategory)
     });
 
+    console.log('create form state:', createCategoryForm.formState.errors);
+
     const handleSelectCategoryForEdit = (category: Category) => {
-        categoryForm.reset({ ...category });
+        updateCategoryForm.reset({ ...category });
         setFormState(ManageCategoriesFormState.EDIT);
     }
 
-    const handleCreateCategory = () => {
-        categoryForm.reset(categoryFormCreateValues);
+    const beginCreateCategory = () => {
+        createCategoryForm.reset(categoryFormCreateValues);
         setFormState(ManageCategoriesFormState.CREATE)
+    }
+
+    const handleCreateCategory = (formData: CreateCategory) => {
+        console.log('create category', formData);
+        createCategory(formData);
     }
 
     const handleCancel = () => {
@@ -62,8 +76,6 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             setFormState(ManageCategoriesFormState.VIEW);
         }
     }
-
-    console.log(formState);
 
     return (
         <Stack>
@@ -77,7 +89,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                 {formState === ManageCategoriesFormState.VIEW && (
                     <Button
                         startIcon={<Add />}
-                        onClick={() => handleCreateCategory()}
+                        onClick={() => beginCreateCategory()}
                     >
                         Add Category
                     </Button>
@@ -89,12 +101,10 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                         return (
                             <MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category.categoryId}>
                                 <ListItemIcon>
-                                    {/* <Icon color={category.avatarPrimaryColor}>{category.</Icon> */}
                                     <CategoryIcon category={category} />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={category.label}
-                                    // secondary={category.description}
                                 />
                                 <ListItemSecondaryAction>
                                     <NavigateNext />
@@ -105,7 +115,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                 </List>
             )}
             {formState === ManageCategoriesFormState.EDIT && (
-                <FormProvider {...categoryForm}>
+                <FormProvider {...updateCategoryForm}>
                     <form>
                         <Stack gap={2} pt={2}>
                             <CategoryForm />
@@ -115,8 +125,8 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                 </FormProvider>
             )}
             {formState === ManageCategoriesFormState.CREATE && (
-                <FormProvider {...categoryForm}>
-                    <form>
+                <FormProvider {...createCategoryForm}>
+                    <form onSubmit={createCategoryForm.handleSubmit(handleCreateCategory)}>
                         <Stack gap={2} pt={2}>
                             <CategoryForm />
                             <Button type='submit' variant='contained' startIcon={<Add />}>Create</Button>
