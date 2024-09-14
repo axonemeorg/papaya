@@ -6,6 +6,7 @@ import { CSSProperties, useContext, useMemo } from "react";
 
 import { type Category } from "@/types/get";
 import { CategoryContext } from "@/contexts/CategoryContext";
+import CategoryIcon from "../icon/CategoryIcon";
 
 type CategoryAutocompleteProps = 
     & Omit<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>
@@ -22,7 +23,6 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
             getOptionLabel={(option) => option.label}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
-                const { avatarPrimaryColor, avatarContent } = option;
 
                 return (
                     <ListItem
@@ -31,7 +31,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
                         {...optionProps}
                     >
                         <ListItemIcon>
-                            <Icon sx={{ color: avatarPrimaryColor }}>{avatarContent}</Icon>
+                            <CategoryIcon category={option} />
                         </ListItemIcon>
                         <ListItemText primary={option.label} />
                     </ListItem>
