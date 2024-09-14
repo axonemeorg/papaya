@@ -13,9 +13,9 @@ import { IconWithGradient } from '../icon/IconWithGradient';
 const DEFAULT_ICON = 'home'
 
 interface IconPickerProps {
-    icon?: string;
     onChangeIcon?: (icon: string) => void;
-    ColorPickerProps?: ColorPickerProps;
+    color?: string;
+    onChangeColor?: (color: string) => void;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -34,16 +34,15 @@ const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
 export default function IconPicker(props: IconPickerProps) {
-    const icon: string = props.icon || DEFAULT_ICON;
-    const color: string | undefined = props.ColorPickerProps?.color ?? undefined
+    const color: string | undefined = props.color ?? undefined
 
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     const scrollbarWidth = useScrollbarWidth();
 
-    const iconPrimaryColor = '#FF0000';
-    const iconSecondaryColor = '#00FF00';
-    const iconColor: string | undefined = undefined;
+    // const iconPrimaryColor = '#FF0000';
+    // const iconSecondaryColor = '#00FF00';
+    // const iconColor: string | undefined = undefined;
 
     const handleShuffle = () => {
         const iconIndex = Math.floor(Math.random() * sortedIcons.length);
@@ -81,6 +80,10 @@ export default function IconPicker(props: IconPickerProps) {
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                 />
+                <ColorPicker
+                    color={color}
+                    onChange={(newColor) => props.onChangeColor?.(newColor)}
+                />
                 <Button
                     onClick={() => handleShuffle()}
                     variant='outlined'
@@ -89,36 +92,6 @@ export default function IconPicker(props: IconPickerProps) {
                     <Shuffle />
                 </Button>
             </Stack>
-            {props.ColorPickerProps && (
-                <Stack direction='row' p={2} gap={1} mt={2}>
-                    <ColorPicker
-                        id='primary-color-picker'
-                        label='Primary'
-                        color={color}
-                        onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
-                    />
-                    <ColorPicker
-                        id='secondary-color-picker'
-                        label='Secondary'
-                        color={color}
-                        onChange={(newColor) => props.ColorPickerProps?.onChange?.(newColor)}
-                    />
-                    <Button
-                        // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
-                        variant='outlined'
-                        size='small'
-                    >
-                        <Add />
-                    </Button>
-                    <Button
-                        // onClick={() => props.ColorPickerProps?.onChange?.(undefined)}
-                        variant='outlined'
-                        size='small'
-                    >
-                        <FormatColorReset />
-                    </Button>
-                </Stack>
-            )}
             <Box pl={2} mt={2}>
                 <FixedSizeGrid
                     columnCount={COLUMN_COUNT}
@@ -141,16 +114,15 @@ export default function IconPicker(props: IconPickerProps) {
                                     size="small"
                                     sx={(theme) => ({ 
                                         minWidth: 'unset',
-                                        '& span': { color: `${iconColor ?? theme.palette.text.primary} !important` }
-                                        
+                                        '& span': { color: `${color ?? theme.palette.text.primary} !important` }
                                     })}
                                     style={{
                                         ...style,
                                     }}
                                 >
-                                    <IconWithGradient style={{ fontSize: '36px' }} primaryColor={iconPrimaryColor} secondaryColor={iconSecondaryColor}>
+                                    <Icon style={{ fontSize: '36px' }} sx={{ color }}>
                                         {icon.name}
-                                    </IconWithGradient>
+                                    </Icon>
                                 </Button>
                             )
                         );

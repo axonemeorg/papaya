@@ -76,7 +76,11 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                     </Tabs>
                 </Box>
                 {currentTab === 0 && (
-                    <IconPicker />
+                    <IconPicker
+                        color={displayIcon.avatarPrimaryColor}
+                        onChangeColor={(color) => props.onChange({ ...displayIcon, avatarPrimaryColor: color })}
+                        onChangeIcon={(icon) => props.onChange({ ...displayIcon, avatarContent: icon })}
+                    />
                 )}
                 {currentTab === 3 && (
                     <ImageAvatarPicker

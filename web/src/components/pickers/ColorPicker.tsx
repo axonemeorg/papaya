@@ -122,10 +122,8 @@ export const Swatch = (props: SwatchProps) => {
 }
 
 export interface ColorPickerProps {
-    id: string;
-    label?: string;
-    color?: string;
-    onChange?: (color: string) => void;
+    color: string | null;
+    onChange: (color: string) => void;
 }
 
 const getMuiColor = (colorLabel: string) => {
@@ -140,30 +138,23 @@ export default function ColorPicker(props: ColorPickerProps) {
 
     return (
         <FormControl>
-            {props.label && (
+            {/* {props.label && (
                 <InputLabel id={`${props.id}-label`}>
                     {props.label}
                 </InputLabel>
-            )}
+            )} */}
             <Select
                 size='small'
-                label={props.label}
+                // label={props.label}
                 value={color}
                 onChange={(event) => {
                     props.onChange?.(event.target.value)
                 }}
                 renderValue={(value: string) => {
-                    const color = getMuiColor(value);
+                    // const color = getMuiColor(value);
                     return (
                         <Swatch color={color} />
                     )
-                }}
-                slotProps={{
-                    input: {
-                        sx: {
-                            minWidth: 60,
-                        }
-                    }
                 }}
                 MenuProps={{
                     slotProps: {
