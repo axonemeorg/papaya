@@ -11,17 +11,19 @@ import { updateJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
 import dayjs from "dayjs";
 import { JournalEntry } from "@/types/get";
+import { UpdateJournalEntry } from "@/types/put";
 
 interface EditJournalEntryModalProps {
     open: boolean;
-    initialValues: JournalEntry;
+    initialValues: UpdateJournalEntry;
     onClose: () => void;
 }
 
 export default function EditJournalEntryModal(props: EditJournalEntryModalProps) {
+    console.log('EditJournalEntryModal.props.initialValues', props.initialValues)
     const [saving, setSaving] = useState<boolean>(false);
 
-    const handleUpdateJournalEntry = (formData: JournalEntry) => {
+    const handleUpdateJournalEntry = (formData: UpdateJournalEntry) => {
         setSaving(true);
         updateJournalEntry(formData)
             .then(() => {
@@ -35,11 +37,11 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
             })
     }
 
-    const editJournalEntryForm = useForm<JournalEntry>({
+    const editJournalEntryForm = useForm<UpdateJournalEntry>({
         defaultValues: {
             ...props.initialValues
         },
-        resolver: zodResolver(JournalEntry)
+        resolver: zodResolver(UpdateJournalEntry)
     });
 
     useEffect(() => {
@@ -48,7 +50,9 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
         }
     }, [props.open])
 
-    const { formState: { errors} } = editJournalEntryForm
+    const { formState: { errors} } = editJournalEntryForm;
+
+    console.log('EditJournalEntryModal.formErrors', errors)
 
     return (
         <FormProvider {...editJournalEntryForm}>

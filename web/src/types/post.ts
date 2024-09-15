@@ -4,7 +4,7 @@ import { Category, ItemAvatar, TransactionMethod } from "./get";
 
 export const CreateTransaction = z.object({
     transactionType: TransactionType,
-    date: z.string().min(1, "A date is required"),
+    // date: z.string().min(1, "A date is required"),
     amount: z.string().min(0, "A positive number is required"),
     memo: z.string()
         .optional()

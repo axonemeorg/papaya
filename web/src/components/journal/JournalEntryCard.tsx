@@ -7,8 +7,9 @@ import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/Utils";
 import { deleteJournalEntry } from "@/actions/journal-actions";
 import EditJournalEntryModal from "../modal/EditJournalEntryModal";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
+import { UpdateJournalEntry } from "@/types/put";
 
 interface JournalEntryCard {
     anchorEl: HTMLElement;
@@ -29,10 +30,22 @@ export default function JournalEntryCard(props: JournalEntryCard) {
         props.onClose();
     }
 
+    const editJournalEntryFormValues: UpdateJournalEntry = useMemo(() => {
+        return {
+            ...props.entry,
+            transactions: props.entry.transactions?.map((transaction) => {
+                return {
+                    ...transaction,
+                    amount: (transaction.amount / 100).toFixed(2)
+                }
+            })
+        }
+    }, [props.entry])
+
     return (
         <>
             <EditJournalEntryModal
-                initialValues={props.entry}
+                initialValues={editJournalEntryFormValues}
                 open={showEditDialog}
                 onClose={() => setShowEditDialog(false)}
             />

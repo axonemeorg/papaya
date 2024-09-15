@@ -6,15 +6,15 @@ export default class JournalService {
     static async _santizeJournalEntries(results) {
         return results.map((journalEntry) => {
 
-            const methods = journalEntry
-                .transactions
-                .reduce((acc, transaction) => {
-                    const { method } = transaction;
-                    if (method) {
-                        acc.push(method);
-                    }
-                    return acc;
-                }, []);
+            // const methods = journalEntry
+            //     .transactions
+            //     .reduce((acc, transaction) => {
+            //         const { method } = transaction;
+            //         if (method) {
+            //             acc.push(method);
+            //         }
+            //         return acc;
+            //     }, []);
     
             const netAmount = journalEntry
                 .transactions
@@ -27,11 +27,11 @@ export default class JournalService {
                     return acc;
                 }, 0);
 
-            delete journalEntry.transactions;
+            // delete journalEntry.transactions;
 
             return {
                 ...journalEntry,
-                methods,
+                // methods,
                 netAmount,
             }
         })

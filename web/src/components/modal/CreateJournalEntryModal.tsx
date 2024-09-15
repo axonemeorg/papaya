@@ -44,7 +44,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
             transactions: [
                 {
                     transactionType: TransactionType.Enum.DEBIT,
-                    date: new Date().toISOString(),
+                    // date: new Date().toISOString(),
                     memo: '',
                     amount: undefined,
                     // paymentType: PaymentType.Enum.ETRANSFER, // TODO
