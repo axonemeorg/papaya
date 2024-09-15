@@ -1,6 +1,6 @@
 'use client';
 
-import { createCategory, updateCategory } from "@/actions/category-actions";
+import { createCategory, deleteCategory, updateCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
@@ -10,7 +10,7 @@ import { Category } from "@/types/get";
 import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Add, ArrowBack, ArrowRight, Close, NavigateNext, Save } from "@mui/icons-material";
+import { Add, ArrowBack, ArrowRight, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
 import { Box, Button, Drawer, IconButton, List, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Stack, Typography } from "@mui/material";
 import { useContext, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -40,7 +40,9 @@ const formTitles: Record<ManageCategoriesFormState, string> = {
 export default function ManageCategories(props: ManageCategoriesProps) {
     const [formState, setFormState] = useState<ManageCategoriesFormState>(ManageCategoriesFormState.VIEW);
     const categories = useCategoryStore((state) => state.categories);
-    const addCategory = useCategoryStore((state) => state.addCategory);
+    const addCategoryToStore = useCategoryStore((state) => state.addCategory);
+    const updateCategoryInStore = useCategoryStore((state) => state.updateCategory);
+    const deleteCategoryFromStore = useCategoryStore((state) => state.deleteCategory);
     const { snackbar } = useContext(NotificationsContext);
 
     const formTitle = formTitles[formState] ?? 'Categories';
@@ -72,14 +74,25 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             await createCategory(formData);
             snackbar({ message: 'Created category' })
             setFormState(ManageCategoriesFormState.VIEW);
-            addCategory(formData);
+            addCategoryToStore(formData);
         } catch {
             snackbar({ message: 'Failed to create category' })
         }
     }
 
     const handleUpdateCategory = async (formData: UpdateCategory) => {
-        updateCategory(formData);
+        await updateCategory(formData);
+        snackbar({ message: 'Updated category' })
+        setFormState(ManageCategoriesFormState.VIEW);
+        updateCategoryInStore(formData);
+    }
+
+    const handleDeleteCategory = async () => {
+        const category = updateCategoryForm.watch();
+        await deleteCategory(category);
+        snackbar({ message: 'Deleted category' })
+        setFormState(ManageCategoriesFormState.VIEW);
+        deleteCategoryFromStore(category);
     }
 
     const handleCancel = () => {
@@ -103,8 +116,19 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                     <Button
                         startIcon={<Add />}
                         onClick={() => beginCreateCategory()}
+                        variant='text'
                     >
                         Add Category
+                    </Button>
+                )}
+                {formState === ManageCategoriesFormState.EDIT && (
+                    <Button
+                        startIcon={<Delete />}
+                        onClick={() => handleDeleteCategory()}
+                        variant='text'
+                        color='error'
+                    >
+                        Delete
                     </Button>
                 )}
             </Stack>

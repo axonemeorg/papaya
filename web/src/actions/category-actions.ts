@@ -2,11 +2,12 @@
 
 import { validateRequest } from "@/auth";
 import db from "@/database/client";
-import { CategoryTable } from "@/database/schemas";
+import { CategoryTable, JournalEntryTable } from "@/database/schemas";
 import { eq, cosineDistance, desc, sql, and } from "drizzle-orm";
 import { generateEmbedding } from "./embeddings";
 import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
+import { revalidatePath } from "next/cache";
 
 export const getCategoriesByUserId = async (userId: string) => {
 	return db
@@ -96,7 +97,7 @@ export const updateCategory = async (category: UpdateCategory) => {
 
 	const descriptionEmbedding = await generateEmbedding(category.description);
 
-	return db
+	const response = await db
 		.update(CategoryTable)
 		.set({
 			label: category.label,
@@ -122,4 +123,43 @@ export const updateCategory = async (category: UpdateCategory) => {
 			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
 			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
 		});
+
+	revalidatePath('/journal');
+	return response;
+}
+
+export const deleteCategory = async (category: UpdateCategory) => {
+	const { user } = await validateRequest();
+
+	if (!user) {
+		throw new Error('Not authorized.');
+	}
+
+	// Update journal entries to remove references to the category
+
+	await db.update(JournalEntryTable)
+		.set({
+			categoryId: null,
+		})
+		.where(
+			and(
+				eq(JournalEntryTable.userId, user.id),
+				eq(JournalEntryTable.categoryId, category.categoryId)
+			)
+		)
+
+	const response = await  db.delete(CategoryTable)
+		.where(
+			and(
+				eq(CategoryTable.userId, user.id),
+				eq(CategoryTable.categoryId, category.categoryId)
+			)
+		)
+		.returning({
+			categoryId: CategoryTable.categoryId,
+		});
+
+	revalidatePath('/journal');
+
+	return response;
 }
