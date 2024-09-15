@@ -4,6 +4,7 @@ import { createCategory, updateCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { useCategoryStore } from "@/store/useCategoriesStore";
 import { Category } from "@/types/get";
 import { CreateCategory } from "@/types/post";
@@ -39,6 +40,8 @@ const formTitles: Record<ManageCategoriesFormState, string> = {
 export default function ManageCategories(props: ManageCategoriesProps) {
     const [formState, setFormState] = useState<ManageCategoriesFormState>(ManageCategoriesFormState.VIEW);
     const categories = useCategoryStore((state) => state.categories);
+    const addCategory = useCategoryStore((state) => state.addCategory);
+    const { snackbar } = useContext(NotificationsContext);
 
     const formTitle = formTitles[formState] ?? 'Categories';
 
@@ -67,8 +70,11 @@ export default function ManageCategories(props: ManageCategoriesProps) {
     const handleCreateCategory = async (formData: CreateCategory) => {
         try {
             await createCategory(formData);
+            snackbar({ message: 'Created category' })
+            setFormState(ManageCategoriesFormState.VIEW);
+            addCategory(formData);
         } catch {
-            //
+            snackbar({ message: 'Failed to create category' })
         }
     }
 
