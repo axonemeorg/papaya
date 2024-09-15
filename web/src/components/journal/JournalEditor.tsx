@@ -2,8 +2,8 @@
 
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { alpha, Avatar, Box, Button, Chip, Fab, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { Add, Settings } from "@mui/icons-material";
+import { alpha, Avatar, Box, Button, Chip, Fab, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Add, Category as MuiCategoryIcon, Settings } from "@mui/icons-material";
 import { Category, JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import JournalEntryCard from "./JournalEntryCard";
@@ -96,17 +96,13 @@ export default function JournalEditor(props: JournalEditorProps) {
             <BaseLayout
                 headerChildren={
                     <JournalHeader month={props.month} year={props.year}>
-                        <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)} variant='extended'>
+                        <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)} variant='extended' size='medium'>
                             <Add />
                             Add
                         </Fab>
-                        <Button
-                            variant='outlined'
-                            startIcon={<Settings />}
-                            onClick={() => setShowSettingsDrawer(true)}
-                        >
-                            Settings
-                        </Button>
+                        <IconButton onClick={() => setShowSettingsDrawer(true)}>
+                            <MuiCategoryIcon />
+                        </IconButton>
                     </JournalHeader>
                 }
                 user={props.user}
