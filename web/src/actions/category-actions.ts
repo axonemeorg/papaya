@@ -56,7 +56,6 @@ export const findMostSimilarCategory = async (memo: string) => {
 }
 
 export const createCategory = async (category: CreateCategory) => {
-	console.log('create category action:', category);
 	const { user } = await validateRequest();
 
 	if (!user) {

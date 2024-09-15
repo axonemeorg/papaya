@@ -49,9 +49,6 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
     }, [props.open])
 
     const { formState: { errors} } = editJournalEntryForm
-    console.log('errors:', errors)
-
-    console.log(editJournalEntryForm.getValues())
 
     return (
         <FormProvider {...editJournalEntryForm}>

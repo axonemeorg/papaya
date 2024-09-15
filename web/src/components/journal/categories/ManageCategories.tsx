@@ -57,8 +57,6 @@ export default function ManageCategories(props: ManageCategoriesProps) {
         resolver: zodResolver(UpdateCategory)
     });
 
-    console.log('create form state:', createCategoryForm.formState.errors);
-
     const handleSelectCategoryForEdit = (category: Category) => {
         updateCategoryForm.reset({ ...category });
         setFormState(ManageCategoriesFormState.EDIT);
