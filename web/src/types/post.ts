@@ -49,3 +49,15 @@ export const CreateCategory = ItemAvatar.extend({
     description: z.string().min(1, 'A description is required'),
 });
 export type CreateCategory = z.output<typeof CreateCategory>;
+
+export const LoginCredentials = z.object({
+    username: z.string().email('A valid email is required'),
+    password: z.string().min(1, 'A password is required')
+});
+export type LoginCredentials = z.output<typeof LoginCredentials>;
+
+export const SignupCredentials = z.object({
+    username: z.string().email('A valid email is required'),
+    password: z.string().min(1, 'A password is required')
+});
+export type SignupCredentials = z.output<typeof SignupCredentials>;
