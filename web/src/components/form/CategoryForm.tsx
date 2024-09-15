@@ -15,8 +15,6 @@ import { ItemAvatar } from "@/types/get";
 export default function CategoryForm() {
     const { register, control, setValue, watch } = useFormContext<CreateCategory | UpdateCategory>();
 
-    console.log('w:', watch())
-
     const currentIcon: ItemAvatar | null = useMemo(() => {
         const {
             avatarContent,

@@ -81,6 +81,7 @@ export default class JournalRepository {
                     columns: {
                         transactionId: true,
                         amount: true,
+                        memo: true,
                         transactionType: true,
                     }
                 },
@@ -114,45 +115,4 @@ export default class JournalRepository {
 
         return response;
     }
-
-    // static async getUserJournalEntriesByMonthAndYear(userId: string, month: number, year: number) {
-    //     return await JournalEntryTable
-    //         .select()
-    //         .where({ userId, month, year })
-    //         .orderBy('date', 'desc')
-    //         .run();
-    // }
-
-    // static async getUserJournalEntriesByCategory(userId: string, categoryId: string) {
-    //     return await JournalEntryTable
-    //         .select()
-    //         .where({ userId, categoryId })
-    //         .orderBy('date', 'desc')
-    //         .run();
-    // }
-
-    // static async getUserJournalEntriesByTransactionMethod(userId: string, transactionMethodId: string) {
-    //     return await JournalEntryTable
-    //         .select()
-    //         .where({ userId, transactionMethodId })
-    //         .orderBy('date', 'desc')
-    //         .run();
-    // }
-
-    // static async getUserJournalEntriesByTransactionType(userId: string, transactionType: string) {
-    //     return await JournalEntryTable
-    //         .select()
-    //         .where({ userId, transactionType })
-    //         .orderBy('date', 'desc')
-    //         .run();
-    // }
-
-    // static async getUserJournalEntriesByPaymentType(userId: string, paymentType: string) {
-    //     return await JournalEntryTable
-    //         .select()
-    //         .where({ userId, paymentType })
-    //         .orderBy('date', 'desc')
-    //         .run();
-    // }
-
 }

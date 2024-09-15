@@ -6,22 +6,26 @@ import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentType, TransactionType } from "@/types/enum";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { updateJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
 import dayjs from "dayjs";
 import { JournalEntry } from "@/types/get";
+import { UpdateJournalEntry } from "@/types/put";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 interface EditJournalEntryModalProps {
     open: boolean;
-    initialValues: JournalEntry;
+    initialValues: UpdateJournalEntry;
     onClose: () => void;
+    onSave: () => void;
 }
 
 export default function EditJournalEntryModal(props: EditJournalEntryModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
+    const { snackbar } = useContext(NotificationsContext);
 
-    const handleUpdateJournalEntry = (formData: JournalEntry) => {
+    const handleUpdateJournalEntry = (formData: UpdateJournalEntry) => {
         setSaving(true);
         updateJournalEntry(formData)
             .then(() => {
@@ -33,14 +37,20 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
             .finally(() => {
                 setSaving(false);
             })
+        snackbar({ message: 'Updated journal entry'});
+        props.onSave();
     }
 
-    const editJournalEntryForm = useForm<JournalEntry>({
+    const editJournalEntryForm = useForm<UpdateJournalEntry>({
         defaultValues: {
             ...props.initialValues
         },
-        resolver: zodResolver(JournalEntry)
+        resolver: zodResolver(UpdateJournalEntry)
     });
+
+    useEffect(() => {
+        editJournalEntryForm.reset({ ...props.initialValues });
+    }, [props.initialValues])
 
     useEffect(() => {
         if (props.open) {
@@ -48,10 +58,7 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
         }
     }, [props.open])
 
-    const { formState: { errors} } = editJournalEntryForm
-    console.log('errors:', errors)
-
-    console.log(editJournalEntryForm.getValues())
+    const { formState: { errors} } = editJournalEntryForm;
 
     return (
         <FormProvider {...editJournalEntryForm}>

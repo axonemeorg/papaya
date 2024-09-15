@@ -58,7 +58,6 @@ export default function JournalEditor(props: JournalEditorProps) {
 
     const journal = useMemo(() => {
         return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
-            console.log('j entry:', entry)
             const { date } = entry;
             if (acc[date]) {
                 acc[date].push(entry);

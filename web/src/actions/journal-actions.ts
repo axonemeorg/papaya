@@ -14,7 +14,6 @@ import { and, eq, InferInsertModel } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
-	console.log('createJournalEntry:', formData)
 	const { user } = await validateRequest();
 	
     if (!user) {
@@ -51,8 +50,6 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 		});
 
 	const { journalEntryId } = result[0];
-
-	console.log('transactions:', transactions)
 
 	await db
 		.insert(TransactionTable)

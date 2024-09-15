@@ -7,10 +7,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateJournalEntry } from '@/types/post'
 import { PaymentType, TransactionType } from "@/types/enum";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { createJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
 import dayjs from "dayjs";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 interface JournalEntryModalProps {
     open: boolean;
@@ -20,6 +21,7 @@ interface JournalEntryModalProps {
 
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
+    const { snackbar } = useContext(NotificationsContext);
 
     const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
         setSaving(true);
@@ -32,7 +34,8 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
             })
             .finally(() => {
                 setSaving(false);
-            })
+            });
+        snackbar({ message: 'Created journal entry'});
     }
 
     const createJournalEntryForm = useForm<CreateJournalEntry>({
@@ -44,7 +47,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
             transactions: [
                 {
                     transactionType: TransactionType.Enum.DEBIT,
-                    date: new Date().toISOString(),
+                    // date: new Date().toISOString(),
                     memo: '',
                     amount: undefined,
                     // paymentType: PaymentType.Enum.ETRANSFER, // TODO

@@ -19,6 +19,7 @@ export default async function JournalPage(props: JournalPageProps) {
 
     // const transactionMethods = await getTransactionMethodsByUserId(user.id);
     const journalEntries = await getUserJournalEntriesByMonthAndYear(user.id, month, year);
+    console.log('JournalPage.journalEntries:', journalEntries)
     const categories = await getCategoriesByUserId(user.id);
 
     return (
