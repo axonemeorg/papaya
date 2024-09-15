@@ -60,11 +60,6 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
         createJournalEntryForm.setValue('date', props.initialDate);
     }, [props.initialDate]);
 
-    const { formState: { errors} } = createJournalEntryForm
-    console.log('errors:', errors)
-
-    console.log(createJournalEntryForm.getValues())
-
     return (
         <FormProvider {...createJournalEntryForm}>
             <Dialog open={props.open} fullWidth onClose={props.onClose} maxWidth='md'>

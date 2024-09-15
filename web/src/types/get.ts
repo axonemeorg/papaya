@@ -33,12 +33,18 @@ export const Category = Timestamps
     .merge(ItemAvatar)
     .extend({
         categoryId: z.string().uuid(),
-        icon: z.string(),
-        color: z.string(),
-        description: z.string(),
         label: z.string(),
+        description: z.string(),
     });
 export type Category = z.output<typeof Category>;
 
-export const JournalEntry = z.any();
+export const JournalEntry = z.object({
+    journalEntryId: z.string(),
+    date: z.string(),
+    time: z.string(),
+    netAmount: z.number(),
+    memo: z.string(),
+    methods: z.array(TransactionMethod),
+    category: z.optional(Category)
+})
 export type JournalEntry = z.output<typeof JournalEntry>;
