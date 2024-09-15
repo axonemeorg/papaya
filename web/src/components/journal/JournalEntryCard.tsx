@@ -40,7 +40,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                 }
             })
         }
-    }, [props.entry])
+    }, [props.entry]);
 
     return (
         <>
@@ -48,6 +48,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                 initialValues={editJournalEntryFormValues}
                 open={showEditDialog}
                 onClose={() => setShowEditDialog(false)}
+                onSave={() => props.onClose()}
             />
             <Popover
                 anchorEl={props.anchorEl}
