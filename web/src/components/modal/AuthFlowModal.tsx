@@ -1,7 +1,8 @@
+'use client'
+
 import { PropsWithChildren } from "react"
 
 import { alpha, Box, Button, Container, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
-import { login } from "@/actions/auth-actions";
 import { Close } from "@mui/icons-material";
 import Link from "next/link";
 
@@ -35,25 +36,17 @@ export default function AuthFlowModal(props: AuthFlowModalProps) {
 									<Close />
 								</IconButton>
 							</Stack>
-							<form action={login}>
-								<Grid container columns={2} mb={4}>
-									<Grid item xs={1}>
-										{/* <Typography variant='h4' mb={1}>Sign in</Typography>
-										<Typography>Start using Zisk</Typography> */}
-										<Typography variant='h4' mb={1}>{props.title}</Typography>
-										<Typography>{props.description}</Typography>
-									</Grid>
-									<Grid item xs={1}>
-										{props.children}
-									</Grid>
-								</Grid>
-								<Stack direction='row' justifyContent={'flex-end'} gap={1}>
-                                    <Link href='/signup'>
-									    <Button variant='text'>Sign up</Button>
-                                    </Link>
-									<Button variant='contained' type='submit'>Next</Button>
-								</Stack>
-							</form>
+                            <Grid container columns={2}>
+                                <Grid item xs={1}>
+                                    {/* <Typography variant='h4' mb={1}>Sign in</Typography>
+                                    <Typography>Start using Zisk</Typography> */}
+                                    <Typography variant='h4' mb={1}>{props.title}</Typography>
+                                    <Typography>{props.description}</Typography>
+                                </Grid>
+                                <Grid item xs={1}>
+                                    {props.children}
+                                </Grid>
+                            </Grid>
 						</Stack>
 					</Paper>
 				</Container>

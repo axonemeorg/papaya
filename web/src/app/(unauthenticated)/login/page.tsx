@@ -1,5 +1,3 @@
-'use client'
-
 import AuthFlowModal from "@/components/modal/AuthFlowModal";
 import LoginForm from "@/components/form/LoginForm";
 
