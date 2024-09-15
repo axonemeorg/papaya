@@ -33,6 +33,7 @@
     "react-hook-form": "^7.52.1",
     "react-window": "^1.8.10",
     "sass": "^1.77.8",
+    "sharp": "^0.33.5",
     "zod": "^3.23.8",
     "zustand": "^4.5.5"
   },
