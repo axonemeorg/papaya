@@ -38,7 +38,7 @@ abstract class DatabaseTableSeeder {
 
         console.log(`${statusIndicator} ${this.constructor.name} (ran in ${elapsedTimeString})`);
         if (seedError) {
-            console.error(seedError.detail)
+            console.error(seedError)
         }
         // console.log('\n');
     }

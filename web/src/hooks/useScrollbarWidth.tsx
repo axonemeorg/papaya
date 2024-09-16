@@ -22,7 +22,7 @@ export const useScrollbarWidth = () => {
     const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
   
     // Removing temporary elements from the DOM
-    outer.parentNode.removeChild(outer);
+    outer.parentNode?.removeChild(outer);
   
     didCompute.current = true;
     widthRef.current = scrollbarWidth;

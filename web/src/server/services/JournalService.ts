@@ -1,10 +1,11 @@
 import { TransactionType } from "@/types/enum";
 import JournalRepository from "../repositories/JournalRepository";
+import { Transaction } from "@/types/get";
 
 
 export default class JournalService {
-    static async _santizeJournalEntries(results) {
-        return results.map((journalEntry) => {
+    static async _santizeJournalEntries(results: any) {
+        return results.map((journalEntry: any) => {
 
             // const methods = journalEntry
             //     .transactions
@@ -18,7 +19,7 @@ export default class JournalService {
     
             const netAmount = journalEntry
                 .transactions
-                .reduce((acc, transaction) => {
+                .reduce((acc: number, transaction: Transaction) => {
                     if (transaction.transactionType === TransactionType.Enum.CREDIT) {
                         return acc + transaction.amount;
                     } else if (transaction.transactionType === TransactionType.Enum.DEBIT) {

@@ -60,7 +60,7 @@ export default class CategoriesTableSeeder extends DatabaseTableSeeder {
 
         const categoryLabels = faker.helpers.uniqueArray(EXAMPLE_CATEGORIES, NUM_CATEGORIES_PER_USER)
 
-        const categories = users.reduce((acc, user) => {
+        const categories = users.reduce((acc: any[], user) => {
             categoryLabels.forEach((label) => {
                 const iconIndex = Math.floor(Math.random() * icons.length);
                 const shadeIndex = Math.floor(Math.random() * shades.length);

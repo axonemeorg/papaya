@@ -37,7 +37,7 @@ export const ImageAvatar = (props: ImageAvatarProps) => {
 export default function ImageAvatarPicker(props: ImageAvatarPicker) {
     const [uploading, setUploading] = useState<boolean>(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
-    const fileInputRef = useRef<Todo>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageUploadSuccess = (data: { s3Key: string }) => {
         props.onChange({
