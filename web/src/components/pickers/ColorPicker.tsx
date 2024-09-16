@@ -1,8 +1,9 @@
 'use client';
 
 import { Box, Button, colors, FormControl, Grid, InputLabel, MenuItem, Paper, Popover, Popper, Select, Stack, Tooltip } from '@mui/material';
-import * as muiColors from '@mui/material/colors';
-import { useState } from 'react';
+import * as _muiColors from '@mui/material/colors';
+
+const muiColors = { ..._muiColors } as unknown as Record<string, Record<number, string>>
 
 const colorGroups = [
     [
@@ -30,7 +31,7 @@ const colorGroups = [
     ]
 ];
 
-export const colorNameLabels = {
+export const colorNameLabels: Record<string, string> = {
     'red': 'Red',
     'pink': 'Pink',
     'purple': 'Purple',
@@ -53,7 +54,7 @@ const colorShades = [
     800
 ]
 
-export const colorShadeLabels = {
+export const colorShadeLabels: Record<number, string> = {
     [200]: 'Light',
     [400]: '',
     [800]: 'Deep'
@@ -124,11 +125,6 @@ export const Swatch = (props: SwatchProps) => {
 export interface ColorPickerProps {
     color: string | null;
     onChange: (color: string) => void;
-}
-
-const getMuiColor = (colorLabel: string) => {
-    const [colorName, colorShade] = colorLabel.split('.');
-    return muiColors[colorName][colorShade];
 }
 
 const DEFAULT_COLOR = muiColors['red'][400];

@@ -12,7 +12,7 @@ import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { UpdateJournalEntry } from "@/types/put";
 
 interface JournalEntryCard {
-    anchorEl: HTMLElement;
+    anchorEl: HTMLElement | null;
     onClose: () => void;
     entry: JournalEntry;
 }
@@ -36,7 +36,7 @@ export default function JournalEntryCard(props: JournalEntryCard) {
             transactions: props.entry.transactions?.map((transaction) => {
                 return {
                     ...transaction,
-                    amount: (transaction.amount / 100).toFixed(2)
+                    amount: (transaction.amount / 100).toFixed(2),
                 }
             })
         }

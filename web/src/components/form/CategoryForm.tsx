@@ -35,7 +35,7 @@ export default function CategoryForm() {
         return null;
     }, [watch()]);
 
-    const handleChangeIcon = (avatar: ItemAvatar | null) => {
+    const handleChangeIcon = (avatar: ItemAvatar) => {
         setValue('avatarContent', avatar.avatarContent);
         setValue('avatarPrimaryColor', avatar.avatarPrimaryColor);
         setValue('avatarVariant', avatar.avatarVariant);

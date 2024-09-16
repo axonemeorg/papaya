@@ -8,7 +8,7 @@ import { AvatarVariant } from '@/types/enum';
 
 interface AvatarPickerProps {
     value: ItemAvatar | null;
-    onChange: (avatar: ItemAvatar | null) => void;
+    onChange: (avatar: ItemAvatar) => void;
 }
 
 export const DEFAULT_AVATAR: ItemAvatar = {

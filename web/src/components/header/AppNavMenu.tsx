@@ -32,11 +32,6 @@ const MenuItem = (props: MenuItemProps & { component: any, href: string }) => <M
 export default function AppNavMenu() {
     const pathName = usePathname();
 
-    const handleClickMenuItem = (event) => {
-        // event.preventDefault();
-        // event.stopPropagation();
-    }
-
     return (
         <>
             <Select<string>
@@ -59,7 +54,7 @@ export default function AppNavMenu() {
                 }}
             >
                 {Object.entries(menuItems).map(([path, { title, description, disabled }]) => (
-                    <MenuItem component={Link} href={path} key={path} value={path} onClick={handleClickMenuItem} disabled={disabled}>
+                    <MenuItem component={Link} href={path} key={path} value={path} disabled={disabled}>
                         <ListItemIcon>{menuItems[path].icon}</ListItemIcon>
                         <ListItemText primary={title} secondary={description} />
                     </MenuItem>

@@ -6,12 +6,6 @@ import { UserFileUploads } from '@/database/schemas';
 import sharp from 'sharp';
 import { generateIdFromEntropySize } from 'lucia';
 
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-};
-
 const s3Config: S3ClientConfig = {
 	region: process.env.AWS_S3_REGION ?? '',
 	credentials: {

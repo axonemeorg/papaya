@@ -9,7 +9,7 @@ import { useMemo, useRef, useState } from "react";
 
 interface ImageAvatarPicker {
     value: ItemAvatar;
-    onChange: (avatar: ItemAvatar) => void;
+    onChange: (avatar: ItemAvatar | null) => void;
 }
 
 
@@ -37,9 +37,9 @@ export const ImageAvatar = (props: ImageAvatarProps) => {
 export default function ImageAvatarPicker(props: ImageAvatarPicker) {
     const [uploading, setUploading] = useState<boolean>(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef<Todo>(null);
 
-    const handleImageUploadSuccess = (data) => {
+    const handleImageUploadSuccess = (data: { s3Key: string }) => {
         props.onChange({
             avatarContent: data.s3Key,
             avatarVariant: AvatarVariant.Enum.IMAGE,
@@ -60,7 +60,7 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
     }
 
     const handleClickUploadButton = () => {
-      fileInputRef.current.click();
+      fileInputRef?.current?.click();
     };
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

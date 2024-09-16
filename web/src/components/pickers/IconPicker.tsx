@@ -124,7 +124,8 @@ export default function IconPicker(props: IconPickerProps) {
                     width={(CELL_SIZE * COLUMN_COUNT) + scrollbarWidth}
                     style={{ overflowX: 'hidden' }}
                 >
-                    {({ columnIndex, rowIndex, style }) => {
+                    {(rowProps: { columnIndex: number, rowIndex: number, style: any }) => {
+                        const { columnIndex, rowIndex, style } = rowProps;
                         const index = rowIndex * COLUMN_COUNT + columnIndex;
                         const icon = results[index];
 

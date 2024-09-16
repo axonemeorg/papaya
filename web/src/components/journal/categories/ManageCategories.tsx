@@ -69,10 +69,10 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 
     const handleCreateCategory = async (formData: CreateCategory) => {
         try {
-            await createCategory(formData);
+            const response = await createCategory(formData);
             snackbar({ message: 'Created category' })
             setFormState(ManageCategoriesFormState.VIEW);
-            addCategoryToStore(formData);
+            addCategoryToStore(response);
         } catch {
             snackbar({ message: 'Failed to create category' })
         }

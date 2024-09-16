@@ -10,6 +10,7 @@ import JournalHeader from "./JournalHeader";
 import { JournalDate } from "@/types/calendar";
 import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import JournalEditor from "./JournalEditor";
+import { Category } from "@/types/get";
 
 interface JournalPageProps extends JournalDate {}
 
@@ -17,9 +18,11 @@ export default async function JournalPage(props: JournalPageProps) {
     const { month, year } = props;
     const { user } = await validateRequest();
 
-    // const transactionMethods = await getTransactionMethodsByUserId(user.id);
+    if (!user) {
+        return <></>
+    }
+
     const journalEntries = await getUserJournalEntriesByMonthAndYear(user.id, month, year);
-    console.log('JournalPage.journalEntries:', journalEntries)
     const categories = await getCategoriesByUserId(user.id);
 
     return (
