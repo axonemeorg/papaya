@@ -12,10 +12,12 @@ const database = process.env.DB_NAME as string;
 const user = process.env.DB_USER as string;
 const password = process.env.DB_PASSWORD as string;
 const port = Number(process.env.DB_PORT as string);
+const host = process.env.POSTGRES_DATABASE_HOST as string;
 
 const enableLogger = process.env.ENABLE_DB_LOGGER === 'true';
 
 export const pool = new Pool({
+    host,
     database,
     user,
     password,
