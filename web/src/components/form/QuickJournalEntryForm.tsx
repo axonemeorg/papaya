@@ -1,6 +1,6 @@
 'use client';
 
-import { Grid, InputAdornment, Stack, TextField } from "@mui/material";
+import { Grid2 as Grid, InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateQuickJournalEntry } from "@/types/post";
@@ -26,7 +26,7 @@ export default function QuickJournalEntryForm() {
 
     return (
         <Grid container columns={12} spacing={2}>
-            <Grid item xs={3}>
+            <Grid size={3}>
                 <Controller
                     control={control}
                     name='memo'
@@ -50,7 +50,7 @@ export default function QuickJournalEntryForm() {
                     )}
                 />
             </Grid>
-            <Grid item xs={3}>
+            <Grid size={3}>
                 <Controller
                     control={control}
                     name={`amount`}
@@ -74,7 +74,7 @@ export default function QuickJournalEntryForm() {
                     )}
                 />
             </Grid>
-            <Grid item xs={5}>
+            <Grid size={5}>
                 <Controller
                     control={control}
                     name='category'

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Collapse, Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Add, Delete } from "@mui/icons-material";
 import CustomDatePicker from "../date/CustomDatePicker";
@@ -27,7 +27,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     return (
         <Stack direction='row' gap={1} alignItems='center'>
             <Grid container columns={12} spacing={1}>
-                <Grid item xs={2}>
+                <Grid size={2}>
                     <Controller
                         control={control}
                         name={`transactions.${props.index}.amount` as const}
@@ -51,7 +51,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                         )}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <Controller
                         control={control}
                         name={`transactions.${props.index}.transactionMethod` as const}
@@ -68,7 +68,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                         )}
                     />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={6}>
                     <TextField
                         label='Memo (Optional)'
                         fullWidth
@@ -150,7 +150,7 @@ export default function JournalEntryForm() {
                 </Tabs>
             </Box> */}
             <Grid container columns={12} spacing={1} mb={2}>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <Controller
                         control={control}
                         name='date'
@@ -174,7 +174,7 @@ export default function JournalEntryForm() {
                         )}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <Controller
                         control={control}
                         name='time'
@@ -204,7 +204,7 @@ export default function JournalEntryForm() {
                         }}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={4}>
                     <Controller
                         control={control}
                         name='category'
