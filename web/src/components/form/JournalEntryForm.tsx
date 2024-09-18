@@ -14,6 +14,7 @@ import { debounce } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
+import { Category, TransactionMethod } from "@/types/get";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -58,10 +59,10 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                             <TransactionMethodAutocomplete
                                 {...field}
                                 ref={null}
-                                value={field.value}
+                                value={field.value as TransactionMethod}
                                 onChange={(_event, newValue) => {
                                     setValue(field.name, newValue);
-                                    setValue(`transactions.${props.index}.paymentType`, newValue.defaultPaymentType)
+                                    setValue(`transactions.${props.index}.paymentType`, newValue?.defaultPaymentType)
                                 }}
                             />
                         )}
@@ -98,8 +99,8 @@ export default function JournalEntryForm() {
 
     const addDebitTransaction = () => {
         transactionsFieldArray.append({
-            amount: undefined,
-            date: new Date().toISOString(),
+            amount: '',
+            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -109,8 +110,8 @@ export default function JournalEntryForm() {
 
     const addCreditTransaction = () => {
         transactionsFieldArray.append({
-            amount: undefined,
-            date: new Date().toISOString(),
+            amount: '',
+            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -159,7 +160,7 @@ export default function JournalEntryForm() {
                                     {...field}
                                     value={dayjs(field.value)}
                                     onChange={(value) => {
-                                        setValue(field.name, value.format('YYYY-MM-DD'));
+                                        setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
                                     }}
                                     format='dddd, MMMM D'
                                     label='Date'
@@ -189,7 +190,7 @@ export default function JournalEntryForm() {
                                         {...field}
                                         value={value}
                                         onChange={(value) => {
-                                            setValue(field.name, value.format('HH:mm:ss'));
+                                            setValue(field.name, value?.format('HH:mm:ss') ?? '');
                                         }}
                                         label='Time'
                                         slotProps={{
@@ -211,7 +212,7 @@ export default function JournalEntryForm() {
                             <CategoryAutocomplete
                                 {...field}
                                 ref={null}
-                                value={watch('category') ?? null}
+                                value={watch('category') as Category}
                                 onChange={(_event, newValue) => {
                                     setManuallySetCategory(Boolean(newValue))
                                     setValue(field.name, newValue);

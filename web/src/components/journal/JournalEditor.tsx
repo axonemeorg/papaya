@@ -135,7 +135,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                 <List>
                                                     {entries.map((entry) => {
                                                         const { category } = entry;
-                                                        const { netAmount, methods } = entry;
+                                                        const { netAmount } = entry;
                                                         const isNetPositive = netAmount > 0;
 
                                                         return (

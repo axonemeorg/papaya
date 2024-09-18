@@ -19,11 +19,7 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
         setAnchorEl(null);
     }
 
-    const handleLogout = () => {
-        // return logout();
-    }
-    
-    const initials = props.user.username?.slice(0, 1)?.toUpperCase?.() ?? undefined;
+    const initials = props.user?.username?.slice(0, 1)?.toUpperCase?.() ?? undefined;
 
     return (
         <>

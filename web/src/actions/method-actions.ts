@@ -18,7 +18,7 @@ export const createTransactionMethod = async (method: CreateTransactionMethod) =
         throw new Error('Not authorized.');
     }
 
-    const response = await db.insert(TransactionMethodTable).values({
+    const values: typeof TransactionMethodTable.$inferInsert = {
         userId: user.id,
         label: method.label,
         defaultPaymentType: method.defaultPaymentType,
@@ -26,7 +26,11 @@ export const createTransactionMethod = async (method: CreateTransactionMethod) =
         avatarContent: method.avatarContent,
         avatarPrimaryColor: method.avatarPrimaryColor,
         avatarSecondaryColor: method.avatarSecondaryColor,
-    }).returning({
+    }
+
+    const response = await db.insert(TransactionMethodTable)
+        .values(values)
+        .returning({
         transactionMethodId: TransactionMethodTable.transactionMethodId,
     });
 

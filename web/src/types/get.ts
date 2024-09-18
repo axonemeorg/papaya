@@ -5,8 +5,10 @@ import { z } from "zod"
 import { AvatarVariant, PaymentType, TransactionType } from "./enum";
 
 export const Timestamps = z.object({
-    createdAt: z.union([z.string(), z.date()]),
-    updatedAt: z.string().nullable(),
+    createdAt: z.union([z.string(), z.date()])
+        .optional(),
+    updatedAt: z.string().nullable()
+        .optional(),
 });
 export type Timestamps = z.output<typeof Timestamps>;
 
@@ -32,7 +34,7 @@ export type TransactionMethod = z.output<typeof TransactionMethod>;
 export const Transaction = z.object({
     transactionId: z.string(),
     amount: z.number(),
-    transactoinType: TransactionType,
+    transactionType: TransactionType,
     memo: z.string().optional().nullable(),
     method: TransactionMethod.optional(),
 });

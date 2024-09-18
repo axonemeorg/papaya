@@ -7,6 +7,7 @@ import { CreateQuickJournalEntry } from "@/types/post";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { findMostSimilarCategory } from "@/actions/category-actions";
 import { debounce } from "@/utils/Utils";
+import { Category } from "@/types/get";
 
 export default function QuickJournalEntryForm() {
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
@@ -81,7 +82,7 @@ export default function QuickJournalEntryForm() {
                         <CategoryAutocomplete
                             {...field}
                             ref={null}
-                            value={watch('category') ?? null}
+                            value={watch('category') as Category}
                             onChange={(_event, newValue) => {
                                 setManuallySetCategory(Boolean(newValue))
                                 setValue(field.name, newValue);

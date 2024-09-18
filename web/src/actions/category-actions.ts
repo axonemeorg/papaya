@@ -8,9 +8,10 @@ import { generateEmbedding } from "./embeddings";
 import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
 import { revalidatePath } from "next/cache";
+import { Category } from "@/types/get";
 
-export const getCategoriesByUserId = async (userId: string) => {
-	return db
+export const getCategoriesByUserId = async (userId: string): Promise<Category[]> => {
+	const response = await db
 		.select({
 			categoryId: CategoryTable.categoryId,
 			label: CategoryTable.label,
@@ -21,7 +22,9 @@ export const getCategoriesByUserId = async (userId: string) => {
 			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
 		})
 		.from(CategoryTable)
-		.where(eq(CategoryTable.userId, userId))
+		.where(eq(CategoryTable.userId, userId));
+	
+	return response as Category[];
 }
 
 export const findMostSimilarCategory = async (memo: string) => {
@@ -51,11 +54,11 @@ export const findMostSimilarCategory = async (memo: string) => {
 		.orderBy((t) => desc(t.similarity))
 		.limit(1);
 
-	delete result[0].similarity;
+	// delete result[0].similarity; // Commenting this out due to strict=true type error
 	return result[0];
 }
 
-export const createCategory = async (category: CreateCategory) => {
+export const createCategory = async (category: CreateCategory): Promise<Category> => {
 	const { user } = await validateRequest();
 
 	if (!user) {
@@ -64,7 +67,7 @@ export const createCategory = async (category: CreateCategory) => {
 
 	const descriptionEmbedding = await generateEmbedding(category.description);
 
-	return db
+	const response = await db
 		.insert(CategoryTable)
 		.values({
 			userId: user.id,
@@ -85,6 +88,8 @@ export const createCategory = async (category: CreateCategory) => {
 			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
 			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
 		});
+
+	return response as unknown as Category;
 }
 
 export const updateCategory = async (category: UpdateCategory) => {

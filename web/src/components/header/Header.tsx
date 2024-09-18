@@ -1,14 +1,11 @@
 'use client';
 
-import { Avatar, Box, Breadcrumbs, Button, ListItemText, MenuItem, Select, Stack } from "@mui/material";
-import HeaderBreadcrumbs from "./HeaderBreadcrumbs";
+import { Box, Breadcrumbs, Stack } from "@mui/material";
 import BaseContainer from "../layout/BaseContainer";
-import HeaderTabs from "./HeaderTabs";
 import { PropsWithChildren } from "react";
 import AppLogo from "./AppLogo";
 import UserAvatarMenu from "./UserAvatarMenu";
 import { User } from "lucia";
-import { usePathname } from "next/navigation";
 import AppNavMenu from "./AppNavMenu";
 
 type HeaderProps = PropsWithChildren<{

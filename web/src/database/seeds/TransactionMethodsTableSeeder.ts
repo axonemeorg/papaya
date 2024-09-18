@@ -14,7 +14,7 @@ export default class TransactionMethodsTableSeeder extends DatabaseTableSeeder {
         const shades = Object.keys(colorShadeLabels)
         const users = await this.transaction.query.UserTable.findMany() as InferSelectModel<typeof UserTable>[];
 
-        const transactionMethods = users.reduce((acc, user) => {
+        const transactionMethods = users.reduce((acc: any[], user) => {
             for (let i = 0; i < NUM_METHODS_PER_USER; i ++) {
                 const iconIndex = Math.floor(Math.random() * icons.length);
                 const shadeIndex = Math.floor(Math.random() * shades.length);

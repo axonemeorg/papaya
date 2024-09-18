@@ -13,10 +13,10 @@ export default class UsersTableSeeder extends DatabaseTableSeeder {
             }
         ];
 
-        const users = await Promise.all(credentials.map(async ({ username, passwordText }) => {
+        const users: any[] = await Promise.all(credentials.map(async ({ username, passwordText }) => {
             const userId = generateIdFromEntropySize(10);
             // Default password is their username.
-            const passwordHash = await hash(passwordText, {
+            const passwordHash = await hash(passwordText ?? '', {
                 memoryCost: 19456,
                 timeCost: 2,
                 outputLen: 64,
