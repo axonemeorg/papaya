@@ -16,14 +16,14 @@ export default function AuthFlowModal(props: AuthFlowModalProps) {
         <Paper
 			square
 			sx={(theme) => ({
-				minWidth: '100vw',
-				minHeight: '100vh',
+				minWidth: '100dvw',
+				minHeight: '100dvh',
 				background: theme.palette.mode === 'light'
 					? alpha(theme.palette.primary.main, 0.1)
 					: undefined,
 				// background: alpha(theme.palette.primary.main, 0.1),
 			})}>
-			<Stack sx={{ minHeight: '100vh'}} justifyContent={'center'}>
+			<Stack sx={{ minHeight: '100dvh'}} justifyContent={'center'}>
 				<Container
 					maxWidth='lg'
 					disableGutters

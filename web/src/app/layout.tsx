@@ -22,7 +22,7 @@ export default async (props: PropsWithChildren) => {
 			<body>
 				<ThemeProvider theme={appTheme}>
 					<CssBaseline />
-					<Stack component='main' id='root' minHeight='100vh'>
+					<Stack component='main' id='root' minHeight='100dvh'>
 						{props.children}
 					</Stack>
 				</ThemeProvider>

@@ -8,6 +8,15 @@ import { PropsWithChildren } from "react";
 
 type JournalHeaderProps = PropsWithChildren<JournalDate>;
 
+const formatMonthString = (year: number, month: number): string => {
+    const day = dayjs([year, month].join('-'))
+    if (day.isSame(dayjs(), 'year')) {
+        return day.format('MMMM');
+    }
+
+    return day.format('MMM YYYY');
+}
+
 export default function JournalHeader({ month, year, children }: JournalHeaderProps) {
     return (
         <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center'>
@@ -26,7 +35,7 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
                         </Link>
                     </Stack>
                     <Typography variant='h5' sx={{ fontWeight: 500 }}>
-                        {dayjs([year, month].join('-')).format('MMMM YYYY')}
+                        {formatMonthString(year, month)}
                     </Typography>
                 </Stack>
                 <Link href={'/journal'}>
