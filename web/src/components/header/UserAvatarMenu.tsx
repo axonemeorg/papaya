@@ -60,9 +60,11 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
                 <MenuItem component={Link} href='/settings'>
                     Settings
                 </MenuItem>
-                <MenuItem component={Link} href='/logout'>
-                    Logout
-                </MenuItem>
+                <form action={logout}>
+                    <MenuItem component={'button'} sx={{ width: '100%' }} type='submit'>
+                        Logout
+                    </MenuItem>
+                    </form>
             </Menu>
         </>
     );
