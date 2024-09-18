@@ -2,10 +2,9 @@
 
 import { PropsWithChildren } from "react"
 
-import { alpha, Box, Button, Container, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { alpha, Box, Container, IconButton, Paper, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2"
 import { Close } from "@mui/icons-material";
-import Link from "next/link";
-
 
 type AuthFlowModalProps = PropsWithChildren<{
     title: string;
@@ -17,15 +16,19 @@ export default function AuthFlowModal(props: AuthFlowModalProps) {
         <Paper
 			square
 			sx={(theme) => ({
-				minWidth: '100vw',
-				minHeight: '100vh',
+				minWidth: '100dvw',
+				minHeight: '100dvh',
 				background: theme.palette.mode === 'light'
 					? alpha(theme.palette.primary.main, 0.1)
 					: undefined,
 				// background: alpha(theme.palette.primary.main, 0.1),
 			})}>
-			<Stack sx={{ minHeight: '100vh'}} justifyContent={'center'}>
-				<Container maxWidth='lg' disableGutters sx={{ px: 16 }}>
+			<Stack sx={{ minHeight: '100dvh'}} justifyContent={'center'}>
+				<Container
+					maxWidth='lg'
+					disableGutters
+					sx={{ px: { md: 16, sm: 8, xs: 2 } }}
+				>
 					<Paper variant='outlined' sx={{ borderRadius: 6, p: 6 }}>
 						<Stack spacing={3}>
 							<Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
@@ -36,14 +39,12 @@ export default function AuthFlowModal(props: AuthFlowModalProps) {
 									<Close />
 								</IconButton>
 							</Stack>
-                            <Grid container columns={2}>
-                                <Grid item xs={1}>
-                                    {/* <Typography variant='h4' mb={1}>Sign in</Typography>
-                                    <Typography>Start using Zisk</Typography> */}
+                            <Grid container columns={2} spacing={4}>
+                                <Grid size={{ xs: 2, md: 1 }}>
                                     <Typography variant='h4' mb={1}>{props.title}</Typography>
                                     <Typography>{props.description}</Typography>
                                 </Grid>
-                                <Grid item xs={1}>
+                                <Grid size={{ xs: 2, md: 1 }}>
                                     {props.children}
                                 </Grid>
                             </Grid>

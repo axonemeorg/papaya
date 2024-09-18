@@ -1,16 +1,10 @@
 'use server'
 
 import { getCategoriesByUserId } from "@/actions/category-actions";
-import { getJournalEntriesByUserId, getUserJournalEntriesByMonthAndYear } from "@/actions/journal-actions";
-import { getTransactionMethodsByUserId } from "@/actions/method-actions";
+import { getUserJournalEntriesByMonthAndYear } from "@/actions/journal-actions";
 import { validateRequest } from "@/auth";
-import { redirect } from "next/navigation";
-import BaseLayout from "../layout/BaseLayout";
-import JournalHeader from "./JournalHeader";
 import { JournalDate } from "@/types/calendar";
-import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import JournalEditor from "./JournalEditor";
-import { Category } from "@/types/get";
 
 interface JournalPageProps extends JournalDate {}
 
