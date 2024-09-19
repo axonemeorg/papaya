@@ -1,13 +1,13 @@
 import { JournalDate } from "@/types/calendar";
 import { getJournalDateUrl, getNextYearMonth, getPreviousYearMonth, getTodayYearAndMonth } from "@/utils/Utils";
-import { Apps, ArrowBack, ArrowForward, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
-import { Button, ButtonBase, IconButton, Popover, Stack, Tooltip, Typography } from "@mui/material";
+import { Apps, ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
+import { Button, ButtonBase, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 
 type JournalHeaderProps = PropsWithChildren<JournalDate>;
 
@@ -21,6 +21,7 @@ const formatMonthString = (year: number, month: number): string => {
 }
 
 export default function JournalHeader({ month, year, children }: JournalHeaderProps) {
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const router = useRouter();
 
     const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
@@ -30,31 +31,41 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
         router.push(getJournalDateUrl({ year, month }));
     }
 
+    const theme = useTheme();
+    const hideNextPrevButtons = useMediaQuery(theme.breakpoints.down('md'));
+
     return (
-        <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center'>
+        <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center' gap={1}>
             <Stack direction='row' alignItems='center' gap={2}>
                 <Stack direction='row' alignItems='center' gap={1}>
-                    <Stack direction='row'>
-                        <Link href={getJournalDateUrl(getPreviousYearMonth({ year, month }))}>
-                            <Tooltip title='Previous month'>
-                                <IconButton>
-                                    <ChevronLeft />
-                                </IconButton>
-                            </Tooltip>
-                        </Link>
-                        <Link href={getJournalDateUrl(getNextYearMonth({ year, month }))}>
-                            <Tooltip title='Next month'>
-                                <IconButton>
-                                    <ChevronRight />
-                                </IconButton>
-                            </Tooltip>
-                        </Link>
-                    </Stack>
-                    <Typography variant='h5' sx={{ fontWeight: 500 }}>
-                        {formatMonthString(year, month)}
-                    </Typography>
-                    <Popover open={true}>
-                        
+                    {!hideNextPrevButtons && (
+                        <Stack direction='row'>
+                            <Link href={getJournalDateUrl(getPreviousYearMonth({ year, month }))}>
+                                <Tooltip title='Previous month'>
+                                    <IconButton>
+                                        <ArrowBackIos />
+                                    </IconButton>
+                                </Tooltip>
+                            </Link>
+                            <Link href={getJournalDateUrl(getNextYearMonth({ year, month }))}>
+                                <Tooltip title='Next month'>
+                                    <IconButton>
+                                        <ArrowForwardIos />
+                                    </IconButton>
+                                </Tooltip>
+                            </Link>
+                        </Stack>
+                    )}
+                    <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
+                        <Typography variant='h5' sx={{ fontWeight: 500 }}>
+                            {formatMonthString(year, month)}
+                        </Typography>
+                    </Button>
+                    <Popover
+                        open={Boolean(anchorEl)}
+                        onClose={() => setAnchorEl(null)}
+                        anchorEl={anchorEl}
+                    >
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DateCalendar
                                 views={['month', 'year']}
@@ -63,13 +74,13 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
                         </LocalizationProvider>
                     </Popover>
                 </Stack>
-                <Link href={'/journal'}>
+                {/* <Link href={'/journal'}>
                     <Tooltip title='Today'>
                         <IconButton color='inherit'>
                             <EventRepeat />
                         </IconButton>
                     </Tooltip>
-                </Link>
+                </Link> */}
             </Stack>
             <Stack direction='row' alignItems='center' gap={2}>
                 {children}

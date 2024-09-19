@@ -96,10 +96,6 @@ export default function JournalEditor(props: JournalEditorProps) {
             <BaseLayout
                 headerChildren={
                     <JournalHeader month={props.month} year={props.year}>
-                        <Fab color='primary' aria-label='add' onClick={() => setShowJournalEntryModal(true)} variant='extended' size='medium'>
-                            <Add />
-                            Add
-                        </Fab>
                         <IconButton onClick={() => setShowSettingsDrawer(true)}>
                             <MuiCategoryIcon />
                         </IconButton>
@@ -107,6 +103,21 @@ export default function JournalEditor(props: JournalEditorProps) {
                 }
                 user={props.user}
             >
+                <Fab
+                    color='primary'
+                    aria-label='add'
+                    onClick={() => setShowJournalEntryModal(true)}
+                    variant='extended'
+                    size='medium'
+                    sx={(theme) => ({
+                        position: 'fixed',
+                        bottom: theme.spacing(4),
+                        right: theme.spacing(2),
+                    })}
+                >
+                    <Add />
+                    Add
+                </Fab>
                 {selectedEntry && (
                     <JournalEntryCard
                         entry={selectedEntry}
