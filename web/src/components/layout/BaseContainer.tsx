@@ -17,9 +17,9 @@ export default function BaseContainer(props: IBaseContainerProps) {
             disableGutters
             sx={{
                 px: {
-                    xs: 2,
+                    xs: 1,
                     sm: 4,
-                    md: 8,
+                    md: 6,
                 },
                 ...sx
             }}

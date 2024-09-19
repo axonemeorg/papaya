@@ -177,7 +177,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                     </Grid>
                                     <Grid size={{ xs: 12, sm: 10 }}>
                                         {entries.length > 0 && (
-                                            <List sx={{ pl: 1, pt: isSmall ? 0 : undefined }}>
+                                            <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
                                                 {entries.map((entry) => {
                                                     const { category } = entry;
                                                     const { netAmount } = entry;
@@ -186,7 +186,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                     return (
                                                         <MenuItem
                                                             key={entry.journalEntryId}
-                                                            sx={{ borderRadius: '64px' }}
+                                                            sx={{ borderRadius: '64px', pl: isSmall ? 4 : undefined }}
                                                             onClick={(event) => handleClickListItem(event, entry)}
                                                         >
                                                             <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
@@ -220,7 +220,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                             </List>
                                         )}
                                         {isToday && (
-                                            <QuickJournalEditor />
+                                            <QuickJournalEditor onAdd={isSmall ? () => setShowJournalEntryModal(true) : undefined} />
                                         )}
                                     </Grid>
                                 </React.Fragment>

@@ -9,7 +9,11 @@ import { Add, Save } from "@mui/icons-material";
 import { useState } from "react";
 import { createQuickJournalEntry } from "@/actions/journal-actions";
 
-export default function QuickJournalEditor() {
+interface QuickJournalEditorProps {
+    onAdd?: () => void;
+}
+
+export default function QuickJournalEditor(props: QuickJournalEditorProps) {
     const [isActive, setIsActive] = useState<boolean>(false);
 
     const createQuickJournalEntryForm = useForm<CreateQuickJournalEntry>({
@@ -44,7 +48,18 @@ export default function QuickJournalEditor() {
                             <Button onClick={() => setIsActive(false)}>Cancel</Button>
                         </Stack>
                     ) : (
-                        <Button startIcon={<Add />} onClick={() => setIsActive(true)}>New Entry</Button>
+                        <Button
+                            startIcon={<Add />}
+                            onClick={() => {
+                                if (props.onAdd) {
+                                    props.onAdd();
+                                } else {
+                                    setIsActive(true);
+                                }}
+                            }
+                        >
+                            New Entry
+                        </Button>
                     )}
                 </Box>
             </form>
