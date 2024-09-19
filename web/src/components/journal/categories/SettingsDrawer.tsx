@@ -15,7 +15,7 @@ export default function SettingsDrawer(props: SettingsDrawerProps) {
             onClose={() => props.onClose()}
             anchor="right"
         >
-            <Box p={4} sx={{ width: '500px' }}>
+            <Box p={4} sx={{ width: '500px', maxWidth: '100dvw' }}>
                 <ManageCategories
                     onClose={() => props.onClose()}
                 />
