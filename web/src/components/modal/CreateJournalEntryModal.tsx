@@ -1,7 +1,7 @@
 'use client';
 
 import { Add } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  DialogTitle} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  DialogTitle, useMediaQuery, useTheme} from "@mui/material";
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,9 +63,12 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
         createJournalEntryForm.setValue('date', props.initialDate);
     }, [props.initialDate]);
 
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
         <FormProvider {...createJournalEntryForm}>
-            <Dialog open={props.open} fullWidth onClose={props.onClose} maxWidth='md'>
+            <Dialog open={props.open} fullWidth fullScreen={fullScreen} onClose={props.onClose} maxWidth='md'>
                 <form onSubmit={createJournalEntryForm.handleSubmit(handleCreateJournalEntry)}>
                     <DialogTitle>Add Entry</DialogTitle>
                     <DialogContent sx={{ overflow: "initial" }}>
