@@ -33,6 +33,7 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
 
     const theme = useTheme();
     const hideNextPrevButtons = useMediaQuery(theme.breakpoints.down('md'));
+    const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
 
     return (
         <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center' gap={1}>
@@ -57,7 +58,7 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
                         </Stack>
                     )}
                     <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
-                        <Typography variant='h5' sx={{ fontWeight: 500 }}>
+                        <Typography variant={headingSize} sx={{ fontWeight: 500 }}>
                             {formatMonthString(year, month)}
                         </Typography>
                     </Button>

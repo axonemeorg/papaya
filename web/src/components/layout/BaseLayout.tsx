@@ -1,15 +1,16 @@
-import { Paper, Stack } from "@mui/material";
+import { ContainerProps, Paper, Stack } from "@mui/material";
 import { PropsWithChildren, ReactNode } from "react";
 import Header from '@/components/header/Header'
 import BaseContainer from "./BaseContainer";
 import { User } from "lucia";
 
-interface BaseLayoutProps extends PropsWithChildren {
+interface BaseLayoutProps extends PropsWithChildren<ContainerProps> {
 	headerChildren: ReactNode;
 	user: User;
 }
 
 export default function BaseLayout(props: BaseLayoutProps) {
+	const { headerChildren, user, sx, ...rest } = props;
 	return (
 		<>
 			<Header user={props.user}>
@@ -21,9 +22,10 @@ export default function BaseLayout(props: BaseLayoutProps) {
 						flex: 1,
 						display: 'flex',
 						flexFlow: 'column nowrap',
-						width: '100dvw',
-						overflowX: 'auto'
+						...sx,
+						
 					}}
+					{...rest}
 				>
 					{props.children}
 				</BaseContainer>
