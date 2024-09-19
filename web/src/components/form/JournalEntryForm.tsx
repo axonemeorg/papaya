@@ -27,7 +27,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     return (
         <Stack direction='row' gap={1} alignItems='center'>
             <Grid container columns={12} spacing={1}>
-                <Grid size={2}>
+                <Grid size={6}>
                     <Controller
                         control={control}
                         name={`transactions.${props.index}.amount` as const}
@@ -51,7 +51,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                         )}
                     />
                 </Grid>
-                <Grid size={4}>
+                {/* <Grid size={4}>
                     <Controller
                         control={control}
                         name={`transactions.${props.index}.transactionMethod` as const}
@@ -67,7 +67,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                             />
                         )}
                     />
-                </Grid>
+                </Grid> */}
                 <Grid size={6}>
                     <TextField
                         label='Memo (Optional)'
@@ -143,14 +143,8 @@ export default function JournalEntryForm() {
 
     return (
         <>
-            {/* <Box mb={2}>
-                <Tabs value={formTab} onChange={handleChangeTab} centered>
-                    <Tab label="Quick" />
-                    <Tab label="Advanced" />
-                </Tabs>
-            </Box> */}
-            <Grid container columns={12} spacing={1} mb={2}>
-                <Grid size={4}>
+            <Grid container columns={12} spacing={1} mb={1}>
+                <Grid size={{ xs: 6, md: 4}}>
                     <Controller
                         control={control}
                         name='date'
@@ -162,7 +156,7 @@ export default function JournalEntryForm() {
                                     onChange={(value) => {
                                         setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
                                     }}
-                                    format='dddd, MMMM D'
+                                    format='ddd, MMM D'
                                     label='Date'
                                     slotProps={{
                                         textField:  {
@@ -174,7 +168,7 @@ export default function JournalEntryForm() {
                         )}
                     />
                 </Grid>
-                <Grid size={4}>
+                <Grid size={{ xs: 6, md: 4}}>
                     <Controller
                         control={control}
                         name='time'
@@ -204,7 +198,7 @@ export default function JournalEntryForm() {
                         }}
                     />
                 </Grid>
-                <Grid size={4}>
+                <Grid size={{ xs: 12, md: 4}}>
                     <Controller
                         control={control}
                         name='category'

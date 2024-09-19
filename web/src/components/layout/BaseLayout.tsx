@@ -16,7 +16,15 @@ export default function BaseLayout(props: BaseLayoutProps) {
 				{props.headerChildren}
 			</Header>
 			<Stack component={Paper} square variant="outlined" sx={{ flex: 1, borderLeft: 0, borderRight: 0 }}>
-				<BaseContainer sx={{ flex: 1, display: 'flex', flexFlow: 'column nowrap' }}>
+				<BaseContainer
+					sx={{
+						flex: 1,
+						display: 'flex',
+						flexFlow: 'column nowrap',
+						width: '100dvw',
+						overflowX: 'auto'
+					}}
+				>
 					{props.children}
 				</BaseContainer>
 			</Stack>
