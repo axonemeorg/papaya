@@ -1,5 +1,6 @@
 'use client';
 
+import { AvatarImageUploadResponse } from "@/server/repositories/FileUploadRepository";
 import { AvatarVariant } from "@/types/enum";
 import { ItemAvatar } from "@/types/get";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
@@ -39,11 +40,11 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
     const [uploadError, setUploadError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleImageUploadSuccess = (data: { s3Key: string }) => {
+    const handleImageUploadSuccess = (data: AvatarImageUploadResponse) => {
         props.onChange({
-            avatarContent: data.s3Key,
+            avatarContent: data.record.s3Key,
             avatarVariant: AvatarVariant.Enum.IMAGE,
-            avatarPrimaryColor: '',
+            avatarPrimaryColor: data.color ?? '',
         })
     }
 
@@ -79,7 +80,7 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
                     body: formData,
                 });
 
-                const data = await response.json();
+                const data: AvatarImageUploadResponse = await response.json();
                 handleImageUploadSuccess(data);
             } catch (err) {
                 setUploadError((err as Error).message);
