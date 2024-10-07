@@ -83,6 +83,7 @@ export default class JournalRepository {
                         amount: true,
                         memo: true,
                         transactionType: true,
+                        categoryId: true,
                     }
                 },
                 category: {
