@@ -62,6 +62,8 @@ export const TransactionTable = pgTable("transaction", {
     memo: varchar('memo', { length: 1024 }),
     transactionMethodId: uuid('transaction_method_id')
         .references(() => TransactionMethodTable.transactionMethodId),
+    categoryId: uuid('category_id')
+        .references(() => CategoryTable.categoryId),
 
     ...timestamps
 });

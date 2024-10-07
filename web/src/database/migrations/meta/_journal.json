@@ -50,6 +50,13 @@
       "when": 1726245694966,
       "tag": "0006_furry_genesis",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1728328020600,
+      "tag": "0007_cynical_quicksilver",
+      "breakpoints": true
     }
   ]
 }
