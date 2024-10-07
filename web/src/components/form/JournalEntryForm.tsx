@@ -100,7 +100,6 @@ export default function JournalEntryForm() {
     const addDebitTransaction = () => {
         transactionsFieldArray.append({
             amount: '',
-            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -111,7 +110,6 @@ export default function JournalEntryForm() {
     const addCreditTransaction = () => {
         transactionsFieldArray.append({
             amount: '',
-            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -143,8 +141,32 @@ export default function JournalEntryForm() {
 
     return (
         <>
-            <Grid container columns={12} spacing={1} mb={1}>
-                <Grid size={{ xs: 6, md: 4}}>
+            <Controller
+                control={control}
+                name='memo'
+                render={({ field }) => (
+                    <TextField
+                        label='Memo'
+                        autoFocus
+                        {...field}
+                        ref={null}
+                        value={field.value}
+                        onChange={(event) => {
+                            const value = event.target.value;
+                            setValue(field.name, value);
+                            if (!manuallySetCategory && enableAutoDetectCategory) {
+                                handleDetectCategoryWithAi(value);
+                            }
+                        }}
+                        fullWidth
+                        multiline
+                        maxRows={3}
+                        sx={{ mb: 2 }}
+                    />
+                )}
+            />
+            <Grid container columns={12} spacing={1} rowSpacing={2} mb={1}>
+                <Grid size={{ xs: 6, md: 4  }}>
                     <Controller
                         control={control}
                         name='date'
@@ -206,7 +228,7 @@ export default function JournalEntryForm() {
                             <CategoryAutocomplete
                                 {...field}
                                 ref={null}
-                                value={watch('category') as Category}
+                                value={watch('category') as Category ?? null}
                                 onChange={(_event, newValue) => {
                                     setManuallySetCategory(Boolean(newValue))
                                     setValue(field.name, newValue);
@@ -216,31 +238,6 @@ export default function JournalEntryForm() {
                     />
                 </Grid>
             </Grid>
-            <Controller
-                control={control}
-                name='memo'
-                render={({ field }) => (
-                    <TextField
-                        label='Memo'
-                        autoFocus
-                        {...field}
-                        ref={null}
-                        value={field.value}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setValue(field.name, value);
-                            if (!manuallySetCategory && enableAutoDetectCategory) {
-                                handleDetectCategoryWithAi(value);
-                            }
-                        }}
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        sx={{ mb: 2 }}
-                    />
-                )}
-            />
-
             <Box mb={1}>
                 <Typography variant='overline'><strong>Money Out</strong></Typography>
             </Box>

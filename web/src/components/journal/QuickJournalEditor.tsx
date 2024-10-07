@@ -26,6 +26,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
     });
 
     const handleCreateQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
+        console.log('handleCreateQuickJournalEntry()')
         try {
             await createQuickJournalEntry(formData)
             setIsActive(false);
