@@ -192,8 +192,8 @@ export const deleteJournalEntry = async (formData: FormData) => {
 	return response;
 }
 
-export const getJournalEntriesByUserId = (userId: string) => {
-	return JournalService.getUserJournalEntries(userId);
+export const getAllJournalEntriesByUserId = (userId: string) => {
+	return JournalService.getAllUserJournalEntries(userId);
 }
 
 export const getUserJournalEntriesByMonthAndYear = (userId: string, month: string | number, year: string | number) => {

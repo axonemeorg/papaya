@@ -38,8 +38,8 @@ export default class JournalService {
         })
     }
 
-    static async getUserJournalEntries(userId: string) {
-        const results = await JournalRepository.getUserJournalEntries(userId);
+    static async getAllUserJournalEntries(userId: string) {
+        const results = await JournalRepository.getAllUserJournalEntries(userId);
         
         return this._santizeJournalEntries(results);
     }

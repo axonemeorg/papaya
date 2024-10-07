@@ -19,7 +19,6 @@ interface EditJournalEntryModalProps {
 }
 
 export default function EditJournalEntryModal(props: EditJournalEntryModalProps) {
-    console.log('initialVals:', props.initialValues)
     const [saving, setSaving] = useState<boolean>(false);
     const { snackbar } = useContext(NotificationsContext);
 
