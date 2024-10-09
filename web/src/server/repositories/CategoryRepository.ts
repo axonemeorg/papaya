@@ -11,4 +11,10 @@ export default class CateogryRepository {
             )
         })
     }
+
+    static async getAllCategoriesByUserId(userId: string) {
+        return db.query.CategoryTable.findMany({
+            where: eq(CategoryTable.userId, userId)
+        })
+    }
 }

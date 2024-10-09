@@ -9,21 +9,10 @@ import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
 import { revalidatePath } from "next/cache";
 import { Category } from "@/types/get";
+import CategoryService from "@/server/services/CategoryService";
 
-export const getCategoriesByUserId = async (userId: string): Promise<Category[]> => {
-	const response = await db
-		.select({
-			categoryId: CategoryTable.categoryId,
-			label: CategoryTable.label,
-			description: CategoryTable.description,
-			avatarVariant: CategoryTable.avatarVariant,
-			avatarContent: CategoryTable.avatarContent,
-			avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
-			avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
-		})
-		.from(CategoryTable)
-		.where(eq(CategoryTable.userId, userId));
-	
+export const getAllUserCategories = async (): Promise<Category[]> => {
+	const response = await CategoryService.getAllUserCategories();
 	return response as Category[];
 }
 
