@@ -61,4 +61,46 @@ export default class CategoryRepository {
                 avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
             });
     }
+
+    static async updateCategory(values: InferInsertModel<typeof CategoryTable>) {
+        return db
+            .update(CategoryTable)
+            .set({
+                label: values.label,
+                description: values.description,
+                descriptionEmbedding: values.descriptionEmbedding,
+                avatarVariant: values.avatarVariant,
+                avatarContent: values.avatarContent,
+                avatarPrimaryColor: values.avatarPrimaryColor,
+                avatarSecondaryColor: values.avatarSecondaryColor,
+            })
+            .where(
+                and(
+                    eq(CategoryTable.userId, values.userId),
+                    eq(CategoryTable.categoryId, values.categoryId as string)
+                )
+            )
+            .returning({
+                categoryId: CategoryTable.categoryId,
+                label: CategoryTable.label,
+                description: CategoryTable.description,
+                avatarVariant: CategoryTable.avatarVariant,
+                avatarContent: CategoryTable.avatarContent,
+                avatarPrimaryColor: CategoryTable.avatarPrimaryColor,
+                avatarSecondaryColor: CategoryTable.avatarSecondaryColor,
+            });
+    }
+
+    static async deleteCategoryByCategoryIdAndUserId(categoryId: string, userId: string) {
+        return db.delete(CategoryTable)
+            .where(
+                and(
+                    eq(CategoryTable.userId, userId),
+                    eq(CategoryTable.categoryId, categoryId)
+                )
+            )
+            .returning({
+                categoryId: CategoryTable.categoryId,
+            });
+    }
 }

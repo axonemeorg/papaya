@@ -127,4 +127,17 @@ export default class JournalRepository {
 
         return response;
     }
+
+    static async removeCategoryFromJournalEntries(userId: string, categoryId: string) {
+        return db.update(JournalEntryTable)
+            .set({
+                categoryId: null,
+            })
+            .where(
+                and(
+                    eq(JournalEntryTable.userId, userId),
+                    eq(JournalEntryTable.categoryId, categoryId)
+                )
+            )
+    }
 }

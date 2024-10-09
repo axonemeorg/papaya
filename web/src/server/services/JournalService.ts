@@ -188,4 +188,14 @@ export default class JournalService {
 
         return JournalRepository.deleteUserJournalEntryById(user.id, journalEntryId);
     }
+
+    static async removeCategoryFromJournalEntries(categoryId: string) {
+        const { user } = await validateRequest();
+    
+        if (!user) {
+            throw new Error('Not authorized.');
+        }
+
+        return JournalRepository.removeCategoryFromJournalEntries(user.id, categoryId);
+    }
 }
