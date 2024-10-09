@@ -7,12 +7,12 @@ import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFo
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionType } from "@/types/enum";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
-import { findMostSimilarCategory } from "@/actions/category-actions";
 import { debounce } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import { Category, TransactionMethod } from "@/types/get";
+import { findMostSimilarUserCategory } from "@/actions/category-actions";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -134,7 +134,7 @@ export default function JournalEntryForm() {
             return
         }
 
-        const category = await findMostSimilarCategory(memo);
+        const category = await findMostSimilarUserCategory(memo);
         setValue('category', category);
     }, 500)
 
