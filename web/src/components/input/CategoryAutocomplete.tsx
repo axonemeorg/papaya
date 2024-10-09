@@ -11,15 +11,17 @@ import { useCategoryStore } from "@/store/useCategoriesStore";
 type CategoryAutocompleteProps = 
     & Omit<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>
     & Partial<Pick<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>>
+    & { label?: string }
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
+    const { label, sx, ...rest } = props;
     const categories = useCategoryStore((state) => state.categories)
 
     return (
         <Autocomplete<Category>
             options={categories}
             isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
-            renderInput={(params) => <TextField {...params} label="Category" />}
+            renderInput={(params) => <TextField {...params} label={label ?? "Category"} />}
             getOptionLabel={(option) => option.label}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
@@ -37,10 +39,10 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
                     </ListItem>
                 );
             }}
-            {...props}
+            {...rest}
             sx={{
                 flex: 1,
-                ...props.sx
+                ...sx
             }}
         />
     )

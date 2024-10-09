@@ -82,7 +82,7 @@ export default function QuickJournalEntryForm() {
                         <CategoryAutocomplete
                             {...field}
                             ref={null}
-                            value={watch('category') as Category}
+                            value={watch('category') as Category ?? null}
                             onChange={(_event, newValue) => {
                                 setManuallySetCategory(Boolean(newValue))
                                 setValue(field.name, newValue);

@@ -15,6 +15,9 @@ export const CreateTransaction = z.object({
     transactionMethod: TransactionMethod.pick({ transactionMethodId: true })
         .optional()
         .nullable(),
+    category: Category.pick({ categoryId: true })
+        .optional()
+        .nullable(),
 });
 export type CreateTransaction = z.output<typeof CreateTransaction>;
 

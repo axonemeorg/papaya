@@ -1,10 +1,8 @@
 'use client';
 
-import { Box, Button, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Add, Delete } from "@mui/icons-material";
-import CustomDatePicker from "../date/CustomDatePicker";
-import TransactionMethodAutocomplete from "../input/TransactionMethodAutocomplete";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionType } from "@/types/enum";
@@ -22,67 +20,68 @@ interface JournalEntryTransactionRowProps {
 }
 
 const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
-    const { setValue, control } = useFormContext<CreateJournalEntry>();
+    const { setValue, control, watch } = useFormContext<CreateJournalEntry>();
 
     return (
-        <Stack direction='row' gap={1} alignItems='center'>
-            <Grid container columns={12} spacing={1}>
-                <Grid size={6}>
-                    <Controller
-                        control={control}
-                        name={`transactions.${props.index}.amount` as const}
-                        render={({ field }) => (
-                            <TextField
-                                label='Amount'
-                                {...field}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    const newValue = value.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-                                        .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-                                        .replace(/(\.\d{2})\d+/g, '$1'); // Limit to two decimal places
-                                    field.onChange(newValue);
-                                }}
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                }}
-                                sx={{ flex: 1 }}
-                            />
-                        )}
-                    />
-                </Grid>
-                {/* <Grid size={4}>
-                    <Controller
-                        control={control}
-                        name={`transactions.${props.index}.transactionMethod` as const}
-                        render={({ field }) => (
-                            <TransactionMethodAutocomplete
-                                {...field}
-                                ref={null}
-                                value={field.value as TransactionMethod}
-                                onChange={(_event, newValue) => {
-                                    setValue(field.name, newValue);
-                                    setValue(`transactions.${props.index}.paymentType`, newValue?.defaultPaymentType)
-                                }}
-                            />
-                        )}
-                    />
-                </Grid> */}
-                <Grid size={6}>
-                    <TextField
-                        label='Memo (Optional)'
-                        fullWidth
-                    />
-                </Grid>
-            </Grid>
         
-            <IconButton
-                onClick={() => props.fieldArray.remove(props.index)}
-                disabled={props.fieldArray.fields.length <= 1}
-            >
-                <Delete />
-            </IconButton>
-        </Stack>
+        <Grid container columns={12} spacing={1} sx={{ alignItems: 'center' }}>
+            <Grid size={'grow'}>
+                <Controller
+                    control={control}
+                    name={`transactions.${props.index}.amount` as const}
+                    render={({ field }) => (
+                        <TextField
+                            label='Amount'
+                            {...field}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                const newValue = value.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
+                                    .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
+                                    .replace(/(\.\d{2})\d+/g, '$1'); // Limit to two decimal places
+                                field.onChange(newValue);
+                            }}
+                            fullWidth
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                            }}
+                            sx={{ flex: 1 }}
+                        />
+                    )}
+                />
+            </Grid>
+            <Grid size={4}>
+                <TextField
+                    label='Memo (Optional)'
+                    fullWidth
+                />
+            </Grid>
+            <Grid size={4}>
+                <Controller
+                    control={control}
+                    name={`transactions.${props.index}.category` as const}
+                    render={({ field }) => (
+                        <CategoryAutocomplete
+                            {...field}
+                            ref={null}
+                            value={watch(`transactions.${props.index}.category`) as Category ?? null}
+                            onChange={(_event, newValue) => {
+                                setValue(field.name, newValue);
+                            }}
+                            label='Category (Optional)'
+                        />
+                    )}
+                />
+            </Grid>
+            <Grid size='auto'>              
+                <IconButton
+                    onClick={() => props.fieldArray.remove(props.index)}
+                    disabled={props.fieldArray.fields.length <= 1}
+                >
+                    <Delete />
+                </IconButton>
+            </Grid>
+        </Grid>
+        
     )
 }
 
@@ -100,7 +99,6 @@ export default function JournalEntryForm() {
     const addDebitTransaction = () => {
         transactionsFieldArray.append({
             amount: '',
-            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -111,7 +109,6 @@ export default function JournalEntryForm() {
     const addCreditTransaction = () => {
         transactionsFieldArray.append({
             amount: '',
-            // date: new Date().toISOString(),
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
@@ -143,8 +140,32 @@ export default function JournalEntryForm() {
 
     return (
         <>
-            <Grid container columns={12} spacing={1} mb={1}>
-                <Grid size={{ xs: 6, md: 4}}>
+            <Controller
+                control={control}
+                name='memo'
+                render={({ field }) => (
+                    <TextField
+                        label='Memo'
+                        autoFocus
+                        {...field}
+                        ref={null}
+                        value={field.value}
+                        onChange={(event) => {
+                            const value = event.target.value;
+                            setValue(field.name, value);
+                            if (!manuallySetCategory && enableAutoDetectCategory) {
+                                handleDetectCategoryWithAi(value);
+                            }
+                        }}
+                        fullWidth
+                        multiline
+                        maxRows={3}
+                        sx={{ mb: 2 }}
+                    />
+                )}
+            />
+            <Grid container columns={12} spacing={1} rowSpacing={2} mb={1}>
+                <Grid size={{ xs: 6, md: 4  }}>
                     <Controller
                         control={control}
                         name='date'
@@ -206,7 +227,7 @@ export default function JournalEntryForm() {
                             <CategoryAutocomplete
                                 {...field}
                                 ref={null}
-                                value={watch('category') as Category}
+                                value={watch('category') as Category ?? null}
                                 onChange={(_event, newValue) => {
                                     setManuallySetCategory(Boolean(newValue))
                                     setValue(field.name, newValue);
@@ -216,31 +237,6 @@ export default function JournalEntryForm() {
                     />
                 </Grid>
             </Grid>
-            <Controller
-                control={control}
-                name='memo'
-                render={({ field }) => (
-                    <TextField
-                        label='Memo'
-                        autoFocus
-                        {...field}
-                        ref={null}
-                        value={field.value}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setValue(field.name, value);
-                            if (!manuallySetCategory && enableAutoDetectCategory) {
-                                handleDetectCategoryWithAi(value);
-                            }
-                        }}
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        sx={{ mb: 2 }}
-                    />
-                )}
-            />
-
             <Box mb={1}>
                 <Typography variant='overline'><strong>Money Out</strong></Typography>
             </Box>

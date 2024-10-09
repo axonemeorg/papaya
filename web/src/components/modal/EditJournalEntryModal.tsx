@@ -1,16 +1,13 @@
 'use client';
 
-import { Add, Save } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  DialogTitle, useMediaQuery, useTheme} from "@mui/material";
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PaymentType, TransactionType } from "@/types/enum";
 import { useContext, useEffect, useState } from "react";
 import { updateJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
-import dayjs from "dayjs";
-import { JournalEntry } from "@/types/get";
 import { UpdateJournalEntry } from "@/types/put";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 
