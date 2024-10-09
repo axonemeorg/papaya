@@ -38,7 +38,7 @@ export default class CategoryRepository {
             .limit(1);
     }
 
-    static async createCategory(values: InferInsertModel<typeof CategoryTable>) {
+    static async insertCategory(values: InferInsertModel<typeof CategoryTable>) {
         return await db
             .insert(CategoryTable)
             .values({

@@ -162,6 +162,7 @@ export default class JournalService {
         }
 
         const updatedJournalEntryValues: InferInsertModel<typeof JournalEntryTable> = {
+            journalEntryId,
             userId: user.id,
             categoryId: category?.categoryId ?? null,
             memo,
@@ -169,10 +170,7 @@ export default class JournalService {
             time,
         }
 
-        await JournalRepository.updateJournalEntry(
-            journalEntryId,
-            updatedJournalEntryValues
-        );
+        await JournalRepository.updateJournalEntry(updatedJournalEntryValues);
 
         // Delete existing transactions
         await TransactionService.deleteAllTransactionsByJournalEntryId(journalEntryId)

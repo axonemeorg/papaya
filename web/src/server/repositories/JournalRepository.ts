@@ -92,7 +92,7 @@ export default class JournalRepository {
         return { journalEntryId };
     }
 
-    static async updateJournalEntry(journalEntryId: string, values: InferInsertModel<typeof JournalEntryTable>) {
+    static async updateJournalEntry(values: InferInsertModel<typeof JournalEntryTable>) {
         return db
             .update(JournalEntryTable)
             .set({
@@ -104,7 +104,7 @@ export default class JournalRepository {
             .where(
                 and(
                     eq(JournalEntryTable.userId, values.userId),
-                    eq(JournalEntryTable.journalEntryId, journalEntryId)
+                    eq(JournalEntryTable.journalEntryId, values.journalEntryId as string)
                 )
             )
             .returning({

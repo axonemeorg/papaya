@@ -48,7 +48,7 @@ export default class CategoryService {
 
         const descriptionEmbedding = await generateEmbedding(category.description);
 
-        return CategoryRepository.createCategory({
+        return CategoryRepository.insertCategory({
             userId: user.id,
             label: category.label,
             description: category.description,

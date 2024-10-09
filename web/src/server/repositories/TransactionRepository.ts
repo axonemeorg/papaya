@@ -1,23 +1,13 @@
 import db from "@/database/client";
 import { JournalEntryTable, TransactionTable } from "@/database/schemas";
 import { CreateTransaction } from "@/types/post";
-import { and, eq } from "drizzle-orm";
+import { and, eq, InferInsertModel } from "drizzle-orm";
 
 export default class TransactionRepository {
-    static async insertTransactions(journalEntryId: string, transactions: CreateTransaction[]) {
+    static async insertTransactions(values: InferInsertModel<typeof TransactionTable>[]) {
         const response = db
             .insert(TransactionTable)
-            .values(transactions.map((transaction) => {
-                return {
-                    journalEntryId,
-                    amount: Number.parseInt(String(100 * Number.parseFloat(transaction.amount))),
-                    transactionType: transaction.transactionType,
-                    memo: transaction.memo ?? null,
-                    paymentType: transaction.transactionType,
-                    transactionMethodId: transaction.transactionMethod?.transactionMethodId,
-                    categoryId: transaction.category?.categoryId,
-                }
-            }));
+            .values(values);
 
         return response;
     }
