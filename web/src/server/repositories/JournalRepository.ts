@@ -1,6 +1,6 @@
 import db from "@/database/client";
 import { JournalEntryTable, TransactionTable } from "@/database/schemas";
-import { and, eq, gte, lt } from "drizzle-orm";
+import { and, eq, gte, InferInsertModel, lt } from "drizzle-orm";
 
 export default class JournalRepository {
     static async getAllUserJournalEntries(userId: string) {
@@ -76,8 +76,44 @@ export default class JournalRepository {
         });
     }
 
+    static async insertJournalEntry(values: InferInsertModel<typeof JournalEntryTable>) {
+        const result = await db
+            .insert(JournalEntryTable)
+            .values({
+                userId: values.userId,
+                categoryId: values.categoryId,
+                memo: values.memo,
+            } as InferInsertModel<typeof JournalEntryTable>)
+            .returning({
+                journalEntryId: JournalEntryTable.journalEntryId
+            });
+
+        const { journalEntryId } = result[0];
+        return { journalEntryId };
+    }
+
+    static async updateJournalEntry(journalEntryId: string, values: InferInsertModel<typeof JournalEntryTable>) {
+        return db
+            .update(JournalEntryTable)
+            .set({
+                categoryId: values.categoryId,
+                memo: values.memo,
+                date: values.date,
+                time: values.time,
+            })
+            .where(
+                and(
+                    eq(JournalEntryTable.userId, values.userId),
+                    eq(JournalEntryTable.journalEntryId, journalEntryId)
+                )
+            )
+            .returning({
+                journalEntryId: JournalEntryTable.journalEntryId
+            });
+    }
+
     static async deleteUserJournalEntryById(userId: string, journalEntryId: string) {
-        console.log('deleteUserJournalEntryById', userId, journalEntryId)
+        console.log('deleteUserJournalEntryById', userId, journalEntryId);
         const response = await db.delete(JournalEntryTable)
             .where(
                 and(
