@@ -32,10 +32,10 @@ export const deleteJournalEntry = async (formData: FormData) => {
 	return response;
 }
 
-export const getAllJournalEntriesByUserId = (userId: string) => {
-	return JournalService.getAllUserJournalEntries(userId);
+export const getAllJournalEntriesByUserId = () => {
+	return JournalService.getAllUserJournalEntries();
 }
 
-export const getUserJournalEntriesByMonthAndYear = (userId: string, month: string | number, year: string | number) => {
-	return JournalService.getUserJournalEntriesByMonthAndYear(userId, month, year);
+export const getUserJournalEntriesByMonthAndYear = (month: string | number, year: string | number) => {
+	return JournalService.getUserJournalEntriesByMonthAndYear(month, year);
 }

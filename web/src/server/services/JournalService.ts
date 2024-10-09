@@ -45,15 +45,26 @@ export default class JournalService {
         })
     }
 
-    static async getAllUserJournalEntries(userId: string) {
-        const results = await JournalRepository.getAllUserJournalEntries(userId);
+    static async getAllUserJournalEntries() {
+        const { user } = await validateRequest();
+
+        if (!user) {
+            throw new Error('Not authorized.');
+        }
+
+        const results = await JournalRepository.getAllUserJournalEntries(user.id);
         
         return this._santizeJournalEntries(results);
     }
 
-    static async getUserJournalEntriesByMonthAndYear(userId: string, month: string | number, year: string | number) {
-        const results = await JournalRepository.getUserJournalEntriesByMonthAndYear(userId, month, year);
-        
+    static async getUserJournalEntriesByMonthAndYear(month: string | number, year: string | number) {
+        const { user } = await validateRequest();
+
+        if (!user) {
+            throw new Error('Not authorized.');
+        }
+
+        const results = await JournalRepository.getUserJournalEntriesByMonthAndYear(user.id, month, year);        
         return this._santizeJournalEntries(results);
     }
 
@@ -68,7 +79,7 @@ export default class JournalService {
 
         if (category) {
             // Ensure that the given category belongs to the user
-            const categoryResult = await CategoryService.getCategoryById(category.categoryId);
+            const categoryResult = await CategoryService.getUserCategoryById(category.categoryId);
 
             if (!categoryResult) {
                 throw new Error('Category could not be found.')
@@ -97,7 +108,7 @@ export default class JournalService {
 
         if (category) {
             // Ensure that the given category belongs to the user
-            const categoryResult = await CategoryService.getCategoryById(category.categoryId);
+            const categoryResult = await CategoryService.getUserCategoryById(category.categoryId);
 
             if (!categoryResult) {
                 throw new Error('Category could not be found.')
@@ -143,7 +154,7 @@ export default class JournalService {
 
         if (category) {
             // Ensure that the given category belongs to the user
-            const categoryResult = await CategoryService.getCategoryById(category.categoryId);
+            const categoryResult = await CategoryService.getUserCategoryById(category.categoryId);
 
             if (!categoryResult) {
                 throw new Error('Category could not be found.')
@@ -151,6 +162,7 @@ export default class JournalService {
         }
 
         const updatedJournalEntryValues: InferInsertModel<typeof JournalEntryTable> = {
+            journalEntryId,
             userId: user.id,
             categoryId: category?.categoryId ?? null,
             memo,
@@ -158,10 +170,7 @@ export default class JournalService {
             time,
         }
 
-        await JournalRepository.updateJournalEntry(
-            journalEntryId,
-            updatedJournalEntryValues
-        );
+        await JournalRepository.updateJournalEntry(updatedJournalEntryValues);
 
         // Delete existing transactions
         await TransactionService.deleteAllTransactionsByJournalEntryId(journalEntryId)
@@ -178,5 +187,15 @@ export default class JournalService {
         }
 
         return JournalRepository.deleteUserJournalEntryById(user.id, journalEntryId);
+    }
+
+    static async removeCategoryFromJournalEntries(categoryId: string) {
+        const { user } = await validateRequest();
+    
+        if (!user) {
+            throw new Error('Not authorized.');
+        }
+
+        return JournalRepository.removeCategoryFromJournalEntries(user.id, categoryId);
     }
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { CreateQuickJournalEntry } from "@/types/post";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
-import { findMostSimilarCategory } from "@/actions/category-actions";
+import { findMostSimilarUserCategory } from "@/actions/category-actions";
 import { debounce } from "@/utils/Utils";
 import { Category } from "@/types/get";
 
@@ -20,7 +20,7 @@ export default function QuickJournalEntryForm() {
             return
         }
 
-        const category = await findMostSimilarCategory(memo);
+        const category = await findMostSimilarUserCategory(memo);
         setValue('category', category);
     }, 500)
 

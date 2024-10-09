@@ -1,6 +1,6 @@
 'use server'
 
-import { getCategoriesByUserId } from "@/actions/category-actions";
+import { getAllUserCategories } from "@/actions/category-actions";
 import { getUserJournalEntriesByMonthAndYear } from "@/actions/journal-actions";
 import { validateRequest } from "@/auth";
 import { JournalDate } from "@/types/calendar";
@@ -16,8 +16,8 @@ export default async function JournalPage(props: JournalPageProps) {
         return <></>
     }
 
-    const journalEntries = await getUserJournalEntriesByMonthAndYear(user.id, month, year);
-    const categories = await getCategoriesByUserId(user.id);
+    const journalEntries = await getUserJournalEntriesByMonthAndYear(month, year);
+    const categories = await getAllUserCategories();
 
     return (
         <JournalEditor
