@@ -76,3 +76,11 @@ export const getPriceString = (price: number): string => {
         ? `+$${Number(price / 100).toFixed(2)}`
         : `$${Number(price / -100).toFixed(2)}`
 }
+
+export const getUserImagePublicUrlFromS3Key = (s3Key: string) => {
+    return [
+        'https:/',
+        process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
+        s3Key,
+    ].join('/');
+}

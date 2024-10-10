@@ -3,6 +3,7 @@
 import { AvatarImageUploadResponse } from "@/server/services/FileUploadService";
 import { AvatarVariant } from "@/types/enum";
 import { ItemAvatar } from "@/types/get";
+import { getUserImagePublicUrlFromS3Key } from "@/utils/Utils";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Avatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
@@ -20,11 +21,7 @@ interface ImageAvatarProps extends AvatarProps {
 
 export const ImageAvatar = (props: ImageAvatarProps) => {
     const { avatar, ...rest } = props;
-    const imageSrc = [
-        'https:/',
-        process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
-        avatar.avatarContent
-    ].join('/');
+    const imageSrc = getUserImagePublicUrlFromS3Key(avatar.avatarContent);
 
     return (
         <Avatar
