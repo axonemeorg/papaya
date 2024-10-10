@@ -68,6 +68,19 @@ export const TransactionTable = pgTable("transaction", {
     ...timestamps
 });
 
+export const TransactionTagTable = pgTable("transaction_tag", {
+    transactionTagId: uuid('transaction_tag_id')
+        .defaultRandom()
+        .primaryKey(),
+    transactionId: uuid('transaction_id')
+        .references(() => TransactionTable.transactionId, { onDelete: 'cascade' })
+        .notNull(),
+    tag: varchar('tag', { length: 128 })
+        .notNull(),
+
+    ...timestamps
+});
+
 export const CategoryTable = pgTable("category", {
     categoryId: uuid('category_id')
         .defaultRandom()

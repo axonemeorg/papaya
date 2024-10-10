@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { CategoryTable, JournalEntryTable, TransactionMethodTable, TransactionTable } from "./tables";
+import { CategoryTable, JournalEntryTable, TransactionMethodTable, TransactionTable, TransactionTagTable } from "./tables";
 
 export const JournalEntryTableRelations = relations(JournalEntryTable, ({ one, many }) => {
     return {
@@ -13,6 +13,7 @@ export const JournalEntryTableRelations = relations(JournalEntryTable, ({ one, m
 
 export const TransactionTableRelations = relations(TransactionTable, ({ one, many }) => {
     return {
+        tags: many(TransactionTagTable),
         journalEntry: one(JournalEntryTable, {
             fields: [TransactionTable.journalEntryId],
             references: [JournalEntryTable.journalEntryId]
@@ -24,6 +25,15 @@ export const TransactionTableRelations = relations(TransactionTable, ({ one, man
         category: one(CategoryTable, {
             fields: [TransactionTable.categoryId],
             references: [CategoryTable.categoryId]
+        }),
+    }
+});
+
+export const TransactionTagTableRelations = relations(TransactionTagTable, ({ one, many }) => {
+    return {
+        transaction: one(TransactionTable, {
+            fields: [TransactionTagTable.transactionId],
+            references: [TransactionTable.transactionId]
         }),
     }
 });
