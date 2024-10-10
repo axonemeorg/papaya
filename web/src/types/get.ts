@@ -52,6 +52,22 @@ export const Category = Timestamps
     });
 export type Category = z.output<typeof Category>;
 
+export const UserFileUpload = z.object({
+    userFileUploadId: z.string(),
+    mimeType: z.string(),
+    s3Key: z.string(),
+});
+
+export type UserFileUpload = z.output<typeof UserFileUpload>;
+
+export const JournalEntryAttachment = z.object({
+    journalEntryAttachmentId: z.string(),
+    memo: z.string()
+        .nullable(),
+    fileUpload: UserFileUpload,
+});
+export type JournalEntryAttachment = z.output<typeof JournalEntryAttachment>;
+
 export const JournalEntry = z.object({
     journalEntryId: z.string(),
     entryNumber: z.number(),
@@ -59,8 +75,8 @@ export const JournalEntry = z.object({
     time: z.string(),
     netAmount: z.number(),
     memo: z.string(),
-    // methods: z.array(TransactionMethod),
     transactions: z.array(Transaction),
-    category: z.optional(Category)
+    category: z.optional(Category),
+    attachments: z.array(JournalEntryAttachment),
 })
 export type JournalEntry = z.output<typeof JournalEntry>;

@@ -40,7 +40,13 @@ export default class JournalRepository {
                         memo: true,
                     },
                     with: {
-                        fileUpload: true,
+                        fileUpload: {
+                            columns: {
+                                userFileUploadId: true,
+                                mimeType: true,
+                                s3Key: true,
+                            }
+                        }
                     },
                 },
                 transactions: {

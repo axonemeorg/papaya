@@ -1,13 +1,13 @@
 'use client';
 
-import { Box, Button, Chip, Collapse, Divider, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Divider, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
 import { Add, Delete, Label, Photo } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionTag, TransactionType } from "@/types/enum";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
-import { debounce } from "@/utils/Utils";
+import { debounce, getUserImagePublicUrlFromS3Key } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
@@ -29,7 +29,6 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     const hasTags = transactionTags.length > 0;
 
     return (
-        
         <Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
             <Grid size={'grow'}>
                 <Controller
@@ -113,6 +112,74 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     )
 }
 
+interface JournalEntryAttachmentThumbnailProps {
+    /**
+     * Source for the image. If no source is provided, a loading spinner is rendered.
+     */
+    imgSrc?: string;
+    altText?: string;
+}
+
+const JournalEntryAttachmentThumbnail = (props: JournalEntryAttachmentThumbnailProps) => {
+    return (
+        <Card>
+            <CardActionArea>
+                <CardMedia
+                    component="img"
+                    width={72}
+                    image={props.imgSrc}
+                    alt={props.altText}
+                />
+            </CardActionArea>
+        </Card>
+    )
+}
+
+interface JournalEntryAttachmentRowProps {
+    index: number;
+    fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
+}
+
+const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
+    const { watch, register } = useFormContext<CreateJournalEntry>();
+
+    const values = watch(`attachments.${props.index}`);
+    const { s3Key } = values.fileUpload;
+    const altText = values.memo ?? undefined;
+    const imgSrc = getUserImagePublicUrlFromS3Key(s3Key);
+
+    return (
+        <Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
+            <Grid size={'auto'}>
+                <JournalEntryAttachmentThumbnail
+                    imgSrc={imgSrc}
+                    altText={altText}
+                />
+            </Grid>
+            <Grid size={'grow'}>
+                <TextField
+                    label='Memo'
+                    placeholder="Describe this attachment"
+                    {...register(`attachments.${props.index}.memo`)}
+                    fullWidth
+                    multiline
+                    minRows={2}
+                    maxRows={3}
+                    size='small'
+                />
+            </Grid>
+            <Grid size='auto'>
+                <IconButton
+                    onClick={() => props.fieldArray.remove(props.index)}
+                    disabled={props.fieldArray.fields.length <= 1}
+                >
+                    <Delete />
+                </IconButton>
+            </Grid>
+        </Grid>
+    )
+}
+
 export default function JournalEntryForm() {
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
     const [transactionTagPickerData, setTransactionTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
@@ -123,6 +190,11 @@ export default function JournalEntryForm() {
     const enableAutoDetectCategory = false;
 
     const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
+
+    const attachmentFieldArray = useFieldArray<CreateJournalEntry>({
+        name: 'attachments',
+        control
+    });
 
     const transactionsFieldArray = useFieldArray<CreateJournalEntry>({
         name: 'transactions',
@@ -150,6 +222,10 @@ export default function JournalEntryForm() {
             tags: [],
         });
     }
+
+    const attachmentFields = attachmentFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
+        return [field, index]
+    });
 
     const transactions = getValues('transactions');
     const transactionFields = transactionsFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
@@ -354,6 +430,15 @@ export default function JournalEntryForm() {
                         <Typography variant='overline'><strong>Attachments</strong></Typography>
                     </Box>
                     <Stack spacing={1.5}>
+                        {attachmentFields.map(([field, index]) => {
+                            return (
+                                <JournalEntryAttachmentRow
+                                    key={field.id}
+                                    index={index}
+                                    fieldArray={transactionsFieldArray}
+                                />
+                            )
+                        })}
                         <Button
                             variant='outlined'
                             startIcon={<Photo />}
