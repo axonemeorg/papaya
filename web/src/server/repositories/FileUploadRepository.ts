@@ -2,7 +2,6 @@ import db from "@/database/client";
 import { UserFileUploadTable } from "@/database/schemas";
 import { InferInsertModel } from "drizzle-orm";
 
-
 export default class FileUploadRepository {
 	static async insertFileUploadRecord(values: InferInsertModel<typeof UserFileUploadTable>) {
 		const records = await db

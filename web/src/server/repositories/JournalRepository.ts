@@ -1,5 +1,5 @@
 import db from "@/database/client";
-import { JournalEntryTable, TransactionTable } from "@/database/schemas";
+import { JournalEntryAttachmentTable, JournalEntryTable, TransactionTable } from "@/database/schemas";
 import { and, eq, gte, InferInsertModel, lt } from "drizzle-orm";
 
 export default class JournalRepository {
@@ -145,5 +145,19 @@ export default class JournalRepository {
                     eq(JournalEntryTable.categoryId, categoryId)
                 )
             )
+    }
+
+    static async insertJournalEntryAttachmentRecord(values: InferInsertModel<typeof JournalEntryAttachmentTable>) {
+        const records = await db
+            .insert(JournalEntryAttachmentTable)
+            .values({
+                journalEntryId: values.journalEntryId,
+                userFileUploadId: values.userFileUploadId,
+            })
+            .returning({
+                journalEntryAttachmentId: JournalEntryAttachmentTable.journalEntryAttachmentId,
+            });
+
+        return records[0];
     }
 }
