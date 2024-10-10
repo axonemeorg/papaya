@@ -5,6 +5,7 @@ import { getUserJournalEntriesByMonthAndYear } from "@/actions/journal-actions";
 import { validateRequest } from "@/auth";
 import { JournalDate } from "@/types/calendar";
 import JournalEditor from "./JournalEditor";
+import JournalEntryLoupe from "./JournalEntryLoupe";
 
 interface JournalPageProps extends JournalDate {}
 
@@ -20,12 +21,15 @@ export default async function JournalPage(props: JournalPageProps) {
     const categories = await getAllUserCategories();
 
     return (
-        <JournalEditor
-            user={user}
-            month={month}
-            year={year}
-            journalEntries={journalEntries}
-            categories={categories}
-        />
+        <>
+            <JournalEntryLoupe />
+            <JournalEditor
+                user={user}
+                month={month}
+                year={year}
+                journalEntries={journalEntries}
+                categories={categories}
+            />
+        </>
     )
 }
