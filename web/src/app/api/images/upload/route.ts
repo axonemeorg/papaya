@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
-import { FileUploadRepository } from '@/server/repositories/FileUploadRepository';
+import { FileUploadRepository } from '@/server/services/FileUploadRepository';
 
 
 export async function POST(request: NextRequest) {
