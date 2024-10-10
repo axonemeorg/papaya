@@ -106,6 +106,9 @@ export const JournalEntryTable = pgTable("journal_entry", {
     journalEntryId: uuid('journal_entry_id')
         .defaultRandom()
         .primaryKey(),
+    entryNumber: integer('entry_number')
+        .notNull()
+        .default(0),
     memo: varchar('memo', { length: 1024 })
         .notNull(),
     date: date('date')
