@@ -210,6 +210,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                         <CategoryChip category={category} />
                                                                     ) : (
                                                                         <Chip
+                                                                            size='small'
                                                                             sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
                                                                             label='Uncategorized'
                                                                         />

@@ -329,6 +329,7 @@ export default function JournalEntryForm() {
                 })}
             </Stack>
             <Button startIcon={<Add />} onClick={() => addCreditTransaction()}>Add Transaction</Button>
+            <Button variant='outlined'>Add Attachment</Button>
         </>
     )
 }
