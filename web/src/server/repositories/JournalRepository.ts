@@ -37,6 +37,7 @@ export default class JournalRepository {
                 attachments: {
                     columns: {
                         journalEntryAttachmentId: true,
+                        memo: true,
                     },
                     with: {
                         fileUpload: true,
@@ -160,6 +161,8 @@ export default class JournalRepository {
             .insert(JournalEntryAttachmentTable)
             .values({
                 journalEntryId: values.journalEntryId,
+                memo: values.memo,
+                memoEmbedding: values.memoEmbedding,
                 userFileUploadId: values.userFileUploadId,
             })
             .returning({

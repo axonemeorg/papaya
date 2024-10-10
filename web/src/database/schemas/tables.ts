@@ -155,4 +155,6 @@ export const JournalEntryAttachmentTable = pgTable("journal_entry_attachment", {
         .references(() => JournalEntryTable.journalEntryId, { onDelete: 'cascade' }),
     userFileUploadId: uuid('user_file_upload_id')
         .references(() => UserFileUploadTable.userFileUploadId, { onDelete: 'cascade' }),
+    memo: varchar('memo', { length: 1024 }),
+    memoEmbedding: vector('memo_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS }),
 });
