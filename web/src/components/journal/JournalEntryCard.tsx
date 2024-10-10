@@ -10,6 +10,8 @@ import EditJournalEntryModal from "../modal/EditJournalEntryModal";
 import { useContext, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { UpdateJournalEntry } from "@/types/put";
+import { usePathname } from "next/navigation";
+import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
 
 interface JournalEntryCard {
     anchorEl: HTMLElement | null;
@@ -18,9 +20,12 @@ interface JournalEntryCard {
 }
 
 const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
-    const entryNumberString = `#${props.value ?? ''}`
-
     const { snackbar } = useContext(NotificationsContext);
+    const pathname = usePathname();
+    
+    const entryNumber = Number(props.value ?? 0);
+    const entryNumberString = `#${entryNumber}`;
+    const entryLink = `${pathname}?${JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY}=${entryNumber}`;
 
     const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         e.preventDefault(); // Prevent the default anchor tag behavior
@@ -31,12 +36,12 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
         });
     };
 
-    if (!props.value) {
+    if (!entryNumber) {
         return <></>
     }
 
     return (
-        <a onClick={copyText} href="#" style={{ textDecoration: 'none' }}>            
+        <a onClick={copyText} href={entryLink} style={{ textDecoration: 'none' }}>            
             <Typography variant='button'>{entryNumberString}</Typography>
         </a>
     )
