@@ -6,7 +6,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useState } from 'react';
 
 export default function CustomDatePicker() {
-    const [anchorEl, setAnchorEl] = useState<any>(null);
+    const [anchorEl, setAnchorEl] = useState<Element |  null>(null);
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>

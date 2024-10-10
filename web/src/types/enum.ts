@@ -27,3 +27,14 @@ export const PAYMENT_TYPE_NAMES: Record<PaymentType, string> = {
     DEBIT: 'Debit Card',
     CREDIT: 'Credit Card',
 };
+
+export const TransactionTag = z.enum([
+    "UNPAID",
+    "APPROXIMATE",
+    "UNCONFIRMED",
+    "REVIEW_REQUIRED",
+    "TAX_DEDUCTIBLE",
+    "PENDING_REFUND",
+]);
+
+export type TransactionTag = z.output<typeof TransactionTag>;

@@ -35,7 +35,7 @@ const renderAvatarItem = (avatar: ItemAvatar) => {
 }
 
 export default function AvatarPicker(props: AvatarPickerProps) {
-    const [anchorEl, setAnchorEl] = useState<any>(null);
+    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
     const [currentTab, setCurrentTab] = useState<number>(0);
 
     const displayIcon: ItemAvatar = props.value ?? DEFAULT_AVATAR;

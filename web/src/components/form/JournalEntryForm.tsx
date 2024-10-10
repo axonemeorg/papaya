@@ -1,7 +1,7 @@
 'use client';
 
-import { Box, Button, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { useMemo, useState } from "react";
 import { Add, Delete, Label } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
@@ -11,16 +11,22 @@ import { debounce } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, TransactionMethod } from "@/types/get";
+import { Category, Transaction, TransactionMethod } from "@/types/get";
 import { findMostSimilarUserCategory } from "@/actions/category-actions";
+import TransactionTagPicker from "../pickers/TransactionTagPicker";
+import { TRANSACTION_TAG_LABELS } from "@/constants/transactionTags";
 
 interface JournalEntryTransactionRowProps {
     index: number;
     fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
+    onClickTagButton: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
     const { setValue, control, watch } = useFormContext<CreateJournalEntry>();
+
+    const transactionTags = watch(`transactions.${props.index}.tags`) ?? [];
+    const hasTags = transactionTags.length > 0;
 
     return (
         
@@ -77,7 +83,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
             </Grid>
             <Grid size='auto'>
                 <Stack direction='row'>           
-                    <IconButton>
+                    <IconButton onClick={props.onClickTagButton}>
                         <Label />
                     </IconButton>
                     <IconButton
@@ -88,13 +94,28 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                     </IconButton>
                 </Stack>
             </Grid>
+            <Grid size={12}>
+                <Collapse in={hasTags}>
+                    <Stack gap={1} sx={{ flexFlow: 'row wrap' }}>
+                        {transactionTags.map((tag) => {
+                            return (
+                                <Chip size='small' key={tag} label={TRANSACTION_TAG_LABELS[tag]?.label} />
+                            );
+                        })}
+                    </Stack>
+                </Collapse>
+            </Grid>
         </Grid>
-        
     )
 }
 
 export default function JournalEntryForm() {
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
+    const [transactionTagPickerData, setTransactionTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
+        anchorEl: null,
+        index: 0,    
+    });
+
     const enableAutoDetectCategory = false;
 
     const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
@@ -110,7 +131,8 @@ export default function JournalEntryForm() {
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
-            transactionType: TransactionType.Enum.DEBIT
+            transactionType: TransactionType.Enum.DEBIT,
+            tags: [],
         });
     }
 
@@ -120,7 +142,8 @@ export default function JournalEntryForm() {
             memo: '',
             paymentType: undefined,
             transactionMethod: undefined,
-            transactionType: TransactionType.Enum.CREDIT
+            transactionType: TransactionType.Enum.CREDIT,
+            tags: [],
         });
     }
 
@@ -146,8 +169,21 @@ export default function JournalEntryForm() {
         setValue('category', category);
     }, 500)
 
+    const transactionTagPickerSelectedTags = useMemo(() => {
+        return watch(`transactions.${transactionTagPickerData.index}.tags`);
+    }, [transactionTagPickerData.index, watch(`transactions.${transactionTagPickerData.index}.tags`)])
+
     return (
         <>
+            <TransactionTagPicker
+                anchorEl={transactionTagPickerData.anchorEl}
+                onClose={() => setTransactionTagPickerData((prev) => ({ ...prev, anchorEl: null }))}
+                value={transactionTagPickerSelectedTags}
+                onChange={(tags) => {
+                    console.log('onChange...', tags)
+                    setValue(`transactions.${transactionTagPickerData.index}.tags`, tags);
+                }}
+            />
             <Controller
                 control={control}
                 name='memo'
@@ -255,6 +291,12 @@ export default function JournalEntryForm() {
                             key={field.id}
                             index={index}
                             fieldArray={transactionsFieldArray}
+                            onClickTagButton={(event) => {
+                                setTransactionTagPickerData({
+                                    anchorEl: event.currentTarget,
+                                    index,
+                                })
+                            }}
                         />
                     )
                 })}
@@ -272,6 +314,12 @@ export default function JournalEntryForm() {
                             key={field.id}
                             index={index}
                             fieldArray={transactionsFieldArray}
+                            onClickTagButton={(event) => {
+                                setTransactionTagPickerData({
+                                    anchorEl: event.currentTarget,
+                                    index,
+                                })
+                            }}
                         />
                     )
                 })}
