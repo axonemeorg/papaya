@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Button, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, Collapse, Divider, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
-import { Add, Delete, Label } from "@mui/icons-material";
+import { Add, Delete, Label, Photo } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionTag, TransactionType } from "@/types/enum";
@@ -30,7 +30,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
 
     return (
         
-        <Grid container columns={12} spacing={1} sx={{ alignItems: 'center' }}>
+        <Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
             <Grid size={'grow'}>
                 <Controller
                     control={control}
@@ -96,10 +96,14 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
             </Grid>
             <Grid size={12}>
                 <Collapse in={hasTags}>
-                    <Stack gap={1} sx={{ flexFlow: 'row wrap' }}>
+                    <Stack gap={1} sx={{ pt: 1.25, pb: 0.75, flexFlow: 'row wrap' }}>
                         {transactionTags.map((tagRecord) => {
                             return (
-                                <Chip size='small' key={tagRecord.tag} label={TRANSACTION_TAG_LABELS[tagRecord.tag]?.label} />
+                                <Chip
+                                    size='small'
+                                    key={tagRecord.tag}
+                                    label={TRANSACTION_TAG_LABELS[tagRecord.tag]?.label}
+                                />
                             );
                         })}
                     </Stack>
@@ -188,74 +192,47 @@ export default function JournalEntryForm() {
                     }));
                 }}
             />
-            <Controller
-                control={control}
-                name='memo'
-                render={({ field }) => (
-                    <TextField
-                        label='Memo'
-                        autoFocus
-                        {...field}
-                        ref={null}
-                        value={field.value}
-                        onChange={(event) => {
-                            const value = event.target.value;
-                            setValue(field.name, value);
-                            if (!manuallySetCategory && enableAutoDetectCategory) {
-                                handleDetectCategoryWithAi(value);
-                            }
-                        }}
-                        fullWidth
-                        multiline
-                        maxRows={3}
-                        sx={{ mb: 2 }}
-                    />
-                )}
-            />
-            <Grid container columns={12} spacing={1} rowSpacing={2} mb={1}>
-                <Grid size={{ xs: 6, md: 4  }}>
-                    <Controller
-                        control={control}
-                        name='date'
-                        render={({ field }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
+            <Stack gap={2}>
+                <Grid container columns={12} spacing={1} rowSpacing={2}>
+                    <Grid size={12}>
+                        <Controller
+                            control={control}
+                            name='memo'
+                            render={({ field }) => (
+                                <TextField
+                                    label='Memo'
+                                    autoFocus
                                     {...field}
-                                    value={dayjs(field.value)}
-                                    onChange={(value) => {
-                                        setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
-                                    }}
-                                    format='ddd, MMM D'
-                                    label='Date'
-                                    slotProps={{
-                                        textField:  {
-                                            fullWidth: true
+                                    ref={null}
+                                    value={field.value}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        setValue(field.name, value);
+                                        if (!manuallySetCategory && enableAutoDetectCategory) {
+                                            handleDetectCategoryWithAi(value);
                                         }
                                     }}
+                                    fullWidth
+                                    multiline
+                                    maxRows={3}
                                 />
-                            </LocalizationProvider>
-                        )}
-                    />
-                </Grid>
-                <Grid size={{ xs: 6, md: 4}}>
-                    <Controller
-                        control={control}
-                        name='time'
-                        render={({ field }) => {
-                            const value = dayjs([
-                                dayjs(watch('date')).format('YYYY-MM-DD'),
-                                field.value
-                            ].join(' '));
-
-                            return (
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 4  }}>
+                        <Controller
+                            control={control}
+                            name='date'
+                            render={({ field }) => (
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <TimePicker
+                                    <DatePicker
                                         {...field}
-                                        value={value}
+                                        value={dayjs(field.value)}
                                         onChange={(value) => {
-                                            setValue(field.name, value?.format('HH:mm:ss') ?? '');
+                                            setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
                                         }}
-                                        label='Time'
+                                        format='ddd, MMM D'
+                                        label='Date'
                                         slotProps={{
                                             textField:  {
                                                 fullWidth: true
@@ -263,73 +240,131 @@ export default function JournalEntryForm() {
                                         }}
                                     />
                                 </LocalizationProvider>
-                            );
-                        }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, md: 4}}>
-                    <Controller
-                        control={control}
-                        name='category'
-                        render={({ field }) => (
-                            <CategoryAutocomplete
-                                {...field}
-                                ref={null}
-                                value={watch('category') as Category ?? null}
-                                onChange={(_event, newValue) => {
-                                    setManuallySetCategory(Boolean(newValue))
-                                    setValue(field.name, newValue);
-                                }}
-                            />
-                        )}
-                    />
-                </Grid>
-            </Grid>
-            <Box mb={1}>
-                <Typography variant='overline'><strong>Money Out</strong></Typography>
-            </Box>
-            <Stack mb={2} spacing={2}>
-                {debitTransactionFields.map(([field, index]) => {
-                    return (
-                        <JournalEntryTransactionRow
-                            key={field.id}
-                            index={index}
-                            fieldArray={transactionsFieldArray}
-                            onClickTagButton={(event) => {
-                                setTransactionTagPickerData({
-                                    anchorEl: event.currentTarget,
-                                    index,
-                                })
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 6, md: 4}}>
+                        <Controller
+                            control={control}
+                            name='time'
+                            render={({ field }) => {
+                                const value = dayjs([
+                                    dayjs(watch('date')).format('YYYY-MM-DD'),
+                                    field.value
+                                ].join(' '));
+
+                                return (
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <TimePicker
+                                            {...field}
+                                            value={value}
+                                            onChange={(value) => {
+                                                setValue(field.name, value?.format('HH:mm:ss') ?? '');
+                                            }}
+                                            label='Time'
+                                            slotProps={{
+                                                textField:  {
+                                                    fullWidth: true
+                                                }
+                                            }}
+                                        />
+                                    </LocalizationProvider>
+                                );
                             }}
                         />
-                    )
-                })}
-            </Stack>
-            
-            <Button startIcon={<Add />} onClick={() => addDebitTransaction()}>Add Transaction</Button>
-        
-            <Box mb={1}>
-                <Typography variant='overline'><strong>Money In</strong></Typography>
-            </Box>
-            <Stack mb={2} spacing={2}>
-                {creditTransactionFields.map(([field, index]) => {
-                    return (
-                        <JournalEntryTransactionRow
-                            key={field.id}
-                            index={index}
-                            fieldArray={transactionsFieldArray}
-                            onClickTagButton={(event) => {
-                                setTransactionTagPickerData({
-                                    anchorEl: event.currentTarget,
-                                    index,
-                                })
-                            }}
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 4}}>
+                        <Controller
+                            control={control}
+                            name='category'
+                            render={({ field }) => (
+                                <CategoryAutocomplete
+                                    {...field}
+                                    ref={null}
+                                    value={watch('category') as Category ?? null}
+                                    onChange={(_event, newValue) => {
+                                        setManuallySetCategory(Boolean(newValue))
+                                        setValue(field.name, newValue);
+                                    }}
+                                />
+                            )}
                         />
-                    )
-                })}
+                    </Grid>
+                </Grid>
+                <Box>
+                    <Box mb={1}>
+                        <Typography variant='overline'><strong>Money Out</strong></Typography>
+                    </Box>
+                    <Stack spacing={1.5}>
+                        {debitTransactionFields.map(([field, index]) => {
+                            return (
+                                <JournalEntryTransactionRow
+                                    key={field.id}
+                                    index={index}
+                                    fieldArray={transactionsFieldArray}
+                                    onClickTagButton={(event) => {
+                                        setTransactionTagPickerData({
+                                            anchorEl: event.currentTarget,
+                                            index,
+                                        })
+                                    }}
+                                />
+                            )
+                        })}
+                        <Button
+                            startIcon={<Add />}
+                            onClick={() => addDebitTransaction()}
+                            sx={{ alignSelf: 'flex-start' }}
+                        >
+                            Add Transaction
+                        </Button>
+                    </Stack>
+                </Box>
+                <Box>
+                    <Box mb={1}>
+                        <Typography variant='overline'><strong>Money In</strong></Typography>
+                    </Box>
+                    <Stack spacing={1.5}>
+                        {creditTransactionFields.map(([field, index]) => {
+                            return (
+                                <JournalEntryTransactionRow
+                                    key={field.id}
+                                    index={index}
+                                    fieldArray={transactionsFieldArray}
+                                    onClickTagButton={(event) => {
+                                        setTransactionTagPickerData({
+                                            anchorEl: event.currentTarget,
+                                            index,
+                                        })
+                                    }}
+                                />
+                            )
+                        })}
+                        <Button
+                            startIcon={<Add />}
+                            onClick={() => addCreditTransaction()}
+                            sx={{ alignSelf: 'flex-start' }}
+                        >
+                            Add Transaction
+                        </Button>
+                    </Stack>
+                </Box>
+                <Box>
+                    <Box mb={1}>
+                        <Typography variant='overline'><strong>Attachments</strong></Typography>
+                    </Box>
+                    <Stack spacing={1.5}>
+                        <Button
+                            variant='outlined'
+                            startIcon={<Photo />}
+                            onClick={() => {}}
+                            sx={{ alignSelf: 'flex-start' }}
+                        >
+                            Add Attachment
+                        </Button>
+                    </Stack>
+                </Box>
             </Stack>
-            <Button startIcon={<Add />} onClick={() => addCreditTransaction()}>Add Transaction</Button>
-            <Button variant='outlined'>Add Attachment</Button>
         </>
     )
 }
