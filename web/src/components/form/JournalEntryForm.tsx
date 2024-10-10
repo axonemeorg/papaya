@@ -2,7 +2,7 @@
 
 import { Box, Button, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { Add, Delete } from "@mui/icons-material";
+import { Add, Delete, Label } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionType } from "@/types/enum";
@@ -45,14 +45,9 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
                             }}
                             sx={{ flex: 1 }}
+                            size="small"
                         />
                     )}
-                />
-            </Grid>
-            <Grid size={4}>
-                <TextField
-                    label='Memo (Optional)'
-                    fullWidth
                 />
             </Grid>
             <Grid size={4}>
@@ -68,17 +63,30 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                                 setValue(field.name, newValue);
                             }}
                             label='Category (Optional)'
+                            size='small'
                         />
                     )}
                 />
             </Grid>
-            <Grid size='auto'>              
-                <IconButton
-                    onClick={() => props.fieldArray.remove(props.index)}
-                    disabled={props.fieldArray.fields.length <= 1}
-                >
-                    <Delete />
-                </IconButton>
+            <Grid size={4}>
+                <TextField
+                    label='Memo (Optional)'
+                    fullWidth
+                    size='small'
+                />
+            </Grid>
+            <Grid size='auto'>
+                <Stack direction='row'>           
+                    <IconButton>
+                        <Label />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => props.fieldArray.remove(props.index)}
+                        disabled={props.fieldArray.fields.length <= 1}
+                    >
+                        <Delete />
+                    </IconButton>
+                </Stack>
             </Grid>
         </Grid>
         
