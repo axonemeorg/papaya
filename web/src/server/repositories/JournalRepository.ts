@@ -28,6 +28,7 @@ export default class JournalRepository {
             orderBy: [JournalEntryTable.date, JournalEntryTable.time],
             columns: {
                 journalEntryId: true,
+                entryNumber: true,
                 memo: true,
                 date: true,
                 time: true,

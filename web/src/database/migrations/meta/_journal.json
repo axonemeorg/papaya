@@ -64,6 +64,20 @@
       "when": 1728532338567,
       "tag": "0008_shallow_owl",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728546471066,
+      "tag": "0009_shocking_kingpin",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1728546495815,
+      "tag": "0010_nervous_talkback",
+      "breakpoints": true
     }
   ]
 }

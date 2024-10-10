@@ -2,7 +2,7 @@
 
 import { JournalEntry } from "@/types/get";
 import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
-import { Box, Icon, IconButton, Paper, Popover, Stack, Typography } from "@mui/material";
+import { Box, Icon, IconButton, Paper, Popover, Stack, Tooltip, Typography } from "@mui/material";
 import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/Utils";
 import { deleteJournalEntry } from "@/actions/journal-actions";
@@ -15,6 +15,31 @@ interface JournalEntryCard {
     anchorEl: HTMLElement | null;
     onClose: () => void;
     entry: JournalEntry;
+}
+
+const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
+    const entryNumberString = `#${props.value ?? ''}`
+
+    const { snackbar } = useContext(NotificationsContext);
+
+    const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        e.preventDefault(); // Prevent the default anchor tag behavior
+        navigator.clipboard.writeText(entryNumberString).then(() => {
+            snackbar({ message: 'Copied to clipboard.' });
+        }).catch(err => {
+            console.error('Failed to copy journal entry number to clipboard: ', err);
+        });
+    };
+
+    if (!props.value) {
+        return <></>
+    }
+
+    return (
+        <a onClick={copyText} href="#" style={{ textDecoration: 'none' }}>            
+            <Typography variant='button'>{entryNumberString}</Typography>
+        </a>
+    )
 }
 
 export default function JournalEntryCard(props: JournalEntryCard) {
@@ -65,18 +90,23 @@ export default function JournalEntryCard(props: JournalEntryCard) {
             >
                 <Stack gap={2} sx={{ minWidth: '400px' }}>
                     <Box p={1} mb={2}>
-                        <Stack direction='row' justifyContent='flex-end' gap={0.5} sx={{ mb: 2 }}>
-                            <IconButton size='small' onClick={() => setShowEditDialog(true)}>
-                                <Edit fontSize="small"/>
-                            </IconButton>
-                            <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
-                                <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
-                                <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
-                            </form>
-                            <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
-                            <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
-                                <Close fontSize="small" />
-                            </IconButton>
+                        <Stack direction='row' justifyContent="space-between" alignItems={'center'} sx={{ mb: 2 }}>
+                            <Box px={1}>
+                                <JournalEntryNumber value={props.entry.entryNumber} />
+                            </Box>
+                            <Stack direction='row' gap={0.5}>
+                                <IconButton size='small' onClick={() => setShowEditDialog(true)}>
+                                    <Edit fontSize="small"/>
+                                </IconButton>
+                                <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
+                                    <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
+                                    <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
+                                </form>
+                                <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
+                                <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
+                                    <Close fontSize="small" />
+                                </IconButton>
+                            </Stack>
                         </Stack>
                         <Stack sx={{ textAlign: 'center' }} alignItems='center'>
                             <Typography

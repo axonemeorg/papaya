@@ -1,0 +1,1 @@
+ALTER TABLE "journal_entry" ADD COLUMN "entry_number" integer DEFAULT 0 NOT NULL;

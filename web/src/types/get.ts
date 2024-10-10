@@ -54,6 +54,7 @@ export type Category = z.output<typeof Category>;
 
 export const JournalEntry = z.object({
     journalEntryId: z.string(),
+    entryNumber: z.number(),
     date: z.string(),
     time: z.string(),
     netAmount: z.number(),
