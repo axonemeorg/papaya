@@ -80,6 +80,8 @@ export default function JournalEditor(props: JournalEditorProps) {
         });
     }, [journalEntries]);
 
+    console.log('journal:', journal);
+
     const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
         setSelectedEntryAnchorEl(event.currentTarget);
         setSelectedEntry(entry);

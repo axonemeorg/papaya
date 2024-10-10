@@ -2,7 +2,7 @@
 import { JournalEntryTable, TransactionMethodTable, TransactionTable } from "@/database/schemas"
 import { relations, type InferSelectModel } from "drizzle-orm"
 import { z } from "zod"
-import { AvatarVariant, PaymentType, TransactionType } from "./enum";
+import { AvatarVariant, PaymentType, TransactionTag, TransactionType } from "./enum";
 
 export const Timestamps = z.object({
     createdAt: z.union([z.string(), z.date()])
@@ -37,6 +37,9 @@ export const Transaction = z.object({
     transactionType: TransactionType,
     memo: z.string().optional().nullable(),
     method: TransactionMethod.optional(),
+    tags: z.array(
+        z.object({ tag: TransactionTag })
+    ),
 });
 export type Transaction = z.output<typeof Transaction>;
 

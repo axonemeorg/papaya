@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { PaymentType, TransactionType } from "./enum";
+import { PaymentType, TransactionTag, TransactionType } from "./enum";
 import { Category, ItemAvatar, TransactionMethod } from "./get";
 
 export const CreateTransaction = z.object({
@@ -18,6 +18,9 @@ export const CreateTransaction = z.object({
     category: Category.pick({ categoryId: true })
         .optional()
         .nullable(),
+    tags: z.array(
+        z.object({ tag: TransactionTag })
+    ),
 });
 export type CreateTransaction = z.output<typeof CreateTransaction>;
 

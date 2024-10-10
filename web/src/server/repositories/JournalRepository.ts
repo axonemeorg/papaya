@@ -35,6 +35,11 @@ export default class JournalRepository {
             with: {
                 transactions: {
                     with: {
+                        tags: {
+                            columns: {
+                                tag: true,
+                            },
+                        },
                         method: {
                             columns: {
                                 label: true,
