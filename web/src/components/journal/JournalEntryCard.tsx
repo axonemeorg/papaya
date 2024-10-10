@@ -17,6 +17,12 @@ interface JournalEntryCard {
     entry: JournalEntry;
 }
 
+const JournalEntryNumber = (props: { value: number }) => {
+    return (
+        <Typography variant='button'>#{props.value}</Typography>
+    )
+}
+
 export default function JournalEntryCard(props: JournalEntryCard) {
     const [showEditDialog, setShowEditDialog] = useState<boolean>(false);
     const isNetPositive = props.entry.netAmount > 0;
@@ -65,18 +71,23 @@ export default function JournalEntryCard(props: JournalEntryCard) {
             >
                 <Stack gap={2} sx={{ minWidth: '400px' }}>
                     <Box p={1} mb={2}>
-                        <Stack direction='row' justifyContent='flex-end' gap={0.5} sx={{ mb: 2 }}>
-                            <IconButton size='small' onClick={() => setShowEditDialog(true)}>
-                                <Edit fontSize="small"/>
-                            </IconButton>
-                            <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
-                                <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
-                                <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
-                            </form>
-                            <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
-                            <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
-                                <Close fontSize="small" />
-                            </IconButton>
+                        <Stack direction='row' justifyContent="space-between" alignItems={'center'} sx={{ mb: 2 }}>
+                            <Box px={1}>
+                                <JournalEntryNumber value={props.entry.entryNumber} />
+                            </Box>
+                            <Stack direction='row' gap={0.5}>
+                                <IconButton size='small' onClick={() => setShowEditDialog(true)}>
+                                    <Edit fontSize="small"/>
+                                </IconButton>
+                                <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
+                                    <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
+                                    <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
+                                </form>
+                                <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
+                                <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
+                                    <Close fontSize="small" />
+                                </IconButton>
+                            </Stack>
                         </Stack>
                         <Stack sx={{ textAlign: 'center' }} alignItems='center'>
                             <Typography

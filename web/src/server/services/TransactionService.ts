@@ -39,6 +39,9 @@ export default class TransactionService {
         );
 
         await TransactionRepository.insertTransactions(transactionRecords);
-        await TransactionRepository.insertTransactionTags(transactionsTagRecords);
+
+        if (transactionsTagRecords.length > 0) {
+            await TransactionRepository.insertTransactionTags(transactionsTagRecords);
+        }
     }
 }
