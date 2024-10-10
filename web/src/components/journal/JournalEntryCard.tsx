@@ -2,7 +2,7 @@
 
 import { JournalEntry } from "@/types/get";
 import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
-import { Box, Icon, IconButton, Paper, Popover, Stack, Typography } from "@mui/material";
+import { Box, Icon, IconButton, Paper, Popover, Stack, Tooltip, Typography } from "@mui/material";
 import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/Utils";
 import { deleteJournalEntry } from "@/actions/journal-actions";
@@ -17,9 +17,28 @@ interface JournalEntryCard {
     entry: JournalEntry;
 }
 
-const JournalEntryNumber = (props: { value: number }) => {
+const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
+    const entryNumberString = `#${props.value ?? ''}`
+
+    const { snackbar } = useContext(NotificationsContext);
+
+    const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        e.preventDefault(); // Prevent the default anchor tag behavior
+        navigator.clipboard.writeText(entryNumberString).then(() => {
+            snackbar({ message: 'Copied to clipboard.' });
+        }).catch(err => {
+            console.error('Failed to copy journal entry number to clipboard: ', err);
+        });
+    };
+
+    if (!props.value) {
+        return <></>
+    }
+
     return (
-        <Typography variant='button'>#{props.value}</Typography>
+        <a onClick={copyText} href="#" style={{ textDecoration: 'none' }}>            
+            <Typography variant='button'>{entryNumberString}</Typography>
+        </a>
     )
 }
 
