@@ -25,10 +25,10 @@ export default class TransactionService {
                 };
 
                 transactionRecords.push(record);
-                transaction.tags.forEach((tag: string) => {
+                transaction.tags.forEach((tagRecord) => {
                     transactionsTagRecords.push({
                         transactionId,
-                        tag
+                        tag: tagRecord.tag,
                     });
                 })
                 return acc;

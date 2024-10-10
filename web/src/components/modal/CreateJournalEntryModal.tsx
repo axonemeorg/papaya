@@ -53,6 +53,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                     // paymentType: PaymentType.Enum.ETRANSFER, // TODO
                     paymentType: undefined,
                     transactionMethod: undefined,
+                    tags: [],
                 }
             ]
         },

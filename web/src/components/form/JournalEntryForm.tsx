@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Add, Delete, Label } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
-import { TransactionType } from "@/types/enum";
+import { TransactionTag, TransactionType } from "@/types/enum";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { debounce } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
@@ -97,9 +97,9 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
             <Grid size={12}>
                 <Collapse in={hasTags}>
                     <Stack gap={1} sx={{ flexFlow: 'row wrap' }}>
-                        {transactionTags.map((tag) => {
+                        {transactionTags.map((tagRecord) => {
                             return (
-                                <Chip size='small' key={tag} label={TRANSACTION_TAG_LABELS[tag]?.label} />
+                                <Chip size='small' key={tagRecord.tag} label={TRANSACTION_TAG_LABELS[tagRecord.tag]?.label} />
                             );
                         })}
                     </Stack>
@@ -170,7 +170,10 @@ export default function JournalEntryForm() {
     }, 500)
 
     const transactionTagPickerSelectedTags = useMemo(() => {
-        return watch(`transactions.${transactionTagPickerData.index}.tags`);
+        console.log("TEST:", watch(`transactions.${transactionTagPickerData.index}`));
+        return watch(`transactions.${transactionTagPickerData.index}.tags`).map((tagRecord) => {
+            return tagRecord.tag;
+        });
     }, [transactionTagPickerData.index, watch(`transactions.${transactionTagPickerData.index}.tags`)])
 
     return (
@@ -179,9 +182,10 @@ export default function JournalEntryForm() {
                 anchorEl={transactionTagPickerData.anchorEl}
                 onClose={() => setTransactionTagPickerData((prev) => ({ ...prev, anchorEl: null }))}
                 value={transactionTagPickerSelectedTags}
-                onChange={(tags) => {
-                    console.log('onChange...', tags)
-                    setValue(`transactions.${transactionTagPickerData.index}.tags`, tags);
+                onChange={(tags: TransactionTag[]) => {
+                    setValue(`transactions.${transactionTagPickerData.index}.tags`, tags.map((tag) => {
+                        return { tag };
+                    }));
                 }}
             />
             <Controller
