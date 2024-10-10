@@ -25,7 +25,7 @@ export interface AvatarImageUploadResponse {
     color: string | null;
 }
 
-export class FileUploadRepository {
+export class FileUploadService {
     private static generateRandomFilename(entropy: number = 20) {
         return generateIdFromEntropySize(entropy);
     };

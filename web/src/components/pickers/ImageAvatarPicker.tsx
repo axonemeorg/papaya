@@ -1,6 +1,6 @@
 'use client';
 
-import { AvatarImageUploadResponse } from "@/server/services/FileUploadRepository";
+import { AvatarImageUploadResponse } from "@/server/services/FileUploadService";
 import { AvatarVariant } from "@/types/enum";
 import { ItemAvatar } from "@/types/get";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
