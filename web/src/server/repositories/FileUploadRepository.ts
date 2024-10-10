@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
 import db from '@/database/client';
-import { UserFileUploads } from '@/database/schemas';
+import { UserFileUploadTable } from '@/database/schemas';
 import sharp from 'sharp';
 import { generateIdFromEntropySize, User } from "lucia";
 import Vibrant from 'node-vibrant';
@@ -68,7 +68,7 @@ export class FileUploadRepository {
 
 		// Insert the file into the database
 		const records = await db
-			.insert(UserFileUploads)
+			.insert(UserFileUploadTable)
 			.values({
 				userId: user.id,
 				fileName,
@@ -78,8 +78,8 @@ export class FileUploadRepository {
 				fileUploadType: 'IMAGE_AVATAR',
 			})
 			.returning({
-				userFileUploadId: UserFileUploads.userId,
-				s3Key: UserFileUploads.s3Key,
+				userFileUploadId: UserFileUploadTable.userId,
+				s3Key: UserFileUploadTable.s3Key,
 			})
 		
 		return {
