@@ -34,6 +34,14 @@ export default class JournalRepository {
                 time: true,
             },
             with: {
+                attachments: {
+                    columns: {
+                        journalEntryAttachmentId: true,
+                    },
+                    with: {
+                        fileUpload: true,
+                    },
+                },
                 transactions: {
                     with: {
                         tags: {

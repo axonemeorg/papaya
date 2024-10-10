@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { CategoryTable, JournalEntryAttachmentTable, JournalEntryTable, TransactionMethodTable, TransactionTable, TransactionTagTable } from "./tables";
+import { CategoryTable, JournalEntryAttachmentTable, JournalEntryTable, TransactionMethodTable, TransactionTable, TransactionTagTable, UserFileUploadTable } from "./tables";
 
 export const JournalEntryTableRelations = relations(JournalEntryTable, ({ one, many }) => {
     return {
@@ -45,5 +45,15 @@ export const JournalEntryAttachmentTableRelations = relations(JournalEntryAttach
             fields: [JournalEntryAttachmentTable.journalEntryId],
             references: [JournalEntryTable.journalEntryId],
         }),
+        fileUpload: one(UserFileUploadTable, {
+            fields: [JournalEntryAttachmentTable.userFileUploadId],
+            references: [UserFileUploadTable.userFileUploadId],
+        }),
     };
+});
+
+export const UserFileUploadTableRelations = relations(UserFileUploadTable, ({ one, many }) => {
+    return {
+        journalEntryAttachments: many(JournalEntryAttachmentTable),
+    }
 });
