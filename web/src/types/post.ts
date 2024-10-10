@@ -18,6 +18,7 @@ export const CreateTransaction = z.object({
     category: Category.pick({ categoryId: true })
         .optional()
         .nullable(),
+    tags: z.array(z.string()),
 });
 export type CreateTransaction = z.output<typeof CreateTransaction>;
 

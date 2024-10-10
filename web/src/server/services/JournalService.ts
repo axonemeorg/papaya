@@ -13,17 +13,6 @@ import { JournalEntryTable } from "@/database/schemas";
 export default class JournalService {
     static async _santizeJournalEntries(results: any) {
         return results.map((journalEntry: any) => {
-
-            // const methods = journalEntry
-            //     .transactions
-            //     .reduce((acc, transaction) => {
-            //         const { method } = transaction;
-            //         if (method) {
-            //             acc.push(method);
-            //         }
-            //         return acc;
-            //     }, []);
-    
             const netAmount = journalEntry
                 .transactions
                 .reduce((acc: number, transaction: Transaction) => {
@@ -35,11 +24,8 @@ export default class JournalService {
                     return acc;
                 }, 0);
 
-            // delete journalEntry.transactions;
-
             return {
                 ...journalEntry,
-                // methods,
                 netAmount,
             }
         })
@@ -138,7 +124,8 @@ export default class JournalService {
             paymentType: null,
             transactionMethod: null,
             category: null,
-        }     
+            tags: [],
+        }
 
         await TransactionService.insertTransactions(journalEntryId, [transaction]);
     }
