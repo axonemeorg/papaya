@@ -4,6 +4,7 @@ import { UserFileUploadTable } from '@/database/schemas';
 import sharp from 'sharp';
 import { generateIdFromEntropySize, User } from "lucia";
 import Vibrant from 'node-vibrant';
+import FileUploadRepository from '../repositories/FileUploadRepository';
 
 const s3Config: S3ClientConfig = {
 	region: process.env.AWS_S3_REGION ?? '',
@@ -79,23 +80,17 @@ export class FileUploadService {
 		await s3Client.send(command);
 
 		// Insert the file into the database
-		const records = await db
-			.insert(UserFileUploadTable)
-			.values({
-				userId: user.id,
-				fileName,
-				originalFileName,
-				mimeType,
-				s3Key: fileS3Key,
-				fileUploadType: 'IMAGE_AVATAR',
-			})
-			.returning({
-				userFileUploadId: UserFileUploadTable.userId,
-				s3Key: UserFileUploadTable.s3Key,
-			})
-		
+		const record = await FileUploadRepository.insertFileUploadRecord({
+			userId: user.id,
+			fileName,
+			originalFileName,
+			mimeType,
+			s3Key: fileS3Key,
+			fileUploadType: 'IMAGE_AVATAR',
+		});
+
 		return {
-            record: records[0],
+            record,
             color: paletteColor,
         }
     }
