@@ -10,7 +10,7 @@ export default function LoginForm() {
         <form action={login}>
             <Stack gap={2} alignItems={'flex-start'}>
                 <TextField
-                    label='Email'
+                    label='Username'
                     name='username'
                     id='username'
                     fullWidth
