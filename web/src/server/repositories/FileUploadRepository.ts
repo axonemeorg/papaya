@@ -26,13 +26,12 @@ export interface AvatarImageUploadResponse {
 }
 
 export class FileUploadRepository {
-
     private static generateRandomFilename(entropy: number = 20) {
         return generateIdFromEntropySize(entropy);
     };
 
-    static async uploadAvatarImage(file: File, user: User): Promise<AvatarImageUploadResponse> {
-        const mimeType = file.type;
+	private static _generateFileMeta(file: File) {
+		const mimeType = file.type;
         const originalFileName = String(file.name ?? '');
         const originalFileNameParts = originalFileName.split('.');
         const originalFileExtension = originalFileNameParts.at(-1);;
@@ -41,6 +40,19 @@ export class FileUploadRepository {
             originalFileExtension
         ].join('.');
 
+		return {
+			mimeType,
+			fileName,
+			originalFileName
+		}
+	}
+
+    static async uploadAvatarImage(file: File, user: User): Promise<AvatarImageUploadResponse> {
+		const {
+			mimeType,
+			fileName,
+			originalFileName
+		} = this._generateFileMeta(file);
 
         // Upload the file to S3
 		const fileBuffer = await file.arrayBuffer();
