@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand, S3ClientConfig } from '@aws-sdk/client-s3';
 import db from '@/database/client';
-import { UserFileUploadTable } from '@/database/schemas';
+import { UserFileUploadTable, type UserFileUploadTypeEnum } from '@/database/schemas';
 import sharp from 'sharp';
 import { generateIdFromEntropySize, User } from "lucia";
 import Vibrant from 'node-vibrant';
@@ -16,7 +16,15 @@ const s3Config: S3ClientConfig = {
 
 const s3Client = new S3Client(s3Config);
 
-const bucketName = process.env.AWS_S3_BUCKET_NAME ?? '';
+const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME ?? '';
+
+const UPLOADS_FOLDER_NAME = 'uploads';
+
+export interface FileMeta {
+	mimeType: string;
+	fileName: string;
+	originalFileName: string;
+}
 
 export interface AvatarImageUploadResponse {
     record: {
@@ -27,17 +35,17 @@ export interface AvatarImageUploadResponse {
 }
 
 export class FileUploadService {
-    private static generateRandomFilename(entropy: number = 20) {
+    private static _generateRandomFilename(entropy: number = 20) {
         return generateIdFromEntropySize(entropy);
     };
 
-	private static _generateFileMeta(file: File) {
+	private static _generateFileMeta(file: File): FileMeta {
 		const mimeType = file.type;
         const originalFileName = String(file.name ?? '');
         const originalFileNameParts = originalFileName.split('.');
         const originalFileExtension = originalFileNameParts.at(-1);;
         const fileName = [
-            this.generateRandomFilename(32),
+            this._generateRandomFilename(32),
             originalFileExtension
         ].join('.');
 
@@ -48,14 +56,39 @@ export class FileUploadService {
 		}
 	}
 
-    static async uploadAvatarImage(file: File, user: User): Promise<AvatarImageUploadResponse> {
+	static async uploadUserImageToS3(file: File, uploadType: UserFileUploadTypeEnum, processedBuffer: Buffer, user: User) {
 		const {
 			mimeType,
 			fileName,
 			originalFileName
 		} = this._generateFileMeta(file);
 
-        // Upload the file to S3
+		const fileS3Key = [UPLOADS_FOLDER_NAME, fileName].join('/');
+		const s3Params = {
+			Bucket: BUCKET_NAME,
+			Key: fileS3Key,
+			Body: Buffer.from(processedBuffer),
+			ContentType: mimeType,
+		};
+
+		const command = new PutObjectCommand(s3Params);
+		await s3Client.send(command);
+
+		// Insert the file record into the database
+		const record = await FileUploadRepository.insertFileUploadRecord({
+			userId: user.id,
+			fileName,
+			originalFileName,
+			mimeType,
+			s3Key: fileS3Key,
+			fileUploadType: uploadType,
+		});
+
+		return record;
+	}
+
+    static async createAvatarImage(file: File, user: User): Promise<AvatarImageUploadResponse> {
+		// Create file buffer by resizing the image to thumbnail size
 		const fileBuffer = await file.arrayBuffer();
 		const resizedImageBuffer = await sharp(Buffer.from(fileBuffer))
 			.resize(64, 64, {
@@ -68,26 +101,12 @@ export class FileUploadService {
         const palette = await Vibrant.from(colorPaletteImageBuffer).getPalette();
         const paletteColor = palette.Vibrant?.getHex() ?? null;
 
-		const fileS3Key = `uploads/${fileName}`
-		const s3Params = {
-			Bucket: bucketName,
-			Key: fileS3Key,
-			Body: Buffer.from(resizedImageBuffer),
-			ContentType: mimeType,
-		};
-
-		const command = new PutObjectCommand(s3Params);
-		await s3Client.send(command);
-
-		// Insert the file into the database
-		const record = await FileUploadRepository.insertFileUploadRecord({
-			userId: user.id,
-			fileName,
-			originalFileName,
-			mimeType,
-			s3Key: fileS3Key,
-			fileUploadType: 'IMAGE_AVATAR',
-		});
+		const record = await this.uploadUserImageToS3(
+			file,
+			'IMAGE_AVATAR',
+			resizedImageBuffer,
+			user
+		);
 
 		return {
             record,
