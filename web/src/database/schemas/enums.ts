@@ -16,6 +16,7 @@ export const AvatarVariantEnum = pgEnum("avatar_variant", ["TEXT", "PICTORIAL", 
 
 export const UserFileUploadTypeEnum = pgEnum("user_file_upload_type", [
     "IMAGE_AVATAR",
+    "JOURNAL_ENTRY_ATTACHMENT",
 ]);
 
 export type UserFileUploadTypeEnum = (typeof UserFileUploadTypeEnum.enumValues)[number];

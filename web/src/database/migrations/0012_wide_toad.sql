@@ -1,0 +1,1 @@
+ALTER TYPE "user_file_upload_type" ADD VALUE 'JOURNAL_ENTRY_ATTACHMENT';
