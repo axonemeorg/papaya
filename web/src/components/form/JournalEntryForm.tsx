@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Divider, FormHelperText, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, FormHelperText, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 import { Add, AddPhotoAlternate, Delete, Label, Photo } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
@@ -19,7 +19,8 @@ import { LoadingButton } from "@mui/lab";
 
 interface JournalEntryTransactionRowProps {
     index: number;
-    fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
+    fieldArray: UseFieldArrayReturn<CreateJournalEntry>['fields'];
+    remove: UseFieldArrayReturn<CreateJournalEntry>['remove'];
     onClickTagButton: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -87,8 +88,8 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
                         <Label />
                     </IconButton>
                     <IconButton
-                        onClick={() => props.fieldArray.remove(props.index)}
-                        disabled={props.fieldArray.fields.length <= 1}
+                        onClick={() => props.remove(props.index)}
+                        disabled={props.fieldArray.length <= 1}
                     >
                         <Delete />
                     </IconButton>
@@ -139,7 +140,8 @@ const JournalEntryAttachmentThumbnail = (props: JournalEntryAttachmentThumbnailP
 
 interface JournalEntryAttachmentRowProps {
     index: number;
-    fieldArray: UseFieldArrayReturn<CreateJournalEntry>;
+    fieldArray: UseFieldArrayReturn<CreateJournalEntry>['fields'];
+    remove: UseFieldArrayReturn<CreateJournalEntry>['remove'];
 }
 
 const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
@@ -172,7 +174,7 @@ const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
             </Grid>
             <Grid size='auto'>
                 <IconButton
-                    onClick={() => props.fieldArray.remove(props.index)}
+                    onClick={() => props.remove(props.index)}
                 >
                     <Delete />
                 </IconButton>
@@ -272,20 +274,32 @@ export default function JournalEntryForm() {
 
     const enableAutoDetectCategory = false;
 
-    const { watch, control, getValues, setValue } = useFormContext<CreateJournalEntry>();
+    const { watch, control, getValues, setValue, formState } = useFormContext<CreateJournalEntry>();
 
-    const attachmentFieldArray = useFieldArray<CreateJournalEntry>({
+    console.log('JournalEntryForm.watch:', watch());
+    console.log('JournalEntryForm.formState.errors:', formState.errors);
+
+
+    const {
+        fields: attachmentFieldArray,
+        append: appendAttachment,
+        remove: removeAttachment,
+    } = useFieldArray<CreateJournalEntry>({
+        control,
         name: 'attachments',
-        control
     });
 
-    const transactionsFieldArray = useFieldArray<CreateJournalEntry>({
+    const {
+        fields: transactionsFieldArray,
+        append: appendTransaction,
+        remove: removeTransaction,
+    } = useFieldArray<CreateJournalEntry>({
+        control,
         name: 'transactions',
-        control
     });
 
     const addDebitTransaction = () => {
-        transactionsFieldArray.append({
+        appendTransaction({
             amount: '',
             memo: '',
             paymentType: undefined,
@@ -296,7 +310,7 @@ export default function JournalEntryForm() {
     }
 
     const addCreditTransaction = () => {
-        transactionsFieldArray.append({
+        appendTransaction({
             amount: '',
             memo: '',
             paymentType: undefined,
@@ -307,18 +321,18 @@ export default function JournalEntryForm() {
     }
 
     const addAttachment = (data: UserFileUpload) => {
-        attachmentFieldArray.append({
+        appendAttachment({
             fileUpload: data,
             memo: '',
         });
     }
 
-    const attachmentFields = attachmentFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
+    const attachmentFields = attachmentFieldArray.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
         return [field, index]
     });
 
     const transactions = getValues('transactions');
-    const transactionFields = transactionsFieldArray.fields.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
+    const transactionFields = transactionsFieldArray.map((field, index: number): [FieldArrayWithId<CreateJournalEntry>, number] => {
         return [field, index]
     });
 
@@ -468,6 +482,7 @@ export default function JournalEntryForm() {
                                     key={field.id}
                                     index={index}
                                     fieldArray={transactionsFieldArray}
+                                    remove={removeTransaction}
                                     onClickTagButton={(event) => {
                                         setTransactionTagPickerData({
                                             anchorEl: event.currentTarget,
@@ -497,6 +512,7 @@ export default function JournalEntryForm() {
                                     key={field.id}
                                     index={index}
                                     fieldArray={transactionsFieldArray}
+                                    remove={removeTransaction}
                                     onClickTagButton={(event) => {
                                         setTransactionTagPickerData({
                                             anchorEl: event.currentTarget,
@@ -525,6 +541,7 @@ export default function JournalEntryForm() {
                                 <JournalEntryAttachmentRow
                                     key={field.id}
                                     index={index}
+                                    remove={removeAttachment}
                                     fieldArray={transactionsFieldArray}
                                 />
                             )

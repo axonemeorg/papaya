@@ -22,8 +22,6 @@ export default function TransactionTagPicker(props: TransactionTagPicker) {
         }
     }
 
-    console.log('TransactionTagPickerProps', props);
-
     return (
         <Popover
             anchorEl={anchorEl}

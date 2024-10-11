@@ -2,13 +2,13 @@ import { TransactionType } from "@/types/enum";
 import JournalRepository from "../repositories/JournalRepository";
 import { Transaction } from "@/types/get";
 import { validateRequest } from "@/auth";
-import { CreateJournalEntry, CreateQuickJournalEntry, CreateTransaction } from "@/types/post";
+import { CreateJournalEntry, CreateJournalEntryAttachment, CreateQuickJournalEntry, CreateTransaction } from "@/types/post";
 import CategoryService from "./CategoryService";
 import TransactionService from "./TransactionService";
 import { UpdateJournalEntry } from "@/types/put";
 import { InferInsertModel } from "drizzle-orm";
-import { JournalEntryTable } from "@/database/schemas";
-import { User } from "lucia";
+import { JournalEntryAttachmentTable, JournalEntryTable } from "@/database/schemas";
+import { generateEmbedding } from "@/actions/embeddings";
 
 export default class JournalService {
     static async _santizeJournalEntries(results: any) {
@@ -61,7 +61,7 @@ export default class JournalService {
             throw new Error('Not authorized.');
         }
 
-        const { memo, transactions, category, date, time } = formData;
+        const { memo, transactions, category, date, time, attachments } = formData;
 
         if (category) {
             // Ensure that the given category belongs to the user
@@ -80,10 +80,26 @@ export default class JournalService {
             time,
         });
 
+        // Insert transactions and attachments
         await TransactionService.insertTransactions(journalEntryId, transactions);
-        throw new Error('todo:');
-        await JournalRepository.insertJournalEntryAttachmentRecord({
-        });
+        await this.createJournalEntryAttachment(attachments, journalEntryId);
+    }
+
+    static async createJournalEntryAttachment(attachments: CreateJournalEntryAttachment[], journalEntryId: string) {
+        const attachmentRecords = await Promise.all(attachments.map(async (attachment) => {
+            const memoEmbedding = attachment.memo ? await generateEmbedding(attachment.memo) : null;
+
+            return {
+                journalEntryId,
+                memo: attachment.memo,
+                memoEmbedding,
+                userFileUploadId: attachment.fileUpload.userFileUploadId
+            }
+        }));
+
+        return JournalRepository.insertJournalEntryAttachmentRecords(
+            attachmentRecords
+        );
     }
 
     static async createQuickJournalEntry(formData: CreateQuickJournalEntry) {
@@ -140,7 +156,7 @@ export default class JournalService {
             throw new Error('Not authorized.');
         }
 
-        const { journalEntryId, memo, transactions, category, date, time } = formData;
+        const { journalEntryId, memo, transactions, category, date, time, attachments } = formData;
 
         if (category) {
             // Ensure that the given category belongs to the user
@@ -162,11 +178,13 @@ export default class JournalService {
 
         await JournalRepository.updateJournalEntry(updatedJournalEntryValues);
 
-        // Delete existing transactions
+        // Delete existing transactions and attachments
         await TransactionService.deleteAllTransactionsByJournalEntryId(journalEntryId)
+        await JournalRepository.deleteAllJournalEntryAttachmentsByJournalEntryId(journalEntryId);
 
-        // Insert updated transactions
+        // Insert updated transactions and attachments
         await TransactionService.insertTransactions(journalEntryId, transactions);
+        await this.createJournalEntryAttachment(attachments, journalEntryId);
     }
 
     static async deleteUserJournalEntryById(journalEntryId: string) {

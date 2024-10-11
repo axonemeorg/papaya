@@ -24,6 +24,13 @@ export const CreateTransaction = z.object({
 });
 export type CreateTransaction = z.output<typeof CreateTransaction>;
 
+export const CreateJournalEntryAttachment = z.object({
+    memo: z.string()
+        .nullable(),
+    fileUpload: UserFileUpload,
+});
+export type CreateJournalEntryAttachment = z.output<typeof CreateJournalEntryAttachment>;
+
 export const CreateJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),
     date: z.string(),
@@ -32,16 +39,9 @@ export const CreateJournalEntry = z.object({
         .optional()
         .nullable(),
     transactions: z.array(CreateTransaction),
-    attachments: z.array(JournalEntryAttachment),
+    attachments: z.array(CreateJournalEntryAttachment),
 });
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
-
-export const CreateJournalEntryAttachment = z.object({
-    memo: z.string()
-        .nullable(),
-    fileUpload: UserFileUpload,
-});
-export type CreateJournalEntryAttachment = z.output<typeof CreateJournalEntryAttachment>;
 
 export const CreateQuickJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),

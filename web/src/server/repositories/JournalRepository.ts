@@ -162,19 +162,28 @@ export default class JournalRepository {
             )
     }
 
-    static async insertJournalEntryAttachmentRecord(values: InferInsertModel<typeof JournalEntryAttachmentTable>) {
+    static async insertJournalEntryAttachmentRecords(values: InferInsertModel<typeof JournalEntryAttachmentTable>[]) {
         const records = await db
             .insert(JournalEntryAttachmentTable)
-            .values({
-                journalEntryId: values.journalEntryId,
-                memo: values.memo,
-                memoEmbedding: values.memoEmbedding,
-                userFileUploadId: values.userFileUploadId,
-            })
+            .values(values)
             .returning({
                 journalEntryAttachmentId: JournalEntryAttachmentTable.journalEntryAttachmentId,
             });
 
         return records[0];
+    }
+
+    static async deleteAllJournalEntryAttachmentsByJournalEntryId(journalEntryId: string) {
+        const response = await db.delete(JournalEntryAttachmentTable)
+            .where(
+                and(
+                    eq(JournalEntryAttachmentTable.journalEntryId, journalEntryId)
+                )
+            )
+            .returning({
+                journalEntryAttachmentId: JournalEntryAttachmentTable.journalEntryAttachmentId
+            });
+
+        return response;
     }
 }
