@@ -34,6 +34,8 @@ export interface AvatarImageUploadResponse {
     color: string | null;
 }
 
+const JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION = 2160;
+
 export class FileUploadService {
     private static _generateRandomFilename(entropy: number = 20) {
         return generateIdFromEntropySize(entropy);
@@ -112,5 +114,28 @@ export class FileUploadService {
             record,
             color: paletteColor,
         }
+    }
+
+    static async createJournalEntryImage(file: File, user: User) {
+		// Create image buffer
+        const fileBuffer = await file.arrayBuffer();
+		const resizedImageBuffer = await sharp(Buffer.from(fileBuffer))
+            .resize({
+                width: JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION,
+                height: JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION,
+                fit: 'inside', // Ensures the image fits within the dimensions
+                withoutEnlargement: true,
+            })
+			.toBuffer();
+
+        // Create user file record
+        const userFileRecord = await FileUploadService.uploadUserImageToS3(
+            file,
+            "JOURNAL_ENTRY_ATTACHMENT",
+            resizedImageBuffer,
+            user
+        );
+
+		return userFileRecord;
     }
 }

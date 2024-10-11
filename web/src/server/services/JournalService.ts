@@ -9,10 +9,6 @@ import { UpdateJournalEntry } from "@/types/put";
 import { InferInsertModel } from "drizzle-orm";
 import { JournalEntryTable } from "@/database/schemas";
 import { User } from "lucia";
-import { FileUploadService } from "./FileUploadService";
-import sharp from "sharp";
-
-const JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION = 2160;
 
 export default class JournalService {
     static async _santizeJournalEntries(results: any) {
@@ -85,6 +81,9 @@ export default class JournalService {
         });
 
         await TransactionService.insertTransactions(journalEntryId, transactions);
+        throw new Error('todo:');
+        await JournalRepository.insertJournalEntryAttachmentRecord({
+        });
     }
 
     static async createQuickJournalEntry(formData: CreateQuickJournalEntry) {
@@ -188,34 +187,5 @@ export default class JournalService {
         }
 
         return JournalRepository.removeCategoryFromJournalEntries(user.id, categoryId);
-    }
-
-    static async createJournalEntryAttachment(file: File, user: User, journalEntryId: string) {
-        // Create image buffer
-        const fileBuffer = await file.arrayBuffer();
-		const resizedImageBuffer = await sharp(Buffer.from(fileBuffer))
-            .resize({
-                width: JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION,
-                height: JOURNAL_ENTRY_ATTACHMENT_MAX_DIMENSION,
-                fit: 'inside', // Ensures the image fits within the dimensions
-                withoutEnlargement: true,
-            })
-			.toBuffer();
-
-        // Create user file record
-        const userFileRecord = await FileUploadService.uploadUserImageToS3(
-            file,
-            "JOURNAL_ENTRY_ATTACHMENT",
-            resizedImageBuffer,
-            user
-        );
-
-        // Attach the image to the journal entry
-        await JournalRepository.insertJournalEntryAttachmentRecord({
-            journalEntryId,
-            userFileUploadId: userFileRecord.userFileUploadId,
-        });
-
-        return userFileRecord;
     }
 }

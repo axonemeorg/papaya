@@ -127,6 +127,7 @@ const JournalEntryAttachmentThumbnail = (props: JournalEntryAttachmentThumbnailP
                 <CardMedia
                     component="img"
                     width={72}
+                    height={72}
                     image={props.imgSrc}
                     alt={props.altText}
                 />
@@ -149,7 +150,7 @@ const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
     const imgSrc = getUserImagePublicUrlFromS3Key(s3Key);
 
     return (
-        <Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
+        <Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'flex-start' }}>
             <Grid size={'auto'}>
                 <JournalEntryAttachmentThumbnail
                     imgSrc={imgSrc}
@@ -163,15 +164,14 @@ const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
                     {...register(`attachments.${props.index}.memo`)}
                     fullWidth
                     multiline
-                    minRows={2}
-                    maxRows={3}
+                    minRows={1}
+                    maxRows={2}
                     size='small'
                 />
             </Grid>
             <Grid size='auto'>
                 <IconButton
                     onClick={() => props.fieldArray.remove(props.index)}
-                    disabled={props.fieldArray.fields.length <= 1}
                 >
                     <Delete />
                 </IconButton>
@@ -440,7 +440,7 @@ export default function JournalEntryForm() {
                             )
                         })}
                         <Button
-                            variant='outlined'
+                            variant='text'
                             startIcon={<Photo />}
                             onClick={() => {}}
                             sx={{ alignSelf: 'flex-start' }}
