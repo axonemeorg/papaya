@@ -55,7 +55,8 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                     transactionMethod: undefined,
                     tags: [],
                 }
-            ]
+            ],
+            attachments: [],
         },
         resolver: zodResolver(CreateJournalEntry)
     });

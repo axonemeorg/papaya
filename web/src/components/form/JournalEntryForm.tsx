@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Divider, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { useMemo, useState } from "react";
-import { Add, Delete, Label, Photo } from "@mui/icons-material";
+import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Divider, FormHelperText, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { useMemo, useRef, useState } from "react";
+import { Add, AddPhotoAlternate, Delete, Label, Photo } from "@mui/icons-material";
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import { CreateJournalEntry } from "@/types/post";
 import { TransactionTag, TransactionType } from "@/types/enum";
@@ -11,10 +11,11 @@ import { debounce, getUserImagePublicUrlFromS3Key } from "@/utils/Utils";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, Transaction, TransactionMethod } from "@/types/get";
+import { Category, type UserFileUpload } from "@/types/get";
 import { findMostSimilarUserCategory } from "@/actions/category-actions";
 import TransactionTagPicker from "../pickers/TransactionTagPicker";
 import { TRANSACTION_TAG_LABELS } from "@/constants/transactionTags";
+import { LoadingButton } from "@mui/lab";
 
 interface JournalEntryTransactionRowProps {
     index: number;
@@ -180,6 +181,88 @@ const JournalEntryAttachmentRow = (props: JournalEntryAttachmentRowProps) => {
     )
 }
 
+interface JournalEntryAttachmentFormProps {
+    onImageUploadSuccess: (data: UserFileUpload) => void;
+}
+
+const JournalEntryAttachmentForm = (props: JournalEntryAttachmentFormProps) => {
+    const [uploading, setUploading] = useState<boolean>(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleClickUploadButton = () => {
+      fileInputRef?.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setUploading(true);
+            setUploadError(null);
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // Send the file to your API endpoint
+                const response = await fetch('/api/upload/attachment', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data: UserFileUpload = await response.json();
+                props.onImageUploadSuccess(data);
+            } catch (err) {
+                setUploadError((err as Error).message);
+            } finally {
+                setUploading(false);
+            }
+        }
+    }
+
+    return (
+        <>
+            <input
+                type="file"
+                onChange={handleFileChange}
+                disabled={uploading}
+                style={{ display: 'none' }}
+                ref={fileInputRef}
+            />
+            <Stack direction='row' sx={{ mb: 1 }} gap={2}>
+                {/* {hasImageIcon && (
+                    <>
+                        <ImageAvatar
+                            avatar={props.value}
+                            sx={uploading ? {
+                                filter: 'blur(2px)',
+                                opacity: 0.5,
+                            } : undefined}
+                        />
+                        <Button
+                            variant='text'
+                            onClick={() => handleRemoveImage()}
+                            startIcon={<RemoveCircle />}
+                        >
+                            Remove
+                        </Button>
+                    </>
+                )} */}
+                <LoadingButton
+                    onClick={handleClickUploadButton}
+                    loading={uploading}
+                    startIcon={<AddPhotoAlternate />}
+                >
+                    Add Attachment
+                </LoadingButton>
+            </Stack>            
+            {uploadError && (
+                <FormHelperText error>{uploadError}</FormHelperText>
+            )}
+        </>
+    )
+}
+
 export default function JournalEntryForm() {
     const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
     const [transactionTagPickerData, setTransactionTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
@@ -220,6 +303,13 @@ export default function JournalEntryForm() {
             transactionMethod: undefined,
             transactionType: TransactionType.Enum.CREDIT,
             tags: [],
+        });
+    }
+
+    const addAttachment = (data: UserFileUpload) => {
+        attachmentFieldArray.append({
+            fileUpload: data,
+            memo: '',
         });
     }
 
@@ -439,14 +529,9 @@ export default function JournalEntryForm() {
                                 />
                             )
                         })}
-                        <Button
-                            variant='text'
-                            startIcon={<Photo />}
-                            onClick={() => {}}
-                            sx={{ alignSelf: 'flex-start' }}
-                        >
-                            Add Attachment
-                        </Button>
+                        <JournalEntryAttachmentForm
+                            onImageUploadSuccess={addAttachment}
+                        />
                     </Stack>
                 </Box>
             </Stack>

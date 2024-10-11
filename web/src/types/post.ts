@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { PaymentType, TransactionTag, TransactionType } from "./enum";
-import { Category, ItemAvatar, JournalEntryAttachment, TransactionMethod } from "./get";
+import { Category, ItemAvatar, JournalEntryAttachment, TransactionMethod, UserFileUpload } from "./get";
 
 export const CreateTransaction = z.object({
     transactionType: TransactionType,
@@ -35,6 +35,13 @@ export const CreateJournalEntry = z.object({
     attachments: z.array(JournalEntryAttachment),
 });
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
+
+export const CreateJournalEntryAttachment = z.object({
+    memo: z.string()
+        .nullable(),
+    fileUpload: UserFileUpload,
+});
+export type CreateJournalEntryAttachment = z.output<typeof CreateJournalEntryAttachment>;
 
 export const CreateQuickJournalEntry = z.object({
     memo: z.string().min(1, "Add a description"),

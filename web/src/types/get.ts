@@ -57,7 +57,6 @@ export const UserFileUpload = z.object({
     mimeType: z.string(),
     s3Key: z.string(),
 });
-
 export type UserFileUpload = z.output<typeof UserFileUpload>;
 
 export const JournalEntryAttachment = z.object({

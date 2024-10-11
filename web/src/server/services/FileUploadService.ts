@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { generateIdFromEntropySize, User } from "lucia";
 import Vibrant from 'node-vibrant';
 import FileUploadRepository from '../repositories/FileUploadRepository';
+import { type UserFileUpload } from '@/types/get';
 
 const s3Config: S3ClientConfig = {
 	region: process.env.AWS_S3_REGION ?? '',
@@ -20,17 +21,9 @@ const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME ?? '';
 
 const UPLOADS_FOLDER_NAME = 'uploads';
 
-export interface FileMeta {
-	mimeType: string;
-	fileName: string;
-	originalFileName: string;
-}
 
 export interface AvatarImageUploadResponse {
-    record: {
-        s3Key: string;
-        userFileUploadId: string;
-    },
+    record: UserFileUpload;
     color: string | null;
 }
 
@@ -41,7 +34,7 @@ export class FileUploadService {
         return generateIdFromEntropySize(entropy);
     };
 
-	private static _generateFileMeta(file: File): FileMeta {
+	private static _generateFileMeta(file: File) {
 		const mimeType = file.type;
         const originalFileName = String(file.name ?? '');
         const originalFileNameParts = originalFileName.split('.');
