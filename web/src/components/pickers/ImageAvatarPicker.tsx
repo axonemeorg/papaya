@@ -72,7 +72,7 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
                 formData.append('file', file);
 
                 // Send the file to your API endpoint
-                const response = await fetch('/api/images/upload', {
+                const response = await fetch('/api/upload/avatar', {
                     method: 'POST',
                     body: formData,
                 });
