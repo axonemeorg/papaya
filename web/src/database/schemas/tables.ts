@@ -126,7 +126,7 @@ export const JournalEntryTable = pgTable("journal_entry", {
     ...timestamps
 });
 
-export const UserFileUploads = pgTable("user_file_uploads", {
+export const UserFileUploadTable = pgTable("user_file_uploads", {
     userFileUploadId: uuid('user_file_upload_id')
         .defaultRandom()
         .primaryKey(),
@@ -145,4 +145,16 @@ export const UserFileUploads = pgTable("user_file_uploads", {
         .notNull(),
     
     ...timestamps,
+});
+
+export const JournalEntryAttachmentTable = pgTable("journal_entry_attachment", {
+    journalEntryAttachmentId: uuid('journal_entry_attachment_id')
+        .defaultRandom()
+        .primaryKey(),
+    journalEntryId: uuid('journal_entry_id')
+        .references(() => JournalEntryTable.journalEntryId, { onDelete: 'cascade' }),
+    userFileUploadId: uuid('user_file_upload_id')
+        .references(() => UserFileUploadTable.userFileUploadId, { onDelete: 'cascade' }),
+    memo: varchar('memo', { length: 1024 }),
+    memoEmbedding: vector('memo_embedding', { dimensions: EMBEDDING_NUM_DIMENSIONS }),
 });

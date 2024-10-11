@@ -1,5 +1,5 @@
 import db from "@/database/client";
-import { JournalEntryTable, TransactionTable } from "@/database/schemas";
+import { JournalEntryAttachmentTable, JournalEntryTable, TransactionTable } from "@/database/schemas";
 import { and, eq, gte, InferInsertModel, lt } from "drizzle-orm";
 
 export default class JournalRepository {
@@ -34,6 +34,21 @@ export default class JournalRepository {
                 time: true,
             },
             with: {
+                attachments: {
+                    columns: {
+                        journalEntryAttachmentId: true,
+                        memo: true,
+                    },
+                    with: {
+                        fileUpload: {
+                            columns: {
+                                userFileUploadId: true,
+                                mimeType: true,
+                                s3Key: true,
+                            }
+                        }
+                    },
+                },
                 transactions: {
                     with: {
                         tags: {
@@ -145,5 +160,30 @@ export default class JournalRepository {
                     eq(JournalEntryTable.categoryId, categoryId)
                 )
             )
+    }
+
+    static async insertJournalEntryAttachmentRecords(values: InferInsertModel<typeof JournalEntryAttachmentTable>[]) {
+        const records = await db
+            .insert(JournalEntryAttachmentTable)
+            .values(values)
+            .returning({
+                journalEntryAttachmentId: JournalEntryAttachmentTable.journalEntryAttachmentId,
+            });
+
+        return records[0];
+    }
+
+    static async deleteAllJournalEntryAttachmentsByJournalEntryId(journalEntryId: string) {
+        const response = await db.delete(JournalEntryAttachmentTable)
+            .where(
+                and(
+                    eq(JournalEntryAttachmentTable.journalEntryId, journalEntryId)
+                )
+            )
+            .returning({
+                journalEntryAttachmentId: JournalEntryAttachmentTable.journalEntryAttachmentId
+            });
+
+        return response;
     }
 }

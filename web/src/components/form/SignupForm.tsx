@@ -10,11 +10,12 @@ export default function SignupForm() {
         <form action={signup}>
             <Stack gap={2} alignItems={'flex-start'}>
                 <TextField
-                    label='Email'
+                    label='Username'
                     name='username'
                     id='username'
                     fullWidth
                     autoFocus
+                    helperText={"No special symbols or spaces."}
                 />
                 <TextField
                     label='Password'

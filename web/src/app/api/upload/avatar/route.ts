@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateRequest } from '@/auth';
-import { FileUploadRepository } from '@/server/repositories/FileUploadRepository';
-
+import { FileUploadService } from '@/server/services/FileUploadService';
 
 export async function POST(request: NextRequest) {
 	const { user } = await validateRequest();
@@ -18,7 +17,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	try {
-		const response = await FileUploadRepository.uploadAvatarImage(file, user);
+		const response = await FileUploadService.createAvatarImage(file, user);
 		return NextResponse.json(response, { status: 200 });
 	} catch (error) {
 		console.error('Error uploading file:', error);
