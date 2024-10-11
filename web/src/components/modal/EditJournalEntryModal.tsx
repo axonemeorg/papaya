@@ -27,6 +27,8 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
         updateJournalEntry(formData)
             .then(() => {
                 props.onClose();
+                snackbar({ message: 'Updated journal entry'});
+                props.onSave();
             })
             .catch(() => {
 
@@ -34,8 +36,6 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
             .finally(() => {
                 setSaving(false);
             })
-        snackbar({ message: 'Updated journal entry'});
-        props.onSave();
     }
 
     const editJournalEntryForm = useForm<UpdateJournalEntry>({

@@ -86,6 +86,10 @@ export default class JournalService {
     }
 
     static async createJournalEntryAttachment(attachments: CreateJournalEntryAttachment[], journalEntryId: string) {
+        if (attachments.length === 0) {
+            return;
+        }
+
         const attachmentRecords = await Promise.all(attachments.map(async (attachment) => {
             const memoEmbedding = attachment.memo ? await generateEmbedding(attachment.memo) : null;
 

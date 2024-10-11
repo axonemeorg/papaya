@@ -100,11 +100,7 @@ export default class JournalRepository {
     static async insertJournalEntry(values: InferInsertModel<typeof JournalEntryTable>) {
         const result = await db
             .insert(JournalEntryTable)
-            .values({
-                userId: values.userId,
-                categoryId: values.categoryId,
-                memo: values.memo,
-            } as InferInsertModel<typeof JournalEntryTable>)
+            .values(values)
             .returning({
                 journalEntryId: JournalEntryTable.journalEntryId
             });

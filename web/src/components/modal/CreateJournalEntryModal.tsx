@@ -23,11 +23,42 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const [saving, setSaving] = useState<boolean>(false);
     const { snackbar } = useContext(NotificationsContext);
 
+    const journalEntryDefaultValues: CreateJournalEntry = {
+        memo: '',
+        date: props.initialDate,
+        category: undefined,
+        time: dayjs().format("HH:mm:ss"),
+        transactions: [
+            {
+                transactionType: TransactionType.Enum.DEBIT,
+                // date: new Date().toISOString(),
+                memo: '',
+                amount: undefined as unknown as string,
+                // paymentType: PaymentType.Enum.ETRANSFER, // TODO
+                paymentType: undefined,
+                transactionMethod: undefined,
+                tags: [],
+            }
+        ],
+        attachments: [],
+    }
+
+    const createJournalEntryForm = useForm<CreateJournalEntry>({
+        defaultValues: journalEntryDefaultValues,
+        resolver: zodResolver(CreateJournalEntry)
+    });
+
     const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
         setSaving(true);
         createJournalEntry(formData)
             .then(() => {
                 props.onClose();
+                snackbar({ message: 'Created journal entry'});
+                createJournalEntryForm.reset({
+                    // Resets the form but preserves the last entered date
+                    ...journalEntryDefaultValues,
+                    date: formData.date
+                })
             })
             .catch(() => {
 
@@ -35,31 +66,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
             .finally(() => {
                 setSaving(false);
             });
-        snackbar({ message: 'Created journal entry'});
     }
-
-    const createJournalEntryForm = useForm<CreateJournalEntry>({
-        defaultValues: {
-            memo: '',
-            date: props.initialDate,
-            category: undefined,
-            time: dayjs().format("HH:mm:ss"),
-            transactions: [
-                {
-                    transactionType: TransactionType.Enum.DEBIT,
-                    // date: new Date().toISOString(),
-                    memo: '',
-                    amount: undefined,
-                    // paymentType: PaymentType.Enum.ETRANSFER, // TODO
-                    paymentType: undefined,
-                    transactionMethod: undefined,
-                    tags: [],
-                }
-            ],
-            attachments: [],
-        },
-        resolver: zodResolver(CreateJournalEntry)
-    });
 
     useEffect(() => {
         createJournalEntryForm.setValue('date', props.initialDate);
