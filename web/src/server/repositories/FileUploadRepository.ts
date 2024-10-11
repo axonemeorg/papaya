@@ -16,6 +16,7 @@ export default class FileUploadRepository {
 			})
 			.returning({
 				userFileUploadId: UserFileUploadTable.userId,
+				mimeType: UserFileUploadTable.mimeType,
 				s3Key: UserFileUploadTable.s3Key,
 			});
 
