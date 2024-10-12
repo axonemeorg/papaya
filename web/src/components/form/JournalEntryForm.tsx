@@ -25,7 +25,7 @@ interface JournalEntryTransactionRowProps {
 }
 
 const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
-    const { setValue, control, watch } = useFormContext<CreateJournalEntry>();
+    const { setValue, control, watch, register } = useFormContext<CreateJournalEntry>();
 
     const transactionTags = watch(`transactions.${props.index}.tags`) ?? [];
     const hasTags = transactionTags.length > 0;
@@ -78,6 +78,7 @@ const JournalEntryTransactionRow = (props: JournalEntryTransactionRowProps) => {
             <Grid size={4}>
                 <TextField
                     label='Memo (Optional)'
+                    {...register(`transactions.${props.index}.memo`)}
                     fullWidth
                     size='small'
                 />
