@@ -2,8 +2,8 @@
 
 import React, { MouseEvent, useEffect, useMemo, useState } from "react";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { alpha, Avatar, Box, Button, ButtonBase, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
+import { alpha, Avatar, Box, Button, ButtonBase, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Add, Flag, ImportExport, InsertLink, Category as MuiCategoryIcon, Photo } from "@mui/icons-material";
 import { Category, JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import JournalEntryCard from "./JournalEntryCard";
@@ -185,6 +185,53 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                     const { netAmount } = entry;
                                                     const isNetPositive = netAmount > 0;
 
+                                                    const hasTransactionTags = entry.transactions.some((transaction) => {
+                                                        return transaction.tags?.length > 0;
+                                                    });
+                                                    const hasAttachments = entry.attachments?.length > 0;
+                                                    const hasLinkedEntry = false;
+                                                    const hasIncomingAndOutgoingTransactions =
+                                                        entry.transactions.some((transaction) => {
+                                                            return transaction.transactionType === 'DEBIT';
+                                                        }) &&
+                                                        entry.transactions.some((transaction) => {
+                                                            return transaction.transactionType === 'CREDIT';
+                                                        });
+
+                                                    const badges = [];
+
+                                                    if (hasTransactionTags) {
+                                                        badges.push(
+                                                            <Tooltip key='tags' title='Has tags'>
+                                                                <Flag fontSize="small" />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
+                                                    if (hasAttachments) {
+                                                        badges.push(
+                                                            <Tooltip key='attachments' title='Has attachments'>
+                                                                <Photo fontSize="small" />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
+                                                    if (hasLinkedEntry) {
+                                                        badges.push(
+                                                            <Tooltip key='linked' title='Linked entry'>
+                                                                <InsertLink fontSize="small" />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
+                                                    if (hasIncomingAndOutgoingTransactions) {
+                                                        badges.push(
+                                                            <Tooltip key='linked' title='Incoming + Outgoing'>
+                                                                <ImportExport fontSize="small" />
+                                                            </Tooltip>
+                                                        );
+                                                    }
+
                                                     return (
                                                         <MenuItem
                                                             key={entry.journalEntryId}
@@ -197,6 +244,11 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                         <CategoryIcon category={category} />
                                                                     </ListItemIcon>
                                                                     <ListItemText>{entry.memo}</ListItemText>
+                                                                    {badges.length > 0 && (
+                                                                        <Stack direction='row' gap={0.5}>
+                                                                            {badges}
+                                                                        </Stack>
+                                                                    )}
                                                                 </Grid>
                                                                 <Grid size={{ xs: 'auto', sm: 3, md: 2 }}>
                                                                     <ListItemText
