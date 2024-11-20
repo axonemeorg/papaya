@@ -1,10 +1,9 @@
 'use client'
 
-import React, { MouseEvent, useEffect, useMemo, useState } from "react";
-import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { alpha, Avatar, Box, Button, ButtonBase, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+// import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
+import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
-import { Category, JournalEntry } from "@/types/get";
 import dayjs from "dayjs";
 import JournalEntryCard from "./JournalEntryCard";
 import CategoryIcon from "../icon/CategoryIcon";
@@ -14,9 +13,11 @@ import QuickJournalEditor from "./QuickJournalEditor";
 import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
-import { User } from "lucia";
 import SettingsDrawer from "./categories/SettingsDrawer";
-import { useCategoryStore } from "@/store/useCategoriesStore";
+// import { useCategoryStore } from "@/store/useCategoriesStore";
+import { JournalEntry } from "@/types/schema";
+import { db } from "@/database/client";
+import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -44,54 +45,76 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
     )
 }
 
+type JournalEditorView =
+    | 'week'
+    | 'month'
+    | 'year'
+
 interface JournalEditorProps {
-    journalEntries: JournalEntry[];
-    categories: Category[];
-    user: User;
-    month: number;
-    year: number;
+    view: JournalEditorView;
+    date: string;
 }
 
 export default function JournalEditor(props: JournalEditorProps) {
-    const { journalEntries } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
-    
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
     const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
+    const [journalGroups, setJournalGroups] = useState<Record<string, JournalEntry[]>>({});
 
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     const currentDayString = dayjs().format('YYYY-MM-DD');
 
-    const journal = useMemo(() => {
-        return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
-            const { date } = entry;
-            if (acc[date]) {
-                acc[date].push(entry);
-            } else {
-                acc[date] = [entry];
+    const getJournalEntries: () => Promise<JournalEntry[]> = useCallback(async () => {
+        const startDate = dayjs(props.date)
+            .startOf(props.view)
+            .format('YYYY-MM-DD');
+
+        const endDate = dayjs(props.date)
+            .endOf(props.view)
+            .format('YYYY-MM-DD');
+
+        const result = await db.find({
+            selector: {
+                _type: 'JOURNAL_ENTRY',
+                date: {
+                    $gte: startDate,
+                    $lte: endDate,
+                }
             }
-
-            return acc;
-        }, {
-            [currentDayString]: [],
         });
-    }, [journalEntries]);
 
-    console.log('journal:', journal);
+        return result.docs as JournalEntry[];
+       
+    }, [props.date, props.view]);
+
+    useEffect(() => {
+        getJournalEntries().then((entries) => {
+            const groups: Record<string, JournalEntry[]> = entries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+                const { date } = entry;
+                if (acc[date]) {
+                    acc[date].push(entry);
+                } else {
+                    acc[date] = [entry];
+                }
+
+                return acc;
+            }, {
+                [currentDayString]: [],
+            });
+
+            setJournalGroups(groups);
+        });
+    }, [getJournalEntries])
+
+    console.log('journalGroups:', journalGroups);
 
     const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
         setSelectedEntryAnchorEl(event.currentTarget);
         setSelectedEntry(entry);
     }
-
-    const setCategories = useCategoryStore((state) => state.setCategories);
-
-    useEffect(() => {
-        setCategories(props.categories);
-    }, []);
 
     return (
         <NotificationsProvider>
@@ -106,13 +129,12 @@ export default function JournalEditor(props: JournalEditorProps) {
             />
             <BaseLayout
                 headerChildren={
-                    <JournalHeader month={props.month} year={props.year}>
+                    <JournalHeader month={1} year={1990}>
                         <IconButton onClick={() => setShowSettingsDrawer(true)}>
                             <MuiCategoryIcon />
                         </IconButton>
                     </JournalHeader>
                 }
-                user={props.user}
                 sx={{
                     // width: '100dvw',
                     // overflowX: 'auto',
@@ -164,7 +186,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                     }}
                 >
                     {Object
-                        .entries(journal)
+                        .entries(journalGroups)
                         .sort(([dateA, _a], [dateB, _b]) => {
                             return new Date(dateA).getTime() - new Date(dateB).getTime()
                         })
@@ -181,20 +203,20 @@ export default function JournalEditor(props: JournalEditorProps) {
                                         {entries.length > 0 && (
                                             <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
                                                 {entries.map((entry) => {
-                                                    const { category } = entry;
-                                                    const { netAmount } = entry;
+                                                    const { categoryIds } = entry;
+                                                    const netAmount = -1;
                                                     const isNetPositive = netAmount > 0;
 
                                                     return (
                                                         <MenuItem
-                                                            key={entry.journalEntryId}
+                                                            key={entry._id}
                                                             sx={{ borderRadius: '64px', pl: isSmall ? 4 : undefined }}
                                                             onClick={(event) => handleClickListItem(event, entry)}
                                                         >
                                                             <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
                                                                 <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flowFlow: 'row nowrap', }}>
                                                                     <ListItemIcon sx={{ display: isSmall ? 'none' : undefined }}>
-                                                                        <CategoryIcon category={category} />
+                                                                        <CategoryIcon category={null} />
                                                                     </ListItemIcon>
                                                                     <ListItemText>{entry.memo}</ListItemText>
                                                                 </Grid>
@@ -206,14 +228,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                     </ListItemText>
                                                                 </Grid>
                                                                 <Grid size={{ xs: 'grow', sm: 5, md: 6 }}>
-                                                                    {category ? (
+                                                                    {/* {category ? (
                                                                         <CategoryChip category={category} />
                                                                     ) : (
                                                                         <Chip
                                                                             sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
                                                                             label='Uncategorized'
                                                                         />
-                                                                    )}
+                                                                    )} */}
                                                                 </Grid>
                                                             </Grid>
                                                         </MenuItem>

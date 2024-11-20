@@ -29,6 +29,7 @@
     "node-vibrant": "^3.2.1-alpha.1",
     "openai": "^4.53.2",
     "pg": "^8.12.0",
+    "pouchdb": "^9.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.52.1",
@@ -42,6 +43,7 @@
     "@faker-js/faker": "^8.4.1",
     "@types/node": "20.14.0",
     "@types/pg": "^8.11.10",
+    "@types/pouchdb": "^6.4.2",
     "@types/react": "18.3.3",
     "@types/react-window": "^1.8.8",
     "typescript": "5.4.5"

@@ -10,7 +10,7 @@ import AppNavMenu from "./AppNavMenu";
 import { Menu } from "@mui/icons-material";
 
 type HeaderProps = PropsWithChildren<{
-    user: User;
+    user?: User;
 }>;
 
 export default function Header(props: HeaderProps) {
@@ -46,7 +46,7 @@ export default function Header(props: HeaderProps) {
                     )}
                     <Stack direction='row' gap={1} alignItems='center' sx={{ flex: 1 }}>
                         {props.children}
-                        <UserAvatarMenu user={props.user} />
+                        {props.user && <UserAvatarMenu user={props.user} />}
                     </Stack>
                 </Stack>
             </BaseContainer>

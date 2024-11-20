@@ -6,14 +6,13 @@ import { User } from "lucia";
 
 interface BaseLayoutProps extends PropsWithChildren<ContainerProps> {
 	headerChildren: ReactNode;
-	user: User;
 }
 
 export default function BaseLayout(props: BaseLayoutProps) {
-	const { headerChildren, user, sx, ...rest } = props;
+	const { headerChildren, sx, ...rest } = props;
 	return (
 		<>
-			<Header user={props.user}>
+			<Header user={undefined}>
 				{props.headerChildren}
 			</Header>
 			<Stack component={Paper} square variant="outlined" sx={{ flex: 1, borderLeft: 0, borderRight: 0 }}>

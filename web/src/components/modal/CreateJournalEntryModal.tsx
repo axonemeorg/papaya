@@ -5,13 +5,12 @@ import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  Dial
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateJournalEntry } from '@/types/post'
-import { PaymentType, TransactionType } from "@/types/enum";
 import { useContext, useEffect, useState } from "react";
-import { createJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
 import dayjs from "dayjs";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
+import { CreateJournalEntry, JournalEntry } from "@/types/schema";
+import { db } from "@/database/client";
 
 interface JournalEntryModalProps {
     open: boolean;
@@ -20,48 +19,41 @@ interface JournalEntryModalProps {
 }
 
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
-    const [saving, setSaving] = useState<boolean>(false);
     const { snackbar } = useContext(NotificationsContext);
 
     const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
-        setSaving(true);
-        createJournalEntry(formData)
-            .then(() => {
-                props.onClose();
-            })
-            .catch(() => {
-
-            })
-            .finally(() => {
-                setSaving(false);
-            });
+        const { parent } = formData;
+        const children = formData.children.map(child => {
+            return {
+                ...child,
+                date: parent.date,
+                parent: parent._id,
+            }
+        });
+        db.bulkDocs([parent, ...children]);
         snackbar({ message: 'Created journal entry'});
     }
 
     const createJournalEntryForm = useForm<CreateJournalEntry>({
         defaultValues: {
-            memo: '',
-            date: props.initialDate,
-            category: undefined,
-            time: dayjs().format("HH:mm:ss"),
-            transactions: [
-                {
-                    transactionType: TransactionType.Enum.DEBIT,
-                    // date: new Date().toISOString(),
-                    memo: '',
-                    amount: undefined,
-                    // paymentType: PaymentType.Enum.ETRANSFER, // TODO
-                    paymentType: undefined,
-                    transactionMethod: undefined,
-                    tags: [],
-                }
-            ]
+            parent: {
+                _id: '',
+                _type: 'JOURNAL_ENTRY',
+                memo: '',
+                date: props.initialDate,
+                categoryIds: [],
+                tagIds: [],
+                attachmentIds: [],
+                notes: '',
+                entryType: 'CREDIT',
+            },
+            children: [],
         },
         resolver: zodResolver(CreateJournalEntry)
     });
 
     useEffect(() => {
-        createJournalEntryForm.setValue('date', props.initialDate);
+        createJournalEntryForm.setValue('parent.date', props.initialDate);
     }, [props.initialDate]);
 
     const theme = useTheme();
@@ -77,7 +69,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => props.onClose()}>Cancel</Button>
-                        <LoadingButton loading={saving} type='submit' variant='contained' startIcon={<Add />}>Add</LoadingButton>
+                        <Button type='submit' variant='contained' startIcon={<Add />}>Add</Button>
                     </DialogActions>
                 </form>
             </Dialog>
