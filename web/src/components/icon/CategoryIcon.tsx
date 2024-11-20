@@ -1,9 +1,7 @@
-import { Category } from "@/types/get";
 import { Icon } from "@mui/material";
 import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
-import { AvatarVariant } from "@/types/enum";
 import { ImageAvatar } from "../pickers/ImageAvatarPicker";
-
+import { AvatarVariant, Category } from "@/types/schema";
 
 interface CategoryIconProps {
 	category?: Category;

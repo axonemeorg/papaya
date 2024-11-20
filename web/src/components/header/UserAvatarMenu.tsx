@@ -1,7 +1,7 @@
 'use client'
 
-import { logout } from "@/actions/auth-actions";
-import { validateRequest } from "@/auth";
+// import { logout } from "@/actions/auth-actions";
+// import { validateRequest } from "@/auth";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { Avatar, Badge, Button, Menu, MenuItem, Paper } from "@mui/material";
 import { User } from "lucia";
@@ -60,11 +60,11 @@ export default function UserAvatarMenu(props: UserAvatarMenuProps) {
                 <MenuItem component={Link} href='/settings'>
                     Settings
                 </MenuItem>
-                <form action={logout}>
+                {/* <form action={logout}>
                     <MenuItem component={'button'} sx={{ width: '100%' }} type='submit'>
                         Logout
                     </MenuItem>
-                    </form>
+                </form> */}
             </Menu>
         </>
     );

@@ -7,12 +7,15 @@ export const Document = z.object({
     _deleted: z.boolean().optional(),
 });
 
-export const EntryType = z.union([z.literal('DEBIT'), z.literal('CREDIT')]);
+export const EntryType = z.enum([
+    'DEBIT',
+    'CREDIT',
+]);
 
-export const AvatarVariant = z.union([
-    z.literal('TEXT'),
-    z.literal('PICTORIAL'),
-    z.literal('IMAGE'),
+export const AvatarVariant = z.enum([
+    'TEXT',
+    'PICTORIAL',
+    'IMAGE',
 ]);
 
 export const Avatar = Document.merge(z.object({
@@ -29,6 +32,8 @@ export const Category = Document.merge(z.object({
     description: z.string(),
     avatarId: z.string().nullable(),
 }));
+
+export type Category = z.output<typeof Category>;
 
 export const JournalEntry = Document.merge(z.object({
     _type: z.literal('JOURNAL_ENTRY'),
@@ -52,3 +57,10 @@ export const CreateJournalEntry = z.object({
 });
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
+
+export const CreateQuickJournalEntry = z.object({
+    memo: z.string(),
+    amount: z.string(),
+});
+
+export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;

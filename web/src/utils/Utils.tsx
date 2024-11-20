@@ -1,5 +1,10 @@
-import { JournalDate } from "@/types/calendar";
 import dayjs from "dayjs";
+
+// TODO might move this to /types or just eventually remove it
+export interface JournalDate {
+    month: number,
+    year: number
+}
 
 /**
  * Formats a URL for printing, which strips most of the URL away, excluding
@@ -76,3 +81,11 @@ export const getPriceString = (price: number): string => {
         ? `+$${Number(price / 100).toFixed(2)}`
         : `$${Number(price / -100).toFixed(2)}`
 }
+
+const generateGenericUniqueId = () => {
+    return crypto.randomUUID();
+}
+
+export const generateJournalEntryId = generateGenericUniqueId;
+export const generateCategoryId = generateGenericUniqueId;
+

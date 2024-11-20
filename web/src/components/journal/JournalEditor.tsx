@@ -159,13 +159,13 @@ export default function JournalEditor(props: JournalEditorProps) {
                     <Add />
                     Add
                 </Fab>
-                {selectedEntry && (
+                {/* {selectedEntry && (
                     <JournalEntryCard
                         entry={selectedEntry}
                         onClose={() => setSelectedEntryAnchorEl(null)}
                         anchorEl={selectedEntryAnchorEl}
                     />
-                )}
+                )} */}
                 <Grid
                     container
                     columns={12}
@@ -216,7 +216,8 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                             <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
                                                                 <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flowFlow: 'row nowrap', }}>
                                                                     <ListItemIcon sx={{ display: isSmall ? 'none' : undefined }}>
-                                                                        <CategoryIcon category={null} />
+                                                                        {/* <CategoryIcon category={null} /> */}
+                                                                        Icon
                                                                     </ListItemIcon>
                                                                     <ListItemText>{entry.memo}</ListItemText>
                                                                 </Grid>

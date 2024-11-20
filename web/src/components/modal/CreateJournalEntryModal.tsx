@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { CreateJournalEntry, JournalEntry } from "@/types/schema";
 import { db } from "@/database/client";
+import { createJournalEntry } from "@/database/actions";
 
 interface JournalEntryModalProps {
     open: boolean;
@@ -22,15 +23,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const { snackbar } = useContext(NotificationsContext);
 
     const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
-        const { parent } = formData;
-        const children = formData.children.map(child => {
-            return {
-                ...child,
-                date: parent.date,
-                parent: parent._id,
-            }
-        });
-        db.bulkDocs([parent, ...children]);
+        createJournalEntry(formData);
         snackbar({ message: 'Created journal entry'});
     }
 
