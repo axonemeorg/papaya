@@ -16,7 +16,7 @@ import { Category, JournalEntry } from "@/types/schema";
 import { db } from "@/database/client";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "@/database/queries";
+import { getCategories, getJournalEntries } from "@/database/queries";
 import CategoryIcon from "../icon/CategoryIcon";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
@@ -76,47 +76,31 @@ export default function JournalEditor(props: JournalEditorProps) {
         initialData: {},
     });
 
-    const getJournalEntries: () => Promise<JournalEntry[]> = useCallback(async () => {
-        const startDate = dayjs(props.date)
-            .startOf(props.view)
-            .format('YYYY-MM-DD');
+    const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
+        queryKey: ['journal-entries', props.view, props.date],
+        queryFn: async () => {
+            const entries = await getJournalEntries(props.view, props.date);
 
-        const endDate = dayjs(props.date)
-            .endOf(props.view)
-            .format('YYYY-MM-DD');
+            const groups: Record<string, JournalEntry[]> = Object.values(entries)
+                .reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+                    const { date } = entry;
+                    if (acc[date]) {
+                        acc[date].push(entry);
+                    } else {
+                        acc[date] = [entry];
+                    }
 
-        const result = await db.find({
-            selector: {
-                type: 'JOURNAL_ENTRY',
-                date: {
-                    $gte: startDate,
-                    $lte: endDate,
-                }
-            }
-        });
-
-        return result.docs as JournalEntry[];
-       
-    }, [props.date, props.view]);
-
-    useEffect(() => {
-        getJournalEntries().then((entries) => {
-            const groups: Record<string, JournalEntry[]> = entries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
-                const { date } = entry;
-                if (acc[date]) {
-                    acc[date].push(entry);
-                } else {
-                    acc[date] = [entry];
-                }
-
-                return acc;
-            }, {
-                [currentDayString]: [],
-            });
+                    return acc;
+                }, {
+                    [currentDayString]: [],
+                });
 
             setJournalGroups(groups);
-        });
-    }, [getJournalEntries])
+
+            return entries;
+        },
+        initialData: {},
+    });
 
     const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
         setSelectedEntryAnchorEl(event.currentTarget);
