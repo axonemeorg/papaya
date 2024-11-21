@@ -31,7 +31,7 @@ export const Category = Document.merge(z.object({
     type: z.literal('CATEGORY'),
     label: z.string(),
     description: z.string(),
-    avatar: z.string().optional().nullable(),
+    avatar: Avatar,
 }));
 
 export type Category = z.output<typeof Category>;

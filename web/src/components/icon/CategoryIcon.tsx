@@ -8,25 +8,13 @@ interface CategoryIconProps {
 }
 
 export default function CategoryIcon(props: CategoryIconProps) {
-	const {
-		avatarVariant,
-		avatarPrimaryColor,
-		avatarContent,
-		avatarSecondaryColor,
-	} = props.category ?? DEFAULT_AVATAR;
+	const avatar = props.category?.avatar ?? DEFAULT_AVATAR;
 
-	const avatar = {
-		avatarVariant,
-		avatarPrimaryColor,
-		avatarContent,
-		avatarSecondaryColor,
-	};
-
-	switch (avatar.avatarVariant) {
+	switch (avatar.variant) {
         case AvatarVariant.Enum.PICTORIAL:
             return (
-                <Icon sx={{ color: avatar.avatarPrimaryColor }}>
-                    {avatar.avatarContent}
+                <Icon sx={{ color: avatar.primaryColor }}>
+                    {avatar.content}
                 </Icon>
             );
         case AvatarVariant.Enum.IMAGE:
