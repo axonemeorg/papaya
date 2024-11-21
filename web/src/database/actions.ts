@@ -1,6 +1,6 @@
-import { CreateJournalEntry, CreateQuickJournalEntry } from "@/types/schema";
+import { Category, CreateJournalEntry, CreateQuickJournalEntry } from "@/types/schema";
 import { db } from "./client";
-import { generateJournalEntryId } from "@/utils/Utils";
+import { generateCategoryId, generateJournalEntryId } from "@/utils/Utils";
 
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
@@ -43,4 +43,30 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
     };
 
     return createJournalEntry(journalEntryFormData);
+}
+
+export const createCategory = async (formData: Category) => {
+    const category = {
+        ...formData,
+        _id: generateCategoryId(),
+    };
+
+    return db.put(category);
+}
+
+export const updateCategory = async (formData: Category) => {
+    return db.put(formData);
+}
+
+export const deleteCategory = async (formData: Category) => {
+    const record = await db.get(formData._id);
+    return db.remove(record);
+}
+
+export const undeleteCategory = async (formData: Category) => {
+    const record = await db.get(formData._id);
+    return db.put({
+        ...record,
+        _deleted: false,
+    });
 }

@@ -1,7 +1,5 @@
-'use client';
-
 import { Box, Drawer } from "@mui/material";
-// import ManageCategories from "./ManageCategories";
+import ManageCategories from "./ManageCategories";
 
 interface SettingsDrawerProps {
     open: boolean;
@@ -16,9 +14,9 @@ export default function SettingsDrawer(props: SettingsDrawerProps) {
             anchor="right"
         >
             <Box p={4} sx={{ width: '500px', maxWidth: '100dvw' }}>
-                {/* <ManageCategories
+                <ManageCategories
                     onClose={() => props.onClose()}
-                /> */}
+                />
             </Box>
         </Drawer>
     )
