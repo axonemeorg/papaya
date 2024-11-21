@@ -43,8 +43,7 @@ export const getEnhancedJournalEntries = async (view: JournalEditorView, date: s
     const result = Object.fromEntries(
         Object.values(journalEntries)
             .map((entry) => {
-                console.log('parent entry', entry);
-                const children: JournalEntry[] = []; // entry.childEntryIds.map(childId => journalEntries[childId]);
+                const children: JournalEntry[] = (entry.childEntryIds ?? []).map(childId => journalEntries[childId]);
 
                 return [entry._id, enhanceJournalEntry(entry, children)];
             })
