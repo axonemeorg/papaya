@@ -26,7 +26,7 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
     const journalEntryFormData: CreateJournalEntry = {
         parent: {
             _id: '',
-            _type: 'JOURNAL_ENTRY',
+            type: 'JOURNAL_ENTRY',
             memo: formData.memo,
             date: new Date().toISOString(),
             parentEntryId: null,

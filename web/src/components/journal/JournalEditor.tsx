@@ -5,9 +5,6 @@ import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "re
 import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
-import JournalEntryCard from "./JournalEntryCard";
-import CategoryIcon from "../icon/CategoryIcon";
-import CategoryChip from "../icon/CategoryChip";
 import { getPriceString } from "@/utils/Utils";
 import QuickJournalEditor from "./QuickJournalEditor";
 import NotificationsProvider from "@/providers/NotificationsProvider";
@@ -78,7 +75,7 @@ export default function JournalEditor(props: JournalEditorProps) {
 
         const result = await db.find({
             selector: {
-                _type: 'JOURNAL_ENTRY',
+                type: 'JOURNAL_ENTRY',
                 date: {
                     $gte: startDate,
                     $lte: endDate,
@@ -86,9 +83,19 @@ export default function JournalEditor(props: JournalEditorProps) {
             }
         });
 
+        console.log('result:', result);
+
         return result.docs as JournalEntry[];
        
     }, [props.date, props.view]);
+
+    db.allDocs().then((value) => {
+        const firstId = value.rows[0].id;
+        db.get(firstId).then((doc) => {
+            console.log('doc:', doc);
+        });
+    })
+
 
     useEffect(() => {
         getJournalEntries().then((entries) => {

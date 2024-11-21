@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const Document = z.object({
     _id: z.string(),
-    _type: z.string(),
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
+    type: z.string(),
 });
 
 export const EntryType = z.enum([
@@ -19,7 +19,7 @@ export const AvatarVariant = z.enum([
 ]);
 
 export const Avatar = Document.merge(z.object({
-    _type: z.literal('AVATAR'),
+    type: z.literal('AVATAR'),
     content: z.string(),
     variant: AvatarVariant,
     primaryColor: z.string(),
@@ -27,7 +27,7 @@ export const Avatar = Document.merge(z.object({
 }));
 
 export const Category = Document.merge(z.object({
-    _type: z.literal('CATEGORY'),
+    type: z.literal('CATEGORY'),
     label: z.string(),
     description: z.string(),
     avatarId: z.string().nullable(),
@@ -36,8 +36,9 @@ export const Category = Document.merge(z.object({
 export type Category = z.output<typeof Category>;
 
 export const JournalEntry = Document.merge(z.object({
-    _type: z.literal('JOURNAL_ENTRY'),
+    type: z.literal('JOURNAL_ENTRY'),
     memo: z.string(),
+    amount: z.string().min(0, "A positive number is required"),
     notes: z.string(),
     entryType: EntryType,
     date: z.string(),
@@ -60,7 +61,7 @@ export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
 export const CreateQuickJournalEntry = z.object({
     memo: z.string(),
-    amount: z.string(),
+    amount: z.string().min(0, "A positive number is required"),
 });
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;

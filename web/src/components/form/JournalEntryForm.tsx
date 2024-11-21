@@ -49,7 +49,7 @@ export default function JournalEntryForm() {
                 <Grid size={4}>
                     <Controller
                         control={control}
-                        name='parent.memo'
+                        name='parent.amount'
                         render={({ field }) => (
                             <TextField
                                 label='Amount'

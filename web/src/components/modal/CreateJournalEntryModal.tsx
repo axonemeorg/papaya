@@ -31,19 +31,25 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
         defaultValues: {
             parent: {
                 _id: '',
-                _type: 'JOURNAL_ENTRY',
+                type: 'JOURNAL_ENTRY',
                 memo: '',
+                amount: '',
                 date: props.initialDate,
                 categoryIds: [],
                 tagIds: [],
                 attachmentIds: [],
                 notes: '',
                 entryType: 'CREDIT',
+                parentEntryId: null,
+                paymentMethodId: null,
+                relatedEntryIds: [],
             },
             children: [],
         },
         resolver: zodResolver(CreateJournalEntry)
     });
+
+    console.log(createJournalEntryForm.formState.errors);
 
     useEffect(() => {
         createJournalEntryForm.setValue('parent.date', props.initialDate);
