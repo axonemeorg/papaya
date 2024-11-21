@@ -1,11 +1,5 @@
 import dayjs from "dayjs";
 
-// TODO might move this to /types or just eventually remove it
-export interface JournalDate {
-    month: number,
-    year: number
-}
-
 /**
  * Formats a URL for printing, which strips most of the URL away, excluding
  * the hostname and TLD.

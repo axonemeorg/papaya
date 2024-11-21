@@ -42,14 +42,17 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
     )
 }
 
-type JournalEditorView =
+export type JournalEditorView =
     | 'week'
     | 'month'
     | 'year'
 
-interface JournalEditorProps {
+export interface JournalEditorProps {
     view: JournalEditorView;
     date: string;
+    onNextPage: () => void;
+    onPrevPage: () => void;
+    onDateChange: (date: string) => void;
 }
 
 export default function JournalEditor(props: JournalEditorProps) {
@@ -114,8 +117,6 @@ export default function JournalEditor(props: JournalEditorProps) {
         });
     }, [getJournalEntries])
 
-    console.log('journalGroups:', journalGroups);
-
     const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
         setSelectedEntryAnchorEl(event.currentTarget);
         setSelectedEntry(entry);
@@ -134,7 +135,13 @@ export default function JournalEditor(props: JournalEditorProps) {
             />
             <BaseLayout
                 headerChildren={
-                    <JournalHeader month={1} year={1990}>
+                    <JournalHeader
+                        date={props.date}
+                        view={props.view}
+                        onNextPage={props.onNextPage}
+                        onPrevPage={props.onPrevPage}
+                        onDateChange={props.onDateChange}
+                    >
                         <IconButton onClick={() => setShowSettingsDrawer(true)}>
                             <MuiCategoryIcon />
                         </IconButton>

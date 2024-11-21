@@ -1,39 +1,92 @@
-import { JournalDate } from "@/types/calendar";
-import { getJournalDateUrl, getNextYearMonth, getPreviousYearMonth, getTodayYearAndMonth } from "@/utils/Utils";
-import { Apps, ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
-import { Button, ButtonBase, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
+import { getJournalDateUrl } from "@/utils/Utils";
+import { ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
+import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { DateCalendar, DateView, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { JournalEditorProps } from "./JournalEditor";
 
-type JournalHeaderProps = PropsWithChildren<JournalDate>;
+type JournalHeaderProps = PropsWithChildren<JournalEditorProps>;
 
-const formatMonthString = (year: number, month: number): string => {
-    const day = dayjs([year, month].join('-'))
-    if (day.isSame(dayjs(), 'year')) {
-        return day.format('MMMM');
-    }
-
-    return day.format('MMM YYYY');
-}
-
-export default function JournalHeader({ month, year, children }: JournalHeaderProps) {
+export default function JournalHeader(props: JournalHeaderProps) {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-    const router = useRouter();
 
     const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
-        const year = Number(value.format('YYYY'));
-        const month = Number(value.format('M'));
-
-        router.push(getJournalDateUrl({ year, month }));
+        props.onDateChange(value.format('YYYY-MM-DD'));
     }
 
     const theme = useTheme();
     const hideNextPrevButtons = useMediaQuery(theme.breakpoints.down('md'));
     const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
+
+    const now = useMemo(() => dayjs(), []);
+
+    const nextButtonTooltip = useMemo(() => {
+        if (props.view === 'month') {
+            return 'Next month';
+        }
+        if (props.view === 'year') {
+            return 'Next year';
+        }
+        if (props.view === 'week') {
+            return 'Next week';
+        }
+    }, [props.view]);
+
+    const prevButtonTooltip = useMemo(() => {
+        if (props.view === 'month') {
+            return 'Previous month';
+        }
+        if (props.view === 'year') {
+            return 'Previous year';
+        }
+        if (props.view === 'week') {
+            return 'Previous week';
+        }
+    }, [props.view]);
+
+    const formattedDateString = useMemo(() => {
+        const date = dayjs(props.date);
+        switch (props.view) {
+            case 'month':
+                const isCurrentYear = date.isSame(now, 'year');
+                if (isCurrentYear) {
+                    return date.format('MMMM');
+                }
+
+                return date.format('MMM YYYY');
+            case 'year':
+                return date.format('YYYY');
+            case 'week':
+            default:
+                const startOfWeek = date.startOf('week');
+                const endOfWeek = date.endOf('week');
+                // Format into form "Jan 1 - 7, 2022"
+                return `${startOfWeek.format('MMM D')} - ${endOfWeek.format('D, YYYY')}`;
+            
+        }
+    }, [props.date, props.view]);
+
+    const calendarAvailableViews = useMemo((): DateView[] => {
+        switch (props.view) {
+            case 'month':
+            default:
+                return ['month', 'year'];
+            case 'year':
+                return ['year'];
+            case 'week':
+                return ['year', 'month', 'day'];
+        }
+    }, [props.view]);
+
+    const formattedCurrentDay = useMemo(() => {
+        return now.format('dddd, MMMM D');
+    }, []);
+
+    const jumpToToday = useCallback(() => {
+        props.onDateChange(now.format('YYYY-MM-DD'));
+    }, []);
 
     return (
         <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center' gap={1}>
@@ -41,25 +94,21 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
                 <Stack direction='row' alignItems='center' gap={1}>
                     {!hideNextPrevButtons && (
                         <Stack direction='row'>
-                            <Link href={getJournalDateUrl(getPreviousYearMonth({ year, month }))}>
-                                <Tooltip title='Previous month'>
-                                    <IconButton>
-                                        <ArrowBackIos />
-                                    </IconButton>
-                                </Tooltip>
-                            </Link>
-                            <Link href={getJournalDateUrl(getNextYearMonth({ year, month }))}>
-                                <Tooltip title='Next month'>
-                                    <IconButton>
-                                        <ArrowForwardIos />
-                                    </IconButton>
-                                </Tooltip>
-                            </Link>
+                            <Tooltip title={prevButtonTooltip}>
+                                <IconButton onClick={() => props.onPrevPage()}>
+                                    <ArrowBackIos />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title={nextButtonTooltip}>
+                                <IconButton onClick={() => props.onNextPage()}>
+                                    <ArrowForwardIos />
+                                </IconButton>
+                            </Tooltip>
                         </Stack>
                     )}
                     <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
                         <Typography variant={headingSize} sx={{ fontWeight: 500 }}>
-                            {formatMonthString(year, month)}
+                            {formattedDateString}
                         </Typography>
                     </Button>
                     <Popover
@@ -69,22 +118,20 @@ export default function JournalHeader({ month, year, children }: JournalHeaderPr
                     >
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DateCalendar
-                                views={['month', 'year']}
+                                views={calendarAvailableViews}
                                 onChange={(value) => {handleChangeDatePickerDate(value)}}
                             />
                         </LocalizationProvider>
                     </Popover>
                 </Stack>
-                {/* <Link href={'/journal'}>
-                    <Tooltip title='Today'>
-                        <IconButton color='inherit'>
-                            <EventRepeat />
-                        </IconButton>
-                    </Tooltip>
-                </Link> */}
+                <Tooltip title={formattedCurrentDay}>
+                    <IconButton color='inherit' onClick={() => jumpToToday()}>
+                        <EventRepeat />
+                    </IconButton>
+                </Tooltip>
             </Stack>
             <Stack direction='row' alignItems='center' gap={2}>
-                {children}
+                {props.children}
             </Stack>
         </Stack>
     )
