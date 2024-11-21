@@ -1,11 +1,8 @@
 'use client'
 
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps, MenuItem } from "@mui/material";
-import * as colors from '@mui/material/colors';
-import { CSSProperties, useContext, useMemo } from "react";
 
 import CategoryIcon from "../icon/CategoryIcon";
-import { useCategoryStore } from "@/store/useCategoriesStore";
 import { fetchCategoriesQuery } from "@/database/queries";
 import { Category } from "@/types/schema";
 

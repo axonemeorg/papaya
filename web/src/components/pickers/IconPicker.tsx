@@ -5,18 +5,16 @@ import { FixedSizeGrid } from 'react-window';
 import icons from '@/constants/icons';
 import { ReactNode, useMemo, useState } from 'react';
 import ColorPicker, { ColorPickerProps } from '../pickers/ColorPicker';
-import { Add, FormatColorReset, Search, Shuffle } from '@mui/icons-material';
+import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';
-import { IconWithGradient } from '../icon/IconWithGradient';
-import { ItemAvatar } from '@/types/get';
-import { AvatarVariant } from '@/types/enum';
+import { Avatar, AvatarVariant } from '@/types/schema';
 
 // const DEFAULT_ICON = 'home'
 
 interface IconPickerProps {
-    value: ItemAvatar;
-    onChange: (avatar: ItemAvatar) => void;
+    value: Avatar;
+    onChange: (avatar: Avatar) => void;
 }
 
 const sortedIcons = icons.sort((a, b) => b.popularity - a.popularity);
@@ -35,7 +33,7 @@ const COLUMN_COUNT = 10;
 const CELL_SIZE = 40;
 
 export default function IconPicker(props: IconPickerProps) {
-    const color: string | undefined = props.value.avatarPrimaryColor ?? undefined
+    const color: string | undefined = props.value.primaryColor ?? undefined
 
     const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -50,24 +48,24 @@ export default function IconPicker(props: IconPickerProps) {
         const newIcon = sortedIcons[iconIndex].name;
         props.onChange({
             ...props.value,
-            avatarContent: newIcon,
-            avatarVariant: AvatarVariant.Enum.PICTORIAL
+            content: newIcon,
+            variant: AvatarVariant.Enum.PICTORIAL
         });
     }
 
     const handleChangeColor = (color: string) => {
         props.onChange({
             ...props.value,
-            avatarVariant: AvatarVariant.Enum.PICTORIAL,
-            avatarPrimaryColor: color,
+            variant: AvatarVariant.Enum.PICTORIAL,
+            primaryColor: color,
         });
     }
 
     const handleChangeIcon = (icon: string) => {
         props.onChange({
             ...props.value,
-            avatarVariant: AvatarVariant.Enum.PICTORIAL,
-            avatarContent: icon,
+            variant: AvatarVariant.Enum.PICTORIAL,
+            content: icon,
         });
     }
 

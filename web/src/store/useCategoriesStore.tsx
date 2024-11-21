@@ -1,4 +1,4 @@
-import { Category, ItemAvatar } from "@/types/get";
+import { Category, Avatar } from "@/types/get";
 import { CreateCategory } from "@/types/post";
 import { UpdateCategory } from "@/types/put";
 import { create } from "zustand";

@@ -5,7 +5,6 @@ class MyDocument extends Document {
     return (
       <Html lang='en'>
         <Head>
-          <title>Zisk</title>
           <link rel="icon" href="favicon.ico" />
           <link
             rel="stylesheet"

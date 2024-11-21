@@ -1,14 +1,14 @@
-import { ItemAvatar } from "@/types/get";
+import { Avatar } from "@/types/get";
 import { create } from "zustand";
 
 interface UserImageAvatarHistoryStore {
-    history: ItemAvatar[];
-    add: (avatar: ItemAvatar) => void;
+    history: Avatar[];
+    add: (avatar: Avatar) => void;
     clear: () => void;
   }
 
 export const useUserImageAvatarHistoryStore = create<UserImageAvatarHistoryStore>((set) => ({
     history: [],
-    add: (avatar: ItemAvatar) => set((state) => ({ history: [avatar, ...state.history] })),
+    add: (avatar: Avatar) => set((state) => ({ history: [avatar, ...state.history] })),
     clear: () => set({ history: [] }),
 }));

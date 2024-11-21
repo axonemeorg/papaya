@@ -3,26 +3,25 @@ import { Box, Button, colors, Fade, Icon, InputAdornment, OutlinedInput, Popover
 import { useState } from 'react';
 import IconPicker from './IconPicker';
 import ImageAvatarPicker, { ImageAvatar } from './ImageAvatarPicker';
-import { ItemAvatar } from '@/types/get';
-import { AvatarVariant } from '@/types/enum';
+import { Avatar, AvatarVariant } from '@/types/schema';
 
 interface AvatarPickerProps {
-    value: ItemAvatar | null;
-    onChange: (avatar: ItemAvatar) => void;
+    value: Avatar | null;
+    onChange: (avatar: Avatar) => void;
 }
 
-export const DEFAULT_AVATAR: ItemAvatar = {
-    avatarContent: 'layers',
-    avatarVariant: AvatarVariant.Enum.PICTORIAL,
-    avatarPrimaryColor: colors.grey[500],
+export const DEFAULT_AVATAR: Avatar = {
+    content: 'layers',
+    variant: AvatarVariant.Enum.PICTORIAL,
+    primaryColor: colors.grey[500],
 };
 
-const renderAvatarItem = (avatar: ItemAvatar) => {
-    switch (avatar.avatarVariant) {
+const renderAvatarItem = (avatar: Avatar) => {
+    switch (avatar.variant) {
         case AvatarVariant.Enum.PICTORIAL:
             return (
-                <Icon sx={{ color: avatar.avatarPrimaryColor }}>
-                    {avatar.avatarContent}
+                <Icon sx={{ color: avatar.primaryColor }}>
+                    {avatar.content}
                 </Icon>
             );
         case AvatarVariant.Enum.IMAGE:
@@ -38,10 +37,10 @@ export default function AvatarPicker(props: AvatarPickerProps) {
     const [anchorEl, setAnchorEl] = useState<Element | null>(null);
     const [currentTab, setCurrentTab] = useState<number>(0);
 
-    const displayIcon: ItemAvatar = props.value ?? DEFAULT_AVATAR;
+    const displayIcon: Avatar = props.value ?? DEFAULT_AVATAR;
     const open = Boolean(anchorEl);
 
-    const handleChange = (avatar: ItemAvatar | null) => {
+    const handleChange = (avatar: Avatar | null) => {
         props.onChange(avatar ?? DEFAULT_AVATAR);
     }
 
@@ -86,7 +85,7 @@ export default function AvatarPicker(props: AvatarPickerProps) {
                 </Box>
                 {currentTab === 0 && (
                     <IconPicker
-                        value={displayIcon.avatarVariant === 'IMAGE' ? DEFAULT_AVATAR : displayIcon}
+                        value={displayIcon.variant === 'IMAGE' ? DEFAULT_AVATAR : displayIcon}
                         onChange={handleChange}
                     />
                 )}

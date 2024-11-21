@@ -10,12 +10,12 @@ import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
 import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
 import { UpdateCategory } from "@/types/put";
 import AvatarPicker from "../pickers/AvatarPicker";
-import { ItemAvatar } from "@/types/get";
+import { Avatar } from "@/types/get";
 
 export default function CategoryForm() {
     const { register, control, setValue, watch } = useFormContext<CreateCategory | UpdateCategory>();
 
-    const currentIcon: ItemAvatar | null = useMemo(() => {
+    const currentIcon: Avatar | null = useMemo(() => {
         const {
             avatarContent,
             avatarPrimaryColor,
@@ -23,7 +23,7 @@ export default function CategoryForm() {
             avatarSecondaryColor
         } = watch();
 
-        const avatar: ItemAvatar = {
+        const avatar: Avatar = {
             avatarContent,
             avatarPrimaryColor,
             avatarVariant,
@@ -35,7 +35,7 @@ export default function CategoryForm() {
         return null;
     }, [watch()]);
 
-    const handleChangeIcon = (avatar: ItemAvatar) => {
+    const handleChangeIcon = (avatar: Avatar) => {
         setValue('avatarContent', avatar.avatarContent);
         setValue('avatarPrimaryColor', avatar.avatarPrimaryColor);
         setValue('avatarVariant', avatar.avatarVariant);

@@ -18,19 +18,20 @@ export const AvatarVariant = z.enum([
     'IMAGE',
 ]);
 
-export const Avatar = Document.merge(z.object({
-    type: z.literal('AVATAR'),
+export const Avatar = z.object({
     content: z.string(),
     variant: AvatarVariant,
     primaryColor: z.string(),
-    secondaryColor: z.string(),
-}));
+    secondaryColor: z.string().optional().nullable(),
+});
+
+export type Avatar = z.output<typeof Avatar>;
 
 export const Category = Document.merge(z.object({
     type: z.literal('CATEGORY'),
     label: z.string(),
     description: z.string(),
-    avatarId: z.string().nullable(),
+    avatar: z.string().optional().nullable(),
 }));
 
 export type Category = z.output<typeof Category>;
