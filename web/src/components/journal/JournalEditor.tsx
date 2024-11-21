@@ -12,9 +12,12 @@ import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";
 // import { useCategoryStore } from "@/store/useCategoriesStore";
-import { JournalEntry } from "@/types/schema";
+import { Category, JournalEntry } from "@/types/schema";
 import { db } from "@/database/client";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "@/database/queries";
+import CategoryIcon from "../icon/CategoryIcon";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -65,7 +68,13 @@ export default function JournalEditor(props: JournalEditorProps) {
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const currentDayString = dayjs().format('YYYY-MM-DD');
+    const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
+
+    const getCategoriesQuery = useQuery({
+        queryKey: ['categories'],
+        queryFn: getCategories,
+        initialData: {},
+    });
 
     const getJournalEntries: () => Promise<JournalEntry[]> = useCallback(async () => {
         const startDate = dayjs(props.date)
@@ -89,14 +98,6 @@ export default function JournalEditor(props: JournalEditorProps) {
         return result.docs as JournalEntry[];
        
     }, [props.date, props.view]);
-
-    db.allDocs().then((value) => {
-        const firstId = value.rows[0].id;
-        db.get(firstId).then((doc) => {
-            console.log('doc:', doc);
-        });
-    })
-
 
     useEffect(() => {
         getJournalEntries().then((entries) => {
@@ -216,6 +217,8 @@ export default function JournalEditor(props: JournalEditorProps) {
                                             <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
                                                 {entries.map((entry) => {
                                                     const { categoryIds } = entry;
+                                                    const categoryId: string | undefined = categoryIds[0];
+                                                    const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
                                                     const netAmount = -1;
                                                     const isNetPositive = netAmount > 0;
 
@@ -228,8 +231,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                             <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
                                                                 <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flowFlow: 'row nowrap', }}>
                                                                     <ListItemIcon sx={{ display: isSmall ? 'none' : undefined }}>
-                                                                        {/* <CategoryIcon category={null} /> */}
-                                                                        Icon
+                                                                        <CategoryIcon category={category} />
                                                                     </ListItemIcon>
                                                                     <ListItemText>{entry.memo}</ListItemText>
                                                                 </Grid>
