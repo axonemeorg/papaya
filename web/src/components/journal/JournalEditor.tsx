@@ -1,23 +1,20 @@
 'use client'
 
 import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
-// import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
-import { getPriceString } from "@/utils/Utils";
 import QuickJournalEditor from "./QuickJournalEditor";
 import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";
-// import { useCategoryStore } from "@/store/useCategoriesStore";
 import { Category, JournalEntry } from "@/types/schema";
-import { db } from "@/database/client";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getJournalEntries } from "@/database/queries";
 import CategoryIcon from "../icon/CategoryIcon";
+import { getPriceString } from "@/utils/price";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();

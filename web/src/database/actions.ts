@@ -1,6 +1,6 @@
 import { Category, CreateJournalEntry, CreateQuickJournalEntry } from "@/types/schema";
 import { db } from "./client";
-import { generateCategoryId, generateJournalEntryId } from "@/utils/Utils";
+import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
 
 export const createJournalEntry = async (formData: CreateJournalEntry) => {

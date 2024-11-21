@@ -14,7 +14,6 @@ export const getCategories = async (): Promise<Record<Category['_id'], Category>
 }
 
 export const getJournalEntries = async (view: JournalEditorView, date: string): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
-
     const startDate = dayjs(date)
         .startOf(view)
         .format('YYYY-MM-DD');
