@@ -11,8 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import TransactionTagPicker from "../pickers/TransactionTagPicker";
 import { TRANSACTION_TAG_LABELS } from "@/constants/transactionTags";
-import { register } from "module";
-import { CreateJournalEntry, JournalEntry } from "@/types/schema";
+import { Category, CreateJournalEntry, JournalEntry } from "@/types/schema";
 
 export default function JournalEntryForm() {
     const { setValue, control, watch, register } = useFormContext<CreateJournalEntry>();
@@ -101,19 +100,18 @@ export default function JournalEntryForm() {
                         name='parent.categoryIds'
                         render={({ field }) => {
                             const categoryIds = watch('parent.categoryIds');
-                            const value = categoryIds?.length > 0 ? categoryIds[0] : null;
-                            // TODO update categoryautocomplete to use only categoryId
+                            const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null;
+
                             return (
-                                // <CategoryAutocomplete
-                                //     {...field}
-                                //     ref={null}
-                                //     value={value}
-                                //     onChange={(_event, newValue) => {
-                                //         // setManuallySetCategory(Boolean(newValue))
-                                //         setValue(field.name, newValue);
-                                //     }}
-                                // />
-                                <p>Categories</p>
+                                <CategoryAutocomplete
+                                    {...field}
+                                    ref={null}
+                                    value={categoryId}
+                                    onChange={(_event, newValue) => {
+                                        // setManuallySetCategory(Boolean(newValue))
+                                        setValue(field.name, newValue ? [newValue] : []);
+                                    }}
+                                />
                             );
                         }}
                     />

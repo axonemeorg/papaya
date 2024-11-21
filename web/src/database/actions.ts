@@ -28,6 +28,7 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
             _id: '',
             type: 'JOURNAL_ENTRY',
             memo: formData.memo,
+            amount: formData.amount,
             date: new Date().toISOString(),
             parentEntryId: null,
             paymentMethodId: null,
@@ -42,4 +43,12 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
     };
 
     return createJournalEntry(journalEntryFormData);
+}
+
+export const getCategories = async () => {
+    return db.find({
+        selector: {
+            type: 'CATEGORY',
+        }
+    });
 }

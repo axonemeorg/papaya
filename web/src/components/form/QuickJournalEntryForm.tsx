@@ -2,7 +2,8 @@
 
 import { Grid2 as Grid, InputAdornment, TextField } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
-import { CreateQuickJournalEntry } from "@/types/schema";
+import { Category, CreateQuickJournalEntry } from "@/types/schema";
+import CategoryAutocomplete from "../input/CategoryAutocomplete";
 
 export default function QuickJournalEntryForm() {
     // const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
@@ -70,23 +71,27 @@ export default function QuickJournalEntryForm() {
                 />
             </Grid>
             <Grid size={5}>
-                {/* <Controller
+                <Controller
                     control={control}
-                    name='category'
-                    render={({ field }) => (
-                        <CategoryAutocomplete
-                            {...field}
-                            ref={null}
-                            value={watch('category') as Category ?? null}
-                            onChange={(_event, newValue) => {
-                                setManuallySetCategory(Boolean(newValue))
-                                setValue(field.name, newValue);
-                            }}
-                            size="small"
-                        />
-                    )}
-                /> */}
-                Category
+                    name='categoryIds'
+                    render={({ field }) => {
+                        const categoryIds = watch('categoryIds');
+                        const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null;
+
+                        return (
+                            <CategoryAutocomplete
+                                {...field}
+                                ref={null}
+                                value={categoryId}
+                                onChange={(_event, newValue) => {
+                                    // setManuallySetCategory(Boolean(newValue))
+                                    setValue(field.name, newValue ? [newValue] : []);
+                                }}
+                                size="small"
+                            />
+                        );
+                    }}
+                />
             </Grid>
         </Grid>
     )

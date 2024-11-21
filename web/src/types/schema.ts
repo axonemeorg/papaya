@@ -61,6 +61,7 @@ export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
 export const CreateQuickJournalEntry = z.object({
     memo: z.string(),
+    categoryIds: z.array(z.string()),
     amount: z.string().min(0, "A positive number is required"),
 });
 
