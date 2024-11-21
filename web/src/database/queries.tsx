@@ -1,7 +1,8 @@
-import { Category, JournalEntry } from "@/types/schema";
+import { Category, EnhancedJournalEntry, JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { JournalEditorView } from "@/components/journal/JournalEditor";
 import dayjs from "dayjs";
+import { enhanceJournalEntry } from "@/utils/journal";
 
 export const getCategories = async (): Promise<Record<Category['_id'], Category>> => {
     const result = await db.find({
@@ -34,4 +35,20 @@ export const getJournalEntries = async (view: JournalEditorView, date: string): 
 
     return Object.fromEntries((result.docs as JournalEntry[])
         .map(entry => [entry._id, entry]));
+}
+
+export const getEnhancedJournalEntries = async (view: JournalEditorView, date: string): Promise<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>> => {
+    const journalEntries = await getJournalEntries(view, date);
+
+    const result = Object.fromEntries(
+        Object.values(journalEntries)
+            .map((entry) => {
+                console.log('parent entry', entry);
+                const children: JournalEntry[] = []; // entry.childEntryIds.map(childId => journalEntries[childId]);
+
+                return [entry._id, enhanceJournalEntry(entry, children)];
+            })
+    );
+
+    return result;
 }

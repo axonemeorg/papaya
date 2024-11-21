@@ -17,14 +17,16 @@ interface JournalEntryModalProps {
     open: boolean;
     initialDate: string;
     onClose: () => void;
+    onSaved: () => void;
 }
 
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const { snackbar } = useContext(NotificationsContext);
 
-    const handleCreateJournalEntry = (formData: CreateJournalEntry) => {
-        createJournalEntry(formData);
+    const handleCreateJournalEntry = async (formData: CreateJournalEntry) => {
+        await createJournalEntry(formData);
         snackbar({ message: 'Created journal entry'});
+        props.onSaved();
     }
 
     const createJournalEntryForm = useForm<CreateJournalEntry>({
@@ -48,8 +50,6 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
         },
         resolver: zodResolver(CreateJournalEntry)
     });
-
-    console.log(createJournalEntryForm.formState.errors);
 
     useEffect(() => {
         createJournalEntryForm.setValue('parent.date', props.initialDate);

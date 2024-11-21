@@ -12,6 +12,7 @@ db.createIndex({
         fields: [
             'type',
             'date',
+            'parentEntryId',
         ]
     }
 });

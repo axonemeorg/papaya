@@ -1,24 +1,27 @@
-import { Category, CreateJournalEntry, CreateQuickJournalEntry } from "@/types/schema";
+import { Category, type CreateJournalEntry, CreateQuickJournalEntry, type JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
-
 export const createJournalEntry = async (formData: CreateJournalEntry) => {
-    const parent = {
-        ...formData.parent,
-        _id: generateJournalEntryId(),
-        parent: null,
-    };
+    const parentId = generateJournalEntryId();
 
-    const children = formData.children.map(child => {
+    const children: JournalEntry[] = formData.children.map(child => {
         return {
             ...child,
             date: parent.date,
-            parent: parent._id,
+            parentEntryId: parent._id,
             _id: generateJournalEntryId(),
+            childEntryIds: [],
         }
     });
     
+    const parent: JournalEntry = {
+        ...formData.parent,
+        _id: parentId,
+        parentEntryId: null,
+        childEntryIds: children.map(child => child._id),
+    };
+
     return db.bulkDocs([parent, ...children]);
 }
 
@@ -36,6 +39,7 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
             categoryIds: [],
             tagIds: [],
             attachmentIds: [],
+            childEntryIds: [],
             notes: '',
             entryType: 'CREDIT',
         },

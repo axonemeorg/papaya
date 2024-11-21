@@ -1,7 +1,7 @@
 'use client'
 
 import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
 import QuickJournalEditor from "./QuickJournalEditor";
@@ -9,12 +9,14 @@ import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";
-import { Category, JournalEntry } from "@/types/schema";
+import { Category, EnhancedJournalEntry, JournalEntry } from "@/types/schema";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getJournalEntries } from "@/database/queries";
+import { getCategories, getEnhancedJournalEntries } from "@/database/queries";
 import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/price";
+import { db } from "@/database/client";
+import CategoryChip from "../icon/CategoryChip";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -60,7 +62,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
     const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
     const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
-    const [journalGroups, setJournalGroups] = useState<Record<string, JournalEntry[]>>({});
+    const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
@@ -73,13 +75,16 @@ export default function JournalEditor(props: JournalEditorProps) {
         initialData: {},
     });
 
-    const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
-        queryKey: ['journal-entries', props.view, props.date],
-        queryFn: async () => {
-            const entries = await getJournalEntries(props.view, props.date);
+    console.log('props.view', props.view);
+    console.log('props.date', props.date);
 
-            const groups: Record<string, JournalEntry[]> = Object.values(entries)
-                .reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+    const getJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
+        queryKey: ['enhanced-journal-entries', props.view, props.date],
+        queryFn: async () => {
+            const entries = await getEnhancedJournalEntries(props.view, props.date);
+
+            const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries)
+                .reduce((acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
                     const { date } = entry;
                     if (acc[date]) {
                         acc[date].push(entry);
@@ -97,6 +102,7 @@ export default function JournalEditor(props: JournalEditorProps) {
             return entries;
         },
         initialData: {},
+        enabled: true,
     });
 
     const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
@@ -104,11 +110,22 @@ export default function JournalEditor(props: JournalEditorProps) {
         setSelectedEntry(entry);
     }
 
+    // // show all docs
+    // useEffect(() => {
+    //     db.allDocs({ include_docs: true }).then((result) => {
+    //         console.log('all docs', result);
+    //     });
+    // }, []);
+
     return (
         <NotificationsProvider>
             <CreateJournalEntryModal
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
+                onSaved={() => {
+                    getJournalEntriesQuery.refetch();
+                    setShowJournalEntryModal(false);
+                }}
                 initialDate={currentDayString}
             />
             <SettingsDrawer
@@ -200,7 +217,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                     const { categoryIds } = entry;
                                                     const categoryId: string | undefined = categoryIds[0];
                                                     const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
-                                                    const netAmount = -1;
+                                                    const netAmount = entry.netAmount
                                                     const isNetPositive = netAmount > 0;
 
                                                     return (
@@ -224,14 +241,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                     </ListItemText>
                                                                 </Grid>
                                                                 <Grid size={{ xs: 'grow', sm: 5, md: 6 }}>
-                                                                    {/* {category ? (
+                                                                    {category ? (
                                                                         <CategoryChip category={category} />
                                                                     ) : (
                                                                         <Chip
                                                                             sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
                                                                             label='Uncategorized'
                                                                         />
-                                                                    )} */}
+                                                                    )}
                                                                 </Grid>
                                                             </Grid>
                                                         </MenuItem>

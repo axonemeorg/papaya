@@ -44,6 +44,7 @@ export const JournalEntry = Document.merge(z.object({
     entryType: EntryType,
     date: z.string(),
     parentEntryId: z.string().nullable(),
+    childEntryIds: z.array(z.string()),
     paymentMethodId: z.string().nullable(),
     categoryIds: z.array(z.string()),
     attachmentIds: z.array(z.string()),
@@ -52,6 +53,13 @@ export const JournalEntry = Document.merge(z.object({
 }));
 
 export type JournalEntry = z.output<typeof JournalEntry>;
+
+export const EnhancedJournalEntry = JournalEntry.merge(z.object({
+    allCategoryIds: z.array(z.string()),
+    netAmount: z.number(),
+}));
+
+export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 
 export const CreateJournalEntry = z.object({
     parent: JournalEntry,
