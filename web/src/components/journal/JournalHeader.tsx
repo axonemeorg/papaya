@@ -86,7 +86,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
     const jumpToToday = useCallback(() => {
         props.onDateChange(now.format('YYYY-MM-DD'));
-    }, []);
+    }, [props.view]);
 
     return (
         <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center' gap={1}>

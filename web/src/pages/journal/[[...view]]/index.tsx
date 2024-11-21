@@ -18,7 +18,7 @@ export default function JournalYearMonthPage() {
     
     const now = useMemo(() => dayjs(), []);
     
-    const handleDateChange = (date: string) => {
+    const handleDateChange = useCallback((date: string) => {
         let [y, m, d] = date.split('-');
         if (view === 'year' || view === 'month') {
             d = '';
@@ -28,9 +28,8 @@ export default function JournalYearMonthPage() {
         }
 
         const routerParts = ['', ...['journal', viewShorthand, y, m, d].filter(Boolean)];
-        console.log(routerParts);
         router.push(routerParts.join('/'));
-    }
+    }, [view, viewShorthand]);
 
     const date = useMemo(() => {
         let year: number = viewParams[1] ? Number(viewParams[1]) : now.year();
