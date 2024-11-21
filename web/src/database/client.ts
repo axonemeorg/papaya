@@ -6,3 +6,13 @@ const POUCH_DB_NAME = 'zisk-db';
 export const db = new PouchDB(POUCH_DB_NAME);
 
 PouchDB.plugin(PouchDBFind);
+
+db.createIndex({
+    index: {
+        fields: [
+            'type',
+            'date',
+        ]
+    }
+});
+

@@ -76,10 +76,10 @@ export default function JournalEditor(props: JournalEditorProps) {
         const result = await db.find({
             selector: {
                 type: 'JOURNAL_ENTRY',
-                date: {
-                    $gte: startDate,
-                    $lte: endDate,
-                }
+                // date: {
+                //     $gte: startDate,
+                //     $lte: endDate,
+                // }
             }
         });
 
