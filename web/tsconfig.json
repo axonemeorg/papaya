@@ -6,8 +6,12 @@
       "esnext"
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "core/*": ["../core/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "core/*": [
+        "../core/*"
+      ]
     },
     "allowJs": true,
     "skipLibCheck": true,
@@ -24,7 +28,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "target": "ES2017"
   },
   "include": [
     "next-env.d.ts",

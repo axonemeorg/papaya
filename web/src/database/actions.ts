@@ -44,11 +44,3 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
 
     return createJournalEntry(journalEntryFormData);
 }
-
-export const getCategories = async () => {
-    return db.find({
-        selector: {
-            type: 'CATEGORY',
-        }
-    });
-}

@@ -1,14 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "./actions";
 import { Category } from "@/types/schema";
+import { db } from "./client";
 
+export const getCategories = async (): Promise<Record<Category['_id'], Category>> => {
+    const result = await db.find({
+        selector: {
+            type: 'CATEGORY',
+        }
+    });
 
-export const fetchCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
-    queryKey: ['categories'],
-    initialData: {},
-    queryFn: async (): Promise<Record<Category['_id'], Category>> => {
-        const categories = await getCategories();
-        return Object.fromEntries((categories.docs as Category[])
-            .map(category => [category._id, category]));
-    },
-});
+    return Object.fromEntries((result.docs as Category[]).map(category => [category._id, category]));
+}
