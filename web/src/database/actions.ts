@@ -1,15 +1,27 @@
 import { Category, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
-import { db } from "./client";
+import { db, JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
 export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
-    const parentId = generateJournalEntryId();
+    let s: number | null = null;
+    try {
+        const sequenceDocument = (await db.get(JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY) as { sequenceValue: number });
+        s = sequenceDocument.sequenceValue;
+    } catch (error) {
+        //
+    }
 
-    const children: JournalEntry[] = formData.children.map(child => {
+    console.log('s:', s)
+
+    const parentId = generateJournalEntryId();
+    const parentSequenceNumber = s === null ? null : s;
+
+    const children: JournalEntry[] = formData.children.map((child, index) => {
         return {
             ...child,
             type: 'JOURNAL_ENTRY',
             date: parent.date,
+            sequenceNumber: parentSequenceNumber === null ? null : parentSequenceNumber + index + 1,
             parentEntryId: parent._id,
             _id: generateJournalEntryId(),
             childEntryIds: [],
@@ -21,10 +33,20 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
         type: 'JOURNAL_ENTRY',
         _id: parentId,
         parentEntryId: null,
+        sequenceNumber: parentSequenceNumber,
         childEntryIds: children.map(child => child._id),
     };
 
-    return db.bulkDocs([parent, ...children]);
+    const docs: Object[] = [parent, ...children];
+
+    if (s !== null) {
+        docs.push({
+            _id: JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY,
+            sequenceValue: s + children.length + 1,
+        });
+    }
+
+    return db.bulkDocs(docs);
 }
 
 export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {

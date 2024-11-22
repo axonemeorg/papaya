@@ -108,9 +108,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
                         <Stack direction='row' justifyContent="space-between" alignItems={'center'} sx={{ mb: 2 }}>
                             <Box px={1}>
                                 <JournalEntryNumber
-                                    // TODO
-                                    // value={props.entry.entryNumber}
-                                    value={"-1"}
+                                    value={props.selection.entry?.sequenceNumber}
                                 />
                             </Box>
                             <Stack direction='row' gap={0.5}>

@@ -61,6 +61,7 @@ export const JournalEntry = Document.merge(CreateJournalEntry).merge(z.object({
     type: z.literal('JOURNAL_ENTRY'),
     parentEntryId: z.string().nullable(),
     childEntryIds: z.array(z.string()),
+    sequenceNumber: z.number().nullable(),
 }));
 
 export type JournalEntry = z.output<typeof JournalEntry>;
