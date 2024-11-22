@@ -1,27 +1,20 @@
 import { Category, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
-import { db, JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY } from "./client";
+import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
 export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
-    let s: number | null = null;
-    try {
-        const sequenceDocument = (await db.get(JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY) as { sequenceValue: number });
-        s = sequenceDocument.sequenceValue;
-    } catch (error) {
-        //
-    }
-
-    console.log('s:', s)
+    const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
+    const { journalEntrySequence } = meta;
 
     const parentId = generateJournalEntryId();
-    const parentSequenceNumber = s === null ? null : s;
+    const parentSequenceNumber = journalEntrySequence;
 
     const children: JournalEntry[] = formData.children.map((child, index) => {
         return {
             ...child,
             type: 'JOURNAL_ENTRY',
             date: parent.date,
-            sequenceNumber: parentSequenceNumber === null ? null : parentSequenceNumber + index + 1,
+            sequenceNumber: journalEntrySequence + index + 1,
             parentEntryId: parent._id,
             _id: generateJournalEntryId(),
             childEntryIds: [],
@@ -39,12 +32,10 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
 
     const docs: Object[] = [parent, ...children];
 
-    if (s !== null) {
-        docs.push({
-            _id: JOURNAL_ENTRY_SEQUENCE_NUMBER_KEY,
-            sequenceValue: s + children.length + 1,
-        });
-    }
+    docs.push({
+        ...meta,
+        journalEntrySequence: journalEntrySequence + children.length + 1,
+    });
 
     return db.bulkDocs(docs);
 }

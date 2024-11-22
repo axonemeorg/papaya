@@ -80,6 +80,14 @@ export const CreateJournalEntryForm = z.object({
 
 export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
 
+export const EditJournalEntryForm = z.object({
+    parent: JournalEntry,
+    children: z.array(JournalEntry),
+});
+
+export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;
+
+
 export const CreateQuickJournalEntry = z.object({
     memo: z.string(),
     categoryIds: z.array(z.string()),

@@ -59,6 +59,7 @@ export default function JournalEntryForm() {
                                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
                             }}
                             sx={{ flex: 1 }}
+                            autoComplete="off"
                         />
                     )}
                 />
