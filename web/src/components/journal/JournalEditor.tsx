@@ -17,6 +17,7 @@ import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/price";
 import { db } from "@/database/client";
 import CategoryChip from "../icon/CategoryChip";
+import JournalEntryCard from "./JournalEntryCard";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -57,11 +58,20 @@ export interface JournalEditorProps {
     onDateChange: (date: string) => void;
 }
 
+export interface JournalEntrySelection {
+    entry: EnhancedJournalEntry | null;
+    anchorEl: HTMLElement | null;
+    children: JournalEntry[];
+}
+
 export default function JournalEditor(props: JournalEditorProps) {
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
-    const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-    const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
+    const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
+        entry: null,
+        anchorEl: null,
+        children: [],
+    });
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const theme = useTheme();
@@ -105,9 +115,25 @@ export default function JournalEditor(props: JournalEditorProps) {
         enabled: true,
     });
 
-    const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
-        setSelectedEntryAnchorEl(event.currentTarget);
-        setSelectedEntry(entry);
+    const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
+        const { childEntryIds } = entry;
+        const children: JournalEntry[] = (childEntryIds ?? []).map((childId) => getJournalEntriesQuery.data[childId]);
+
+        setSelectedEntry({
+            anchorEl: event.currentTarget,
+            entry: entry,
+            children,
+        });
+    }
+
+    const handleDeselectListItem = () => {
+        setSelectedEntry((prev) => {
+            const next = {
+                ...prev,
+                anchorEl: null,
+            };
+            return next;
+        });
     }
 
     // // show all docs
@@ -170,13 +196,12 @@ export default function JournalEditor(props: JournalEditorProps) {
                     <Add />
                     Add
                 </Fab>
-                {/* {selectedEntry && (
+                {selectedEntry && (
                     <JournalEntryCard
-                        entry={selectedEntry}
-                        onClose={() => setSelectedEntryAnchorEl(null)}
-                        anchorEl={selectedEntryAnchorEl}
+                        selection={selectedEntry}
+                        onClose={() => handleDeselectListItem()}
                     />
-                )} */}
+                )}
                 <Grid
                     container
                     columns={12}
