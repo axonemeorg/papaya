@@ -27,29 +27,40 @@ export const Avatar = z.object({
 
 export type Avatar = z.output<typeof Avatar>;
 
-export const Category = Document.merge(z.object({
+export const CreateCategory = z.object({
     type: z.literal('CATEGORY'),
     label: z.string(),
     description: z.string(),
     avatar: Avatar,
+});
+
+export type CreateCategory = z.output<typeof CreateCategory>;
+
+export const Category = Document.merge(CreateCategory).merge(z.object({
+    type: z.literal('CATEGORY'),
 }));
 
 export type Category = z.output<typeof Category>;
 
-export const JournalEntry = Document.merge(z.object({
-    type: z.literal('JOURNAL_ENTRY'),
+export const Create_JournalEntry = z.object({
     memo: z.string(),
     amount: z.string().min(0, "A positive number is required"),
     notes: z.string(),
     entryType: EntryType,
     date: z.string(),
-    parentEntryId: z.string().nullable(),
-    childEntryIds: z.array(z.string()),
     paymentMethodId: z.string().nullable(),
     categoryIds: z.array(z.string()),
     attachmentIds: z.array(z.string()),
     tagIds: z.array(z.string()),
     relatedEntryIds: z.array(z.string()),
+});
+
+export type Create_JournalEntry = z.output<typeof Create_JournalEntry>;
+
+export const JournalEntry = Document.merge(Create_JournalEntry).merge(z.object({
+    type: z.literal('JOURNAL_ENTRY'),
+    parentEntryId: z.string().nullable(),
+    childEntryIds: z.array(z.string()),
 }));
 
 export type JournalEntry = z.output<typeof JournalEntry>;
@@ -61,12 +72,12 @@ export const EnhancedJournalEntry = JournalEntry.merge(z.object({
 
 export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 
-export const CreateJournalEntry = z.object({
-    parent: JournalEntry,
-    children: z.array(JournalEntry),
+export const CreateJournalEntryForm = z.object({
+    parent: Create_JournalEntry,
+    children: z.array(Create_JournalEntry),
 });
 
-export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
+export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
 
 export const CreateQuickJournalEntry = z.object({
     memo: z.string(),

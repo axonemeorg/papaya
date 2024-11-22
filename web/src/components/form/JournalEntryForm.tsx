@@ -6,10 +6,10 @@ import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, CreateJournalEntry, JournalEntry } from "@/types/schema";
+import { Category, CreateJournalEntryForm, JournalEntry } from "@/types/schema";
 
 export default function JournalEntryForm() {
-    const { setValue, control, watch } = useFormContext<CreateJournalEntry>();
+    const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
  
     return (
         <Grid container columns={12} spacing={1} rowSpacing={2} mb={1}>

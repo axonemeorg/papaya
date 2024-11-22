@@ -1,13 +1,14 @@
-import { Category, type CreateJournalEntry, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { Category, Create_JournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
-export const createJournalEntry = async (formData: CreateJournalEntry) => {
+export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
     const parentId = generateJournalEntryId();
 
     const children: JournalEntry[] = formData.children.map(child => {
         return {
             ...child,
+            type: 'JOURNAL_ENTRY',
             date: parent.date,
             parentEntryId: parent._id,
             _id: generateJournalEntryId(),
@@ -17,6 +18,7 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
     
     const parent: JournalEntry = {
         ...formData.parent,
+        type: 'JOURNAL_ENTRY',
         _id: parentId,
         parentEntryId: null,
         childEntryIds: children.map(child => child._id),
@@ -26,20 +28,16 @@ export const createJournalEntry = async (formData: CreateJournalEntry) => {
 }
 
 export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
-    const journalEntryFormData: CreateJournalEntry = {
+    const journalEntryFormData: CreateJournalEntryForm = {
         parent: {
-            _id: '',
-            type: 'JOURNAL_ENTRY',
             memo: formData.memo,
             amount: formData.amount,
             date: new Date().toISOString(),
-            parentEntryId: null,
             paymentMethodId: null,
             relatedEntryIds: [],
             categoryIds: [],
             tagIds: [],
             attachmentIds: [],
-            childEntryIds: [],
             notes: '',
             entryType: 'CREDIT',
         },

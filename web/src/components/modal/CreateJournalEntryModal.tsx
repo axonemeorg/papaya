@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import dayjs from "dayjs";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { CreateJournalEntry, JournalEntry } from "@/types/schema";
+import { CreateJournalEntryForm, JournalEntry } from "@/types/schema";
 import { db } from "@/database/client";
 import { createJournalEntry } from "@/database/actions";
 
@@ -23,17 +23,15 @@ interface JournalEntryModalProps {
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const { snackbar } = useContext(NotificationsContext);
 
-    const handleCreateJournalEntry = async (formData: CreateJournalEntry) => {
+    const handleCreateJournalEntry = async (formData: CreateJournalEntryForm) => {
         await createJournalEntry(formData);
         snackbar({ message: 'Created journal entry'});
         props.onSaved();
     }
 
-    const createJournalEntryForm = useForm<CreateJournalEntry>({
+    const createJournalEntryForm = useForm<CreateJournalEntryForm>({
         defaultValues: {
             parent: {
-                _id: '',
-                type: 'JOURNAL_ENTRY',
                 memo: '',
                 amount: '',
                 date: props.initialDate,
@@ -42,13 +40,12 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                 attachmentIds: [],
                 notes: '',
                 entryType: 'CREDIT',
-                parentEntryId: null,
                 paymentMethodId: null,
                 relatedEntryIds: [],
             },
             children: [],
         },
-        resolver: zodResolver(CreateJournalEntry)
+        resolver: zodResolver(CreateJournalEntryForm)
     });
 
     useEffect(() => {
