@@ -38,6 +38,8 @@ export type CreateCategory = z.output<typeof CreateCategory>;
 
 export const Category = Document.merge(CreateCategory).merge(z.object({
     type: z.literal('CATEGORY'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
 }));
 
 export type Category = z.output<typeof Category>;
@@ -62,6 +64,8 @@ export const JournalEntry = Document.merge(CreateJournalEntry).merge(z.object({
     parentEntryId: z.string().nullable(),
     childEntryIds: z.array(z.string()),
     sequenceNumber: z.number().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
 }));
 
 export type JournalEntry = z.output<typeof JournalEntry>;

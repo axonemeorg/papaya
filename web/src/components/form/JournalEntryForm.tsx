@@ -10,7 +10,7 @@ import { Category, CreateJournalEntryForm, JournalEntry } from "@/types/schema";
 
 export default function JournalEntryForm() {
     const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
- 
+
     return (
         <Grid container columns={12} spacing={1} rowSpacing={2} mb={1}>
             <Grid size={8}>

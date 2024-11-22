@@ -1,8 +1,9 @@
-import { Category, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { Category, CreateCategory, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
 export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
+    const now = new Date().toISOString();
     const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
     const { journalEntrySequence } = meta;
 
@@ -18,6 +19,8 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
             parentEntryId: parent._id,
             _id: generateJournalEntryId(),
             childEntryIds: [],
+            createdAt: now,
+            updatedAt: null,
         }
     });
     
@@ -28,6 +31,8 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
         parentEntryId: null,
         sequenceNumber: parentSequenceNumber,
         childEntryIds: children.map(child => child._id),
+        createdAt: now,
+        updatedAt: null,
     };
 
     const docs: Object[] = [parent, ...children];
@@ -60,6 +65,23 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
     return createJournalEntry(journalEntryFormData);
 }
 
+export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
+    const now = new Date().toISOString();
+    const parent: JournalEntry = {
+        ...formData.parent,
+        updatedAt: now,
+    };
+
+    const children: JournalEntry[] = formData.children.map(child => {
+        return {
+            ...child,
+            updatedAt: now,
+        }
+    });
+
+    return db.bulkDocs([parent, ...children]);
+}
+
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
     const record = await db.get(journalEntryId);
     await db.remove(record);
@@ -70,17 +92,22 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
     await db.put(journalEntry);
 }
 
-export const createCategory = async (formData: Category) => {
-    const category = {
+export const createCategory = async (formData: CreateCategory) => {
+    const category: Category = {
         ...formData,
         _id: generateCategoryId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
     };
 
     return db.put(category);
 }
 
 export const updateCategory = async (formData: Category) => {
-    return db.put(formData);
+    return db.put({
+        ...formData,
+        updatedAt: new Date().toISOString(),
+    });
 }
 
 export const deleteCategory = async (categoryId: string): Promise<Category> => {
