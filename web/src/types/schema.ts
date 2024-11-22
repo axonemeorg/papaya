@@ -42,7 +42,7 @@ export const Category = Document.merge(CreateCategory).merge(z.object({
 
 export type Category = z.output<typeof Category>;
 
-export const Create_JournalEntry = z.object({
+export const CreateJournalEntry = z.object({
     memo: z.string(),
     amount: z.string().min(0, "A positive number is required"),
     notes: z.string(),
@@ -55,9 +55,9 @@ export const Create_JournalEntry = z.object({
     relatedEntryIds: z.array(z.string()),
 });
 
-export type Create_JournalEntry = z.output<typeof Create_JournalEntry>;
+export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
-export const JournalEntry = Document.merge(Create_JournalEntry).merge(z.object({
+export const JournalEntry = Document.merge(CreateJournalEntry).merge(z.object({
     type: z.literal('JOURNAL_ENTRY'),
     parentEntryId: z.string().nullable(),
     childEntryIds: z.array(z.string()),
@@ -73,8 +73,8 @@ export const EnhancedJournalEntry = JournalEntry.merge(z.object({
 export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 
 export const CreateJournalEntryForm = z.object({
-    parent: Create_JournalEntry,
-    children: z.array(Create_JournalEntry),
+    parent: CreateJournalEntry,
+    children: z.array(CreateJournalEntry),
 });
 
 export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;

@@ -1,4 +1,4 @@
-import { Category, Create_JournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { Category, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 
