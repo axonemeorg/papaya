@@ -16,6 +16,7 @@ import { JournalEntrySelection } from "./JournalEditor";
 interface JournalEntryCardProps {
     selection: JournalEntrySelection;
     onClose: () => void;
+    onDelete: () => void;
 }
 
 const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
@@ -54,13 +55,8 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 
     const isNetPositive = Boolean(entry && entry.netAmount > 0);
 
-    const { snackbar } = useContext(NotificationsContext);
-
     const handleDeleteEntry = () => {
-        snackbar({
-            message: 'Deleted 1 entry.'
-        });
-        props.onClose();
+        props.onDelete();
     }
 
     const getCategoriesQuery = useQuery({

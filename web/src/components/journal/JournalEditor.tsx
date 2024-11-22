@@ -1,6 +1,6 @@
 'use client'
 
-import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
+import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
@@ -18,6 +18,8 @@ import { getPriceString } from "@/utils/price";
 import { db } from "@/database/client";
 import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";
+import { deleteJournalEntry } from "@/database/actions";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -74,6 +76,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     });
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
+    const { snackbar } = useContext(NotificationsContext);
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -84,9 +87,6 @@ export default function JournalEditor(props: JournalEditorProps) {
         queryFn: getCategories,
         initialData: {},
     });
-
-    console.log('props.view', props.view);
-    console.log('props.date', props.date);
 
     const getJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
         queryKey: ['enhanced-journal-entries', props.view, props.date],
@@ -134,6 +134,21 @@ export default function JournalEditor(props: JournalEditorProps) {
             };
             return next;
         });
+    }
+
+    const handleDeleteEntry = async (entry: EnhancedJournalEntry | null) => {
+        if (!entry) {
+            return;
+        }
+
+        try {
+            await deleteJournalEntry(entry);
+            getJournalEntriesQuery.refetch();
+            handleDeselectListItem();
+            snackbar({ message: 'Deleted 1 entry' });
+        } catch {
+            snackbar({ message: 'Failed to delete entry' });
+        }
     }
 
     // // show all docs
@@ -200,6 +215,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                     <JournalEntryCard
                         selection={selectedEntry}
                         onClose={() => handleDeselectListItem()}
+                        onDelete={() => handleDeleteEntry(selectedEntry.entry)}
                     />
                 )}
                 <Grid
