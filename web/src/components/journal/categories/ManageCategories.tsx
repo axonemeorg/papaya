@@ -93,13 +93,14 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 
     const handleDeleteCategory = async () => {
         const category = updateCategoryForm.watch();
-        await deleteCategory(category);
+        const record = await deleteCategory(category._id);
+
         snackbar({
             message: 'Deleted category',
             action: {
                 label: 'Undo',
                 onClick: () => {
-                    undeleteCategory(category._id)
+                    undeleteCategory(record)
                         .then(() => {
                             getCategoriesQuery.refetch();
                             snackbar({ message: 'Category restored' });

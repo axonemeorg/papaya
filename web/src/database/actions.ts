@@ -47,17 +47,14 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
     return createJournalEntry(journalEntryFormData);
 }
 
-export const deleteJournalEntry = async (entry: EnhancedJournalEntry | JournalEntry) => {
-    const record = await db.get(entry._id);
-    return db.remove(record);
+export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
+    const record = await db.get(journalEntryId);
+    await db.remove(record);
+    return record as JournalEntry;
 }
 
-export const undeleteJournalEntry = async (journalEntryId: string) => {
-    const record = await db.get(journalEntryId, { revs_info: true });
-    return db.put({
-        ...record,
-        _deleted: false,
-    });
+export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
+    await db.put(journalEntry);
 }
 
 export const createCategory = async (formData: Category) => {
@@ -73,15 +70,12 @@ export const updateCategory = async (formData: Category) => {
     return db.put(formData);
 }
 
-export const deleteCategory = async (formData: Category) => {
-    const record = await db.get(formData._id);
-    return db.remove(record);
+export const deleteCategory = async (categoryId: string): Promise<Category> => {
+    const record = await db.get(categoryId);
+    await db.remove(record);
+    return record as Category;
 }
 
-export const undeleteCategory = async (categoryId: string) => {
-    const record = await db.get(categoryId, { revs_info: true });
-    return db.put({
-        ...record,
-        _deleted: false,
-    });
+export const undeleteCategory = async (category: Category) => {
+    await db.put(category);
 }

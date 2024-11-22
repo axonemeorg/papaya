@@ -141,7 +141,7 @@ export default function JournalEditor(props: JournalEditorProps) {
         }
 
         try {
-            await deleteJournalEntry(entry);
+            const record = await deleteJournalEntry(entry._id);
             getJournalEntriesQuery.refetch();
             handleDeselectListItem();
             snackbar({
@@ -149,13 +149,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                 action: {
                     label: 'Undo',
                     onClick: async () => {
-                        undeleteJournalEntry(entry._id)
+                        undeleteJournalEntry(record)
                             .then(() => {
                                 getCategoriesQuery.refetch();
                                 snackbar({ message: 'Category restored' });
                             })
-                            .catch(() => {
-                                snackbar({ message: 'Failed to restore category' });
+                            .catch((error) => {
+                                console.error(error);
+                                snackbar({ message: 'Failed to restore category: ' + error.message });
                             });
                     }
                 }
