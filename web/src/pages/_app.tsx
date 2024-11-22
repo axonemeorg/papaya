@@ -5,10 +5,13 @@ import { montserrat } from '@/fonts/montserrat'
 import '@/styles/main.scss'
 import Head from 'next/head'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import NotificationsProvider from '@/providers/NotificationsProvider'
 
 const queryClient = new QueryClient();
 
-function MyApp({ Component, pageProps }) {
+function MyApp(props: any) {
+  const { Component, pageProps } = props;
+
   return (
     <>
       <Head>
@@ -19,7 +22,9 @@ function MyApp({ Component, pageProps }) {
         <CssBaseline />
         <Stack component='main' id='root' minHeight='100dvh' className={montserrat.className}>
           <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
+            <NotificationsProvider>
+              <Component {...pageProps} />
+            </NotificationsProvider>
           </QueryClientProvider>
         </Stack>
       </ThemeProvider>

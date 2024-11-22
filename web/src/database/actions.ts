@@ -52,6 +52,14 @@ export const deleteJournalEntry = async (entry: EnhancedJournalEntry | JournalEn
     return db.remove(record);
 }
 
+export const undeleteJournalEntry = async (journalEntryId: string) => {
+    const record = await db.get(journalEntryId, { revs_info: true });
+    return db.put({
+        ...record,
+        _deleted: false,
+    });
+}
+
 export const createCategory = async (formData: Category) => {
     const category = {
         ...formData,
@@ -70,8 +78,8 @@ export const deleteCategory = async (formData: Category) => {
     return db.remove(record);
 }
 
-export const undeleteCategory = async (formData: Category) => {
-    const record = await db.get(formData._id);
+export const undeleteCategory = async (categoryId: string) => {
+    const record = await db.get(categoryId, { revs_info: true });
     return db.put({
         ...record,
         _deleted: false,

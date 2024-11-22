@@ -1,5 +1,3 @@
-'use client'
-
 import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
@@ -18,7 +16,7 @@ import { getPriceString } from "@/utils/price";
 import { db } from "@/database/client";
 import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";
-import { deleteJournalEntry } from "@/database/actions";
+import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
@@ -77,6 +75,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const { snackbar } = useContext(NotificationsContext);
+
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -145,7 +144,22 @@ export default function JournalEditor(props: JournalEditorProps) {
             await deleteJournalEntry(entry);
             getJournalEntriesQuery.refetch();
             handleDeselectListItem();
-            snackbar({ message: 'Deleted 1 entry' });
+            snackbar({
+                message: 'Deleted 1 entry',
+                action: {
+                    label: 'Undo',
+                    onClick: async () => {
+                        undeleteJournalEntry(entry._id)
+                            .then(() => {
+                                getCategoriesQuery.refetch();
+                                snackbar({ message: 'Category restored' });
+                            })
+                            .catch(() => {
+                                snackbar({ message: 'Failed to restore category' });
+                            });
+                    }
+                }
+            });
         } catch {
             snackbar({ message: 'Failed to delete entry' });
         }
@@ -159,7 +173,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     // }, []);
 
     return (
-        <NotificationsProvider>
+        <>
             <CreateJournalEntryModal
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
@@ -307,6 +321,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                     }
                 </Grid>
             </BaseLayout>
-        </NotificationsProvider>
-    )
+        </>
+    );
 }

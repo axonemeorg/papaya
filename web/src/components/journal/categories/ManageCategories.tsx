@@ -6,7 +6,6 @@ import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { createCategory, deleteCategory, undeleteCategory, updateCategory } from "@/database/actions";
 import { getCategories } from "@/database/queries";
-import { useCategoryStore } from "@/store/useCategoriesStore";
 import { Category } from "@/types/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Add, ArrowBack, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
@@ -100,9 +99,14 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             action: {
                 label: 'Undo',
                 onClick: () => {
-                    undeleteCategory(category);
-                    getCategoriesQuery.refetch();
-                    snackbar({ message: 'Category restored' });
+                    undeleteCategory(category._id)
+                        .then(() => {
+                            getCategoriesQuery.refetch();
+                            snackbar({ message: 'Category restored' });
+                        })
+                        .catch(() => {
+                            snackbar({ message: 'Failed to restore category' });
+                        });
                 }
             }
         })
