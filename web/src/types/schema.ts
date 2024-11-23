@@ -47,23 +47,23 @@ export type Category = z.output<typeof Category>;
 export const CreateJournalEntry = z.object({
     memo: z.string(),
     amount: z.string().min(0, "A positive number is required"),
-    notes: z.string(),
     entryType: EntryType,
     date: z.string(),
-    paymentMethodId: z.string().nullable(),
-    categoryIds: z.array(z.string()),
-    attachmentIds: z.array(z.string()),
-    tagIds: z.array(z.string()),
-    relatedEntryIds: z.array(z.string()),
+    notes: z.string().optional(),
+    paymentMethodId: z.string().nullable().optional(),
+    categoryIds: z.array(z.string()).optional(),
+    attachmentIds: z.array(z.string()).optional(),
+    tagIds: z.array(z.string()).optional(),
+    relatedEntryIds: z.array(z.string()).optional(),
 });
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
 export const JournalEntry = Document.merge(CreateJournalEntry).merge(z.object({
     type: z.literal('JOURNAL_ENTRY'),
-    parentEntryId: z.string().nullable(),
-    childEntryIds: z.array(z.string()),
-    sequenceNumber: z.number().nullable(),
+    parentEntryId: z.string().nullable().optional(),
+    childEntryIds: z.array(z.string()).optional(),
+    sequenceNumber: z.number().nullable().optional(),
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
 }));

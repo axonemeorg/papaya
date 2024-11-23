@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import PouchDB from 'pouchdb';
 
-const db = new PouchDB('images');
-
 const ImageUploader = () => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +18,7 @@ const ImageUploader = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        const maxDimension = 1080;
+        const maxDimension = 180;
         let width = img.width;
         let height = img.height;
 
@@ -47,7 +45,7 @@ const ImageUploader = () => {
             resolve(blob);
           },
           'image/jpeg',
-          0.8 // Quality factor (80%)
+          1 // Quality factor (80%)
         );
       };
 
