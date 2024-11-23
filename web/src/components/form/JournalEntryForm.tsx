@@ -94,7 +94,7 @@ export default function JournalEntryForm() {
                     name='parent.categoryIds'
                     render={({ field }) => {
                         const categoryIds = watch('parent.categoryIds');
-                        const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null;
+                        const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0];
 
                         return (
                             <CategoryAutocomplete

@@ -6,43 +6,38 @@ import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useEffect, useState } from "react";
-import { updateJournalEntry } from "@/actions/journal-actions";
 import { LoadingButton } from "@mui/lab";
-import { UpdateJournalEntry } from "@/types/put";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
+import { EditJournalEntryForm } from "@/types/schema";
+import { updateJournalEntry } from "@/database/actions";
 
 interface EditJournalEntryModalProps {
     open: boolean;
-    initialValues: UpdateJournalEntry;
+    initialValues: EditJournalEntryForm;
     onClose: () => void;
     onSave: () => void;
 }
 
 export default function EditJournalEntryModal(props: EditJournalEntryModalProps) {
-    const [saving, setSaving] = useState<boolean>(false);
     const { snackbar } = useContext(NotificationsContext);
 
-    const handleUpdateJournalEntry = (formData: UpdateJournalEntry) => {
-        setSaving(true);
+    const handleUpdateJournalEntry = (formData: EditJournalEntryForm) => {
         updateJournalEntry(formData)
             .then(() => {
                 props.onClose();
+                snackbar({ message: 'Updated journal entry'});
+                props.onSave();
             })
             .catch(() => {
-
-            })
-            .finally(() => {
-                setSaving(false);
-            })
-        snackbar({ message: 'Updated journal entry'});
-        props.onSave();
+                snackbar({ message: 'Failed to update journal entry' });
+            });
     }
 
-    const editJournalEntryForm = useForm<UpdateJournalEntry>({
+    const editJournalEntryForm = useForm<EditJournalEntryForm>({
         defaultValues: {
             ...props.initialValues
         },
-        resolver: zodResolver(UpdateJournalEntry)
+        resolver: zodResolver(EditJournalEntryForm)
     });
 
     useEffect(() => {
@@ -68,7 +63,7 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => props.onClose()}>Cancel</Button>
-                        <LoadingButton loading={saving} type='submit' variant='contained' startIcon={<Save />}>Save</LoadingButton>
+                        <Button type='submit' variant='contained' startIcon={<Save />}>Save</Button>
                     </DialogActions>
                 </form>
             </Dialog>

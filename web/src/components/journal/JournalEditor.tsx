@@ -166,6 +166,11 @@ export default function JournalEditor(props: JournalEditorProps) {
         }
     }
 
+    const handleSaveEntry = () => {
+        getJournalEntriesQuery.refetch();
+        handleDeselectListItem();
+    }
+
     // show all docs
     useEffect(() => {
         db.allDocs({ include_docs: true }).then((result) => {
@@ -226,11 +231,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                     <Add />
                     Add
                 </Fab>
-                {selectedEntry && (
+                {selectedEntry.entry && (
                     <JournalEntryCard
-                        selection={selectedEntry}
+                        entry={selectedEntry.entry}
+                        children={selectedEntry.children}
+                        anchorEl={selectedEntry.anchorEl}
                         onClose={() => handleDeselectListItem()}
                         onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+                        onSave={() => handleSaveEntry()}
                     />
                 )}
                 <Grid
@@ -271,7 +279,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                                             <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
                                                 {entries.map((entry) => {
                                                     const { categoryIds } = entry;
-                                                    const categoryId: string | undefined = categoryIds[0];
+                                                    const categoryId: string | undefined = categoryIds?.[0];
                                                     const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
                                                     const netAmount = entry.netAmount
                                                     const isNetPositive = netAmount > 0;
