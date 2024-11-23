@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const Document = z.object({
+export const DocumentMetadata = z.object({
     _id: z.string(),
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
@@ -36,7 +36,7 @@ export const CreateCategory = z.object({
 
 export type CreateCategory = z.output<typeof CreateCategory>;
 
-export const Category = Document.merge(CreateCategory).merge(z.object({
+export const Category = DocumentMetadata.merge(CreateCategory).merge(z.object({
     type: z.literal('CATEGORY'),
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
@@ -59,7 +59,7 @@ export const CreateJournalEntry = z.object({
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
-export const JournalEntry = Document.merge(CreateJournalEntry).merge(z.object({
+export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(z.object({
     type: z.literal('JOURNAL_ENTRY'),
     parentEntryId: z.string().nullable().optional(),
     childEntryIds: z.array(z.string()).optional(),
@@ -91,7 +91,6 @@ export const EditJournalEntryForm = z.object({
 
 export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;
 
-
 export const CreateQuickJournalEntry = z.object({
     memo: z.string(),
     categoryIds: z.array(z.string()),
@@ -99,3 +98,26 @@ export const CreateQuickJournalEntry = z.object({
 });
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;
+
+export const CreateEntryTag = z.object({
+    label: z.string(),
+    description: z.string(),
+});
+
+export type CreateEntryTag = z.output<typeof CreateEntryTag>;
+
+export const EntryTag = DocumentMetadata.merge(CreateEntryTag).merge(z.object({
+    type: z.literal('ENTRY_TAG'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type EntryTag = z.output<typeof EntryTag>;
+
+export const ZiskDocument = z.union([
+    Category,
+    JournalEntry,
+    EntryTag,
+]);
+
+export type ZiskDocument = z.output<typeof ZiskDocument>;
