@@ -25,6 +25,7 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
     const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>();
 
     const childTagIds = watch(`children.${props.index}.tagIds`) ?? [];
+    const childTags = childTagIds.map((tagId) => props.entryTags[tagId]).filter(Boolean);
     const hasTags = childTagIds.length > 0;
     const categoryIds = watch(`children.${props.index}.categoryIds`) as string[] | undefined ?? [];
     const categoryId: string | undefined = categoryIds.length > 0 ? categoryIds[0] : undefined;
@@ -98,8 +99,7 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
             <Grid size={12}>
                 <Collapse in={hasTags}>
                     <Stack gap={1} sx={{ pt: 1.25, pb: 0.75, flexFlow: 'row wrap' }}>
-                        {childTagIds.map((entryTagId) => {
-                            const entryTag = props.entryTags[entryTagId];
+                        {childTags.map((entryTag: EntryTag) => {
                             return (
                                 <Chip
                                     size='small'
