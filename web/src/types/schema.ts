@@ -44,18 +44,23 @@ export const Category = DocumentMetadata.merge(CreateCategory).merge(z.object({
 
 export type Category = z.output<typeof Category>;
 
-export const CreateJournalEntry = z.object({
+export const CreateJournalEntryChild = z.object({
     memo: z.string(),
     amount: z.string().min(0, "A positive number is required"),
     entryType: EntryType,
+    tagIds: z.array(z.string()).optional(),
+    categoryIds: z.array(z.string()).optional(),
+});
+
+export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>;
+
+export const CreateJournalEntry = CreateJournalEntryChild.merge(z.object({
     date: z.string(),
     notes: z.string().optional(),
     paymentMethodId: z.string().nullable().optional(),
-    categoryIds: z.array(z.string()).optional(),
     attachmentIds: z.array(z.string()).optional(),
-    tagIds: z.array(z.string()).optional(),
     relatedEntryIds: z.array(z.string()).optional(),
-});
+}));
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
 
@@ -79,7 +84,7 @@ export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 
 export const CreateJournalEntryForm = z.object({
     parent: CreateJournalEntry,
-    children: z.array(CreateJournalEntry),
+    children: z.array(CreateJournalEntryChild),
 });
 
 export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;

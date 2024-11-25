@@ -1,4 +1,4 @@
-import { Category, EnhancedJournalEntry, JournalEntry } from "@/types/schema";
+import { Category, EnhancedJournalEntry, EntryTag, JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { JournalEditorView } from "@/components/journal/JournalEditor";
 import dayjs from "dayjs";
@@ -50,4 +50,15 @@ export const getEnhancedJournalEntries = async (view: JournalEditorView, date: s
     );
 
     return result;
+}
+
+export const getEntryTags = async (): Promise<Record<EntryTag['_id'], EntryTag>> => {
+    const result = await db.find({
+        selector: {
+            type: 'ENTRY_TAG',
+        }
+    });
+
+    return Object.fromEntries((result.docs as EntryTag[])
+        .map(tag => [tag._id, tag]));
 }
