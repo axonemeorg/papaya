@@ -172,11 +172,11 @@ export default function JournalEditor(props: JournalEditorProps) {
     }
 
     // show all docs
-    // useEffect(() => {
-    //     db.allDocs({ include_docs: true }).then((result) => {
-    //         console.log('all docs', result);
-    //     });
-    // }, []);
+    useEffect(() => {
+        db.allDocs({ include_docs: true }).then((result) => {
+            console.log('all docs', result);
+        });
+    }, []);
 
     return (
         <>

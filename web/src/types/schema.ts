@@ -92,7 +92,7 @@ export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
 
 export const EditJournalEntryForm = z.object({
     parent: JournalEntry,
-    children: z.array(JournalEntry),
+    children: z.array(z.union([JournalEntry, CreateJournalEntryChild])),
 });
 
 export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;

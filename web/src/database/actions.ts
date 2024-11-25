@@ -1,6 +1,7 @@
 import { Category, CreateCategory, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
+import { getJournalEntryChildren } from "./queries";
 
 export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
     const now = new Date().toISOString();
@@ -67,17 +68,39 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry)
 
 export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
     const now = new Date().toISOString();
-    const parent: JournalEntry = {
-        ...formData.parent,
-        updatedAt: now,
-    };
+    
+    const parentDate = formData.parent.date;
+    const currentChildren = await getJournalEntryChildren(formData.parent._id);
+    const newChildren: Record<JournalEntry['_id'], JournalEntry> = formData.children.reduce(
+        (acc: Record<JournalEntry['_id'], JournalEntry>, child) => {
+            acc[child._id] = child;
+            return acc;
+        },
+        {}
+    );
 
-    const children: JournalEntry[] = formData.children.map(child => {
+    const children: JournalEntry[] = currentChildren.map(child => {
+        if (!newChildren[child._id]) {
+            // Child entry was deleted
+            return {
+                ...child,
+                _deleted: true,
+            }
+        }
+
         return {
             ...child,
+            ...newChildren[child._id],
+            date: parentDate, // Keep date in sync with parent
             updatedAt: now,
         }
     });
+
+    const parent: JournalEntry = {
+        ...formData.parent,
+        updatedAt: now,
+        childEntryIds: Object.keys(newChildren),
+    };
 
     return db.bulkDocs([parent, ...children]);
 }

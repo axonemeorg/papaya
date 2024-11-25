@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext, useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { EditJournalEntryForm } from "@/types/schema";
+import { CreateJournalEntryForm, EditJournalEntryForm } from "@/types/schema";
 import { updateJournalEntry } from "@/database/actions";
 
 interface EditJournalEntryModalProps {
@@ -28,7 +28,8 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
                 snackbar({ message: 'Updated journal entry'});
                 props.onSave();
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error(error)
                 snackbar({ message: 'Failed to update journal entry' });
             });
     }
@@ -37,7 +38,7 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
         defaultValues: {
             ...props.initialValues
         },
-        resolver: zodResolver(EditJournalEntryForm)
+        resolver: zodResolver(CreateJournalEntryForm)
     });
 
     useEffect(() => {

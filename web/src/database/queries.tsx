@@ -47,7 +47,9 @@ export const getEnhancedJournalEntries = async (view: JournalEditorView, date: s
                     return acc;
                 }
 
-                const children: JournalEntry[] = (entry.childEntryIds ?? []).map(childId => journalEntries[childId]);
+                const children: JournalEntry[] = (entry.childEntryIds ?? [])
+                    .map(childId => journalEntries[childId])
+                    .filter(Boolean);
 
                 acc.push([entry._id, enhanceJournalEntry(entry, children)]);
 
@@ -67,4 +69,15 @@ export const getEntryTags = async (): Promise<Record<EntryTag['_id'], EntryTag>>
 
     return Object.fromEntries((result.docs as EntryTag[])
         .map(tag => [tag._id, tag]));
+}
+
+export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Promise<JournalEntry[]> => {
+    const result = await db.find({
+        selector: {
+            type: 'JOURNAL_ENTRY',
+            parentEntryId: entryId,
+        }
+    });
+
+    return result.docs as JournalEntry[];    
 }
