@@ -1,28 +1,34 @@
 import { TRANSACTION_TAG_LABELS } from "@/constants/transactionTags";
-import { TransactionTag } from "@/types/enum";
+import { getEntryTags } from "@/database/queries";
+import { EntryTag } from "@/types/schema";
 import { Check, Close } from "@mui/icons-material";
 import { Box, Checkbox, Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 
 interface TransactionTagPicker {
     anchorEl: Element | null;
-    value: TransactionTag[];
-    onChange: (tags: TransactionTag[]) => void;
+    value: EntryTag['_id'][];
+    onChange: (tags: EntryTag['_id'][]) => void;
     onClose: () => void;
 }
 
-export default function TransactionTagPicker(props: TransactionTagPicker) {
+export default function EntryTagPicker(props: TransactionTagPicker) {
     const { anchorEl, onClose } = props;
     const open = Boolean(anchorEl);
 
-    const handleToggleTag = (tag: TransactionTag) => {
-        if (props.value.includes(tag)) {
-            props.onChange(props.value.filter((t) => t !== tag));
+    const handleToggleTag = (tagId: EntryTag['_id']) => {
+        if (props.value.includes(tagId)) {
+            props.onChange(props.value.filter((t) => t !== tagId));
         } else {
-            props.onChange([...props.value, tag]);
+            props.onChange([...props.value, tagId]);
         }
     }
 
-    console.log('TransactionTagPickerProps', props);
+    const entryTagQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
+        queryKey: ['entryTags'],
+        queryFn: getEntryTags,
+        initialData: {},
+    });
 
     return (
         <Popover
@@ -39,22 +45,24 @@ export default function TransactionTagPicker(props: TransactionTagPicker) {
             }}
         >
             <Box p={2}>
-                <Typography variant='body2'>Apply tags to this transaction</Typography>
+                <Typography variant='body2'>Apply tags to this record</Typography>
             </Box>
             <Divider />
             <MenuList>
-                {Object.entries(TRANSACTION_TAG_LABELS).map(([tag, details]) => {
-                    const checked = props.value.includes(tag as TransactionTag);
+                {Object.values(entryTagQuery.data).map((entryTag) => {
+                    const tagId = entryTag._id;
+                    const checked = props.value.includes(tagId);
+
                     return (
-                        <MenuItem key={tag} onClick={() => handleToggleTag(tag as TransactionTag)}>
-                            {/* {props.value.includes(tag as TransactionTag) && (
+                        <MenuItem key={entryTag._id} onClick={() => handleToggleTag(tagId)}>
+                            {/* {props.value.includes(tag as EntryTag) && (
                                 <ListItemIcon><Check /></ListItemIcon>
                             )} */}
                             <ListItemIcon>
                                 <Checkbox checked={checked} />
                             </ListItemIcon>
-                            <ListItemText primary={details.label} secondary={details.description} />
-                            {/* {props.value.includes(tag as TransactionTag) && (
+                            <ListItemText primary={entryTag.label} secondary={entryTag.description} />
+                            {/* {props.value.includes(tag as EntryTag) && (
                                 <Close />
                             )} */}
                         </MenuItem>

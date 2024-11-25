@@ -8,17 +8,17 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
     const { journalEntrySequence } = meta;
 
     const parentId = generateJournalEntryId();
+    const parentDate = formData.parent.date;
     const parentSequenceNumber = journalEntrySequence;
 
     const children: JournalEntry[] = formData.children.map((child, index) => {
         return {
             ...child,
-            type: 'JOURNAL_ENTRY',
-            date: parent.date,
-            sequenceNumber: journalEntrySequence + index + 1,
-            parentEntryId: parent._id,
             _id: generateJournalEntryId(),
-            childEntryIds: [],
+            type: 'JOURNAL_ENTRY',
+            date: parentDate,
+            sequenceNumber: journalEntrySequence + index + 1,
+            parentEntryId: parentId,
             createdAt: now,
             updatedAt: null,
         }

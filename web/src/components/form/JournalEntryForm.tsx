@@ -10,6 +10,8 @@ import { Category, CreateJournalEntryForm, EntryTag, JournalEntry } from "@/type
 import { Delete, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { getEntryTags } from "@/database/queries";
+import { useMemo, useState } from "react";
+import EntryTagPicker from "../pickers/EntryTagPicker";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -116,6 +118,11 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
 export default function JournalEntryForm() {
     const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
 
+    const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
+        anchorEl: null,
+        index: 0,    
+    });
+
     const {
         fields: childrenFieldArray,
         append: appendChild,
@@ -139,131 +146,144 @@ export default function JournalEntryForm() {
         });
     }
 
-    return (
-        <Box>
-            <Grid container columns={12} spacing={1} rowSpacing={1} mb={1}>
-                <Grid size={8}>
-                    <Controller
-                        control={control}
-                        name='parent.memo'
-                        render={({ field }) => (
-                            <TextField
-                                label='Memo'
-                                autoFocus
-                                {...field}
-                                ref={null}
-                                value={field.value}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setValue(field.name, value);
-                                    // if (!manuallySetCategory && enableAutoDetectCategory) {
-                                    //     handleDetectCategoryWithAi(value);
-                                    // }
-                                }}
-                                fullWidth
-                                multiline
-                                maxRows={3}
-                                sx={{ mb: 2 }}
-                            />
-                        )}
-                    />
-                </Grid>
-                <Grid size={4}>
-                    <Controller
-                        control={control}
-                        name='parent.amount'
-                        render={({ field }) => (
-                            <TextField
-                                label='Amount'
-                                {...field}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    const newValue = value.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-                                        .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-                                        .replace(/(\.\d{2})\d+/g, '$1'); // Limit to two decimal places
-                                    field.onChange(newValue);
-                                }}
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                }}
-                                sx={{ flex: 1 }}
-                                autoComplete="off"
-                            />
-                        )}
-                    />
-                </Grid>
-                <Grid size={6}>
-                    <Controller
-                        control={control}
-                        name='parent.date'
-                        render={({ field }) => (
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    {...field}
-                                    value={dayjs(field.value)}
-                                    onChange={(value) => {
-                                        setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
-                                    }}
-                                    format='ddd, MMM D'
-                                    label='Date'
-                                    slotProps={{
-                                        textField:  {
-                                            fullWidth: true
-                                        }
-                                    }}
-                                />
-                            </LocalizationProvider>
-                        )}
-                    />
-                </Grid>
-                <Grid size={6}>
-                    <Controller
-                        control={control}
-                        name='parent.categoryIds'
-                        render={({ field }) => {
-                            const categoryIds = watch('parent.categoryIds');
-                            const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0];
+    const entryTagPickerSelectedTags = useMemo(() => {
+        return watch(`children.${entryTagPickerData.index}.tagIds`) ?? [];
+    }, [entryTagPickerData.index, watch(`children.${entryTagPickerData.index}.tagIds`)])
 
-                            return (
-                                <CategoryAutocomplete
+    return (
+        <>
+            <EntryTagPicker
+                anchorEl={entryTagPickerData.anchorEl}
+                onClose={() => setEntryTagPickerData((prev) => ({ ...prev, anchorEl: null }))}
+                value={entryTagPickerSelectedTags}
+                onChange={(tagIds: EntryTag['_id'][]) => {
+                    setValue(`children.${entryTagPickerData.index}.tagIds`, tagIds);
+                }}
+            />
+            <Box>
+                <Grid container columns={12} spacing={1} rowSpacing={1} mb={1}>
+                    <Grid size={8}>
+                        <Controller
+                            control={control}
+                            name='parent.memo'
+                            render={({ field }) => (
+                                <TextField
+                                    label='Memo'
+                                    autoFocus
                                     {...field}
                                     ref={null}
-                                    value={categoryId}
-                                    onChange={(_event, newValue) => {
-                                        // setManuallySetCategory(Boolean(newValue))
-                                        setValue(field.name, newValue ? [newValue] : []);
+                                    value={field.value}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        setValue(field.name, value);
+                                        // if (!manuallySetCategory && enableAutoDetectCategory) {
+                                        //     handleDetectCategoryWithAi(value);
+                                        // }
                                     }}
+                                    fullWidth
+                                    multiline
+                                    maxRows={3}
                                 />
-                            );
-                        }}
-                    />
-                </Grid>
-            </Grid>
-            <Stack>
-                {childrenFieldArray.map((field, index) => {
-                    return (
-                        <JournalEntryChildRow
-                            key={field.id}
-                            index={index}
-                            fieldArray={childrenFieldArray}
-                            remove={removeChild}
-                            onClickTagButton={(event) => {
-                                // setTransactionTagPickerData({
-                                //     anchorEl: event.currentTarget,
-                                //     index,
-                                // })
-                            }}
-                            entryTags={entryTagQuery.data}
+                            )}
                         />
-                    )
-                })}
-                <Button
-                    onClick={() => handleAddChild()}
-                >
-                    Add Child
-                </Button>
-            </Stack>
-        </Box>
+                    </Grid>
+                    <Grid size={4}>
+                        <Controller
+                            control={control}
+                            name='parent.amount'
+                            render={({ field }) => (
+                                <TextField
+                                    label='Amount'
+                                    {...field}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        const newValue = value.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
+                                            .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
+                                            .replace(/(\.\d{2})\d+/g, '$1'); // Limit to two decimal places
+                                        field.onChange(newValue);
+                                    }}
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                                    }}
+                                    sx={{ flex: 1 }}
+                                    autoComplete="off"
+                                />
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={6}>
+                        <Controller
+                            control={control}
+                            name='parent.date'
+                            render={({ field }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        {...field}
+                                        value={dayjs(field.value)}
+                                        onChange={(value) => {
+                                            setValue(field.name, value?.format('YYYY-MM-DD') ?? '');
+                                        }}
+                                        format='ddd, MMM D'
+                                        label='Date'
+                                        slotProps={{
+                                            textField:  {
+                                                fullWidth: true
+                                            }
+                                        }}
+                                    />
+                                </LocalizationProvider>
+                            )}
+                        />
+                    </Grid>
+                    <Grid size={6}>
+                        <Controller
+                            control={control}
+                            name='parent.categoryIds'
+                            render={({ field }) => {
+                                const categoryIds = watch('parent.categoryIds');
+                                const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0];
+
+                                return (
+                                    <CategoryAutocomplete
+                                        {...field}
+                                        ref={null}
+                                        value={categoryId}
+                                        onChange={(_event, newValue) => {
+                                            // setManuallySetCategory(Boolean(newValue))
+                                            setValue(field.name, newValue ? [newValue] : []);
+                                        }}
+                                    />
+                                );
+                            }}
+                        />
+                    </Grid>
+                </Grid>
+                <Stack>
+                    {childrenFieldArray.map((field, index) => {
+                        return (
+                            <JournalEntryChildRow
+                                key={field.id}
+                                index={index}
+                                fieldArray={childrenFieldArray}
+                                remove={removeChild}
+                                onClickTagButton={(event) => {
+                                    setEntryTagPickerData({
+                                        anchorEl: event.currentTarget,
+                                        index,
+                                    })
+                                }}
+                                entryTags={entryTagQuery.data}
+                            />
+                        )
+                    })}
+                    <Button
+                        onClick={() => handleAddChild()}
+                    >
+                        Add Child
+                    </Button>
+                </Stack>
+            </Box>
+        </>
     )
 }
