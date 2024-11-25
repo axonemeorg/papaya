@@ -27,7 +27,8 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
     });
 
     const handleCreateQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
-        createQuickJournalEntry(formData).then(() => {
+        const now = new Date().toISOString();
+        createQuickJournalEntry(formData, now).then(() => {
             createQuickJournalEntryForm.reset();
         });
         snackbar({ message: 'Created journal entry.' });

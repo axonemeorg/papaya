@@ -46,12 +46,12 @@ export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
     return db.bulkDocs(docs);
 }
 
-export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
+export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry, date: string) => {
     const journalEntryFormData: CreateJournalEntryForm = {
         parent: {
             memo: formData.memo,
             amount: formData.amount,
-            date: new Date().toISOString(),
+            date,
             paymentMethodId: null,
             relatedEntryIds: [],
             categoryIds: [],
