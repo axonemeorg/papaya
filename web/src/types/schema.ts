@@ -76,6 +76,7 @@ export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(z.o
 export type JournalEntry = z.output<typeof JournalEntry>;
 
 export const EnhancedJournalEntry = JournalEntry.merge(z.object({
+    children: z.array(JournalEntry),
     allCategoryIds: z.array(z.string()),
     netAmount: z.number(),
 }));

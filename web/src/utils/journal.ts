@@ -41,6 +41,7 @@ export const enhanceJournalEntry = (parent: JournalEntry, children: JournalEntry
 
     return {
         ...parent,
+        children,
         allCategoryIds,
         netAmount,
     }

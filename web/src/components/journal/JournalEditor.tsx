@@ -61,7 +61,7 @@ export interface JournalEditorProps {
 export interface JournalEntrySelection {
     entry: EnhancedJournalEntry | null;
     anchorEl: HTMLElement | null;
-    children: JournalEntry[];
+    // children: JournalEntry[];
 }
 
 export default function JournalEditor(props: JournalEditorProps) {
@@ -70,7 +70,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
         entry: null,
         anchorEl: null,
-        children: [],
+        // children: [],
     });
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
@@ -116,12 +116,12 @@ export default function JournalEditor(props: JournalEditorProps) {
 
     const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
         const { childEntryIds } = entry;
-        const children: JournalEntry[] = (childEntryIds ?? []).map((childId) => getJournalEntriesQuery.data[childId]);
+        // const children: JournalEntry[] = (childEntryIds ?? []).map((childId) => getJournalEntriesQuery.data[childId]);
 
         setSelectedEntry({
             anchorEl: event.currentTarget,
             entry: entry,
-            children,
+            // children,
         });
     }
 
@@ -234,7 +234,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                 {selectedEntry.entry && (
                     <JournalEntryCard
                         entry={selectedEntry.entry}
-                        children={selectedEntry.children}
+                        // children={selectedEntry.children}
                         anchorEl={selectedEntry.anchorEl}
                         onClose={() => handleDeselectListItem()}
                         onDelete={() => handleDeleteEntry(selectedEntry.entry)}

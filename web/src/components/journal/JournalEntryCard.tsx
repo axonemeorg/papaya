@@ -55,7 +55,8 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 
 export default function JournalEntryCard(props: JournalEntryCardProps) {
     const [showEditDialog, setShowEditDialog] = useState<boolean>(false);
-    const { entry, anchorEl, children } = props;
+    const { entry, anchorEl } = props;
+
 
     const isNetPositive = Boolean(entry && entry.netAmount > 0);
 
@@ -70,15 +71,14 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
     });
 
     const editJournalEntryFormValues: EditJournalEntryForm = useMemo(() => {
-        const x: EditJournalEntryForm =  {
+        return {
             parent: {
                 ...props.entry,
             },
             children: [
-                ...props.children
+                ...props.entry.children
             ]
         };
-        return x
     }, [props.entry]);
 
     const categoryId: string | undefined = entry?.categoryIds?.[0];
