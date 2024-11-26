@@ -2,9 +2,6 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["@node-rs/argon2"],
-  },
   env: {
     ...require("dotenv").config({ path: path.resolve(__dirname, "../.env") }).parsed,
   },

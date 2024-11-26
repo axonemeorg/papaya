@@ -1,12 +1,12 @@
+import { Category } from "@/types/schema";
 import { alpha, Chip } from "@mui/material";
-import { Category } from "@/types/get";
 
 interface CategoryChipProps {
     category?: Category;
 }
 
 export default function CategoryChip(props: CategoryChipProps) {
-    const categoryColor = props.category?.avatarPrimaryColor;
+    const categoryColor = props.category?.avatar.primaryColor;
 
     return (
         <Chip

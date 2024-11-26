@@ -3,9 +3,6 @@
 import { AutocompleteProps, Avatar as MuiAvatar, Box, Button, ButtonGroup, Fade, FormHelperText, Grid, Icon, InputLabel, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import PaymentTypeAutocomplete from "../input/PaymentTypeAutocomplet";
-import { TransactionMethodContext } from "@/contexts/TransactionMethodContext";
-import { InsertEmoticon, Photo, TextFields } from "@mui/icons-material";
 import AvatarPicker from "../pickers/AvatarPicker";
 import { Avatar, Category, CreateCategory } from "@/types/schema";
 

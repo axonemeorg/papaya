@@ -1,6 +1,5 @@
 'use client';
 
-import { AvatarImageUploadResponse } from "@/server/repositories/FileUploadRepository";
 import { Avatar, AvatarVariant } from "@/types/schema";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
@@ -12,6 +11,7 @@ interface ImageAvatarPicker {
     onChange: (avatar: Avatar | null) => void;
 }
 
+type AvatarImageUploadResponse = any; // TODO
 
 interface ImageAvatarProps extends AvatarProps {
     avatar: Avatar;

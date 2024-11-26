@@ -187,6 +187,7 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 export const createCategory = async (formData: CreateCategory) => {
     const category: Category = {
         ...formData,
+        type: 'CATEGORY',
         _id: generateCategoryId(),
         createdAt: new Date().toISOString(),
         updatedAt: null,

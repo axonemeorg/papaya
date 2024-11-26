@@ -12,7 +12,7 @@ export const DocumentMetadata = z.object({
     _id: z.string(),
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
-    _attachments: z.record(AttachmentMeta).optional(),
+    // _attachments: z.record(AttachmentMeta).optional(), // TODO
     type: z.string(),
 });
 

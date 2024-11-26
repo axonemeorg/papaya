@@ -1,4 +1,3 @@
-import { TRANSACTION_TAG_LABELS } from "@/constants/transactionTags";
 import { getEntryTags } from "@/database/queries";
 import { EntryTag } from "@/types/schema";
 import { Check, Close } from "@mui/icons-material";

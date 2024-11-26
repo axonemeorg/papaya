@@ -12,7 +12,7 @@ export default function BaseLayout(props: BaseLayoutProps) {
 	const { headerChildren, sx, ...rest } = props;
 	return (
 		<>
-			<Header user={undefined}>
+			<Header>
 				{props.headerChildren}
 			</Header>
 			<Stack component={Paper} square variant="outlined" sx={{ flex: 1, borderLeft: 0, borderRight: 0 }}>
