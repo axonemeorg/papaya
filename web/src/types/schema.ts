@@ -37,7 +37,6 @@ export const Avatar = z.object({
 export type Avatar = z.output<typeof Avatar>;
 
 export const CreateCategory = z.object({
-    type: z.literal('CATEGORY'),
     label: z.string(),
     description: z.string(),
     avatar: Avatar,

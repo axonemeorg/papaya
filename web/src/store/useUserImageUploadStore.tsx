@@ -1,4 +1,4 @@
-import { Avatar } from "@/types/get";
+import { Avatar } from "@/types/schema";
 import { create } from "zustand";
 
 interface UserImageAvatarHistoryStore {

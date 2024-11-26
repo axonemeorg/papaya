@@ -6,7 +6,7 @@ import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { createCategory, deleteCategory, undeleteCategory, updateCategory } from "@/database/actions";
 import { getCategories } from "@/database/queries";
-import { Category } from "@/types/schema";
+import { Category, CreateCategory } from "@/types/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Add, ArrowBack, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
 import { Button, IconButton, List, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Stack, Typography } from "@mui/material";
@@ -24,14 +24,12 @@ interface ManageCategoriesProps {
     onClose: () => void;
 }
 
-const CATEGORY_FORM_CREATE_VALUES: Category = {
-    _id: '',
-    type: 'CATEGORY',
+const CATEGORY_FORM_CREATE_VALUES: CreateCategory = {
     label: '',
     description: '',
     avatar: {
         ...DEFAULT_AVATAR
-    }
+    },
 }
 
 const FORM_TITLES: Record<ManageCategoriesFormMode, string> = {
