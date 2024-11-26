@@ -40,8 +40,6 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parentSequenceNumber = sequenceGenerator.next().value;
     }
 
-    console.log('createOrUpdateJournalEntry.parentId', parentId);
-
     // Check if form data is for editing. If so, we need to check for children to delete
     if (isEditing) {
         const currentChildren = await getJournalEntryChildren(parentId);

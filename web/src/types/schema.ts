@@ -1,9 +1,18 @@
 import { z } from "zod";
 
+const AttachmentMeta = z.object({
+    content_type: z.string(),
+    digest: z.string(),
+    length: z.number(),
+    revpos: z.number(),
+    stub: z.boolean(),
+});
+
 export const DocumentMetadata = z.object({
     _id: z.string(),
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
+    _attachments: z.record(AttachmentMeta).optional(),
     type: z.string(),
 });
 
@@ -127,3 +136,19 @@ export const ZiskDocument = z.union([
 ]);
 
 export type ZiskDocument = z.output<typeof ZiskDocument>;
+
+export const CreateEntryAttachment = z.object({
+    filename: z.string(),
+    description: z.string(),
+    meta: z.record(AttachmentMeta),
+});
+
+export type CreateEntryAttachment = z.output<typeof CreateEntryAttachment>;
+
+export const EntryAttachment = DocumentMetadata.merge(CreateEntryAttachment).merge(z.object({
+    type: z.literal('ENTRY_ATTACHMENT'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type EntryAttachment = z.output<typeof EntryAttachment>;

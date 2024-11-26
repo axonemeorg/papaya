@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getEntryTags } from "@/database/queries";
 import { useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
+import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -146,6 +147,10 @@ export default function JournalEntryForm() {
         });
     }
 
+    const handleAddFiles = (files: File[]) => {
+        console.log('FILES:', files)
+    }
+
     const entryTagPickerSelectedTags = useMemo(() => {
         return watch(`children.${entryTagPickerData.index}.tagIds`) ?? [];
     }, [entryTagPickerData.index, watch(`children.${entryTagPickerData.index}.tagIds`)])
@@ -160,7 +165,7 @@ export default function JournalEntryForm() {
                     setValue(`children.${entryTagPickerData.index}.tagIds`, tagIds);
                 }}
             />
-            <Box>
+            <Box sx={{ position: 'relative' }}>
                 <Grid container columns={12} spacing={1} rowSpacing={1} mb={1}>
                     <Grid size={8}>
                         <Controller
@@ -277,12 +282,18 @@ export default function JournalEntryForm() {
                             />
                         )
                     })}
-                    <Button
-                        onClick={() => handleAddChild()}
-                    >
-                        Add Child
-                    </Button>
                 </Stack>
+                <Button
+                    onClick={() => handleAddChild()}
+                >
+                    Add Child
+                </Button>
+                <Stack>
+
+                </Stack>
+                <AttachmentDropzone onFilesAdded={handleAddFiles}>
+                    <AttachmentButton />
+                </AttachmentDropzone>
             </Box>
         </>
     )

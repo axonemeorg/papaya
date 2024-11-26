@@ -82,3 +82,9 @@ export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Pro
 
     return result.docs as JournalEntry[];    
 }
+
+export const getJournalEntryWithAttachments = async (entryId: JournalEntry['_id']): Promise<JournalEntry> => {
+    const result = await db.get(entryId, { attachments: true });
+
+    return result as JournalEntry;
+}

@@ -4,7 +4,7 @@ import { createContext, PropsWithChildren, useContext, useRef, useState } from "
 
 interface AttachmentDropzoneProps extends PropsWithChildren {
     onFilesAdded: (files: File[]) => void;
-    allowMultiple?: boolean;
+    singleFile?: boolean;
 }
 
 interface AttachmentContext {
@@ -18,6 +18,8 @@ const AttachmentContext = createContext<AttachmentContext>({
 export const AttachmentDropzone = (props: AttachmentDropzoneProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
+
+    const allowMultiple = !props.singleFile;
 
     const onClickUpload = () => {
         fileInputRef?.current?.click();
@@ -60,38 +62,32 @@ export const AttachmentDropzone = (props: AttachmentDropzoneProps) => {
             <input
                 type="file"
                 onChange={handleFileChange}
-                multiple={props.allowMultiple}
+                multiple={allowMultiple}
                 style={{ display: "none" }}
                 ref={fileInputRef}
             />
-            <div
+            <Box
                 onDragEnter={handleDragEnter}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                style={{ position: "relative", width: "100%", height: "100%" }}
+                sx={{
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    position: "absolute",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    display: isDragging ? "flex" : 'none',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "2px dashed white",
+                    zIndex: 10,
+                }}
             >
-                {isDragging && (
-                    <Box
-                        sx={{
-                            left: 0,
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            position: "absolute",
-                            backgroundColor: "rgba(0,0,0,0.5)",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            border: "2px dashed white",
-                            zIndex: 10,
-                        }}
-                    >
-                        Drop your files here
-                    </Box>
-                )}
-                {props.children}
-            </div>
+                Drop your files here
+            </Box>
+            {props.children}
         </AttachmentContext.Provider>
     );
 };
