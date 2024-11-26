@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { CreateJournalEntryForm, EditJournalEntryForm } from "@/types/schema";
-import { updateJournalEntry } from "@/database/actions";
+import { createOrUpdateJournalEntry } from "@/database/actions";
 
 interface EditJournalEntryModalProps {
     open: boolean;
@@ -22,7 +22,9 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
     const { snackbar } = useContext(NotificationsContext);
 
     const handleUpdateJournalEntry = (formData: EditJournalEntryForm) => {
-        updateJournalEntry(formData)
+        console.log('handleUpdateJournalEntry', formData);
+        console.log('props.initialValues:', props.initialValues);
+        createOrUpdateJournalEntry(formData)
             .then(() => {
                 props.onClose();
                 snackbar({ message: 'Updated journal entry'});
@@ -38,7 +40,7 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
         defaultValues: {
             ...props.initialValues
         },
-        resolver: zodResolver(CreateJournalEntryForm)
+        resolver: zodResolver(EditJournalEntryForm)
     });
 
     useEffect(() => {

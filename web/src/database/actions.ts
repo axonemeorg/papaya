@@ -2,46 +2,112 @@ import { Category, CreateCategory, CreateJournalEntry, type CreateJournalEntryFo
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
 import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
 import { getJournalEntryChildren } from "./queries";
+import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
-export const createJournalEntry = async (formData: CreateJournalEntryForm) => {
+export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
     const now = new Date().toISOString();
+
     const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
     const { journalEntrySequence } = meta;
 
-    const parentId = generateJournalEntryId();
-    const parentDate = formData.parent.date;
-    const parentSequenceNumber = journalEntrySequence;
+    function* makeSequenceGenerator(initialValue: number): Generator<number> {
+        for (let i = initialValue; ; i++) {
+            yield i;
+        }
+    }
 
-    const children: JournalEntry[] = formData.children.map((child, index) => {
-        return {
-            ...child,
-            _id: generateJournalEntryId(),
-            type: 'JOURNAL_ENTRY',
-            date: parentDate,
-            sequenceNumber: journalEntrySequence + index + 1,
-            parentEntryId: parentId,
-            createdAt: now,
-            updatedAt: null,
+    const sequenceGenerator = makeSequenceGenerator(journalEntrySequence);
+    const parentDate = formData.parent.date;
+
+    const editingChildrenIds = new Set<string>(
+        formData.children.map(child => (child as JournalEntry)._id).filter(Boolean)
+    );
+
+    const deletedChildren: JournalEntry[] = [];
+
+    let parent: JournalEntry;
+
+    let parentId: string;
+    let parentSequenceNumber: number | undefined | null;
+
+    const isEditing = '_id' in formData.parent && Boolean(formData.parent._id);
+
+    if (isEditing) {
+        parentId = (formData.parent as JournalEntry)._id;
+        parentSequenceNumber = (formData.parent as JournalEntry).sequenceNumber;
+    } else {
+        parentId = generateJournalEntryId();
+        parentSequenceNumber = sequenceGenerator.next().value;
+    }
+
+    console.log('createOrUpdateJournalEntry.parentId', parentId);
+
+    // Check if form data is for editing. If so, we need to check for children to delete
+    if (isEditing) {
+        const currentChildren = await getJournalEntryChildren(parentId);
+        currentChildren.forEach((child) => {
+            if (!editingChildrenIds.has(child._id)) {
+                deletedChildren.push({
+                    ...child,
+                    _deleted: true,
+                });
+            }
+        });
+    }
+
+    const children: JournalEntry[] = formData.children.map((child) => {
+        if ('_id' in child) {
+            // Child entry was edited
+            return {
+                ...child,
+                date: parentDate,
+                updatedAt: now,
+            }
+        } else {
+            // New child entry
+            return {
+                ...child,
+                _id: generateJournalEntryId(),
+                type: 'JOURNAL_ENTRY',
+                date: parentDate,
+                sequenceNumber: sequenceGenerator.next().value,
+                parentEntryId: parentId,
+                createdAt: now,
+                updatedAt: null,
+            }
         }
     });
-    
-    const parent: JournalEntry = {
-        ...formData.parent,
-        type: 'JOURNAL_ENTRY',
-        _id: parentId,
-        parentEntryId: null,
-        sequenceNumber: parentSequenceNumber,
-        childEntryIds: children.map(child => child._id),
-        createdAt: now,
-        updatedAt: null,
-    };
 
-    const docs: Object[] = [parent, ...children];
+    if ('_id' in formData.parent) {
+        // Updating
+        parent = {
+            ...formData.parent,
+            childEntryIds: children.map(child => child._id),
+            updatedAt: now,
+        };
+    } else {
+        parent = {
+            ...formData.parent,
+            _id: parentId,
+            type: 'JOURNAL_ENTRY',
+            sequenceNumber: parentSequenceNumber,
+            childEntryIds: children.map(child => child._id),
+            createdAt: now,
+            updatedAt: null,
+        };
+    }
 
-    docs.push({
-        ...meta,
-        journalEntrySequence: journalEntrySequence + children.length + 1,
-    });
+    const docs: Object[] = [
+        parent,
+        ...children,
+        ...deletedChildren,
+        {
+            ...meta,
+            journalEntrySequence: journalEntrySequence + children.length + 1,
+        }
+    ];
+
+    console.log('createOrUpdateJournalEntry.docs', docs);
 
     return db.bulkDocs(docs);
 }
@@ -63,51 +129,56 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
         children: [],
     };
 
-    return createJournalEntry(journalEntryFormData);
+    return createOrUpdateJournalEntry(journalEntryFormData);
 }
 
-export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
-    const now = new Date().toISOString();
+// export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
+//     const now = new Date().toISOString();
     
-    const parentDate = formData.parent.date;
-    const currentChildren = await getJournalEntryChildren(formData.parent._id);
-    const newChildren: Record<JournalEntry['_id'], JournalEntry> = formData.children.reduce(
-        (acc: Record<JournalEntry['_id'], JournalEntry>, child) => {
-            acc[child._id] = child;
-            return acc;
-        },
-        {}
-    );
+//     const parentDate = formData.parent.date;
+//     const currentChildren = await getJournalEntryChildren(formData.parent._id);
+//     const newChildren: Record<JournalEntry['_id'], JournalEntry> = formData.children.reduce(
+//         (acc: Record<JournalEntry['_id'], JournalEntry>, child) => {
+//             acc[child._id] = child;
+//             return acc;
+//         },
+//         {}
+//     );
 
-    const children: JournalEntry[] = currentChildren.map(child => {
-        if (!newChildren[child._id]) {
-            // Child entry was deleted
-            return {
-                ...child,
-                _deleted: true,
-            }
-        }
+//     const children: JournalEntry[] = currentChildren.map(child => {
+//         if (!newChildren[child._id]) {
+//             // Child entry was deleted
+//             return {
+//                 ...child,
+//                 _deleted: true,
+//             }
+//         }
 
-        return {
-            ...child,
-            ...newChildren[child._id],
-            date: parentDate, // Keep date in sync with parent
-            updatedAt: now,
-        }
-    });
+//         return {
+//             ...child,
+//             ...newChildren[child._id],
+//             date: parentDate, // Keep date in sync with parent
+//             updatedAt: now,
+//         }
+//     });
 
-    const parent: JournalEntry = {
-        ...formData.parent,
-        updatedAt: now,
-        childEntryIds: Object.keys(newChildren),
-    };
+//     const parent: JournalEntry = {
+//         ...formData.parent,
+//         updatedAt: now,
+//         childEntryIds: Object.keys(newChildren),
+//     };
 
-    return db.bulkDocs([parent, ...children]);
-}
+//     return db.bulkDocs([parent, ...children]);
+// }
 
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
     const record = await db.get(journalEntryId);
-    await db.remove(record);
+    const children = await getJournalEntryChildren(journalEntryId);
+    const docs = [
+        { ...record, _deleted: true },
+        ...children.map(child => ({ ...child, _deleted: true })),
+    ];
+    await db.bulkDocs(docs);
     return record as JournalEntry;
 }
 

@@ -39,6 +39,7 @@ export const getJournalEntries = async (view: JournalEditorView, date: string): 
 
 export const getEnhancedJournalEntries = async (view: JournalEditorView, date: string): Promise<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>> => {
     const journalEntries = await getJournalEntries(view, date);
+    console.log('getEnhancedJournalEntries.journalEntries', journalEntries);
 
     const result = Object.fromEntries(
         Object.values(journalEntries)

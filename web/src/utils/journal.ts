@@ -1,4 +1,4 @@
-import { EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { CreateJournalEntryForm, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -45,4 +45,12 @@ export const enhanceJournalEntry = (parent: JournalEntry, children: JournalEntry
         allCategoryIds,
         netAmount,
     }
+}
+
+export const isCreateJournalEntryForm = (form: CreateJournalEntryForm | EditJournalEntryForm): form is CreateJournalEntryForm => {
+    return '_id' in form.parent;
+}
+
+export const isEditJournalEntryForm = (form: CreateJournalEntryForm | EditJournalEntryForm): form is EditJournalEntryForm => {
+    return !('_id' in form.parent);
 }

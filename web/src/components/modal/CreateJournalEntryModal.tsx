@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { CreateJournalEntryForm, JournalEntry } from "@/types/schema";
 import { db } from "@/database/client";
-import { createJournalEntry } from "@/database/actions";
+import { createOrUpdateJournalEntry } from "@/database/actions";
 
 interface JournalEntryModalProps {
     open: boolean;
@@ -24,7 +24,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const { snackbar } = useContext(NotificationsContext);
 
     const handleCreateJournalEntry = async (formData: CreateJournalEntryForm) => {
-        await createJournalEntry(formData);
+        await createOrUpdateJournalEntry(formData);
         snackbar({ message: 'Created journal entry'});
         props.onSaved();
     }
