@@ -1,5 +1,3 @@
-"use client";
-
 import { DialogNotification, NotificationsContext, SnackbarAction, SnackbarNotification } from "@/contexts/NotificationsContext";
 import { Close } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Snackbar } from "@mui/material";

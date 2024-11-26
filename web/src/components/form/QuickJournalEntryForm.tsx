@@ -1,28 +1,24 @@
 'use client';
 
 import { Grid2 as Grid, InputAdornment, TextField } from "@mui/material";
-import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { CreateQuickJournalEntry } from "@/types/post";
+import { Category, CreateQuickJournalEntry } from "@/types/schema";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
-import { findMostSimilarUserCategory } from "@/actions/category-actions";
-import { debounce } from "@/utils/Utils";
-import { Category } from "@/types/get";
 
 export default function QuickJournalEntryForm() {
-    const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
-    const enableAutoDetectCategory = true;
+    // const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
+    // const enableAutoDetectCategory = true;
 
     const { watch, control, setValue } = useFormContext<CreateQuickJournalEntry>();
 
-    const handleDetectCategoryWithAi = debounce(async (memo) => {
-        if (memo.length < 2) {
-            return
-        }
+    // const handleDetectCategoryWithAi = debounce(async (memo) => {
+    //     if (memo.length < 2) {
+    //         return
+    //     }
 
-        const category = await findMostSimilarUserCategory(memo);
-        setValue('category', category);
-    }, 500)
+    //     const category = await findMostSimilarUserCategory(memo);
+    //     setValue('category', category);
+    // }, 500)
 
     return (
         <Grid container columns={12} spacing={2}>
@@ -40,9 +36,9 @@ export default function QuickJournalEntryForm() {
                             onChange={(event) => {
                                 const value = event.target.value;
                                 setValue(field.name, value);
-                                if (!manuallySetCategory && enableAutoDetectCategory) {
-                                    handleDetectCategoryWithAi(value);
-                                }
+                                // if (!manuallySetCategory && enableAutoDetectCategory) {
+                                //     handleDetectCategoryWithAi(value);
+                                // }
                             }}
                             fullWidth
                             size='small'
@@ -77,19 +73,24 @@ export default function QuickJournalEntryForm() {
             <Grid size={5}>
                 <Controller
                     control={control}
-                    name='category'
-                    render={({ field }) => (
-                        <CategoryAutocomplete
-                            {...field}
-                            ref={null}
-                            value={watch('category') as Category ?? null}
-                            onChange={(_event, newValue) => {
-                                setManuallySetCategory(Boolean(newValue))
-                                setValue(field.name, newValue);
-                            }}
-                            size="small"
-                        />
-                    )}
+                    name='categoryIds'
+                    render={({ field }) => {
+                        const categoryIds = watch('categoryIds');
+                        const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null;
+
+                        return (
+                            <CategoryAutocomplete
+                                {...field}
+                                ref={null}
+                                value={categoryId}
+                                onChange={(_event, newValue) => {
+                                    // setManuallySetCategory(Boolean(newValue))
+                                    setValue(field.name, newValue ? [newValue] : []);
+                                }}
+                                size="small"
+                            />
+                        );
+                    }}
                 />
             </Grid>
         </Grid>

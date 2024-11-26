@@ -1,23 +1,153 @@
-import type { BuildQueryResult, DBQueryConfig, ExtractTablesWithRelations } from 'drizzle-orm';
-import * as schema from '../database/schemas';
+import { z } from "zod";
 
-type Schema = typeof schema;
-type TSchema = ExtractTablesWithRelations<Schema>;
+const AttachmentMeta = z.object({
+    content_type: z.string(),
+    digest: z.string(),
+    length: z.number(),
+    revpos: z.number(),
+    stub: z.boolean(),
+});
 
-export type IncludeRelation<TableName extends keyof TSchema> = DBQueryConfig<
-    'one' | 'many',
-    boolean,
-    TSchema,
-    TSchema[TableName]
->['with'];
+export const DocumentMetadata = z.object({
+    _id: z.string(),
+    _rev: z.string().optional(),
+    _deleted: z.boolean().optional(),
+    // _attachments: z.record(AttachmentMeta).optional(), // TODO
+    type: z.string(),
+});
 
-export type InferResultType<
-    TableName extends keyof TSchema,
-    With extends IncludeRelation<TableName> | undefined = undefined
-> = BuildQueryResult<
-    TSchema,
-    TSchema[TableName],
-    {
-        with: With;
-    }
->;
+export const EntryType = z.enum([
+    'DEBIT',
+    'CREDIT',
+]);
+
+export const AvatarVariant = z.enum([
+    'TEXT',
+    'PICTORIAL',
+    'IMAGE',
+]);
+
+export const Avatar = z.object({
+    content: z.string(),
+    variant: AvatarVariant,
+    primaryColor: z.string(),
+    secondaryColor: z.string().optional().nullable(),
+});
+
+export type Avatar = z.output<typeof Avatar>;
+
+export const CreateCategory = z.object({
+    label: z.string(),
+    description: z.string(),
+    avatar: Avatar,
+});
+
+export type CreateCategory = z.output<typeof CreateCategory>;
+
+export const Category = DocumentMetadata.merge(CreateCategory).merge(z.object({
+    type: z.literal('CATEGORY'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type Category = z.output<typeof Category>;
+
+export const CreateJournalEntryChild = z.object({
+    memo: z.string(),
+    amount: z.string().min(0, "A positive number is required"),
+    entryType: EntryType,
+    tagIds: z.array(z.string()).optional(),
+    categoryIds: z.array(z.string()).optional(),
+});
+
+export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>;
+
+export const CreateJournalEntry = CreateJournalEntryChild.merge(z.object({
+    date: z.string(),
+    notes: z.string().optional(),
+    paymentMethodId: z.string().nullable().optional(),
+    attachmentIds: z.array(z.string()).optional(),
+    relatedEntryIds: z.array(z.string()).optional(),
+}));
+
+export type CreateJournalEntry = z.output<typeof CreateJournalEntry>;
+
+export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(z.object({
+    type: z.literal('JOURNAL_ENTRY'),
+    parentEntryId: z.string().nullable().optional(),
+    childEntryIds: z.array(z.string()).optional(),
+    sequenceNumber: z.number().nullable().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type JournalEntry = z.output<typeof JournalEntry>;
+
+export const EnhancedJournalEntry = JournalEntry.merge(z.object({
+    children: z.array(JournalEntry),
+    allCategoryIds: z.array(z.string()),
+    netAmount: z.number(),
+}));
+
+export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
+
+export const CreateJournalEntryForm = z.object({
+    parent: CreateJournalEntry,
+    children: z.array(CreateJournalEntryChild),
+});
+
+export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
+
+export const EditJournalEntryForm = z.object({
+    parent: JournalEntry,
+    children: z.array(z.union([JournalEntry, CreateJournalEntryChild])),
+});
+
+export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;
+
+export const CreateQuickJournalEntry = z.object({
+    memo: z.string(),
+    categoryIds: z.array(z.string()),
+    amount: z.string().min(0, "A positive number is required"),
+});
+
+export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>;
+
+export const CreateEntryTag = z.object({
+    label: z.string(),
+    description: z.string(),
+});
+
+export type CreateEntryTag = z.output<typeof CreateEntryTag>;
+
+export const EntryTag = DocumentMetadata.merge(CreateEntryTag).merge(z.object({
+    type: z.literal('ENTRY_TAG'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type EntryTag = z.output<typeof EntryTag>;
+
+export const ZiskDocument = z.union([
+    Category,
+    JournalEntry,
+    EntryTag,
+]);
+
+export type ZiskDocument = z.output<typeof ZiskDocument>;
+
+export const CreateEntryAttachment = z.object({
+    filename: z.string(),
+    description: z.string(),
+    meta: z.record(AttachmentMeta),
+});
+
+export type CreateEntryAttachment = z.output<typeof CreateEntryAttachment>;
+
+export const EntryAttachment = DocumentMetadata.merge(CreateEntryAttachment).merge(z.object({
+    type: z.literal('ENTRY_ATTACHMENT'),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type EntryAttachment = z.output<typeof EntryAttachment>;

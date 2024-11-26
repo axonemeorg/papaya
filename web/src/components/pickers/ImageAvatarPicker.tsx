@@ -1,30 +1,32 @@
 'use client';
 
-import { AvatarImageUploadResponse } from "@/server/services/FileUploadService";
-import { AvatarVariant } from "@/types/enum";
-import { ItemAvatar } from "@/types/get";
-import { getUserImagePublicUrlFromS3Key } from "@/utils/Utils";
+import { Avatar, AvatarVariant } from "@/types/schema";
 import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Avatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
+import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 
 interface ImageAvatarPicker {
-    value: ItemAvatar;
-    onChange: (avatar: ItemAvatar | null) => void;
+    value: Avatar;
+    onChange: (avatar: Avatar | null) => void;
 }
 
+type AvatarImageUploadResponse = any; // TODO
 
 interface ImageAvatarProps extends AvatarProps {
-    avatar: ItemAvatar;
+    avatar: Avatar;
 }
 
 export const ImageAvatar = (props: ImageAvatarProps) => {
     const { avatar, ...rest } = props;
-    const imageSrc = getUserImagePublicUrlFromS3Key(avatar.avatarContent);
+    const imageSrc = [
+        'https:/',
+        process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
+        avatar.content
+    ].join('/');
 
     return (
-        <Avatar
+        <MuiAvatar
             variant="rounded"
             src={imageSrc}
             {...rest}
@@ -39,17 +41,17 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 
     const handleImageUploadSuccess = (data: AvatarImageUploadResponse) => {
         props.onChange({
-            avatarContent: data.record.s3Key,
-            avatarVariant: AvatarVariant.Enum.IMAGE,
-            avatarPrimaryColor: data.color ?? '',
+            content: data.record.s3Key,
+            variant: AvatarVariant.Enum.IMAGE,
+            primaryColor: data.color ?? '',
         })
     }
 
     const hasImageIcon = useMemo(() => {
         return [
             Boolean(props.value),
-            Boolean(props.value?.avatarContent),
-            props.value?.avatarVariant === AvatarVariant.Enum.IMAGE,
+            Boolean(props.value?.content),
+            props.value?.variant === AvatarVariant.Enum.IMAGE,
         ].every(Boolean);
     }, [props.value]);
 
@@ -72,7 +74,7 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
                 formData.append('file', file);
 
                 // Send the file to your API endpoint
-                const response = await fetch('/api/upload/avatar', {
+                const response = await fetch('/api/images/upload', {
                     method: 'POST',
                     body: formData,
                 });

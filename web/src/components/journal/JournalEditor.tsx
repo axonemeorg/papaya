@@ -1,22 +1,23 @@
-'use client'
-
-import React, { MouseEvent, useEffect, useMemo, useState } from "react";
-import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { alpha, Avatar, Box, Button, ButtonBase, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Add, Flag, ImportExport, InsertLink, Category as MuiCategoryIcon, Photo } from "@mui/icons-material";
-import { Category, JournalEntry } from "@/types/get";
+import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { alpha, Avatar, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
-import JournalEntryCard from "./JournalEntryCard";
-import CategoryIcon from "../icon/CategoryIcon";
-import CategoryChip from "../icon/CategoryChip";
-import { getPriceString } from "@/utils/Utils";
 import QuickJournalEditor from "./QuickJournalEditor";
 import NotificationsProvider from "@/providers/NotificationsProvider";
 import BaseLayout from "../layout/BaseLayout";
 import JournalHeader from "./JournalHeader";
-import { User } from "lucia";
 import SettingsDrawer from "./categories/SettingsDrawer";
-import { useCategoryStore } from "@/store/useCategoriesStore";
+import { Category, EnhancedJournalEntry, JournalEntry } from "@/types/schema";
+import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories, getEnhancedJournalEntries } from "@/database/queries";
+import CategoryIcon from "../icon/CategoryIcon";
+import { getPriceString } from "@/utils/price";
+import { db } from "@/database/client";
+import CategoryChip from "../icon/CategoryChip";
+import JournalEntryCard from "./JournalEntryCard";
+import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -44,60 +45,148 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
     )
 }
 
-interface JournalEditorProps {
-    journalEntries: JournalEntry[];
-    categories: Category[];
-    user: User;
-    month: number;
-    year: number;
+export type JournalEditorView =
+    | 'week'
+    | 'month'
+    | 'year'
+
+export interface JournalEditorProps {
+    view: JournalEditorView;
+    date: string;
+    onNextPage: () => void;
+    onPrevPage: () => void;
+    onDateChange: (date: string) => void;
+}
+
+export interface JournalEntrySelection {
+    entry: EnhancedJournalEntry | null;
+    anchorEl: HTMLElement | null;
+    // children: JournalEntry[];
 }
 
 export default function JournalEditor(props: JournalEditorProps) {
-    const { journalEntries } = props;
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
-    
-    const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
-    const [selectedEntryAnchorEl, setSelectedEntryAnchorEl] = useState<HTMLElement | null>(null);
+    const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
+        entry: null,
+        anchorEl: null,
+        // children: [],
+    });
+    const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
+
+    const { snackbar } = useContext(NotificationsContext);
 
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const currentDayString = dayjs().format('YYYY-MM-DD');
+    const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
-    const journal = useMemo(() => {
-        return journalEntries.reduce((acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
-            const { date } = entry;
-            if (acc[date]) {
-                acc[date].push(entry);
-            } else {
-                acc[date] = [entry];
-            }
+    const getCategoriesQuery = useQuery({
+        queryKey: ['categories'],
+        queryFn: getCategories,
+        initialData: {},
+    });
 
-            return acc;
-        }, {
-            [currentDayString]: [],
+    const getJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
+        queryKey: ['enhanced-journal-entries', props.view, props.date],
+        queryFn: async () => {
+            const entries = await getEnhancedJournalEntries(props.view, props.date);
+
+            const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries)
+                .reduce((acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
+                    const { date } = entry;
+                    if (acc[date]) {
+                        acc[date].push(entry);
+                    } else {
+                        acc[date] = [entry];
+                    }
+
+                    return acc;
+                }, {
+                    [currentDayString]: [],
+                });
+
+            setJournalGroups(groups);
+
+            return entries;
+        },
+        initialData: {},
+        enabled: true,
+    });
+
+    const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
+        const { childEntryIds } = entry;
+        // const children: JournalEntry[] = (childEntryIds ?? []).map((childId) => getJournalEntriesQuery.data[childId]);
+
+        setSelectedEntry({
+            anchorEl: event.currentTarget,
+            entry: entry,
+            // children,
         });
-    }, [journalEntries]);
-
-    console.log('journal:', journal);
-
-    const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
-        setSelectedEntryAnchorEl(event.currentTarget);
-        setSelectedEntry(entry);
     }
 
-    const setCategories = useCategoryStore((state) => state.setCategories);
+    const handleDeselectListItem = () => {
+        setSelectedEntry((prev) => {
+            const next = {
+                ...prev,
+                anchorEl: null,
+            };
+            return next;
+        });
+    }
 
+    const handleDeleteEntry = async (entry: EnhancedJournalEntry | null) => {
+        if (!entry) {
+            return;
+        }
+
+        try {
+            const record = await deleteJournalEntry(entry._id);
+            getJournalEntriesQuery.refetch();
+            handleDeselectListItem();
+            snackbar({
+                message: 'Deleted 1 entry',
+                action: {
+                    label: 'Undo',
+                    onClick: async () => {
+                        undeleteJournalEntry(record)
+                            .then(() => {
+                                getCategoriesQuery.refetch();
+                                snackbar({ message: 'Category restored' });
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                                snackbar({ message: 'Failed to restore category: ' + error.message });
+                            });
+                    }
+                }
+            });
+        } catch {
+            snackbar({ message: 'Failed to delete entry' });
+        }
+    }
+
+    const handleSaveEntry = () => {
+        getJournalEntriesQuery.refetch();
+        handleDeselectListItem();
+    }
+
+    // show all docs
     useEffect(() => {
-        setCategories(props.categories);
+        db.allDocs({ include_docs: true }).then((result) => {
+            console.log('all docs', result);
+        });
     }, []);
 
     return (
-        <NotificationsProvider>
+        <>
             <CreateJournalEntryModal
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
+                onSaved={() => {
+                    getJournalEntriesQuery.refetch();
+                    setShowJournalEntryModal(false);
+                }}
                 initialDate={currentDayString}
             />
             <SettingsDrawer
@@ -106,13 +195,18 @@ export default function JournalEditor(props: JournalEditorProps) {
             />
             <BaseLayout
                 headerChildren={
-                    <JournalHeader month={props.month} year={props.year}>
+                    <JournalHeader
+                        date={props.date}
+                        view={props.view}
+                        onNextPage={props.onNextPage}
+                        onPrevPage={props.onPrevPage}
+                        onDateChange={props.onDateChange}
+                    >
                         <IconButton onClick={() => setShowSettingsDrawer(true)}>
                             <MuiCategoryIcon />
                         </IconButton>
                     </JournalHeader>
                 }
-                user={props.user}
                 sx={{
                     // width: '100dvw',
                     // overflowX: 'auto',
@@ -137,11 +231,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                     <Add />
                     Add
                 </Fab>
-                {selectedEntry && (
+                {selectedEntry.entry && (
                     <JournalEntryCard
-                        entry={selectedEntry}
-                        onClose={() => setSelectedEntryAnchorEl(null)}
-                        anchorEl={selectedEntryAnchorEl}
+                        entry={selectedEntry.entry}
+                        // children={selectedEntry.children}
+                        anchorEl={selectedEntry.anchorEl}
+                        onClose={() => handleDeselectListItem()}
+                        onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+                        onSave={() => handleSaveEntry()}
                     />
                 )}
                 <Grid
@@ -164,7 +261,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                     }}
                 >
                     {Object
-                        .entries(journal)
+                        .entries(journalGroups)
                         .sort(([dateA, _a], [dateB, _b]) => {
                             return new Date(dateA).getTime() - new Date(dateB).getTime()
                         })
@@ -181,60 +278,15 @@ export default function JournalEditor(props: JournalEditorProps) {
                                         {entries.length > 0 && (
                                             <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
                                                 {entries.map((entry) => {
-                                                    const { category } = entry;
-                                                    const { netAmount } = entry;
+                                                    const { categoryIds } = entry;
+                                                    const categoryId: string | undefined = categoryIds?.[0];
+                                                    const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
+                                                    const netAmount = entry.netAmount
                                                     const isNetPositive = netAmount > 0;
-
-                                                    const hasTransactionTags = entry.transactions.some((transaction) => {
-                                                        return transaction.tags?.length > 0;
-                                                    });
-                                                    const hasAttachments = entry.attachments?.length > 0;
-                                                    const hasLinkedEntry = false;
-                                                    const hasIncomingAndOutgoingTransactions =
-                                                        entry.transactions.some((transaction) => {
-                                                            return transaction.transactionType === 'DEBIT';
-                                                        }) &&
-                                                        entry.transactions.some((transaction) => {
-                                                            return transaction.transactionType === 'CREDIT';
-                                                        });
-
-                                                    const badges = [];
-
-                                                    if (hasTransactionTags) {
-                                                        badges.push(
-                                                            <Tooltip key='tags' title='Has tags'>
-                                                                <Flag fontSize="small" />
-                                                            </Tooltip>
-                                                        );
-                                                    }
-
-                                                    if (hasAttachments) {
-                                                        badges.push(
-                                                            <Tooltip key='attachments' title='Has attachments'>
-                                                                <Photo fontSize="small" />
-                                                            </Tooltip>
-                                                        );
-                                                    }
-
-                                                    if (hasLinkedEntry) {
-                                                        badges.push(
-                                                            <Tooltip key='linked' title='Linked entry'>
-                                                                <InsertLink fontSize="small" />
-                                                            </Tooltip>
-                                                        );
-                                                    }
-
-                                                    if (hasIncomingAndOutgoingTransactions) {
-                                                        badges.push(
-                                                            <Tooltip key='linked' title='Incoming + Outgoing'>
-                                                                <ImportExport fontSize="small" />
-                                                            </Tooltip>
-                                                        );
-                                                    }
 
                                                     return (
                                                         <MenuItem
-                                                            key={entry.journalEntryId}
+                                                            key={entry._id}
                                                             sx={{ borderRadius: '64px', pl: isSmall ? 4 : undefined }}
                                                             onClick={(event) => handleClickListItem(event, entry)}
                                                         >
@@ -244,11 +296,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                         <CategoryIcon category={category} />
                                                                     </ListItemIcon>
                                                                     <ListItemText>{entry.memo}</ListItemText>
-                                                                    {badges.length > 0 && (
-                                                                        <Stack direction='row' gap={0.5}>
-                                                                            {badges}
-                                                                        </Stack>
-                                                                    )}
                                                                 </Grid>
                                                                 <Grid size={{ xs: 'auto', sm: 3, md: 2 }}>
                                                                     <ListItemText
@@ -262,7 +309,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                                                                         <CategoryChip category={category} />
                                                                     ) : (
                                                                         <Chip
-                                                                            size='small'
                                                                             sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
                                                                             label='Uncategorized'
                                                                         />
@@ -284,6 +330,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                     }
                 </Grid>
             </BaseLayout>
-        </NotificationsProvider>
-    )
+        </>
+    );
 }

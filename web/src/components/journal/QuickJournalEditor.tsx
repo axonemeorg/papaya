@@ -1,13 +1,12 @@
-'use client';
-
-import { CreateQuickJournalEntry } from "@/types/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import QuickJournalEntryForm from "../form/QuickJournalEntryForm";
 import { Box, Button, Stack } from "@mui/material";
 import { Add, Save } from "@mui/icons-material";
-import { useState } from "react";
-import { createQuickJournalEntry } from "@/actions/journal-actions";
+import { useContext, useState } from "react";
+import { CreateQuickJournalEntry } from "@/types/schema";
+import { createQuickJournalEntry } from "@/database/actions";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 
 interface QuickJournalEditorProps {
     onAdd?: () => void;
@@ -16,26 +15,23 @@ interface QuickJournalEditorProps {
 export default function QuickJournalEditor(props: QuickJournalEditorProps) {
     const [isActive, setIsActive] = useState<boolean>(false);
 
+    const { snackbar } = useContext(NotificationsContext);
+
     const createQuickJournalEntryForm = useForm<CreateQuickJournalEntry>({
         defaultValues: {
             memo: '',
-            category: undefined,
+            // category: undefined,
             amount: undefined,
         },
         resolver: zodResolver(CreateQuickJournalEntry)
     });
 
     const handleCreateQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
-        console.log('handleCreateQuickJournalEntry()')
-        try {
-            await createQuickJournalEntry(formData)
-            setIsActive(false);
+        const now = new Date().toISOString();
+        createQuickJournalEntry(formData, now).then(() => {
             createQuickJournalEntryForm.reset();
-        } catch {
-            //
-        } finally {
-            //
-        }
+        });
+        snackbar({ message: 'Created journal entry.' });
     }
 
     return (

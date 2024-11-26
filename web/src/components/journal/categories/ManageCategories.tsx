@@ -1,21 +1,20 @@
 'use client';
 
-import { createCategory, deleteCategory, updateCategory } from "@/actions/category-actions";
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { useCategoryStore } from "@/store/useCategoriesStore";
-import { Category } from "@/types/get";
-import { CreateCategory } from "@/types/post";
-import { UpdateCategory } from "@/types/put";
+import { createCategory, deleteCategory, undeleteCategory, updateCategory } from "@/database/actions";
+import { getCategories } from "@/database/queries";
+import { Category, CreateCategory } from "@/types/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Add, ArrowBack, ArrowRight, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
-import { Box, Button, Drawer, IconButton, List, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Stack, Typography } from "@mui/material";
-import { useContext, useState } from "react";
+import { Add, ArrowBack, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
+import { Button, IconButton, List, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Stack, Typography } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { useContext, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-enum ManageCategoriesFormState {
+enum ManageCategoriesFormMode {
     VIEW = 'VIEW',
     EDIT = 'EDIT',
     CREATE = 'CREATE',
@@ -25,79 +24,100 @@ interface ManageCategoriesProps {
     onClose: () => void;
 }
 
-const categoryFormCreateValues: CreateCategory = {
+const CATEGORY_FORM_CREATE_VALUES: CreateCategory = {
     label: '',
     description: '',
-    ...DEFAULT_AVATAR,
+    avatar: {
+        ...DEFAULT_AVATAR
+    },
 }
 
-const formTitles: Record<ManageCategoriesFormState, string> = {
-    [ManageCategoriesFormState.VIEW]: 'Categories',
-    [ManageCategoriesFormState.EDIT]: 'Edit Category',
-    [ManageCategoriesFormState.CREATE]: 'Create Category',
+const FORM_TITLES: Record<ManageCategoriesFormMode, string> = {
+    [ManageCategoriesFormMode.VIEW]: 'Categories',
+    [ManageCategoriesFormMode.EDIT]: 'Edit Category',
+    [ManageCategoriesFormMode.CREATE]: 'Create Category',
 }
 
 export default function ManageCategories(props: ManageCategoriesProps) {
-    const [formState, setFormState] = useState<ManageCategoriesFormState>(ManageCategoriesFormState.VIEW);
-    const categories = useCategoryStore((state) => state.categories);
-    const addCategoryToStore = useCategoryStore((state) => state.addCategory);
-    const updateCategoryInStore = useCategoryStore((state) => state.updateCategory);
-    const deleteCategoryFromStore = useCategoryStore((state) => state.deleteCategory);
+    const [formMode, setFormState] = useState<ManageCategoriesFormMode>(ManageCategoriesFormMode.VIEW);
+
     const { snackbar } = useContext(NotificationsContext);
 
-    const formTitle = formTitles[formState] ?? 'Categories';
+    const formTitle = FORM_TITLES[formMode] ?? 'Categories';
 
-    const createCategoryForm = useForm<CreateCategory>({
-        defaultValues: categoryFormCreateValues,
-        resolver: zodResolver(CreateCategory)
+    const getCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
+        queryKey: ['categories'],
+        queryFn: getCategories,
+        initialData: {},
     });
 
-    const updateCategoryForm = useForm<UpdateCategory>({
-        defaultValues: categoryFormCreateValues,
-        resolver: zodResolver(UpdateCategory)
+    const createCategoryForm = useForm<Category>({
+        defaultValues: CATEGORY_FORM_CREATE_VALUES,
+        resolver: zodResolver(Category)
+    });
+
+    const updateCategoryForm = useForm<Category>({
+        defaultValues: CATEGORY_FORM_CREATE_VALUES,
+        resolver: zodResolver(Category)
     });
 
     const handleSelectCategoryForEdit = (category: Category) => {
         updateCategoryForm.reset({ ...category });
-        setFormState(ManageCategoriesFormState.EDIT);
+        setFormState(ManageCategoriesFormMode.EDIT);
     }
 
     const beginCreateCategory = () => {
-        createCategoryForm.reset(categoryFormCreateValues);
-        setFormState(ManageCategoriesFormState.CREATE)
+        createCategoryForm.reset(CATEGORY_FORM_CREATE_VALUES);
+        setFormState(ManageCategoriesFormMode.CREATE)
     }
 
-    const handleCreateCategory = async (formData: CreateCategory) => {
+    const handleCreateCategory = async (formData: Category) => {
         try {
             const response = await createCategory(formData);
             snackbar({ message: 'Created category' })
-            setFormState(ManageCategoriesFormState.VIEW);
-            addCategoryToStore(response);
+            setFormState(ManageCategoriesFormMode.VIEW);
+            getCategoriesQuery.refetch();
         } catch {
             snackbar({ message: 'Failed to create category' })
         }
     }
 
-    const handleUpdateCategory = async (formData: UpdateCategory) => {
+    const handleUpdateCategory = async (formData: Category) => {
         await updateCategory(formData);
         snackbar({ message: 'Updated category' })
-        setFormState(ManageCategoriesFormState.VIEW);
-        updateCategoryInStore(formData);
+        setFormState(ManageCategoriesFormMode.VIEW);
+        getCategoriesQuery.refetch();
     }
 
     const handleDeleteCategory = async () => {
         const category = updateCategoryForm.watch();
-        await deleteCategory(category);
-        snackbar({ message: 'Deleted category' })
-        setFormState(ManageCategoriesFormState.VIEW);
-        deleteCategoryFromStore(category);
+        const record = await deleteCategory(category._id);
+
+        snackbar({
+            message: 'Deleted category',
+            action: {
+                label: 'Undo',
+                onClick: () => {
+                    undeleteCategory(record)
+                        .then(() => {
+                            getCategoriesQuery.refetch();
+                            snackbar({ message: 'Category restored' });
+                        })
+                        .catch(() => {
+                            snackbar({ message: 'Failed to restore category' });
+                        });
+                }
+            }
+        })
+        setFormState(ManageCategoriesFormMode.VIEW);
+        getCategoriesQuery.refetch();
     }
 
     const handleCancel = () => {
-        if (formState === ManageCategoriesFormState.VIEW) {
+        if (formMode === ManageCategoriesFormMode.VIEW) {
             props.onClose();
         } else {
-            setFormState(ManageCategoriesFormState.VIEW);
+            setFormState(ManageCategoriesFormMode.VIEW);
         }
     }
 
@@ -106,11 +126,11 @@ export default function ManageCategories(props: ManageCategoriesProps) {
             <Stack direction='row' justifyContent='space-between' alignItems='center'>
                 <Stack direction='row' gap={1} alignItems='center'>
                     <IconButton onClick={() => handleCancel()}>
-                        {formState === ManageCategoriesFormState.VIEW ? <Close /> : <ArrowBack />}
+                        {formMode === ManageCategoriesFormMode.VIEW ? <Close /> : <ArrowBack />}
                     </IconButton>
                     <Typography variant='h6'>{formTitle}</Typography>
                 </Stack>
-                {formState === ManageCategoriesFormState.VIEW && (
+                {formMode === ManageCategoriesFormMode.VIEW && (
                     <Button
                         startIcon={<Add />}
                         onClick={() => beginCreateCategory()}
@@ -119,7 +139,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                         Add Category
                     </Button>
                 )}
-                {formState === ManageCategoriesFormState.EDIT && (
+                {formMode === ManageCategoriesFormMode.EDIT && (
                     <Button
                         startIcon={<Delete />}
                         onClick={() => handleDeleteCategory()}
@@ -130,11 +150,11 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                     </Button>
                 )}
             </Stack>
-            {formState === ManageCategoriesFormState.VIEW && (
+            {formMode === ManageCategoriesFormMode.VIEW && (
                 <List dense>
-                    {categories.map((category) =>  {
+                    {Object.values(getCategoriesQuery.data).map((category) =>  {
                         return (
-                            <MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category.categoryId}>
+                            <MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category._id}>
                                 <ListItemIcon>
                                     <CategoryIcon category={category} />
                                 </ListItemIcon>
@@ -149,7 +169,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                     })}
                 </List>
             )}
-            {formState === ManageCategoriesFormState.EDIT && (
+            {formMode === ManageCategoriesFormMode.EDIT && (
                 <FormProvider {...updateCategoryForm}>
                     <form onSubmit={updateCategoryForm.handleSubmit(handleUpdateCategory)}>
                         <Stack gap={2} pt={2}>
@@ -159,7 +179,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                     </form>
                 </FormProvider>
             )}
-            {formState === ManageCategoriesFormState.CREATE && (
+            {formMode === ManageCategoriesFormMode.CREATE && (
                 <FormProvider {...createCategoryForm}>
                     <form onSubmit={createCategoryForm.handleSubmit(handleCreateCategory)}>
                         <Stack gap={2} pt={2}>

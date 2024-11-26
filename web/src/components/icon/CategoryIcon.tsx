@@ -1,34 +1,20 @@
-import { Category } from "@/types/get";
 import { Icon } from "@mui/material";
 import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
-import { AvatarVariant } from "@/types/enum";
 import { ImageAvatar } from "../pickers/ImageAvatarPicker";
-
+import { AvatarVariant, Category } from "@/types/schema";
 
 interface CategoryIconProps {
 	category?: Category;
 }
 
 export default function CategoryIcon(props: CategoryIconProps) {
-	const {
-		avatarVariant,
-		avatarPrimaryColor,
-		avatarContent,
-		avatarSecondaryColor,
-	} = props.category ?? DEFAULT_AVATAR;
+	const avatar = props.category?.avatar ?? DEFAULT_AVATAR;
 
-	const avatar = {
-		avatarVariant,
-		avatarPrimaryColor,
-		avatarContent,
-		avatarSecondaryColor,
-	};
-
-	switch (avatar.avatarVariant) {
+	switch (avatar.variant) {
         case AvatarVariant.Enum.PICTORIAL:
             return (
-                <Icon sx={{ color: avatar.avatarPrimaryColor }}>
-                    {avatar.avatarContent}
+                <Icon sx={{ color: avatar.primaryColor }}>
+                    {avatar.content}
                 </Icon>
             );
         case AvatarVariant.Enum.IMAGE:

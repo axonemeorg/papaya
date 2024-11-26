@@ -1,31 +1,37 @@
 'use client';
 
-import { JournalEntry } from "@/types/get";
-import { Close, Delete, Edit, LocalPizza, MoreVert } from "@mui/icons-material";
-import { Box, Icon, IconButton, Paper, Popover, Stack, Tooltip, Typography } from "@mui/material";
+import { Close, Delete, Edit, MoreVert } from "@mui/icons-material";
+import { Box, IconButton, Popover, Stack, Typography } from "@mui/material";
 import CategoryIcon from "../icon/CategoryIcon";
-import { getPriceString } from "@/utils/Utils";
-import { deleteJournalEntry } from "@/actions/journal-actions";
-import EditJournalEntryModal from "../modal/EditJournalEntryModal";
 import { useContext, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { UpdateJournalEntry } from "@/types/put";
-import { usePathname } from "next/navigation";
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
+import { useRouter } from "next/router";
+import { getPriceString } from "@/utils/price";
+import { Category, EditJournalEntryForm, EnhancedJournalEntry } from "@/types/schema";
+import { getCategories } from "@/database/queries";
+import { useQuery } from "@tanstack/react-query";
+import { JournalEntrySelection } from "./JournalEditor";
+import EditJournalEntryModal from "../modal/EditJournalEntryModal";
 
-interface JournalEntryCard {
-    anchorEl: HTMLElement | null;
+
+
+interface JournalEntryCardProps extends JournalEntrySelection {
+    entry: EnhancedJournalEntry;
     onClose: () => void;
-    entry: JournalEntry;
+    onDelete: () => void;
+    onSave: () => void;
 }
 
 const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
     const { snackbar } = useContext(NotificationsContext);
-    const pathname = usePathname();
-    
+
+    const router = useRouter();
+    const currentPath = router.pathname;
+
     const entryNumber = Number(props.value ?? 0);
     const entryNumberString = `#${entryNumber}`;
-    const entryLink = `${pathname}?${JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY}=${entryNumber}`;
+    const entryLink = `${currentPath}?${JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY}=${entryNumber}`;
 
     const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         e.preventDefault(); // Prevent the default anchor tag behavior
@@ -47,30 +53,38 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
     )
 }
 
-export default function JournalEntryCard(props: JournalEntryCard) {
+export default function JournalEntryCard(props: JournalEntryCardProps) {
     const [showEditDialog, setShowEditDialog] = useState<boolean>(false);
-    const isNetPositive = props.entry.netAmount > 0;
+    const { entry, anchorEl } = props;
 
-    const { snackbar } = useContext(NotificationsContext);
+
+    const isNetPositive = Boolean(entry && entry.netAmount > 0);
 
     const handleDeleteEntry = () => {
-        snackbar({
-            message: 'Deleted 1 entry.'
-        });
-        props.onClose();
+        props.onDelete();
     }
 
-    const editJournalEntryFormValues: UpdateJournalEntry = useMemo(() => {
+    const getCategoriesQuery = useQuery({
+        queryKey: ['categories'],
+        queryFn: getCategories,
+        initialData: {},
+    });
+
+    const editJournalEntryFormValues: EditJournalEntryForm = useMemo(() => {
         return {
-            ...props.entry,
-            transactions: props.entry.transactions?.map((transaction) => {
-                return {
-                    ...transaction,
-                    amount: (transaction.amount / 100).toFixed(2),
-                }
-            })
-        }
+            parent: {
+                ...props.entry,
+            },
+            children: [
+                ...props.entry.children
+            ]
+        };
     }, [props.entry]);
+
+    const categoryId: string | undefined = entry?.categoryIds?.[0];
+    const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
+    const netAmount: number = entry?.netAmount ?? 0;
+    const memo = entry?.memo ?? '';
 
     return (
         <>
@@ -78,11 +92,11 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                 initialValues={editJournalEntryFormValues}
                 open={showEditDialog}
                 onClose={() => setShowEditDialog(false)}
-                onSave={() => props.onClose()}
+                onSave={() => props.onSave()}
             />
             <Popover
-                anchorEl={props.anchorEl}
-                open={Boolean(props.anchorEl)}
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
                 onClose={props.onClose}
                 anchorOrigin={{
                     vertical: 'top',
@@ -97,17 +111,23 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                     <Box p={1} mb={2}>
                         <Stack direction='row' justifyContent="space-between" alignItems={'center'} sx={{ mb: 2 }}>
                             <Box px={1}>
-                                <JournalEntryNumber value={props.entry.entryNumber} />
+                                <JournalEntryNumber
+                                    value={props.entry.sequenceNumber}
+                                />
                             </Box>
                             <Stack direction='row' gap={0.5}>
                                 <IconButton size='small' onClick={() => setShowEditDialog(true)}>
                                     <Edit fontSize="small"/>
                                 </IconButton>
-                                <form action={deleteJournalEntry} onSubmit={() => handleDeleteEntry()}>
-                                    <IconButton type='submit' size='small'><Delete fontSize="small" /></IconButton>
-                                    <input type='hidden' name='journalEntryId' value={props.entry.journalEntryId} />
-                                </form>
-                                <IconButton size='small'><MoreVert fontSize="small" /></IconButton>
+
+                                <IconButton type='submit' size='small' onClick={() => handleDeleteEntry()}>
+                                    <Delete fontSize="small" />
+                                </IconButton>
+
+                                <IconButton size='small'>
+                                    <MoreVert fontSize="small" />
+                                </IconButton>
+
                                 <IconButton size='small' sx={{ ml: 1 }} onClick={() => props.onClose()}>
                                     <Close fontSize="small" />
                                 </IconButton>
@@ -121,10 +141,11 @@ export default function JournalEntryCard(props: JournalEntryCard) {
                                     mb: 0.5
                                 })}
                             >
-                                {getPriceString(props.entry.netAmount)}</Typography>
+                                {getPriceString(netAmount)}
+                            </Typography>
                             <Stack direction='row' gap={1}>
-                                <CategoryIcon category={props.entry.category} />
-                                <Typography>{props.entry.memo}</Typography>
+                                <CategoryIcon category={category} />
+                                <Typography>{memo}</Typography>
                             </Stack>
                         </Stack>
                     </Box>

@@ -1,30 +1,39 @@
 'use client'
 
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps, MenuItem } from "@mui/material";
-import * as colors from '@mui/material/colors';
-import { CSSProperties, useContext, useMemo } from "react";
 
-import { type Category } from "@/types/get";
 import CategoryIcon from "../icon/CategoryIcon";
-import { useCategoryStore } from "@/store/useCategoriesStore";
+// import { fetchCategoriesQuery } from "@/database/queries";
+import { Category } from "@/types/schema";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "@/database/queries";
 
 type CategoryAutocompleteProps = 
-    & Omit<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>
-    & Partial<Pick<AutocompleteProps<Category, false, false, false>, 'options' | 'renderInput'>>
+    & Omit<AutocompleteProps<Category['_id'], false, false, false>, 'options' | 'renderInput'>
+    & Partial<Pick<AutocompleteProps<Category['_id'], false, false, false>, 'options' | 'renderInput'>>
     & { label?: string }
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
     const { label, sx, ...rest } = props;
-    const categories = useCategoryStore((state) => state.categories)
+
+    const fetchCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
+        queryKey: ['categories'],
+        initialData: {},
+        queryFn: getCategories,
+    });
+
+    const { data, isLoading } = fetchCategoriesQuery;
 
     return (
-        <Autocomplete<Category>
-            options={categories}
-            isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+        <Autocomplete<Category['_id']>
+            loading={isLoading}
+            options={Object.keys(data)}
+            // isOptionEqualToValue={(option, value) => option._id === value}
             renderInput={(params) => <TextField {...params} label={label ?? "Category"} />}
-            getOptionLabel={(option) => option.label}
+            getOptionLabel={(option) => data[option]?.label}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
+                const category = data[option];
 
                 return (
                     <ListItem
@@ -33,9 +42,9 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
                         {...optionProps}
                     >
                         <ListItemIcon>
-                            <CategoryIcon category={option} />
+                            <CategoryIcon category={category} />
                         </ListItemIcon>
-                        <ListItemText primary={option.label} />
+                        <ListItemText primary={category?.label} />
                     </ListItem>
                 );
             }}

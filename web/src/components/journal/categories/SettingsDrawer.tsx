@@ -1,5 +1,3 @@
-'use client';
-
 import { Box, Drawer } from "@mui/material";
 import ManageCategories from "./ManageCategories";
 

@@ -4,14 +4,11 @@ import { Box, Breadcrumbs, IconButton, Stack, useMediaQuery, useTheme } from "@m
 import BaseContainer from "../layout/BaseContainer";
 import { PropsWithChildren } from "react";
 import AppLogo from "./AppLogo";
-import UserAvatarMenu from "./UserAvatarMenu";
 import { User } from "lucia";
 import AppNavMenu from "./AppNavMenu";
 import { Menu } from "@mui/icons-material";
 
-type HeaderProps = PropsWithChildren<{
-    user: User;
-}>;
+type HeaderProps = PropsWithChildren;
 
 export default function Header(props: HeaderProps) {
     const theme = useTheme();
@@ -46,7 +43,6 @@ export default function Header(props: HeaderProps) {
                     )}
                     <Stack direction='row' gap={1} alignItems='center' sx={{ flex: 1 }}>
                         {props.children}
-                        <UserAvatarMenu user={props.user} />
                     </Stack>
                 </Stack>
             </BaseContainer>
