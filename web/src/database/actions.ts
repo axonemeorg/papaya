@@ -120,54 +120,16 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
             relatedEntryIds: [],
             categoryIds: [],
             tagIds: [],
-            attachmentIds: [],
+            artifactIds: [],
             notes: '',
             entryType: 'CREDIT',
         },
         children: [],
+        artifacts: [],
     };
 
     return createOrUpdateJournalEntry(journalEntryFormData);
 }
-
-// export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
-//     const now = new Date().toISOString();
-    
-//     const parentDate = formData.parent.date;
-//     const currentChildren = await getJournalEntryChildren(formData.parent._id);
-//     const newChildren: Record<JournalEntry['_id'], JournalEntry> = formData.children.reduce(
-//         (acc: Record<JournalEntry['_id'], JournalEntry>, child) => {
-//             acc[child._id] = child;
-//             return acc;
-//         },
-//         {}
-//     );
-
-//     const children: JournalEntry[] = currentChildren.map(child => {
-//         if (!newChildren[child._id]) {
-//             // Child entry was deleted
-//             return {
-//                 ...child,
-//                 _deleted: true,
-//             }
-//         }
-
-//         return {
-//             ...child,
-//             ...newChildren[child._id],
-//             date: parentDate, // Keep date in sync with parent
-//             updatedAt: now,
-//         }
-//     });
-
-//     const parent: JournalEntry = {
-//         ...formData.parent,
-//         updatedAt: now,
-//         childEntryIds: Object.keys(newChildren),
-//     };
-
-//     return db.bulkDocs([parent, ...children]);
-// }
 
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
     const record = await db.get(journalEntryId);

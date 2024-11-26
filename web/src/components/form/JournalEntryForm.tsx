@@ -124,11 +124,7 @@ export default function JournalEntryForm() {
         index: 0,    
     });
 
-    const {
-        fields: childrenFieldArray,
-        append: appendChild,
-        remove: removeChild,
-    } = useFieldArray<CreateJournalEntryForm>({
+    const childrenFieldArray = useFieldArray<CreateJournalEntryForm>({
         control,
         name: 'children',
     });
@@ -140,7 +136,7 @@ export default function JournalEntryForm() {
     });
 
     const handleAddChild = () => {
-        appendChild({
+        childrenFieldArray.append({
             amount: '',
             memo: '',
             entryType: 'CREDIT',
@@ -148,7 +144,9 @@ export default function JournalEntryForm() {
     }
 
     const handleAddFiles = (files: File[]) => {
-        console.log('FILES:', files)
+        files.forEach((file) => {
+            
+        });
     }
 
     const entryTagPickerSelectedTags = useMemo(() => {
@@ -265,13 +263,13 @@ export default function JournalEntryForm() {
                     </Grid>
                 </Grid>
                 <Stack>
-                    {childrenFieldArray.map((field, index) => {
+                    {childrenFieldArray.fields.map((field, index) => {
                         return (
                             <JournalEntryChildRow
                                 key={field.id}
                                 index={index}
-                                fieldArray={childrenFieldArray}
-                                remove={removeChild}
+                                fieldArray={childrenFieldArray.fields}
+                                remove={childrenFieldArray.remove}
                                 onClickTagButton={(event) => {
                                     setEntryTagPickerData({
                                         anchorEl: event.currentTarget,

@@ -37,13 +37,14 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                 date: props.initialDate,
                 categoryIds: [],
                 tagIds: [],
-                attachmentIds: [],
+                artifactIds: [],
                 notes: '',
                 entryType: 'CREDIT',
                 paymentMethodId: null,
                 relatedEntryIds: [],
             },
             children: [],
+            artifacts: [],
         },
         resolver: zodResolver(CreateJournalEntryForm)
     });
