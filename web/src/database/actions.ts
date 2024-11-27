@@ -1,7 +1,7 @@
 import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
 import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
-import { getJournalEntryChildren } from "./queries";
+import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
 export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
@@ -24,6 +24,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
     );
 
     const deletedChildren: JournalEntry[] = [];
+    const deletedArtifacts: EntryArtifact[] = [];
 
     let parent: JournalEntry;
 
@@ -40,13 +41,23 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parentSequenceNumber = sequenceGenerator.next().value;
     }
 
-    // Check if form data is for editing. If so, we need to check for children to delete
+    // Check if form data is for editing. If so, we need to check for children and artifacts to delete
     if (isEditing) {
         const currentChildren = await getJournalEntryChildren(parentId);
         currentChildren.forEach((child) => {
             if (!editingChildrenIds.has(child._id)) {
                 deletedChildren.push({
                     ...child,
+                    _deleted: true,
+                });
+            }
+        });
+
+        const currentArtifacts = await getJournalEntryArtifacts(parentId);
+        currentArtifacts.forEach((artifact) => {
+            if (!formData.artifacts.some(art => art._id === artifact._id)) {
+                deletedArtifacts.push({
+                    ...artifact,
                     _deleted: true,
                 });
             }
@@ -70,6 +81,26 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
                 date: parentDate,
                 sequenceNumber: sequenceGenerator.next().value,
                 parentEntryId: parentId,
+                artifactIds: [],
+                createdAt: now,
+                updatedAt: null,
+            }
+        }
+    });
+
+    const artifacts: EntryArtifact[] = formData.artifacts.map((artifact) => {
+        if ('parentEntryId' in artifact) {
+            // Artifact was edited
+            return {
+                ...artifact,
+                updatedAt: now,
+            }
+        } else {
+            // New artifact
+            return {
+                ...artifact,
+                type: 'ENTRY_ARTIFACT',
+                parentEntryId: parentId,
                 createdAt: now,
                 updatedAt: null,
             }
@@ -81,6 +112,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parent = {
             ...formData.parent,
             childEntryIds: children.map(child => child._id),
+            artifactIds: artifacts.map(artifact => artifact._id),
             updatedAt: now,
         };
     } else {
@@ -90,6 +122,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
             type: 'JOURNAL_ENTRY',
             sequenceNumber: parentSequenceNumber,
             childEntryIds: children.map(child => child._id),
+            artifactIds: artifacts.map(artifact => artifact._id),
             createdAt: now,
             updatedAt: null,
         };
@@ -99,6 +132,8 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parent,
         ...children,
         ...deletedChildren,
+        ...artifacts,
+        ...deletedArtifacts,
         {
             ...meta,
             journalEntrySequence: journalEntrySequence + children.length + 1,
@@ -125,6 +160,7 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
             entryType: 'CREDIT',
         },
         children: [],
+        artifacts: [],
     };
 
     return createOrUpdateJournalEntry(journalEntryFormData);
@@ -172,18 +208,4 @@ export const deleteCategory = async (categoryId: string): Promise<Category> => {
 
 export const undeleteCategory = async (category: Category) => {
     await db.put(category);
-}
-
-export const createArtifact = async (formData: CreateEntryArtifact): Promise<EntryArtifact> => {
-    const artifact: EntryArtifact = {
-        ...formData,
-        type: 'ENTRY_ARTIFACT',
-        _id: generateArtifactId(),
-        createdAt: new Date().toISOString(),
-        updatedAt: null,
-    };
-
-    await db.put(artifact);
-
-    return db.get(artifact._id)
 }

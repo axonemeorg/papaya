@@ -3,13 +3,13 @@
 import { Close, Delete, Edit, MoreVert } from "@mui/icons-material";
 import { Box, IconButton, Popover, Stack, Typography } from "@mui/material";
 import CategoryIcon from "../icon/CategoryIcon";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
 import { useRouter } from "next/router";
 import { getPriceString } from "@/utils/string";
-import { Category, EditJournalEntryForm, EnhancedJournalEntry } from "@/types/schema";
-import { getCategories } from "@/database/queries";
+import { Category, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact } from "@/types/schema";
+import { getArtifacts, getCategories } from "@/database/queries";
 import { useQuery } from "@tanstack/react-query";
 import { JournalEntrySelection } from "./JournalEditor";
 import EditJournalEntryModal from "../modal/EditJournalEntryModal";
@@ -70,6 +70,12 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
         initialData: {},
     });
 
+    // const getArtifactsQuery = useQuery<Record<EntryArtifact['_id'], EntryArtifact>>({
+    //     queryKey: ['entryArtifacts'],
+    //     queryFn: getArtifacts,
+    //     initialData: {},
+    // });
+
     const editJournalEntryFormValues: EditJournalEntryForm = useMemo(() => {
         return {
             parent: {
@@ -77,7 +83,10 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
             },
             children: [
                 ...props.entry.children
-            ]
+            ],
+            artifacts: [
+                ...props.entry.artifacts
+            ],
         };
     }, [props.entry]);
 

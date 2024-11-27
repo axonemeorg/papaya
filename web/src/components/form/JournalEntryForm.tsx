@@ -1,19 +1,18 @@
 'use client';
 
-import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Avatar as MuiAvatar, Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
-import { Attachment, Delete, Label } from "@mui/icons-material";
+import { Attachment, Delete, Folder, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
-import { getEntryTags } from "@/database/queries";
+import { getArtifacts, getEntryTags } from "@/database/queries";
 import { useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
-import { createArtifact } from "@/database/actions";
 import { generateArtifactId } from "@/utils/id";
 import { formatFileSize } from "@/utils/string";
 
@@ -130,26 +129,46 @@ const AttachmentRow = (props: AttachmentRowProps) => {
 
     const artifact = watch(`artifacts.${index}`);
 
+    // Check if the artifact's file has an content type of image. If so, we create a URL for it
+    const imageSrc: string | null = useMemo(() => {
+        const attachment = artifact._attachments[artifact.filename];
+        if (attachment.content_type.startsWith('image')) {
+            const blob = new Blob([attachment.data], { type: attachment.content_type });
+            return URL.createObjectURL(blob);
+        }
+
+        return null;
+    }, [artifact]);
+
     return (
         <Stack direction='row' alignItems='flex-start' spacing={1}>
-            <Card>
-                <CardActionArea>
+            <Card sx={{ aspectRatio: 4/5, width: 128}}>
+                {imageSrc ? (
+
                     <CardMedia
                         component="img"
-                        width={72}
-                        height={72}
-                        image={props.imgSrc}
-                        alt={props.altText}
+                        sx={{ objectFit: 'cover' }}
+                        height={'100%'}
+                        image={imageSrc}
                     />
-                </CardActionArea>
+                ) : (
+                    <MuiAvatar>
+                        <Folder />
+                    </MuiAvatar>
+                )}
             </Card>
-            <Stack gap={0.5}>
-                <Typography>{artifact.filename}</Typography>
-                <Typography>{formatFileSize(artifact.filesize)}</Typography>
+            <Stack gap={0.5} sx={{ flex: 1, justifyContent: 'space-between' }}>
+                <Stack direction='row' gap={1}>
+                    <Typography variant='body1'>{artifact.filename}</Typography>
+                    <Typography variant='body2'>{formatFileSize(artifact.filesize)}</Typography>
+                </Stack>
                 <TextField
                     label="Description"
                     placeholder="Enter a description for this attachment"
                     {...register(`artifacts.${index}.description`)}
+                    fullWidth
+                    multiline
+                    rows={2}
                 />
             </Stack>
             <IconButton onClick={() => onRemove()}>
@@ -192,13 +211,10 @@ export default function JournalEntryForm() {
     }
 
     const handleAddFiles = async (files: File[]) => {
-        const artifacts: EntryArtifact[] = files.map((file) => {
+        const artifacts: CreateEntryArtifact[] = files.map((file) => {
             const filename = file.name;
-            const artifact: EntryArtifact = {
-                type: 'ENTRY_ARTIFACT',
+            const artifact: CreateEntryArtifact = {
                 _id: generateArtifactId(),
-                createdAt: new Date().toISOString(),
-                updatedAt: null,
                 _attachments: {
                     [filename]: {
                         content_type: file.type,

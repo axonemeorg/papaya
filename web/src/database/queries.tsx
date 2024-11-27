@@ -39,7 +39,7 @@ export const getJournalEntries = async (view: JournalEditorView, date: string): 
 
 export const getEnhancedJournalEntries = async (view: JournalEditorView, date: string): Promise<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>> => {
     const journalEntries = await getJournalEntries(view, date);
-    console.log('getEnhancedJournalEntries.journalEntries', journalEntries);
+    const allArtifacts = await getArtifacts();
 
     const result = Object.fromEntries(
         Object.values(journalEntries)
@@ -52,7 +52,11 @@ export const getEnhancedJournalEntries = async (view: JournalEditorView, date: s
                     .map(childId => journalEntries[childId])
                     .filter(Boolean);
 
-                acc.push([entry._id, enhanceJournalEntry(entry, children)]);
+                const artifacts: EntryArtifact[] = (entry.artifactIds ?? [])
+                    .map(artifactId => allArtifacts[artifactId])
+                    .filter(Boolean);
+
+                acc.push([entry._id, enhanceJournalEntry(entry, children, artifacts)]);
 
                 return acc;
             }, [])
@@ -72,6 +76,17 @@ export const getEntryTags = async (): Promise<Record<EntryTag['_id'], EntryTag>>
         .map(tag => [tag._id, tag]));
 }
 
+export const getArtifacts = async (): Promise<Record<EntryArtifact['_id'], EntryArtifact>> => {
+    const result = await db.find({
+        selector: {
+            type: 'ENTRY_ARTIFACT',
+        }
+    });
+
+    return Object.fromEntries((result.docs as EntryArtifact[])
+        .map(artifact => [artifact._id, artifact]));
+}
+
 export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Promise<JournalEntry[]> => {
     const result = await db.find({
         selector: {
@@ -81,4 +96,20 @@ export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Pro
     });
 
     return result.docs as JournalEntry[];    
+}
+
+export const getJournalEntryArtifacts = async (entryId: JournalEntry['_id']): Promise<EntryArtifact[]> => {
+    const entry = await db.get(entryId) as JournalEntry;
+    const artifactIds = entry.artifactIds ?? [];
+
+    const result = await db.find({
+        selector: {
+            type: 'ENTRY_ARTIFACT',
+            _id: {
+                $in: artifactIds,
+            }
+        }
+    });
+
+    return result.docs as EntryArtifact[];
 }

@@ -1,11 +1,14 @@
 import { z } from "zod";
 
-export const DocumentMetadata = z.object({
+export const IdentifierMetadata = z.object({
     _id: z.string(),
+});
+
+export const DocumentMetadata = IdentifierMetadata.merge(z.object({
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
     type: z.string(),
-});
+}));
 
 export const EntryType = z.enum([
     'DEBIT',
@@ -53,29 +56,32 @@ export const CreateJournalEntryChild = z.object({
 
 export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>;
 
-export const AttachmentContent = z.object({
-    content_type: z.string(),
-    data: z.any(),
-    // TODO need to reconcile this
-    // length: z.number(),
-    // digest: z.string(),
-    // revpos: z.number(),
-    // stub: z.boolean(),
-});
+export const AttachmentContent = z.any();
+
+// export const AttachmentContent = z.object({
+//     content_type: z.string(),
+//     data: z.any(),
+//     // TODO need to reconcile this
+//     // length: z.number(),
+//     // digest: z.string(),
+//     // revpos: z.number(),
+//     // stub: z.boolean(),
+// });
 
 export type AttachmentContent = z.output<typeof AttachmentContent>;
 
-export const CreateEntryArtifact = z.object({
+export const CreateEntryArtifact = IdentifierMetadata.merge(z.object({
     filename: z.string(),
     filesize: z.number(),
     description: z.string(),
     _attachments: z.record(z.string(), AttachmentContent),
-});
+}));
 
 export type CreateEntryArtifact = z.output<typeof CreateEntryArtifact>;
 
 export const EntryArtifact = DocumentMetadata.merge(CreateEntryArtifact).merge(z.object({
     type: z.literal('ENTRY_ARTIFACT'),
+    parentEntryId: z.string(),
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
 }));
@@ -105,6 +111,7 @@ export type JournalEntry = z.output<typeof JournalEntry>;
 
 export const EnhancedJournalEntry = JournalEntry.merge(z.object({
     children: z.array(JournalEntry),
+    artifacts: z.array(EntryArtifact),
     allCategoryIds: z.array(z.string()),
     netAmount: z.number(),
 }));
@@ -114,7 +121,7 @@ export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 export const CreateJournalEntryForm = z.object({
     parent: CreateJournalEntry,
     children: z.array(CreateJournalEntryChild),
-    artifacts: z.array(EntryArtifact),
+    artifacts: z.array(CreateEntryArtifact),
 });
 
 export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
@@ -122,7 +129,7 @@ export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
 export const EditJournalEntryForm = z.object({
     parent: JournalEntry,
     children: z.array(z.union([JournalEntry, CreateJournalEntryChild])),
-    artifacts: z.array(EntryArtifact),
+    artifacts: z.array(z.union([EntryArtifact, CreateEntryArtifact])),
 });
 
 export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;
