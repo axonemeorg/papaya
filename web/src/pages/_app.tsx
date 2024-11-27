@@ -25,13 +25,13 @@ function MyApp(props: any) {
     
       <ThemeProvider theme={appTheme}>
         <CssBaseline />
-        <Stack component='main' id='root' minHeight='100dvh' className={montserrat.className}>
+        <main id='root' className={montserrat.className}>
           <QueryClientProvider client={queryClient}>
             <NotificationsProvider>
               {getLayout(<Component {...pageProps} />)}
             </NotificationsProvider>
           </QueryClientProvider>
-        </Stack>
+        </main>
       </ThemeProvider>
     </>
   )
