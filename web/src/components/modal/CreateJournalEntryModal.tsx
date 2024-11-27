@@ -44,7 +44,6 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
                 relatedEntryIds: [],
             },
             children: [],
-            artifacts: [],
         },
         resolver: zodResolver(CreateJournalEntryForm)
     });

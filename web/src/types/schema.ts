@@ -55,7 +55,12 @@ export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>;
 
 export const AttachmentContent = z.object({
     content_type: z.string(),
-    data: z.string(),
+    data: z.any(),
+    // TODO need to reconcile this
+    // length: z.number(),
+    // digest: z.string(),
+    // revpos: z.number(),
+    // stub: z.boolean(),
 });
 
 export type AttachmentContent = z.output<typeof AttachmentContent>;
@@ -64,12 +69,12 @@ export const CreateEntryArtifact = z.object({
     filename: z.string(),
     filesize: z.number(),
     description: z.string(),
-    _attachments: z.record(AttachmentContent),
+    _attachments: z.record(z.string(), AttachmentContent),
 });
 
 export type CreateEntryArtifact = z.output<typeof CreateEntryArtifact>;
 
-export const EntryArtifact = DocumentMetadata.merge(z.object({
+export const EntryArtifact = DocumentMetadata.merge(CreateEntryArtifact).merge(z.object({
     type: z.literal('ENTRY_ARTIFACT'),
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
@@ -80,8 +85,8 @@ export type EntryArtifact = z.output<typeof EntryArtifact>;
 export const CreateJournalEntry = CreateJournalEntryChild.merge(z.object({
     date: z.string(),
     notes: z.string().optional(),
+    artifactIds: z.array(z.string()),
     paymentMethodId: z.string().nullable().optional(),
-    artifactIds: z.array(z.string()).optional(),
     relatedEntryIds: z.array(z.string()).optional(),
 }));
 
@@ -109,7 +114,7 @@ export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>;
 export const CreateJournalEntryForm = z.object({
     parent: CreateJournalEntry,
     children: z.array(CreateJournalEntryChild),
-    artifacts: z.array(CreateEntryArtifact),
+    artifacts: z.array(EntryArtifact),
 });
 
 export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
@@ -117,7 +122,7 @@ export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>;
 export const EditJournalEntryForm = z.object({
     parent: JournalEntry,
     children: z.array(z.union([JournalEntry, CreateJournalEntryChild])),
-    artifacts: z.array(z.union([EntryArtifact, CreateEntryArtifact])),
+    artifacts: z.array(EntryArtifact),
 });
 
 export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>;

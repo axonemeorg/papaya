@@ -1,6 +1,6 @@
-import { Category, CreateCategory, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
-import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
+import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
 import { getJournalEntryChildren } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
@@ -125,7 +125,6 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
             entryType: 'CREDIT',
         },
         children: [],
-        artifacts: [],
     };
 
     return createOrUpdateJournalEntry(journalEntryFormData);
@@ -173,4 +172,18 @@ export const deleteCategory = async (categoryId: string): Promise<Category> => {
 
 export const undeleteCategory = async (category: Category) => {
     await db.put(category);
+}
+
+export const createArtifact = async (formData: CreateEntryArtifact): Promise<EntryArtifact> => {
+    const artifact: EntryArtifact = {
+        ...formData,
+        type: 'ENTRY_ARTIFACT',
+        _id: generateArtifactId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+    };
+
+    await db.put(artifact);
+
+    return db.get(artifact._id)
 }

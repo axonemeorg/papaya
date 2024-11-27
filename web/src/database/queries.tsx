@@ -1,4 +1,4 @@
-import { Category, EnhancedJournalEntry, EntryTag, JournalEntry } from "@/types/schema";
+import { Category, EnhancedJournalEntry, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
 import { db } from "./client";
 import { JournalEditorView } from "@/components/journal/JournalEditor";
 import dayjs from "dayjs";
@@ -81,10 +81,4 @@ export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Pro
     });
 
     return result.docs as JournalEntry[];    
-}
-
-export const getJournalEntryWithAttachments = async (entryId: JournalEntry['_id']): Promise<JournalEntry> => {
-    const result = await db.get(entryId, { attachments: true });
-
-    return result as JournalEntry;
 }

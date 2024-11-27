@@ -6,13 +6,15 @@ import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, CreateJournalEntryForm, EntryTag, JournalEntry } from "@/types/schema";
+import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
 import { Delete, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { getEntryTags } from "@/database/queries";
 import { useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
+import { createArtifact } from "@/database/actions";
+import { generateArtifactId } from "@/utils/id";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -117,7 +119,7 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
 }
 
 export default function JournalEntryForm() {
-    const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
+    const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>();
 
     const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
         anchorEl: null,
@@ -127,6 +129,11 @@ export default function JournalEntryForm() {
     const childrenFieldArray = useFieldArray<CreateJournalEntryForm>({
         control,
         name: 'children',
+    });
+
+    const artifactsFieldArray = useFieldArray<CreateJournalEntryForm>({
+        control,
+        name: 'artifacts',
     });
 
     const entryTagQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
@@ -143,9 +150,30 @@ export default function JournalEntryForm() {
         });
     }
 
-    const handleAddFiles = (files: File[]) => {
-        files.forEach((file) => {
-            
+    const handleAddFiles = async (files: File[]) => {
+        const artifacts: EntryArtifact[] = files.map((file) => {
+            const filename = file.name;
+            const artifact: EntryArtifact = {
+                type: 'ENTRY_ARTIFACT',
+                _id: generateArtifactId(),
+                createdAt: new Date().toISOString(),
+                updatedAt: null,
+                _attachments: {
+                    [filename]: {
+                        content_type: file.type,
+                        data: file,
+                    }
+                },
+                description: '',
+                filename,
+                filesize: file.size,
+            };
+
+            return artifact;
+        });
+
+        artifacts.forEach((artifact) => {
+            artifactsFieldArray.append(artifact);
         });
     }
 
@@ -287,7 +315,26 @@ export default function JournalEntryForm() {
                     Add Child
                 </Button>
                 <Stack>
+                    {artifactsFieldArray.fields.map((field, index) => {
+                        const filename = watch(`artifacts.${index}.filename`);
+                        const filesize = watch(`artifacts.${index}.filesize`);
+                        const file = watch(`artifacts.${index}._attachments.${filename}`);
 
+                        return (
+                            <Stack key={field.id} direction='row' alignItems='center'>
+                                <Typography>{filename}</Typography>
+                                <Typography>{filesize}</Typography>
+                                <TextField
+                                    label="Description"
+                                    placeholder="Enter a description for this attachment"
+                                    {...register(`artifacts.${index}.description`)}
+                                />
+                                <IconButton onClick={() => artifactsFieldArray.remove(index)}>
+                                    <Delete />
+                                </IconButton>
+                            </Stack>
+                        );
+                    })}
                 </Stack>
                 <AttachmentDropzone onFilesAdded={handleAddFiles}>
                     <AttachmentButton />
