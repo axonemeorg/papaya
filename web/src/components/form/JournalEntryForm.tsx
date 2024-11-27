@@ -15,6 +15,7 @@ import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
 import { createArtifact } from "@/database/actions";
 import { generateArtifactId } from "@/utils/id";
+import { formatFileSize } from "@/utils/string";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -322,8 +323,9 @@ export default function JournalEntryForm() {
 
                         return (
                             <Stack key={field.id} direction='row' alignItems='center'>
+
                                 <Typography>{filename}</Typography>
-                                <Typography>{filesize}</Typography>
+                                <Typography>{formatFileSize(filesize)}</Typography>
                                 <TextField
                                     label="Description"
                                     placeholder="Enter a description for this attachment"
