@@ -1,18 +1,20 @@
 'use client';
 
-import { Box, Button, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Avatar as MuiAvatar, Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, CreateJournalEntryForm, EntryTag, JournalEntry } from "@/types/schema";
-import { Delete, Label } from "@mui/icons-material";
+import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
+import { Attachment, Delete, Folder, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
-import { getEntryTags } from "@/database/queries";
+import { getArtifacts, getEntryTags } from "@/database/queries";
 import { useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
+import { generateArtifactId } from "@/utils/id";
+import { formatFileSize } from "@/utils/string";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -116,21 +118,82 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
     )
 }
 
+interface AttachmentRowProps {
+    onRemove: () => void;
+    index: number;
+}
+
+const AttachmentRow = (props: AttachmentRowProps) => {
+    const { index, onRemove } = props;
+    const { watch, register } = useFormContext<CreateJournalEntryForm>();
+
+    const artifact = watch(`artifacts.${index}`);
+
+    // Check if the artifact's file has an content type of image. If so, we create a URL for it
+    const imageSrc: string | null = useMemo(() => {
+        const attachment = artifact._attachments[artifact.filename];
+        if (attachment.content_type.startsWith('image')) {
+            const blob = new Blob([attachment.data], { type: attachment.content_type });
+            return URL.createObjectURL(blob);
+        }
+
+        return null;
+    }, [artifact]);
+
+    return (
+        <Stack direction='row' alignItems='flex-start' spacing={1}>
+            <Card sx={{ aspectRatio: 4/5, width: 128}}>
+                {imageSrc ? (
+
+                    <CardMedia
+                        component="img"
+                        sx={{ objectFit: 'cover' }}
+                        height={'100%'}
+                        image={imageSrc}
+                    />
+                ) : (
+                    <MuiAvatar>
+                        <Folder />
+                    </MuiAvatar>
+                )}
+            </Card>
+            <Stack gap={0.5} sx={{ flex: 1, justifyContent: 'space-between' }}>
+                <Stack direction='row' gap={1}>
+                    <Typography variant='body1'>{artifact.filename}</Typography>
+                    <Typography variant='body2'>{formatFileSize(artifact.filesize)}</Typography>
+                </Stack>
+                <TextField
+                    label="Description"
+                    placeholder="Enter a description for this attachment"
+                    {...register(`artifacts.${index}.description`)}
+                    fullWidth
+                    multiline
+                    rows={2}
+                />
+            </Stack>
+            <IconButton onClick={() => onRemove()}>
+                <Delete />
+            </IconButton>
+        </Stack>
+    );
+}
+
 export default function JournalEntryForm() {
-    const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
+    const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>();
 
     const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
         anchorEl: null,
         index: 0,    
     });
 
-    const {
-        fields: childrenFieldArray,
-        append: appendChild,
-        remove: removeChild,
-    } = useFieldArray<CreateJournalEntryForm>({
+    const childrenFieldArray = useFieldArray<CreateJournalEntryForm>({
         control,
         name: 'children',
+    });
+
+    const artifactsFieldArray = useFieldArray<CreateJournalEntryForm>({
+        control,
+        name: 'artifacts',
     });
 
     const entryTagQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
@@ -140,15 +203,35 @@ export default function JournalEntryForm() {
     });
 
     const handleAddChild = () => {
-        appendChild({
+        childrenFieldArray.append({
             amount: '',
             memo: '',
             entryType: 'CREDIT',
         });
     }
 
-    const handleAddFiles = (files: File[]) => {
-        console.log('FILES:', files)
+    const handleAddFiles = async (files: File[]) => {
+        const artifacts: CreateEntryArtifact[] = files.map((file) => {
+            const filename = file.name;
+            const artifact: CreateEntryArtifact = {
+                _id: generateArtifactId(),
+                _attachments: {
+                    [filename]: {
+                        content_type: file.type,
+                        data: file,
+                    }
+                },
+                description: '',
+                filename,
+                filesize: file.size,
+            };
+
+            return artifact;
+        });
+
+        artifacts.forEach((artifact) => {
+            artifactsFieldArray.append(artifact);
+        });
     }
 
     const entryTagPickerSelectedTags = useMemo(() => {
@@ -265,13 +348,13 @@ export default function JournalEntryForm() {
                     </Grid>
                 </Grid>
                 <Stack>
-                    {childrenFieldArray.map((field, index) => {
+                    {childrenFieldArray.fields.map((field, index) => {
                         return (
                             <JournalEntryChildRow
                                 key={field.id}
                                 index={index}
-                                fieldArray={childrenFieldArray}
-                                remove={removeChild}
+                                fieldArray={childrenFieldArray.fields}
+                                remove={childrenFieldArray.remove}
                                 onClickTagButton={(event) => {
                                     setEntryTagPickerData({
                                         anchorEl: event.currentTarget,
@@ -289,7 +372,15 @@ export default function JournalEntryForm() {
                     Add Child
                 </Button>
                 <Stack>
-
+                    {artifactsFieldArray.fields.map((field, index) => {
+                        return (
+                            <AttachmentRow
+                                key={field.id} 
+                                onRemove={() => artifactsFieldArray.remove(index)}
+                                index={index}
+                            />
+                        );
+                    })}
                 </Stack>
                 <AttachmentDropzone onFilesAdded={handleAddFiles}>
                     <AttachmentButton />

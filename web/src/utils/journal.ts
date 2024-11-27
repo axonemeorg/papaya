@@ -1,12 +1,9 @@
-import { CreateJournalEntryForm, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { CreateJournalEntryForm, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
 
 /**
  * Strips optional fields from a JournalEntry object
  */
 export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
-    if (!entry.attachmentIds?.length) {
-        delete entry.attachmentIds;
-    }
     if (!entry.tagIds?.length) {
         delete entry.tagIds;
     }
@@ -28,7 +25,7 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
     }
 }
 
-export const enhanceJournalEntry = (parent: JournalEntry, children: JournalEntry[]): EnhancedJournalEntry => {
+export const enhanceJournalEntry = (parent: JournalEntry, children: JournalEntry[], artifacts: EntryArtifact[]): EnhancedJournalEntry => {
     const allCategoryIds = Array.from(new Set([...parent.categoryIds ?? [], ...children.flatMap(child => child.categoryIds ?? [])]));
 
     const netAmount = children.reduce((acc, child) => {
@@ -42,6 +39,7 @@ export const enhanceJournalEntry = (parent: JournalEntry, children: JournalEntry
     return {
         ...parent,
         children,
+        artifacts,
         allCategoryIds,
         netAmount,
     }

@@ -1,7 +1,7 @@
-import { Category, CreateCategory, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, type JournalEntry } from "@/types/schema";
+import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
 import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
-import { generateCategoryId, generateJournalEntryId } from "@/utils/id";
-import { getJournalEntryChildren } from "./queries";
+import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
+import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
 export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
@@ -24,6 +24,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
     );
 
     const deletedChildren: JournalEntry[] = [];
+    const deletedArtifacts: EntryArtifact[] = [];
 
     let parent: JournalEntry;
 
@@ -40,13 +41,23 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parentSequenceNumber = sequenceGenerator.next().value;
     }
 
-    // Check if form data is for editing. If so, we need to check for children to delete
+    // Check if form data is for editing. If so, we need to check for children and artifacts to delete
     if (isEditing) {
         const currentChildren = await getJournalEntryChildren(parentId);
         currentChildren.forEach((child) => {
             if (!editingChildrenIds.has(child._id)) {
                 deletedChildren.push({
                     ...child,
+                    _deleted: true,
+                });
+            }
+        });
+
+        const currentArtifacts = await getJournalEntryArtifacts(parentId);
+        currentArtifacts.forEach((artifact) => {
+            if (!formData.artifacts.some(art => art._id === artifact._id)) {
+                deletedArtifacts.push({
+                    ...artifact,
                     _deleted: true,
                 });
             }
@@ -70,6 +81,26 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
                 date: parentDate,
                 sequenceNumber: sequenceGenerator.next().value,
                 parentEntryId: parentId,
+                artifactIds: [],
+                createdAt: now,
+                updatedAt: null,
+            }
+        }
+    });
+
+    const artifacts: EntryArtifact[] = formData.artifacts.map((artifact) => {
+        if ('parentEntryId' in artifact) {
+            // Artifact was edited
+            return {
+                ...artifact,
+                updatedAt: now,
+            }
+        } else {
+            // New artifact
+            return {
+                ...artifact,
+                type: 'ENTRY_ARTIFACT',
+                parentEntryId: parentId,
                 createdAt: now,
                 updatedAt: null,
             }
@@ -81,6 +112,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parent = {
             ...formData.parent,
             childEntryIds: children.map(child => child._id),
+            artifactIds: artifacts.map(artifact => artifact._id),
             updatedAt: now,
         };
     } else {
@@ -90,6 +122,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
             type: 'JOURNAL_ENTRY',
             sequenceNumber: parentSequenceNumber,
             childEntryIds: children.map(child => child._id),
+            artifactIds: artifacts.map(artifact => artifact._id),
             createdAt: now,
             updatedAt: null,
         };
@@ -99,6 +132,8 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         parent,
         ...children,
         ...deletedChildren,
+        ...artifacts,
+        ...deletedArtifacts,
         {
             ...meta,
             journalEntrySequence: journalEntrySequence + children.length + 1,
@@ -120,54 +155,16 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
             relatedEntryIds: [],
             categoryIds: [],
             tagIds: [],
-            attachmentIds: [],
+            artifactIds: [],
             notes: '',
             entryType: 'CREDIT',
         },
         children: [],
+        artifacts: [],
     };
 
     return createOrUpdateJournalEntry(journalEntryFormData);
 }
-
-// export const updateJournalEntry = async (formData: EditJournalEntryForm) => {
-//     const now = new Date().toISOString();
-    
-//     const parentDate = formData.parent.date;
-//     const currentChildren = await getJournalEntryChildren(formData.parent._id);
-//     const newChildren: Record<JournalEntry['_id'], JournalEntry> = formData.children.reduce(
-//         (acc: Record<JournalEntry['_id'], JournalEntry>, child) => {
-//             acc[child._id] = child;
-//             return acc;
-//         },
-//         {}
-//     );
-
-//     const children: JournalEntry[] = currentChildren.map(child => {
-//         if (!newChildren[child._id]) {
-//             // Child entry was deleted
-//             return {
-//                 ...child,
-//                 _deleted: true,
-//             }
-//         }
-
-//         return {
-//             ...child,
-//             ...newChildren[child._id],
-//             date: parentDate, // Keep date in sync with parent
-//             updatedAt: now,
-//         }
-//     });
-
-//     const parent: JournalEntry = {
-//         ...formData.parent,
-//         updatedAt: now,
-//         childEntryIds: Object.keys(newChildren),
-//     };
-
-//     return db.bulkDocs([parent, ...children]);
-// }
 
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
     const record = await db.get(journalEntryId);
