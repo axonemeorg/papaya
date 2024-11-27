@@ -1,13 +1,13 @@
 'use client';
 
-import { Box, Button, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
-import { Delete, Label } from "@mui/icons-material";
+import { Attachment, Delete, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { getEntryTags } from "@/database/queries";
 import { useMemo, useState } from "react";
@@ -117,6 +117,46 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
             </Grid>
         </Grid>
     )
+}
+
+interface AttachmentRowProps {
+    onRemove: () => void;
+    index: number;
+}
+
+const AttachmentRow = (props: AttachmentRowProps) => {
+    const { index, onRemove } = props;
+    const { watch, register } = useFormContext<CreateJournalEntryForm>();
+
+    const artifact = watch(`artifacts.${index}`);
+
+    return (
+        <Stack direction='row' alignItems='flex-start' spacing={1}>
+            <Card>
+                <CardActionArea>
+                    <CardMedia
+                        component="img"
+                        width={72}
+                        height={72}
+                        image={props.imgSrc}
+                        alt={props.altText}
+                    />
+                </CardActionArea>
+            </Card>
+            <Stack gap={0.5}>
+                <Typography>{artifact.filename}</Typography>
+                <Typography>{formatFileSize(artifact.filesize)}</Typography>
+                <TextField
+                    label="Description"
+                    placeholder="Enter a description for this attachment"
+                    {...register(`artifacts.${index}.description`)}
+                />
+            </Stack>
+            <IconButton onClick={() => onRemove()}>
+                <Delete />
+            </IconButton>
+        </Stack>
+    );
 }
 
 export default function JournalEntryForm() {
@@ -317,24 +357,12 @@ export default function JournalEntryForm() {
                 </Button>
                 <Stack>
                     {artifactsFieldArray.fields.map((field, index) => {
-                        const filename = watch(`artifacts.${index}.filename`);
-                        const filesize = watch(`artifacts.${index}.filesize`);
-                        const file = watch(`artifacts.${index}._attachments.${filename}`);
-
                         return (
-                            <Stack key={field.id} direction='row' alignItems='center'>
-
-                                <Typography>{filename}</Typography>
-                                <Typography>{formatFileSize(filesize)}</Typography>
-                                <TextField
-                                    label="Description"
-                                    placeholder="Enter a description for this attachment"
-                                    {...register(`artifacts.${index}.description`)}
-                                />
-                                <IconButton onClick={() => artifactsFieldArray.remove(index)}>
-                                    <Delete />
-                                </IconButton>
-                            </Stack>
+                            <AttachmentRow
+                                key={field.id} 
+                                onRemove={() => artifactsFieldArray.remove(index)}
+                                index={index}
+                            />
                         );
                     })}
                 </Stack>
