@@ -12,7 +12,7 @@ import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getEnhancedJournalEntries } from "@/database/queries";
 import CategoryIcon from "../icon/CategoryIcon";
-import { getPriceString } from "@/utils/price";
+import { getPriceString } from "@/utils/string";
 import { db } from "@/database/client";
 import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";

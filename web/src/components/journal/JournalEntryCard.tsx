@@ -7,7 +7,7 @@ import { useContext, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
 import { useRouter } from "next/router";
-import { getPriceString } from "@/utils/price";
+import { getPriceString } from "@/utils/string";
 import { Category, EditJournalEntryForm, EnhancedJournalEntry } from "@/types/schema";
 import { getCategories } from "@/database/queries";
 import { useQuery } from "@tanstack/react-query";
