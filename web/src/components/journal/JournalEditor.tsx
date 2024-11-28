@@ -18,6 +18,7 @@ import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";
 import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
+import SyncPanel from "../sync/SyncPanel";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
@@ -195,17 +196,20 @@ export default function JournalEditor(props: JournalEditorProps) {
             />
             <BaseLayout
                 headerChildren={
-                    <JournalHeader
-                        date={props.date}
-                        view={props.view}
-                        onNextPage={props.onNextPage}
-                        onPrevPage={props.onPrevPage}
-                        onDateChange={props.onDateChange}
-                    >
-                        <IconButton onClick={() => setShowSettingsDrawer(true)}>
-                            <MuiCategoryIcon />
-                        </IconButton>
-                    </JournalHeader>
+                    <>
+                        <JournalHeader
+                            date={props.date}
+                            view={props.view}
+                            onNextPage={props.onNextPage}
+                            onPrevPage={props.onPrevPage}
+                            onDateChange={props.onDateChange}
+                        >
+                            <IconButton onClick={() => setShowSettingsDrawer(true)}>
+                                <MuiCategoryIcon />
+                            </IconButton>
+                        </JournalHeader>
+                        <SyncPanel />
+                    </>
                 }
                 sx={{
                     // width: '100dvw',

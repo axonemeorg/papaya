@@ -1,10 +1,5 @@
-const path = require('path');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    ...require("dotenv").config({ path: path.resolve(__dirname, "../.env") }).parsed,
-  },
   images: {
     remotePatterns: [
       {
