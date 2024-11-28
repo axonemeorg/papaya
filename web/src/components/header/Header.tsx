@@ -1,8 +1,7 @@
-'use client';
-
 import { Box, Breadcrumbs, IconButton, Stack, useMediaQuery, useTheme } from "@mui/material";
 import BaseContainer from "../layout/BaseContainer";
 import { PropsWithChildren } from "react";
+import { useSession, signIn, signOut } from "next-auth/react"
 import AppLogo from "./AppLogo";
 import { User } from "lucia";
 import AppNavMenu from "./AppNavMenu";
@@ -43,6 +42,7 @@ export default function Header(props: HeaderProps) {
                     )}
                     <Stack direction='row' gap={1} alignItems='center' sx={{ flex: 1 }}>
                         {props.children}
+                        <button onClick={(e) => { e.preventDefault(); signIn(); }}>Sign in</button>
                     </Stack>
                 </Stack>
             </BaseContainer>
