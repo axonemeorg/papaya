@@ -1,18 +1,17 @@
 version: '3.8'
 
 services:
-  postgres:
+  couchdb:
     build:
       context: ./database
       dockerfile: Dockerfile
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${COUCHDB_PORT}:5984"
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - couchdb_data:/opt/couchdb/data
 
 volumes:
-  postgres_data:
+  couchdb_data:
