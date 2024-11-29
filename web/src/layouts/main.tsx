@@ -9,9 +9,12 @@ export const MainLayout = (props: PropsWithChildren) => {
 	return (
 		<Stack component='main' sx={{ minHeight: '100dvh' }}>
 			<Header />
-            <Stack direction='row' sx={{ flex: 1, gap: 2 }}>
+            <Stack direction='row' sx={{ flex: 1, gap: 0 }}>
                 <AppMenu view={'desktop'} />
-			    <Paper sx={{ flex: 1 }}>
+			    <Paper sx={(theme) => ({
+                    flex: 1,
+                    borderTopLeftRadius: theme.spacing(2)
+                })}>
                     {children}
                 </Paper>
             </Stack>

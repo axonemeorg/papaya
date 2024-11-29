@@ -2,7 +2,7 @@
 
 import { CloudDone, CloudOff, CloudSync, Computer, Insights, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
 import { Button, CircularProgress, Collapse, Grow, IconProps, ListItemText, SvgIconOwnProps, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 enum SyncStatusEnum {
     SAVING = 'SAVING',
@@ -56,31 +56,28 @@ export default function SyncStatus() {
         }
     }, [syncStatus]);
 
-    const ButtonIcon = useMemo(() => {
-
-        const iconColor = syncIconVerboseColor ?? 'inherit';
-
+    const ButtonIcon = useCallback((IconProps: any) => {
         switch (syncStatus) {
             case SyncStatusEnum.SAVING:
                 return (
-                    <Sync color={iconColor} />
+                    <Sync { ...IconProps } />
                 )
             case SyncStatusEnum.SAVED_TO_REMOTE:
                 return (
-                    <CloudDone color={iconColor} />
+                    <CloudDone { ...IconProps } />
                 )
             case SyncStatusEnum.WORKING_OFFLINE:
                 return (
-                    <CloudOff color={iconColor} />
+                    <CloudOff { ...IconProps } />
                 )
             case SyncStatusEnum.WORKING_LOCALLY:
             case SyncStatusEnum.SAVED_TO_THIS_DEVICE:
                 return (
-                    <Computer color={iconColor} />
+                    <Computer { ...IconProps } />
                 )
             case SyncStatusEnum.FAILED_TO_SAVE:
                 return (
-                    <SyncProblem color={iconColor} />
+                    <SyncProblem { ...IconProps } />
                 )
             case SyncStatusEnum.IDLE:
             default:
@@ -127,11 +124,12 @@ export default function SyncStatus() {
                     color: theme.palette.text.secondary,
                     // backgroundColor: theme.palette.action.hover,
                     borderRadius: 16,
-                    py: 0.5,
-                    px: 0.5,
-                    gap: 0.5,
+                    py: 1,
+                    px: 1,
+                    gap: 1,
                     justifyContent: 'flex-start',
-                    minWidth: theme.spacing(4),
+                    // minWidth: theme.spacing(4),
+                    minWidth: 0,
                     // pr: 8
 
                     '& .MuiButton-icon': {
@@ -140,7 +138,11 @@ export default function SyncStatus() {
                 })}
                 // startIcon={ButtonIcon}
             >
-                {ButtonIcon}
+                <ButtonIcon
+                    fontSize='small'
+                    color={verbose ? syncIconVerboseColor : 'inherit'}
+                    sx={{ transition: 'all 0.3s' }}
+                />
                 {verbose && (
                     <Grow in>
                         <Typography variant="caption" sx={{ mr: 1, userSelect: 'none' }}>

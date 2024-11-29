@@ -3,10 +3,8 @@ import { Paper } from "@mui/material";
 
 
 const TestPage = () => {
-    return (
-        <Paper>
-            <h1>Test Page</h1>
-        </Paper>
+    return (        
+        <h1>Test Page</h1>
     )
 }
 

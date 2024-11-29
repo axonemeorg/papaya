@@ -22,7 +22,7 @@ export const APP_MENU: Record<string, NavMenuItem> = {
         icon: <Insights />,
         label: 'Analyze',
         description: 'Understand your spending',
-        disabled: true,
+        // disabled: true,
         pathPattern: /\/analyze$/,
     },
 };
