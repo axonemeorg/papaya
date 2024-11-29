@@ -1,4 +1,5 @@
 import JournalEditor, { JournalEditorView } from "@/components/journal/JournalEditor";
+import { MainLayout } from "@/layouts/main";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo } from "react";
@@ -106,12 +107,14 @@ export default function JournalYearMonthPage() {
     }
 
     return (
-        <JournalEditor
-            view={view}
-            date={date}
-            onNextPage={() => handleNextPage()}
-            onPrevPage={() => handlePrevPage()}
-            onDateChange={(date) => handleDateChange(date)}
-        />
+        <MainLayout>
+            <JournalEditor
+                view={view}
+                date={date}
+                onNextPage={() => handleNextPage()}
+                onPrevPage={() => handlePrevPage()}
+                onDateChange={(date) => handleDateChange(date)}
+            />
+        </MainLayout>
     )
 }

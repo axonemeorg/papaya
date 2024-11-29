@@ -1,5 +1,5 @@
 import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { alpha, Avatar, Box, Button, Chip, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { alpha, Avatar, Box, Button, Chip, Divider, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
 import QuickJournalEditor from "./QuickJournalEditor";
@@ -193,29 +193,14 @@ export default function JournalEditor(props: JournalEditorProps) {
                 onClose={() => setShowSettingsDrawer(false)}
             />
             <Box
-                // headerChildren={
-                //     <JournalHeader
-                //         date={props.date}
-                //         view={props.view}
-                //         onNextPage={props.onNextPage}
-                //         onPrevPage={props.onPrevPage}
-                //         onDateChange={props.onDateChange}
-                //     >
-                //         <IconButton onClick={() => setShowSettingsDrawer(true)}>
-                //             <MuiCategoryIcon />
-                //         </IconButton>
-                //     </JournalHeader>
-                // }
                 sx={{
-                    // width: '100dvw',
-                    // overflowX: 'auto',
                     px: {
                         sm: 0,
-                        md: 4,
+                        // md: 4,
                     }
                 }}   
             >
-                <Fab
+                {/* <Fab
                     color='primary'
                     aria-label='add'
                     onClick={() => setShowJournalEntryModal(true)}
@@ -229,7 +214,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                 >
                     <Add />
                     Add
-                </Fab>
+                </Fab> */}
                 {selectedEntry.entry && (
                     <JournalEntryCard
                         entry={selectedEntry.entry}
@@ -240,6 +225,15 @@ export default function JournalEditor(props: JournalEditorProps) {
                         onSave={() => handleSaveEntry()}
                     />
                 )}
+                <JournalHeader
+                    date={props.date}
+                    view={props.view}
+                    onNextPage={props.onNextPage}
+                    onPrevPage={props.onPrevPage}
+                    onDateChange={props.onDateChange}
+                    reversed
+                />
+                <Divider />
                 <Grid
                     container
                     columns={12}

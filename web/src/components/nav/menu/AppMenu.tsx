@@ -22,7 +22,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
             sx={(theme) => ({
                 mx: props.expanded ? undefined : -1,
                 ml: props.expanded ? 1 : undefined,
-                mb: 1,
+                mb: 2,
                 borderRadius: theme.spacing(2),
             })}
         >
