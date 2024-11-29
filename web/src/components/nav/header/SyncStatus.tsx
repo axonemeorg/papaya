@@ -1,7 +1,7 @@
 'use client';
 
 import { CloudDone, CloudOff, CloudSync, Computer, Insights, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
-import { Button, CircularProgress, Collapse, IconProps, ListItemText, SvgIconOwnProps, Typography } from "@mui/material";
+import { Button, CircularProgress, Collapse, Grow, IconProps, ListItemText, SvgIconOwnProps, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 
 enum SyncStatusEnum {
@@ -37,7 +37,7 @@ export default function SyncStatus() {
             case SyncStatusEnum.IDLE:
                 return 'Idle';
         }
-    }, []);
+    }, [syncStatus]);
 
     const syncIconVerboseColor: IconColor = useMemo(() => {
         switch (syncStatus) {
@@ -103,34 +103,52 @@ export default function SyncStatus() {
         setVerbose(true);
         const timeout = setTimeout(() => {
             setVerbose(false);
-        }, 1000);
+        }, 5000);
         return () => {
             clearTimeout(timeout);
         }
-    }, [syncStatus])
+    }, [syncStatus]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setSyncStatus(SyncStatusEnum.SAVED_TO_REMOTE);
+        }, 1000);
+
+    }, []);
 
     return (
         <>
             <Button
                 variant='text'
+                onClick={() => setVerbose(!verbose)}
                 sx={(theme) => ({
                     // border: '1px solid',
                     // borderColor: 'rgba(0, 0, 0, 0.23)',
                     color: theme.palette.text.secondary,
                     // backgroundColor: theme.palette.action.hover,
                     borderRadius: 16,
-                    py: 0.75,
-                    px: 1.5,
+                    py: 0.5,
+                    px: 0.5,
+                    gap: 0.5,
+                    justifyContent: 'flex-start',
+                    minWidth: theme.spacing(4),
                     // pr: 8
+
+                    '& .MuiButton-icon': {
+                        margin: verbose ? undefined : 0,
+                    },
                 })}
-                startIcon={ButtonIcon}
+                // startIcon={ButtonIcon}
             >
-                <Collapse in={verbose} orientation="horizontal">
-                    <Typography variant="caption" sx={{ userSelect: 'none' }}>
-                        {syncStatusText}
-                        {/* <Shortcut>Ctrl</Shortcut> */}
-                    </Typography>
-                </Collapse>
+                {ButtonIcon}
+                {verbose && (
+                    <Grow in>
+                        <Typography variant="caption" sx={{ mr: 1, userSelect: 'none' }}>
+                            {syncStatusText}
+                            {/* <Shortcut>Ctrl</Shortcut> */}
+                        </Typography>
+                    </Grow>
+                )}
             </Button>
         </>
     )
