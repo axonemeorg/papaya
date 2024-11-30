@@ -7,34 +7,38 @@ import { SessionProvider } from "next-auth/react"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import NotificationsProvider from '@/providers/NotificationsProvider'
 
+// Imports styles
 import '@/styles/main.scss'
 
 const queryClient = new QueryClient();
 
 function MyApp(props: any) {
-  const { Component } = props;
-  const { session, ...rest } = props.pageProps;
+	const { Component } = props;
+	const { session, ...rest } = props.pageProps;
 
-  return (
-    <>
-      <Head>
-        <title>Zisk</title>
-      </Head>
-    
-      <ThemeProvider theme={appTheme}>
-        <CssBaseline />
-        <Stack component='main' id='root' minHeight='100dvh' className={montserrat.className}>
-          <SessionProvider session={session}>
-            <QueryClientProvider client={queryClient}>
-              <NotificationsProvider>
-                <Component {...rest} />
-              </NotificationsProvider>
-            </QueryClientProvider>
-          </SessionProvider>
-        </Stack>
-      </ThemeProvider>
-    </>
-  )
+	// Use the layout defined at the page level, if available
+	const getLayout = Component.getLayout ?? ((page: any) => page)
+
+	return (
+		<>
+			<Head>
+				<title>Zisk</title>
+			</Head>
+
+			<ThemeProvider theme={appTheme}>
+				<CssBaseline />
+				<main id='root' className={montserrat.className}>
+					<SessionProvider session={session}>
+						<QueryClientProvider client={queryClient}>
+							<NotificationsProvider>
+								{getLayout(<Component {...rest} />)}
+							</NotificationsProvider>
+						</QueryClientProvider>
+					</SessionProvider>
+				</main>
+			</ThemeProvider>
+		</>
+	)
 }
 
 export default MyApp

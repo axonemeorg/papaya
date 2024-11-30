@@ -1,4 +1,4 @@
-import { ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
+import { ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { DateCalendar, DateView, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -6,7 +6,9 @@ import dayjs from "dayjs";
 import { PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { JournalEditorProps } from "./JournalEditor";
 
-type JournalHeaderProps = PropsWithChildren<JournalEditorProps>;
+type JournalHeaderProps = PropsWithChildren<JournalEditorProps> & {
+    reversed?: boolean;
+}
 
 export default function JournalHeader(props: JournalHeaderProps) {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -88,50 +90,60 @@ export default function JournalHeader(props: JournalHeaderProps) {
     }, [props.view]);
 
     return (
-        <Stack direction='row' justifyContent='space-between' sx={{ flex: 1 }} alignItems='center' gap={1}>
-            <Stack direction='row' alignItems='center' gap={2}>
-                <Stack direction='row' alignItems='center' gap={1}>
-                    {!hideNextPrevButtons && (
-                        <Stack direction='row'>
-                            <Tooltip title={prevButtonTooltip}>
-                                <IconButton onClick={() => props.onPrevPage()}>
-                                    <ArrowBackIos />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={nextButtonTooltip}>
-                                <IconButton onClick={() => props.onNextPage()}>
-                                    <ArrowForwardIos />
-                                </IconButton>
-                            </Tooltip>
-                        </Stack>
-                    )}
-                    <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
-                        <Typography variant={headingSize} sx={{ fontWeight: 500 }}>
-                            {formattedDateString}
-                        </Typography>
-                    </Button>
-                    <Popover
-                        open={Boolean(anchorEl)}
-                        onClose={() => setAnchorEl(null)}
-                        anchorEl={anchorEl}
-                    >
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DateCalendar
-                                views={calendarAvailableViews}
-                                onChange={(value) => {handleChangeDatePickerDate(value)}}
-                            />
-                        </LocalizationProvider>
-                    </Popover>
+        <>
+            <Popover
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+                anchorEl={anchorEl}
+            >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateCalendar
+                        views={calendarAvailableViews}
+                        onChange={(value) => {handleChangeDatePickerDate(value)}}
+                    />
+                </LocalizationProvider>
+            </Popover>
+            <Stack
+                component='header'
+                direction='row'
+                justifyContent='space-between'
+                sx={{ flex: 1, py: 1, px: 2 }}
+                alignItems='center'
+                flexDirection={props.reversed ? 'row-reverse' : 'row'}
+                gap={1}
+            >
+                <Stack direction='row' alignItems='center' gap={2}>
+                    {props.children}
                 </Stack>
-                <Tooltip title={formattedCurrentDay}>
-                    <IconButton color='inherit' onClick={() => jumpToToday()}>
-                        <EventRepeat />
-                    </IconButton>
-                </Tooltip>
+                <Stack direction='row' alignItems='center' gap={2} flexDirection={props.reversed ? 'row-reverse' : 'row'}>
+                    <Tooltip title={formattedCurrentDay}>
+                        <IconButton color='inherit' onClick={() => jumpToToday()}>
+                            <EventRepeat />
+                        </IconButton>
+                    </Tooltip>
+                    <Stack direction='row' alignItems='center' gap={1}>
+                        <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
+                            <Typography variant={headingSize} sx={{ fontWeight: 500 }}>
+                                {formattedDateString}
+                            </Typography>
+                        </Button>
+                        {!hideNextPrevButtons && (
+                            <Stack direction='row'>
+                                <Tooltip title={prevButtonTooltip}>
+                                    <IconButton size="small" onClick={() => props.onPrevPage()}>
+                                        <ArrowBack />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={nextButtonTooltip}>
+                                    <IconButton size="small" onClick={() => props.onNextPage()}>
+                                        <ArrowForward />
+                                    </IconButton>
+                                </Tooltip>
+                            </Stack>
+                        )}
+                    </Stack>
+                </Stack>
             </Stack>
-            <Stack direction='row' alignItems='center' gap={2}>
-                {props.children}
-            </Stack>
-        </Stack>
+        </>
     )
 }
