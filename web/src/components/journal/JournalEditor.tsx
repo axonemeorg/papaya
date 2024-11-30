@@ -17,7 +17,6 @@ import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";
 import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import SyncPanel from "../sync/SyncPanel";
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
     const theme = useTheme();
