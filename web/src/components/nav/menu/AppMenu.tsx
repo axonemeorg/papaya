@@ -1,7 +1,8 @@
 import { APP_MENU } from "@/constants/menu";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
-import { Add } from "@mui/icons-material";
+import { Add, Create } from "@mui/icons-material";
 import { Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack } from "@mui/material";
+import { useEffect } from "react";
 
 interface AppMenuProps {
     view: 'desktop' | 'mobile';
@@ -26,22 +27,39 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
                 borderRadius: theme.spacing(2),
             })}
         >
-            <Add />
+            <Create sx={{ mr: props.expanded ? 1 : undefined }} />
             {props.expanded && (
-                <span>Add</span>
+                <span>New Entry</span>
             )}
         </Fab>
     )
 }
 
+const LOCAL_STORAGE_KEY = "ZISK_APP_MENU_OPEN_STATE";
+const DEFAULT_OPEN_STATE = true;
+
 export default function AppMenu(props: AppMenuProps) {
     const { view } = props;
     const isOpen = useAppMenuStateStore((state) => state.isOpen);
     const closeMenu = useAppMenuStateStore((state) => state.close);
+    const openMenu = useAppMenuStateStore((state) => state.open);
+
+    useEffect(() => {
+        const openState = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (openState === 'true') {
+            openMenu();
+        } else {
+            closeMenu();
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(LOCAL_STORAGE_KEY, isOpen.toString());
+    }, [isOpen]);
 
     if (isOpen && view === 'desktop') {
         return (
-            <MenuList sx={{ pr: 2 }}>
+            <MenuList sx={(theme) => ({ pr: 3, minWidth: theme.spacing(24) })}>
                 <CreateEntryButton expanded />
                 {Object.entries(APP_MENU).map(([slug, menuItem]) => {
                     return (

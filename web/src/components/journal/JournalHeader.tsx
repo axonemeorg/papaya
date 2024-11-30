@@ -1,4 +1,4 @@
-import { ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
+import { ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { DateCalendar, DateView, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -107,7 +107,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
                 component='header'
                 direction='row'
                 justifyContent='space-between'
-                sx={{ flex: 1, py: 1, px: 1 }}
+                sx={{ flex: 1, py: 1, px: 2 }}
                 alignItems='center'
                 flexDirection={props.reversed ? 'row-reverse' : 'row'}
                 gap={1}
@@ -130,13 +130,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
                         {!hideNextPrevButtons && (
                             <Stack direction='row'>
                                 <Tooltip title={prevButtonTooltip}>
-                                    <IconButton onClick={() => props.onPrevPage()}>
-                                        <ArrowBackIos />
+                                    <IconButton size="small" onClick={() => props.onPrevPage()}>
+                                        <ArrowBack />
                                     </IconButton>
                                 </Tooltip>
                                 <Tooltip title={nextButtonTooltip}>
-                                    <IconButton onClick={() => props.onNextPage()}>
-                                        <ArrowForwardIos />
+                                    <IconButton size="small" onClick={() => props.onNextPage()}>
+                                        <ArrowForward />
                                     </IconButton>
                                 </Tooltip>
                             </Stack>
