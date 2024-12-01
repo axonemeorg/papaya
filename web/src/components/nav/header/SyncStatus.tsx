@@ -1,8 +1,9 @@
 'use client';
 
+import { RemoteContext } from "@/contexts/RemoteContext";
 import { CloudDone, CloudOff, CloudSync, Computer, Insights, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
 import { Button, CircularProgress, Collapse, Grow, IconProps, ListItemText, SvgIconOwnProps, Typography } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 enum SyncStatusEnum {
     SAVING = 'SAVING',
@@ -113,11 +114,18 @@ export default function SyncStatus() {
 
     }, []);
 
+    const remoteContext = useContext(RemoteContext);
+
+    const handleClickButton = () => {
+        // setVerbose(!verbose)
+        remoteContext.sync();
+    }
+
     return (
         <>
             <Button
                 variant='text'
-                onClick={() => setVerbose(!verbose)}
+                onClick={() => handleClickButton()}
                 sx={(theme) => ({
                     // border: '1px solid',
                     // borderColor: 'rgba(0, 0, 0, 0.23)',

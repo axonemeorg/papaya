@@ -22,7 +22,6 @@ const newMetaDoc: ZiskJournalMeta = {
 }
 
 export const db = new PouchDB(POUCH_DB_NAME);
-export const remoteDb = new PouchDB(`${COUCHDB_URL}/zisk`);
 
 PouchDB.plugin(PouchDBFind);
 
