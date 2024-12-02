@@ -26,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let bearerToken = null;
     try {
         bearerToken = jwt.sign(sessionUserClaims, AUTH_SECRET, { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT', kid: AUTH_HMAC_KID } });
-        console.log('Using bearer token:', bearerToken);
     } catch (error) {
         console.error('Failed to generate bearer token:', error);
     }
