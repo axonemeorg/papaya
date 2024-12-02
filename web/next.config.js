@@ -1,13 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  rewrites: async () => {
-    return [
-      {
-        source: `${process.env.NEXT_PUBLIC_REMOTE_DB_PROXY_PATH}/:path*`,
-        destination: `${process.env.COUCHDB_URL}/:path*`,
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {
@@ -18,6 +10,9 @@ const nextConfig = {
       },
     ],
   },
+  sassOptions: {
+    silenceDeprecations: ['legacy-js-api'],
+  }
 };
 
 module.exports = nextConfig;

@@ -11,4 +11,4 @@ web:
 	cd ./web && bun run dev
 
 
-.PHONY: clean, db, web, close
+.PHONY: close, clean, db, web
