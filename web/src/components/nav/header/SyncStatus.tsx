@@ -1,8 +1,8 @@
 'use client';
 
 import { RemoteContext, SyncStatusEnum } from "@/contexts/RemoteContext";
-import { CloudDone, CloudOff, CloudSync, Computer, Insights, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
-import { Button, CircularProgress, Collapse, Grow, IconProps, ListItemText, Popover, SvgIconOwnProps, Typography } from "@mui/material";
+import { CloudDone, CloudOff, CloudSync, Computer, Insights, MoreVert, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
+import { Button, CardActions, CardContent, CardHeader, CircularProgress, Collapse, Divider, Grow, IconButton, IconProps, LinearProgress, ListItemText, Popover, SvgIconOwnProps, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type IconColor = SvgIconOwnProps['color'];
@@ -15,26 +15,53 @@ export default function SyncStatus() {
     const { syncStatus } = remoteContext;
     const isIdle = syncStatus === SyncStatusEnum.IDLE;
 
-    const syncStatusTitle = useMemo(() => {
+    const { syncStatusTitle, syncStatusDescription } = useMemo(() => {
         switch (syncStatus) {
             case SyncStatusEnum.CONNECTING_TO_REMOTE:
-                return 'Connecting to remote...';
+                return {
+                    syncStatusTitle: 'Connecting to remote...',
+                    syncStatusDescription: 'Waiting to establish connection with remote database',
+                };
             case SyncStatusEnum.FAILED_TO_CONNECT:
-                return 'Failed to connect';
+                return {
+                    syncStatusTitle: 'Failed to connect',
+                    syncStatusDescription: 'Failed to establish connection with remote database',
+                };
             case SyncStatusEnum.SAVING:
-                return 'Syncing...';
+                return {
+                    syncStatusTitle: 'Syncing...',
+                    syncStatusDescription: 'Pulling and pushing changes to remote database',
+                };
             case SyncStatusEnum.SAVED_TO_REMOTE:
-                return 'Saved to remote';
+                return {
+                    syncStatusTitle: 'Saved to remote',
+                    syncStatusDescription: 'Your changes have been saved to the remote database',
+                };
             case SyncStatusEnum.WORKING_OFFLINE:
-                return 'Working offline';
+                return {
+                    syncStatusTitle: 'Working offline',
+                    syncStatusDescription: 'Your device is currently offline. Changes will be synced when you are back online',
+                };
             case SyncStatusEnum.SAVED_TO_THIS_DEVICE:
-                return 'Saved to this device';
+                return {
+                    syncStatusTitle: 'Saved to this device',
+                    syncStatusDescription: 'Your changes have been saved locally, but need to be synced to the remote database',
+                };
             case SyncStatusEnum.WORKING_LOCALLY:
-                return 'Working locally';
+                return {
+                    syncStatusTitle: 'Working locally',
+                    syncStatusDescription: 'All changes will be maintained locally',
+                };
             case SyncStatusEnum.FAILED_TO_SAVE:
-                return 'Failed to save';
+                return {
+                    syncStatusTitle: 'Failed to save',
+                    syncStatusDescription: 'Failed to save changes to the remote database',
+                };
             case SyncStatusEnum.IDLE:
-                return 'Idle';
+                return {
+                    syncStatusTitle: 'Idle',
+                    syncStatusDescription: 'No changes to sync',
+                };
         }
     }, [syncStatus]);
 
@@ -112,11 +139,17 @@ export default function SyncStatus() {
         setAnchorEl(event.currentTarget);
     }
 
+    const showingModal = Boolean(anchorEl);
+
+    const isLoading = useMemo(() => {
+        return syncStatus === SyncStatusEnum.SAVING || syncStatus === SyncStatusEnum.CONNECTING_TO_REMOTE;
+    }, [syncStatus]);
+
     return (
         <>
             <Popover
                 anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
+                open={showingModal}
                 onClose={() => setAnchorEl(null)}
                 anchorOrigin={{
                     vertical: 'bottom',
@@ -127,38 +160,47 @@ export default function SyncStatus() {
                     horizontal: 'left',
                 }}
             >
-                <div>Hello</div>
+                <CardHeader
+                    avatar={
+                        <ButtonIcon
+                            sx={{ transition: 'all 0.3s' }}
+                        />
+                    }
+                    title={syncStatusTitle}
+                    subheader={syncStatusDescription}
+                />
+                {isLoading ? (
+                    <LinearProgress variant="indeterminate" />
+                ) : (
+                    <Divider sx={{ height: '1px', my: '1.5px' }} />
+                )}
+                <CardActions>
+                    <Button onClick={handleSync}>Sync Now</Button>
+                </CardActions>
             </Popover>
             <Grow in={!isIdle}>
                 <Button
                     variant='text'
                     onClick={handleClickButton}
                     sx={(theme) => ({
-                        // border: '1px solid',
-                        // borderColor: 'rgba(0, 0, 0, 0.23)',
                         color: theme.palette.text.secondary,
-                        // backgroundColor: theme.palette.action.hover,
                         borderRadius: 16,
                         py: 1,
                         px: 1,
                         gap: 1,
                         justifyContent: 'flex-start',
-                        // minWidth: theme.spacing(4),
                         minWidth: 0,
-                        // pr: 8
-
                         '& .MuiButton-icon': {
                             margin: verbose ? undefined : 0,
                         },
                     })}
-                    // startIcon={ButtonIcon}
                 >
                     <ButtonIcon
                         fontSize='small'
                         color={verbose ? syncIconVerboseColor : 'inherit'}
                         sx={{ transition: 'all 0.3s' }}
                     />
-                    {verbose && (
+                    {(verbose || showingModal) && (
                         <Grow in>
                             <Typography variant="caption" sx={{ mr: 1, userSelect: 'none' }}>
                                 {syncStatusTitle}
