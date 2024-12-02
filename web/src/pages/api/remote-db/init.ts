@@ -4,7 +4,9 @@ import { getToken } from "next-auth/jwt";
 
 const COUCHDB_URL = process.env.COUCHDB_URL;
 // The AUTH_SECRET used by CouchDB gets base64-decoded, so we need to sign these JWTs accordingly
+console.log('process.env.AUTH_SECRET:', process.env.AUTH_SECRET)
 const AUTH_SECRET = atob(process.env.AUTH_SECRET ?? '');
+const AUTH_HMAC_KID = process.env.AUTH_HMAC_KID ?? '';
 
 export const dbNameToUsername = (prefixedHexName: string) => {
     return Buffer.from(prefixedHexName.replace('ziskuserdb-', ''), 'hex').toString('utf8');
@@ -38,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let bearerToken = null;
     try {
-        bearerToken = jwt.sign(sessionUserClaims, AUTH_SECRET, { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT', kid: 'helloworld' } });
+        bearerToken = jwt.sign(sessionUserClaims, AUTH_SECRET, { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT', kid: AUTH_HMAC_KID } });
         console.log('Using bearer token:', bearerToken);
     } catch (error) {
         console.error('Failed to generate bearer token:', error);

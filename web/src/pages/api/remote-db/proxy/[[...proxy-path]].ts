@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { encode, getToken } from 'next-auth/jwt';
+import { getToken } from 'next-auth/jwt';
 import fetch from 'node-fetch';
 import { usernameToDbName } from '../init';
 
 const COUCHDB_URL = process.env.COUCHDB_URL;
 // The AUTH_SECRET used by CouchDB gets base64-decoded, so we need to sign these JWTs accordingly
 const AUTH_SECRET = atob(process.env.AUTH_SECRET ?? '');
+const AUTH_HMAC_KID = process.env.AUTH_HMAC_KID ?? '';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const sessionUserClaims = await getToken({ req });
@@ -24,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let bearerToken = null;
     try {
-        bearerToken = jwt.sign(sessionUserClaims, AUTH_SECRET, { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT', kid: 'helloworld' } });
+        bearerToken = jwt.sign(sessionUserClaims, AUTH_SECRET, { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT', kid: AUTH_HMAC_KID } });
         console.log('Using bearer token:', bearerToken);
     } catch (error) {
         console.error('Failed to generate bearer token:', error);

@@ -5,11 +5,12 @@ FROM couchdb:latest
 RUN sed -i 's/^;daemonize = false/daemonize = true/' /opt/couchdb/etc/default.ini
 
 ARG AUTH_SECRET
+ARG AUTH_HMAC_KID
 
 # Enable JWT authentication, set the secret key, and configure CORS
 RUN echo "\
 [jwt_keys]\n\
-hmac:helloworld = $AUTH_SECRET\n\
+hmac:$AUTH_HMAC_KID = $AUTH_SECRET\n\
 [couch_peruser]\n\
 enabled = false\n\
 \n\

@@ -6,6 +6,8 @@ import { LoadingButton } from "@mui/lab";
 import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 
+const AWS_CLOUDFRONT_IMAGES_URL = process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL;
+
 interface ImageAvatarPicker {
     value: Avatar;
     onChange: (avatar: Avatar | null) => void;
@@ -21,7 +23,7 @@ export const ImageAvatar = (props: ImageAvatarProps) => {
     const { avatar, ...rest } = props;
     const imageSrc = [
         'https:/',
-        process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL,
+        AWS_CLOUDFRONT_IMAGES_URL,
         avatar.content
     ].join('/');
 
