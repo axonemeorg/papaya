@@ -4,11 +4,12 @@ FROM couchdb:latest
 # Set CouchDB to run as a daemon
 RUN sed -i 's/^;daemonize = false/daemonize = true/' /opt/couchdb/etc/default.ini
 
-# Enable JWT authentication and CORS in the CouchDB configuration
+ARG AUTH_SECRET
+
+# Enable JWT authentication, set the secret key, and configure CORS
 RUN echo "\
-[jwt_auth]\n\
-; To enable JWT authentication, set this to true.\n\
-enabled = true\n\
+[jwt_keys]\n\
+hmac:_default = $AUTH_SECRET\n\
 \n\
 [chttpd]\n\
 ; Allow JWT authentication.\n\
@@ -24,7 +25,7 @@ credentials = true\n\
 origins = *\n\
 methods = GET, POST, PUT, DELETE, OPTIONS\n\
 headers = accept, authorization, content-type, origin, referer, x-csrf-token\n\
-" >> /opt/couchdb/etc/local.d/jwt_cors.ini
+" > /opt/couchdb/etc/local.d/jwt_cors.ini
 
 # Expose the default CouchDB port
 EXPOSE 5984

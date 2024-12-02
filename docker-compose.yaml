@@ -5,6 +5,8 @@ services:
     build:
       context: ./database
       dockerfile: Dockerfile
+      args:
+        - AUTH_SECRET=${AUTH_SECRET}
     ports:
       - "${COUCHDB_PORT}:5984"
     environment:
