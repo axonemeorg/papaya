@@ -3,6 +3,11 @@ import { getSession, useSession } from "next-auth/react";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import PouchDB from 'pouchdb';
 import { db } from "@/database/client";
+import { get } from "http";
+import { getToken } from "next-auth/jwt";
+
+const REMOTE_DB_API_PATH = 'api/remote-db';
+const REMOTE_DB_PROXY_PATH = `${REMOTE_DB_API_PATH}/proxy`;
 
 export default function RemoteContextProvider(props: PropsWithChildren) {
     const [syncError, setSyncError] = useState<string | null>(null);
@@ -12,41 +17,70 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
 
     const userSession = useSession();
 
+    console.log('userSession:', userSession);
+
+    // const userName = 'user1111';
+    const isAuthenticated = userSession.status === 'authenticated';
+
+    // const getDatabaseName = () => {
+    //     return userName;
+    // }
+
+    const getRemoteDbApiUrl = () => {
+        return `${process.env.NEXT_PUBLIC_APP_URL}/${REMOTE_DB_API_PATH}`;
+    }
+
+    const getRemoteDbProxyUrl = () => {
+        return `${process.env.NEXT_PUBLIC_APP_URL}/${REMOTE_DB_PROXY_PATH}`;
+    }
+
+    const createRemote = async () => {
+        console.log('Creating remote database...');
+        if (!isAuthenticated) {
+            throw new Error('User is not authenticated');
+        }
+
+        // Step 1. Init the database
+        const initUrl = `${getRemoteDbApiUrl()}/init`;
+        console.log('init URL:', initUrl);
+        const initResult = await fetch(initUrl, {
+            method: 'POST',
+        });
+
+        if (initResult.status !== 200) {
+            throw new Error('Failed to initialize remote database');
+        }
+        
+        // Step 2. Create the remote database PouchDB instance
+        const remoteProxyUrl = getRemoteDbProxyUrl();
+        console.log('Remote proxy URL:', remoteProxyUrl);
+        remoteDb.current = new PouchDB(remoteProxyUrl, {
+            skip_setup: true,
+        });
+
+        return remoteDb.current
+    }
+
     useEffect(() => {
-        if (userSession.status !== 'authenticated') {
+        if (!isAuthenticated) {
             return;
         }
 
-        const databaseName = 'zisk-2'
-        const remoteUrl = `${process.env.NEXT_PUBLIC_REMOTE_DB_PROXY_PATH}/${databaseName}`;
-        console.log('user session', userSession);
+        createRemote();
+    }, [isAuthenticated]);
 
-        remoteDb.current = new PouchDB(
-            remoteUrl,
-            {
-                fetch: (url, opts) => {
-                    // if (opts) {
-                    //     opts.xs = 'include';
-                    // }
-                    console.log('Connecting to remote at:', remoteUrl);
-                    return PouchDB.fetch(url, opts);
-                }
-            });
-    }, [userSession.status]);
-
-    const sync = async () => {
-        console.log('initiating sync')
+    const performSync = async () => {
         if (!remoteDb.current) {
-            console.log('Remote database is null.')
-            // throw new Error('Remote database is not connected');
-            // TODO
-            return;
+            throw new Error('Remote database is not connected');
         }
 
-        console.log('performing sync')
-        remoteDb.current.sync(db).then((info) => {
+        db.sync(remoteDb.current).then((info) => {
             console.log('Sync complete', info);
         });
+    }
+
+    const sync = async () => {
+        performSync();
     }
 
     const context: RemoteContext = {

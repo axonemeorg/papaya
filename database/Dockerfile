@@ -9,7 +9,9 @@ ARG AUTH_SECRET
 # Enable JWT authentication, set the secret key, and configure CORS
 RUN echo "\
 [jwt_keys]\n\
-hmac:_default = $AUTH_SECRET\n\
+hmac:helloworld = $AUTH_SECRET\n\
+[couch_peruser]\n\
+enabled = false\n\
 \n\
 [chttpd]\n\
 ; Allow JWT authentication.\n\
