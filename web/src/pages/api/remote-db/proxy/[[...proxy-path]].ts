@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Build the target CouchDB URL
     // console.log('original request url:', req.url);
-    const targetPath = req?.url?.replace('/api/remote-db/proxy', ''); // Remove /api/remote-db prefix
+    const targetPath = req?.url?.replace('/api/remote-db/proxy', ''); // Remove /api/remote-db/proxy prefix
     const userName = sessionUserClaims.sub ?? '';
     // TODO need a helper fn to get the username from the req object
     const databaseName = usernameToDbName(userName);
