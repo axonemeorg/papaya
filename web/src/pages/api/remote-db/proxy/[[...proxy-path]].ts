@@ -5,7 +5,8 @@ import fetch from 'node-fetch';
 import { usernameToDbName } from '../init';
 
 const COUCHDB_URL = process.env.COUCHDB_URL;
-const AUTH_SECRET = process.env.AUTH_SECRET ?? '';
+// The AUTH_SECRET used by CouchDB gets base64-decoded, so we need to sign these JWTs accordingly
+const AUTH_SECRET = atob(process.env.AUTH_SECRET ?? '');
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const sessionUserClaims = await getToken({ req });

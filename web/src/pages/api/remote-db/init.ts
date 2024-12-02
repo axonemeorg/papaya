@@ -3,8 +3,8 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { getToken } from "next-auth/jwt";
 
 const COUCHDB_URL = process.env.COUCHDB_URL;
-const AUTH_SECRET = process.env.AUTH_SECRET ?? '';
-
+// The AUTH_SECRET used by CouchDB gets base64-decoded, so we need to sign these JWTs accordingly
+const AUTH_SECRET = atob(process.env.AUTH_SECRET ?? '');
 
 export const dbNameToUsername = (prefixedHexName: string) => {
     return Buffer.from(prefixedHexName.replace('ziskuserdb-', ''), 'hex').toString('utf8');
