@@ -19,28 +19,9 @@ export const authOptions: AuthOptions = {
             }
         })
     ],
-    callbacks: {
-        // async jwt({ token, account }) {
-        //     if (account) {
-        //         token = Object.assign({}, token, { access_token: account.access_token });
-        //     }
-        //     return {
-        //         ...token,
-                
-        //     }
-        // },
-        // async session({ session, token }) {
-        //     if (session) {
-        //         session = Object.assign({}, session, { access_token: token.access_token })
-        //         // console.log(session);
-        //     }
-        //     return {
-        //         ...session,
-        //         test: 'Hello world',
-        //         the_token: token,
-        //     }
-        // }
-    }
+    session: {
+        strategy: 'jwt',
+    },
 }
 
 export default NextAuth(authOptions)
