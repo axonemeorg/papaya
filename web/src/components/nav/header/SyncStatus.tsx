@@ -117,7 +117,7 @@ export default function SyncStatus() {
         return (
             <CircularProgress size={16} />
         );
-    }, [syncIconVerboseColor, verbose]);
+    }, [syncIconVerboseColor, verbose, syncStatus]);
 
     useEffect(() => {
         // Whenever sync status changes, set verbose to true, then 3s later set it to false
@@ -145,6 +145,10 @@ export default function SyncStatus() {
         return syncStatus === SyncStatusEnum.SAVING || syncStatus === SyncStatusEnum.CONNECTING_TO_REMOTE;
     }, [syncStatus]);
 
+    const canSync = useMemo(() => {
+        return remoteContext.authenticationStatus === 'authenticated';
+    }, [remoteContext.authenticationStatus]);
+
     return (
         <>
             <Popover
@@ -169,14 +173,18 @@ export default function SyncStatus() {
                     title={syncStatusTitle}
                     subheader={syncStatusDescription}
                 />
-                {isLoading ? (
-                    <LinearProgress variant="indeterminate" />
-                ) : (
-                    <Divider sx={{ height: '1px', my: '1.5px' }} />
+                {canSync && (
+                    <>
+                        {isLoading ? (
+                            <LinearProgress variant="indeterminate" />
+                        ) : (
+                            <Divider sx={{ height: '1px', my: '1.5px' }} />
+                        )}
+                        <CardActions>
+                            <Button onClick={handleSync}>Sync Now</Button>
+                        </CardActions>
+                    </>
                 )}
-                <CardActions>
-                    <Button onClick={handleSync}>Sync Now</Button>
-                </CardActions>
             </Popover>
             <Grow in={!isIdle}>
                 <Button

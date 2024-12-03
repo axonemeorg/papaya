@@ -10,15 +10,14 @@ const REMOTE_DB_PROXY_PATH = `${REMOTE_DB_API_PATH}/proxy`;
 export default function RemoteContextProvider(props: PropsWithChildren) {
     const userSession = useSession();
 
-    const initialSyncStatus = useMemo(() => {
-        if (userSession?.status === 'unauthenticated') {
-            return SyncStatusEnum.WORKING_LOCALLY;
-        }
-        return SyncStatusEnum.IDLE;
-    }, []);
-
     const [syncError, setSyncError] = useState<string | null>(null);
-    const [syncStatus, setSyncStatus] = useState<SyncStatusEnum>(initialSyncStatus);
+    const [syncStatus, setSyncStatus] = useState<SyncStatusEnum>(SyncStatusEnum.IDLE);
+
+    useMemo(() => {
+        if (userSession?.status === 'unauthenticated') {
+            setSyncStatus(SyncStatusEnum.WORKING_LOCALLY);
+        }
+    }, [userSession.status]);
     
     const remoteDb = useRef<PouchDB.Database | null>(null);
 
@@ -102,7 +101,7 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
         syncError,
         syncStatus,
         sync,
-        isAuthenticated,
+        authenticationStatus: userSession.status,
     };
 
     return (

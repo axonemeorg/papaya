@@ -15,7 +15,7 @@ export enum SyncStatusEnum {
 export interface RemoteContext {
     syncError: string | null;
     syncStatus: SyncStatusEnum;
-    isAuthenticated: boolean;
+    authenticationStatus: 'loading' | 'authenticated' | 'unauthenticated';
     sync: () => Promise<void>;
 }
 

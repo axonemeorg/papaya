@@ -4,7 +4,6 @@ import { getToken } from "next-auth/jwt";
 
 const COUCHDB_URL = process.env.COUCHDB_URL;
 // The AUTH_SECRET used by CouchDB gets base64-decoded, so we need to sign these JWTs accordingly
-console.log('process.env.AUTH_SECRET:', process.env.AUTH_SECRET)
 const AUTH_SECRET = atob(process.env.AUTH_SECRET ?? '');
 const AUTH_HMAC_KID = process.env.AUTH_HMAC_KID ?? '';
 
