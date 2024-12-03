@@ -9,6 +9,7 @@ import NotificationsProvider from '@/providers/NotificationsProvider'
 
 // Imports styles
 import '@/styles/main.scss'
+import RemoteContextProvider from '@/providers/RemoteContextProvider'
 
 const queryClient = new QueryClient();
 
@@ -29,11 +30,13 @@ function MyApp(props: any) {
 				<CssBaseline />
 				<main id='root' className={montserrat.className}>
 					<SessionProvider session={session}>
-						<QueryClientProvider client={queryClient}>
-							<NotificationsProvider>
-								{getLayout(<Component {...rest} />)}
-							</NotificationsProvider>
-						</QueryClientProvider>
+						<RemoteContextProvider>
+							<QueryClientProvider client={queryClient}>
+								<NotificationsProvider>
+									{getLayout(<Component {...rest} />)}
+								</NotificationsProvider>
+							</QueryClientProvider>
+						</RemoteContextProvider>
 					</SessionProvider>
 				</main>
 			</ThemeProvider>

@@ -1,22 +1,14 @@
 clean:
 	docker-compose down -v
 
+close:
+	docker-compose down
+
 db:
-	docker-compose up -d
+	docker-compose up --build -d
 
-generate:
-	cd ./web && bun run generate
-
-migrate:
-	cd ./web && bun run migrate
-
-seed:
-	cd ./web && bun run seed
-
-dev:
+web:
 	cd ./web && bun run dev
 
-custom-migration:
-	cd ./web && npx drizzle-kit generate --custom
 
-.PHONY: clean, db, dev, generate, migrate, seed
+.PHONY: close, clean, db, web

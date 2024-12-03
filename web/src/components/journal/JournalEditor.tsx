@@ -200,7 +200,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                     }
                 }}   
             >
-                {/* <Fab
+                <Fab
                     color='primary'
                     aria-label='add'
                     onClick={() => setShowJournalEntryModal(true)}
@@ -214,7 +214,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                 >
                     <Add />
                     Add
-                </Fab> */}
+                </Fab>
                 {selectedEntry.entry && (
                     <JournalEntryCard
                         entry={selectedEntry.entry}

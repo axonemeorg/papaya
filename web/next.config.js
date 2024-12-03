@@ -1,10 +1,11 @@
-const path = require('path');
+const dotenv = require('dotenv');
+const dotenvExpand = require('dotenv-expand');
+
+const env = dotenv.config({ path: '../.env' });
+dotenvExpand.expand(env);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    ...require("dotenv").config({ path: path.resolve(__dirname, "../.env") }).parsed,
-  },
   images: {
     remotePatterns: [
       {
@@ -15,6 +16,9 @@ const nextConfig = {
       },
     ],
   },
+  sassOptions: {
+    silenceDeprecations: ['legacy-js-api'],
+  }
 };
 
 module.exports = nextConfig;

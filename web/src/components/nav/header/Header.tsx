@@ -8,6 +8,7 @@ import { PropsWithChildren } from "react";
 import JournalSelect from "./JournalSelect";
 import SearchWidget from "./SearchWidget";
 import SyncStatus from "./SyncStatus";
+import UserWidget from "./UserWidget";
 
 export default function Header() {
     const theme = useTheme();
@@ -47,7 +48,7 @@ export default function Header() {
                 <IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
                     <Settings />
                 </IconButton>
-                <Avatar />
+                <UserWidget />
             </Stack>
         </Stack>
     )    
