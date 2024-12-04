@@ -1,48 +1,17 @@
-import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { MouseEvent, useContext, useEffect, useMemo, useState } from "react";
 import { alpha, Avatar, Box, Button, Chip, Divider, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Add, Category as MuiCategoryIcon } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import dayjs from "dayjs";
-import QuickJournalEditor from "./QuickJournalEditor";
-import NotificationsProvider from "@/providers/NotificationsProvider";
 import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";
-import { Category, EnhancedJournalEntry, JournalEntry } from "@/types/schema";
+import { EnhancedJournalEntry } from "@/types/schema";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getEnhancedJournalEntries } from "@/database/queries";
-import CategoryIcon from "../icon/CategoryIcon";
-import { getPriceString } from "@/utils/string";
-import { db } from "@/database/client";
-import CategoryChip from "../icon/CategoryChip";
 import JournalEntryCard from "./JournalEntryCard";
 import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-
-const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
-    const theme = useTheme();
-    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-
-    return (
-        <Stack direction='row' alignItems='flex-end' gap={0.75} sx={{ p: 1, pb: isSmall ? 0 : undefined }}>
-            <Avatar
-                component={Button}
-                sx={(theme) => ({
-                    // display: 'block',
-                    background: isToday ? theme.palette.primary.main : 'transparent',
-                    color: isToday ? theme.palette.primary.contrastText : 'inherit',
-                    minWidth: 'unset',
-                    width: isSmall ? theme.spacing(4) : undefined,
-                    height: isSmall ? theme.spacing(4) : undefined,
-                })}
-            >
-                {day.format('D')}
-            </Avatar>
-            <Typography sx={{ mb: isSmall ? -0.25 : 0.25 }} variant='overline' color={isToday ? 'primary' : undefined}>
-                {day.format('MMM')},&nbsp;{day.format('ddd')}
-            </Typography>
-        </Stack>
-    )
-}
+import JournalEntryList from "./JournalEntryList";
 
 export type JournalEditorView =
     | 'week'
@@ -60,7 +29,6 @@ export interface JournalEditorProps {
 export interface JournalEntrySelection {
     entry: EnhancedJournalEntry | null;
     anchorEl: HTMLElement | null;
-    // children: JournalEntry[];
 }
 
 export default function JournalEditor(props: JournalEditorProps) {
@@ -69,14 +37,10 @@ export default function JournalEditor(props: JournalEditorProps) {
     const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
         entry: null,
         anchorEl: null,
-        // children: [],
     });
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const { snackbar } = useContext(NotificationsContext);
-
-    const theme = useTheme();
-    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
@@ -114,13 +78,9 @@ export default function JournalEditor(props: JournalEditorProps) {
     });
 
     const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
-        const { childEntryIds } = entry;
-        // const children: JournalEntry[] = (childEntryIds ?? []).map((childId) => getJournalEntriesQuery.data[childId]);
-
         setSelectedEntry({
             anchorEl: event.currentTarget,
             entry: entry,
-            // children,
         });
     }
 
@@ -171,11 +131,11 @@ export default function JournalEditor(props: JournalEditorProps) {
     }
 
     // show all docs
-    useEffect(() => {
-        db.allDocs({ include_docs: true }).then((result) => {
-            console.log('all docs', result);
-        });
-    }, []);
+    // useEffect(() => {
+    //     db.allDocs({ include_docs: true }).then((result) => {
+    //         console.log('all docs', result);
+    //     });
+    // }, []);
 
     return (
         <>
@@ -194,10 +154,7 @@ export default function JournalEditor(props: JournalEditorProps) {
             />
             <Box
                 sx={{
-                    px: {
-                        sm: 0,
-                        // md: 4,
-                    }
+                    px: { sm: 0, }
                 }}   
             >
                 <Fab
@@ -218,7 +175,6 @@ export default function JournalEditor(props: JournalEditorProps) {
                 {selectedEntry.entry && (
                     <JournalEntryCard
                         entry={selectedEntry.entry}
-                        // children={selectedEntry.children}
                         anchorEl={selectedEntry.anchorEl}
                         onClose={() => handleDeselectListItem()}
                         onDelete={() => handleDeleteEntry(selectedEntry.entry)}
@@ -234,94 +190,10 @@ export default function JournalEditor(props: JournalEditorProps) {
                     reversed
                 />
                 <Divider />
-                <Grid
-                    container
-                    columns={12}
-                    sx={{
-                        '--Grid-borderWidth': '1px',
-                        borderColor: 'divider',
-                        '& > div': {
-                            borderBottom: 'var(--Grid-borderWidth) solid',
-                            borderColor: 'divider',
-
-                            '&.date-cell': {
-                                borderWidth: {
-                                    xs: '0',
-                                    sm: '1px'
-                                }
-                            }
-                        },
-                    }}
-                >
-                    {Object
-                        .entries(journalGroups)
-                        .sort(([dateA, _a], [dateB, _b]) => {
-                            return new Date(dateA).getTime() - new Date(dateB).getTime()
-                        })
-                        .map(([date, entries]) => {
-                            const day = dayjs(date);
-                            const isToday = day.isSame(dayjs(), 'day');
-
-                            return (
-                                <React.Fragment key={date}>
-                                    <Grid size={{ xs: 12, sm: 2 }} className='date-cell'>
-                                        <JournalEntryDate day={day} isToday={isToday} />
-                                    </Grid>
-                                    <Grid size={{ xs: 12, sm: 10 }}>
-                                        {entries.length > 0 && (
-                                            <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
-                                                {entries.map((entry) => {
-                                                    const { categoryIds } = entry;
-                                                    const categoryId: string | undefined = categoryIds?.[0];
-                                                    const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
-                                                    const netAmount = entry.netAmount
-                                                    const isNetPositive = netAmount > 0;
-
-                                                    return (
-                                                        <MenuItem
-                                                            key={entry._id}
-                                                            sx={{ borderRadius: '64px', pl: isSmall ? 4 : undefined }}
-                                                            onClick={(event) => handleClickListItem(event, entry)}
-                                                        >
-                                                            <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
-                                                                <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flowFlow: 'row nowrap', }}>
-                                                                    <ListItemIcon sx={{ display: isSmall ? 'none' : undefined }}>
-                                                                        <CategoryIcon category={category} />
-                                                                    </ListItemIcon>
-                                                                    <ListItemText>{entry.memo}</ListItemText>
-                                                                </Grid>
-                                                                <Grid size={{ xs: 'auto', sm: 3, md: 2 }}>
-                                                                    <ListItemText
-                                                                        sx={(theme) => ({ textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
-                                                                    >
-                                                                        {getPriceString(netAmount)}
-                                                                    </ListItemText>
-                                                                </Grid>
-                                                                <Grid size={{ xs: 'grow', sm: 5, md: 6 }}>
-                                                                    {category ? (
-                                                                        <CategoryChip category={category} />
-                                                                    ) : (
-                                                                        <Chip
-                                                                            sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
-                                                                            label='Uncategorized'
-                                                                        />
-                                                                    )}
-                                                                </Grid>
-                                                            </Grid>
-                                                        </MenuItem>
-                                                    )
-                                                })}
-                                            </List>
-                                        )}
-                                        {isToday && (
-                                            <QuickJournalEditor onAdd={isSmall ? () => setShowJournalEntryModal(true) : undefined} />
-                                        )}
-                                    </Grid>
-                                </React.Fragment>
-                            )
-                        })
-                    }
-                </Grid>
+                <JournalEntryList
+                    journalRecordGroups={journalGroups}
+                    onClickListItem={handleClickListItem}
+                />
             </Box>
         </>
     );
