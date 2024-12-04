@@ -1,10 +1,11 @@
 import { APP_MENU } from "@/constants/menu";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
-import { Add, Create } from "@mui/icons-material";
-import { Box, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Typography } from "@mui/material";
+import { Add, Create, Menu } from "@mui/icons-material";
+import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
+import AppLogo from "../header/AppLogo";
 
 interface AppMenuProps {
     view: 'desktop' | 'mobile';
@@ -40,8 +41,10 @@ const LOCAL_STORAGE_KEY = "ZISK_APP_MENU_OPEN_STATE";
 export default function AppMenu(props: AppMenuProps) {
     const { view } = props;
     const isExpanded = useAppMenuStateStore((state) => state.isExpanded);
-    const closeMenu = useAppMenuStateStore((state) => state.close);
-    const openMenu = useAppMenuStateStore((state) => state.open);
+    const isDrawerOpen = useAppMenuStateStore((state) => state.isDrawerOpen);
+    const closeMenu = useAppMenuStateStore((state) => state.collapse);
+    const openMenu = useAppMenuStateStore((state) => state.expand);
+    const closeDrawer = useAppMenuStateStore((state) => state.closeDrawer);
 
     const router = useRouter();
     const pathname = router.pathname;
@@ -59,12 +62,14 @@ export default function AppMenu(props: AppMenuProps) {
         localStorage.setItem(LOCAL_STORAGE_KEY, isExpanded.toString());
     }, [isExpanded]);
 
-    if (isExpanded && view === 'desktop') {
+    useEffect(() => {
+        closeDrawer();
+    }, [pathname]);
+
+    const MenuItemList = ({ children }: { children?: ReactNode }) => {
         return (
             <MenuList sx={(theme) => ({ pr: 3, minWidth: theme.spacing(24) })}>
-                <Box mb={4}>
-                    <CreateEntryButton expanded />
-                </Box>
+                {children}
                 {Object.entries(APP_MENU).map(([slug, menuItem]) => {
                     const selected = menuItem.pathPattern.test(pathname);
                     return (
@@ -79,44 +84,75 @@ export default function AppMenu(props: AppMenuProps) {
                             <ListItemIcon>
                                 {menuItem.icon}
                             </ListItemIcon>
-                            {isExpanded && (
-                                <ListItemText>
-                                    <Typography sx={{ fontWeight: selected ? 500 : undefined }} variant='body2'>
-                                        {menuItem.label}
-                                    </Typography>
-                                </ListItemText>
-                            )}
+                            <ListItemText>
+                                <Typography
+                                    sx={{ fontWeight: selected ? 500 : undefined }}
+                                    variant={props.view === 'desktop' ? 'body2' : 'body1'}
+                                >
+                                    {menuItem.label}
+                                </Typography>
+                            </ListItemText>
                         </MenuItem>
                     );
-                })}            
+                })}  
             </MenuList>
-        );
+        )
     }
 
-    if (!isExpanded && view === 'desktop') {
+    if (view === 'desktop') {
+        if (isExpanded) {
+            return (
+                <MenuItemList>
+                    <Box mb={4}>
+                        <CreateEntryButton expanded />
+                    </Box>
+                </MenuItemList>
+            );
+        } else {
+            return (
+                <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
+                    <Box mb={2}>
+                        <CreateEntryButton expanded={false} />
+                    </Box>
+                    {Object.entries(APP_MENU).map(([slug, menuItem]) => {
+                        const selected = menuItem.pathPattern.test(pathname);
+                        return (
+                            <IconButton
+                                key={slug}
+                                component={Link}
+                                href={slug}
+                                sx={(theme) => ({
+                                    color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
+                                    backgroundColor: selected ? theme.palette.action.hover : undefined,
+                                })}
+                                disabled={menuItem.disabled}
+                            >
+                                {menuItem.icon}
+                            </IconButton>
+                        );
+                    })}
+                </Stack>
+            );
+        }
+    } else {
         return (
-            <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
-                <Box mb={2}>
-                    <CreateEntryButton expanded={false} />
-                </Box>
-                {Object.entries(APP_MENU).map(([slug, menuItem]) => {
-                    const selected = menuItem.pathPattern.test(pathname);
-                    return (
-                        <IconButton
-                            key={slug}
-                            component={Link}
-                            href={slug}
-                            sx={(theme) => ({
-                                color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
-                                backgroundColor: selected ? theme.palette.action.hover : undefined,
-                            })}
-                            disabled={menuItem.disabled}
-                        >
-                            {menuItem.icon}
+            <Drawer
+                anchor='left'
+                open={isDrawerOpen}
+                onClose={() => closeDrawer()}
+                PaperProps={{ sx: { minWidth: '80vw' } }}
+            >
+                <Box p={2}>
+                    <Stack direction='row' alignItems={'center'} gap={2}>
+                        <IconButton onClick={() => closeDrawer()} size='large' sx={{ m: -1 }}>
+                            <Menu />
                         </IconButton>
-                    );
-                })}
-            </Stack>
+                        <AppLogo />
+                    </Stack>
+                </Box>
+                <Divider />
+                <MenuItemList />
+            </Drawer>
         )
     }
 }

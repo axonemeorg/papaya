@@ -2,14 +2,20 @@ import { create } from "zustand";
 
 interface AppMenuState {
     isExpanded: boolean;
-    toggleOpen: () => void;
-    open: () => void;
-    close: () => void;
+    isDrawerOpen: boolean;
+    closeDrawer: () => void;
+    openDrawer: () => void;
+    toggleExpanded: () => void;
+    expand: () => void;
+    collapse: () => void;
 }
 
 export const useAppMenuStateStore = create<AppMenuState>((set) => ({
     isExpanded: false,
-    toggleOpen: () => set((state) => ({ isExpanded: !state.isExpanded })),
-    open: () => set({ isExpanded: true }),
-    close: () => set({ isExpanded: false }),
+    isDrawerOpen: false,
+    closeDrawer: () => set({ isDrawerOpen: false }),
+    openDrawer: () => set({ isDrawerOpen: true }),
+    toggleExpanded: () => set((state) => ({ isExpanded: !state.isExpanded })),
+    expand: () => set({ isExpanded: true }),
+    collapse: () => set({ isExpanded: false }),
 }));

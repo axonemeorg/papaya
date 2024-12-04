@@ -10,12 +10,27 @@ import SearchWidget from "./SearchWidget";
 import SyncStatus from "./SyncStatus";
 import UserWidget from "./UserWidget";
 
-export default function Header() {
+interface HeaderProps {
+    view: 'desktop' | 'mobile';
+}
+
+export default function Header(props: HeaderProps) {
     const theme = useTheme();
     const showLogo = !useMediaQuery(theme.breakpoints.down('md'));
 
     // Get toggle menu function from zustand store
-    const toggleOpen = useAppMenuStateStore((state) => state.toggleOpen);
+    const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded);
+    const openDrawer = useAppMenuStateStore((state) => state.openDrawer);
+
+    const handleClickMenuButton = () => {
+        // If the screen is small, open the drawer. Otherwise, toggle the menu
+        if (props.view === 'mobile') {
+            openDrawer();
+        } else {
+            toggleExpanded();
+        }
+    }
+
 
     return (
         <Stack
@@ -32,13 +47,13 @@ export default function Header() {
             }}
         >
             <Stack direction='row' gap={1} alignItems={'center'}>
-                <IconButton onClick={() => toggleOpen()} size="large">
+                <IconButton onClick={() => handleClickMenuButton()} size="large">
                     <Menu />
                 </IconButton>
                 {showLogo && (
                     <AppLogo />
                 )}
-                <Stack direction='row' alignItems='center' gap={1} ml={2}>
+                <Stack direction='row' alignItems='center' gap={1} ml={showLogo ? 2 : undefined}>
                     <JournalSelect />
                     <SyncStatus />
                 </Stack>
