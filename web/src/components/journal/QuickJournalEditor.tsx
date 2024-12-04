@@ -46,6 +46,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
                         </Stack>
                     ) : (
                         <Button
+                            size='small'
                             startIcon={<Add />}
                             onClick={() => {
                                 if (props.onAdd) {
