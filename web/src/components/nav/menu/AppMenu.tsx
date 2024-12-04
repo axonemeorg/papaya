@@ -1,7 +1,7 @@
 import { APP_MENU } from "@/constants/menu";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
 import { Add, Create, Menu } from "@mui/icons-material";
-import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Typography } from "@mui/material";
+import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useCallback, useEffect } from "react";
@@ -117,18 +117,19 @@ export default function AppMenu(props: AppMenuProps) {
                     {Object.entries(APP_MENU).map(([slug, menuItem]) => {
                         const selected = menuItem.pathPattern.test(pathname);
                         return (
-                            <IconButton
-                                key={slug}
-                                component={Link}
-                                href={slug}
-                                sx={(theme) => ({
-                                    color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
-                                    backgroundColor: selected ? theme.palette.action.hover : undefined,
-                                })}
-                                disabled={menuItem.disabled}
-                            >
-                                {menuItem.icon}
-                            </IconButton>
+                            <Tooltip key={slug} title={menuItem.label} placement='right'>
+                                <IconButton
+                                    component={Link}
+                                    href={slug}
+                                    sx={(theme) => ({
+                                        color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
+                                        backgroundColor: selected ? theme.palette.action.hover : undefined,
+                                    })}
+                                    disabled={menuItem.disabled}
+                                >
+                                    {menuItem.icon}
+                                </IconButton>
+                            </Tooltip>
                         );
                     })}
                 </Stack>
