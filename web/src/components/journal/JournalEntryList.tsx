@@ -24,7 +24,6 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
             <Avatar
                 component={Button}
                 sx={(theme) => ({
-                    // display: 'block',
                     background: isToday ? theme.palette.primary.main : 'transparent',
                     color: isToday ? theme.palette.primary.contrastText : 'inherit',
                     minWidth: 'unset',
