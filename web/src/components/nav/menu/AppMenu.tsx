@@ -1,8 +1,11 @@
 import { APP_MENU } from "@/constants/menu";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
-import { Add, Create } from "@mui/icons-material";
-import { Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack } from "@mui/material";
-import { useEffect } from "react";
+import { Add, Create, Menu } from "@mui/icons-material";
+import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Typography } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { ReactNode, useCallback, useEffect } from "react";
+import AppLogo from "../header/AppLogo";
 
 interface AppMenuProps {
     view: 'desktop' | 'mobile';
@@ -22,7 +25,6 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
             size={props.expanded ? 'large' : 'medium'}
             sx={(theme) => ({
                 mx: props.expanded ? 1.5 : -1,
-                mb: 2,
                 borderRadius: theme.spacing(2),
             })}
         >
@@ -35,13 +37,17 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 }
 
 const LOCAL_STORAGE_KEY = "ZISK_APP_MENU_OPEN_STATE";
-const DEFAULT_OPEN_STATE = true;
 
 export default function AppMenu(props: AppMenuProps) {
     const { view } = props;
-    const isOpen = useAppMenuStateStore((state) => state.isOpen);
-    const closeMenu = useAppMenuStateStore((state) => state.close);
-    const openMenu = useAppMenuStateStore((state) => state.open);
+    const isExpanded = useAppMenuStateStore((state) => state.isExpanded);
+    const isDrawerOpen = useAppMenuStateStore((state) => state.isDrawerOpen);
+    const closeMenu = useAppMenuStateStore((state) => state.collapse);
+    const openMenu = useAppMenuStateStore((state) => state.expand);
+    const closeDrawer = useAppMenuStateStore((state) => state.closeDrawer);
+
+    const router = useRouter();
+    const pathname = router.pathname;
 
     useEffect(() => {
         const openState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -53,59 +59,100 @@ export default function AppMenu(props: AppMenuProps) {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_KEY, isOpen.toString());
-    }, [isOpen]);
+        localStorage.setItem(LOCAL_STORAGE_KEY, isExpanded.toString());
+    }, [isExpanded]);
 
-    if (isOpen && view === 'desktop') {
+    useEffect(() => {
+        closeDrawer();
+    }, [pathname]);
+
+    const MenuItemList = ({ children }: { children?: ReactNode }) => {
         return (
             <MenuList sx={(theme) => ({ pr: 3, minWidth: theme.spacing(24) })}>
-                <CreateEntryButton expanded />
+                {children}
                 {Object.entries(APP_MENU).map(([slug, menuItem]) => {
+                    const selected = menuItem.pathPattern.test(pathname);
                     return (
                         <MenuItem
                             key={slug}
-                            selected={slug === '/journal'}
+                            component={Link}
+                            href={slug}
+                            selected={selected}
                             disabled={menuItem.disabled}
                             sx={{ borderTopRightRadius: 32, borderBottomRightRadius: 32 }}
                         >
                             <ListItemIcon>
                                 {menuItem.icon}
                             </ListItemIcon>
-                            {isOpen && (
-                                <ListItemText
-                                    primary={menuItem.label}
-                                    // secondary={menuItem.description}
-                                />
-                            )}
+                            <ListItemText>
+                                <Typography
+                                    sx={{ fontWeight: selected ? 500 : undefined }}
+                                    variant={props.view === 'desktop' ? 'body2' : 'body1'}
+                                >
+                                    {menuItem.label}
+                                </Typography>
+                            </ListItemText>
                         </MenuItem>
                     );
-                })}            
+                })}  
             </MenuList>
-        );
+        )
     }
 
-    if (!isOpen && view === 'desktop') {
+    if (view === 'desktop') {
+        if (isExpanded) {
+            return (
+                <MenuItemList>
+                    <Box mb={4}>
+                        <CreateEntryButton expanded />
+                    </Box>
+                </MenuItemList>
+            );
+        } else {
+            return (
+                <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
+                    <Box mb={2}>
+                        <CreateEntryButton expanded={false} />
+                    </Box>
+                    {Object.entries(APP_MENU).map(([slug, menuItem]) => {
+                        const selected = menuItem.pathPattern.test(pathname);
+                        return (
+                            <IconButton
+                                key={slug}
+                                component={Link}
+                                href={slug}
+                                sx={(theme) => ({
+                                    color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
+                                    backgroundColor: selected ? theme.palette.action.hover : undefined,
+                                })}
+                                disabled={menuItem.disabled}
+                            >
+                                {menuItem.icon}
+                            </IconButton>
+                        );
+                    })}
+                </Stack>
+            );
+        }
+    } else {
         return (
-            <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
-                <CreateEntryButton expanded={false} />
-                {Object.entries(APP_MENU).map(([slug, menuItem]) => {
-                    const selected = slug === '/journal';
-                    return (
-                        <IconButton
-                            sx={(theme) => ({
-                                color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
-                                backgroundColor: selected ? theme.palette.action.hover : undefined,
-                            })}
-                            key={slug}
-                            // onClick={() => menuItem.onClick()}
-                            disabled={menuItem.disabled}
-                            
-                        >
-                            {menuItem.icon}
+            <Drawer
+                anchor='left'
+                open={isDrawerOpen}
+                onClose={() => closeDrawer()}
+                PaperProps={{ sx: { minWidth: '80vw' } }}
+            >
+                <Box p={2}>
+                    <Stack direction='row' alignItems={'center'} gap={2}>
+                        <IconButton onClick={() => closeDrawer()} size='large' sx={{ m: -1 }}>
+                            <Menu />
                         </IconButton>
-                    );
-                })}
-            </Stack>
+                        <AppLogo />
+                    </Stack>
+                </Box>
+                <Divider />
+                <MenuItemList />
+            </Drawer>
         )
     }
 }

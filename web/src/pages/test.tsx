@@ -1,4 +1,4 @@
-import { MainLayout } from "@/layouts/main";
+import { getLayout } from "@/layouts/main";
 import { Paper } from "@mui/material";
 
 
@@ -8,8 +8,6 @@ const TestPage = () => {
     )
 }
 
-TestPage.getLayout = (page: any) => {
-    return <MainLayout>{page}</MainLayout>
-}
+TestPage.getLayout = getLayout;
 
 export default TestPage;
