@@ -39,7 +39,7 @@ const LOCAL_STORAGE_KEY = "ZISK_APP_MENU_OPEN_STATE";
 
 export default function AppMenu(props: AppMenuProps) {
     const { view } = props;
-    const isOpen = useAppMenuStateStore((state) => state.isOpen);
+    const isExpanded = useAppMenuStateStore((state) => state.isExpanded);
     const closeMenu = useAppMenuStateStore((state) => state.close);
     const openMenu = useAppMenuStateStore((state) => state.open);
 
@@ -56,10 +56,10 @@ export default function AppMenu(props: AppMenuProps) {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem(LOCAL_STORAGE_KEY, isOpen.toString());
-    }, [isOpen]);
+        localStorage.setItem(LOCAL_STORAGE_KEY, isExpanded.toString());
+    }, [isExpanded]);
 
-    if (isOpen && view === 'desktop') {
+    if (isExpanded && view === 'desktop') {
         return (
             <MenuList sx={(theme) => ({ pr: 3, minWidth: theme.spacing(24) })}>
                 <Box mb={4}>
@@ -79,7 +79,7 @@ export default function AppMenu(props: AppMenuProps) {
                             <ListItemIcon>
                                 {menuItem.icon}
                             </ListItemIcon>
-                            {isOpen && (
+                            {isExpanded && (
                                 <ListItemText>
                                     <Typography sx={{ fontWeight: selected ? 500 : undefined }} variant='body2'>
                                         {menuItem.label}
@@ -93,7 +93,7 @@ export default function AppMenu(props: AppMenuProps) {
         );
     }
 
-    if (!isOpen && view === 'desktop') {
+    if (!isExpanded && view === 'desktop') {
         return (
             <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
                 <Box mb={2}>
