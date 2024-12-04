@@ -1,9 +1,10 @@
 import Header from "@/components/nav/header/Header";
 import AppMenu from "@/components/nav/menu/AppMenu";
 import { Paper, Stack } from "@mui/material";
+import { NextPage } from "next";
 import { PropsWithChildren } from "react";
 
-export const MainLayout = (props: PropsWithChildren) => {
+const MainLayout = (props: PropsWithChildren) => {
     const { children } = props;
 
 	return (
@@ -20,4 +21,12 @@ export const MainLayout = (props: PropsWithChildren) => {
             </Stack>
         </Stack>
 	)
+}
+
+export const getLayout = (page: any) => {
+    return (
+        <MainLayout>
+            {page}
+        </MainLayout>
+    )
 }

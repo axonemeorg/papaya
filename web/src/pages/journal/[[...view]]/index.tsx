@@ -1,5 +1,5 @@
 import JournalEditor, { JournalEditorView } from "@/components/journal/JournalEditor";
-import { MainLayout } from "@/layouts/main";
+import { getLayout } from "@/layouts/main";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo } from "react";
@@ -10,7 +10,7 @@ const VIEW_SHORTHAND_TO_VIEW: Record<string, JournalEditorView> = {
     'w': 'week',
 }
 
-export default function JournalYearMonthPage() {
+const JournalYearMonthPage = () => {
     const router = useRouter();
 
     const viewParams: string[] = router.query.view as string[] ?? [];
@@ -107,14 +107,16 @@ export default function JournalYearMonthPage() {
     }
 
     return (
-        <MainLayout>
-            <JournalEditor
-                view={view}
-                date={date}
-                onNextPage={() => handleNextPage()}
-                onPrevPage={() => handlePrevPage()}
-                onDateChange={(date) => handleDateChange(date)}
-            />
-        </MainLayout>
+        <JournalEditor
+            view={view}
+            date={date}
+            onNextPage={() => handleNextPage()}
+            onPrevPage={() => handlePrevPage()}
+            onDateChange={(date) => handleDateChange(date)}
+        />
     )
 }
+
+JournalYearMonthPage.getLayout = getLayout;
+
+export default JournalYearMonthPage;
