@@ -1,4 +1,25 @@
-import { alpha, Avatar, Button, Chip, Grid2 as Grid, List, ListItemIcon, ListItemText, MenuItem, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+    alpha,
+    Avatar,
+    Button,
+    Chip, Grid2 as Grid,
+    ListItemIcon,
+    ListItemText,
+    Stack,
+    Table,
+    TableBody as MuiTableBody,
+    TableCell as MuiTableCell,
+    TableRow as MuiTableRow,
+    Typography,
+    useMediaQuery,
+    useTheme,
+    TableRowProps,
+    TableCellProps,
+    ButtonBase,
+    ButtonProps,
+    ButtonBaseProps,
+    TableBodyProps,
+} from "@mui/material";
 import React from 'react';
 
 import { Category, EnhancedJournalEntry } from "@/types/schema";
@@ -9,31 +30,104 @@ import CategoryIcon from "../icon/CategoryIcon";
 import { getPriceString } from "@/utils/string";
 import CategoryChip from "../icon/CategoryChip";
 import QuickJournalEditor from "./QuickJournalEditor";
+import { Flag } from "@mui/icons-material";
+
+const TableRow = (props: TableRowProps) => {
+    const { sx, ...rest } = props;
+    return (
+        <MuiTableRow
+            hover
+            // component={TableRowButton}
+            sx={{
+                borderTopLeftRadius: '64px',
+                borderBottomLeftRadius: '64px',
+                overflow: 'hidden',
+                '& > *:first-of-type': {
+                    borderTopLeftRadius: '64px',
+                    borderBottomLeftRadius: '64px',
+                },
+                userSelect: 'none',
+                cursor: 'pointer',
+                ...sx,
+            }}
+            {...rest}
+        />
+    );
+}
+
+const TableCell = (props: TableCellProps) => {
+    const { sx, ...rest } = props;
+    return (
+        <MuiTableCell
+            {...rest}
+            
+            sx={{
+                alignItems: 'center',
+                px: 1,
+                ...sx,
+            }}
+        />
+    )
+}
+
+const TableBody = (props: TableBodyProps) => {
+    const { sx, ...rest } = props;
+    return (
+        <MuiTableBody
+            {...rest}
+            sx={{
+                ...sx,
+                '& > tr:last-of-type td': {
+                    borderBottom: 'none',
+                }
+            }}
+        />
+    )
+};
 
 interface JournalEntryListProps {
     journalRecordGroups: Record<string, EnhancedJournalEntry[]>;
-    onClickListItem: (event: React.MouseEvent<HTMLLIElement, MouseEvent>, entry: EnhancedJournalEntry) => void;
+    onClickListItem: (event: any, entry: EnhancedJournalEntry) => void;
 }
 
-const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean })  => {
+const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean }) => {
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-        <Stack direction='row' alignItems='flex-end' gap={0.75} sx={{ p: 1, pb: isSmall ? 0 : undefined }}>
+        <Stack
+            component={Button}
+            direction='row'
+            alignItems='center'
+            gap={1.5}
+            sx={{
+                py: 0,
+                px: 2,
+                // pt: 0,
+                color: isToday ? undefined : 'unset',
+                // px: 1,
+                // ml: 1,
+                my: 1,
+                ml: 1,
+            }}
+        >
             <Avatar
-                component={Button}
                 sx={(theme) => ({
                     background: isToday ? theme.palette.primary.main : 'transparent',
                     color: isToday ? theme.palette.primary.contrastText : 'inherit',
                     minWidth: 'unset',
-                    width: isSmall ? theme.spacing(4) : undefined,
-                    height: isSmall ? theme.spacing(4) : undefined,
+                    m: -1,
+                    width: theme.spacing(3.5),
+                    height: theme.spacing(3.5),
                 })}
             >
                 {day.format('D')}
             </Avatar>
-            <Typography sx={{ mb: isSmall ? -0.25 : 0.25 }} variant='overline' color={isToday ? 'primary' : undefined}>
+            <Typography
+                sx={(theme) => ({ height: theme.spacing(3.5), lineHeight: theme.spacing(3.5) })}
+                variant='overline'
+                color={isToday ? 'primary' : undefined}
+            >
                 {day.format('MMM')},&nbsp;{day.format('ddd')}
             </Typography>
         </Stack>
@@ -86,52 +180,54 @@ export default function JournalEntryList(props: JournalEntryListProps) {
                             </Grid>
                             <Grid size={{ xs: 12, sm: 10 }}>
                                 {entries.length > 0 && (
-                                    <List sx={{ pl: isSmall ? 1.75 : 1, pt: isSmall ? 0 : undefined }}>
-                                        {entries.map((entry) => {
-                                            const { categoryIds } = entry;
-                                            const categoryId: string | undefined = categoryIds?.[0];
-                                            const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
-                                            const netAmount = entry.netAmount
-                                            const isNetPositive = netAmount > 0;
+                                    <Table size='small' >
+                                        <TableBody >
+                                            {entries.map((entry) => {
+                                                const { categoryIds } = entry;
+                                                const categoryId: string | undefined = categoryIds?.[0];
+                                                const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined;
+                                                const netAmount = entry.netAmount
+                                                const isNetPositive = netAmount > 0;
 
-                                            return (
-                                                <MenuItem
-                                                    key={entry._id}
-                                                    sx={{ borderRadius: '64px', pl: isSmall ? 4 : undefined }}
-                                                    onClick={(event) => props.onClickListItem(event, entry)}
-                                                >
-                                                    <Grid container columns={12} sx={{ width: '100%', alignItems: 'center' }} spacing={2} rowSpacing={0}>
-                                                        <Grid size={{ xs: 12, sm: 4 }} sx={{ display: 'flex', flowFlow: 'row nowrap', }}>
-                                                            <ListItemIcon sx={{ display: isSmall ? 'none' : undefined }}>
-                                                                <CategoryIcon category={category} />
-                                                            </ListItemIcon>
+                                                return (
+                                                    <TableRow
+                                                        key={entry._id}
+                                                        onClick={(event) => props.onClickListItem(event, entry)}
+                                                    >
+                                                        <TableCell sx={{ width: "0%", borderBottom: 'none' }}>
+                                                            <CategoryIcon category={category} compact={isSmall} />
+                                                        </TableCell>
+                                                        <TableCell sx={{ width: "0%" }}>
+                                                            <Flag sx={{ display: 'block' }} />
+                                                        </TableCell>
+                                                        <TableCell sx={{ width: '40%' }}>
                                                             <ListItemText>{entry.memo}</ListItemText>
-                                                        </Grid>
-                                                        <Grid size={{ xs: 'auto', sm: 3, md: 2 }}>
-                                                            <ListItemText
-                                                                sx={(theme) => ({ textAlign: 'right', color: isNetPositive ? theme.palette.success.main : undefined })}
+                                                        </TableCell>
+                                                        <TableCell align="right" sx={{ width: '10%' }}>
+                                                            <Typography
+                                                                sx={(theme) => ({ color: isNetPositive ? theme.palette.success.main : undefined })}
                                                             >
                                                                 {getPriceString(netAmount)}
-                                                            </ListItemText>
-                                                        </Grid>
-                                                        <Grid size={{ xs: 'grow', sm: 5, md: 6 }}>
+                                                            </Typography>
+                                                        </TableCell>
+                                                        <TableCell>
                                                             {category ? (
                                                                 <CategoryChip category={category} />
                                                             ) : (
                                                                 <Chip
-                                                                    sx={ (theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
+                                                                    sx={(theme) => ({ backgroundColor: alpha(theme.palette.grey[400], 0.125) })}
                                                                     label='Uncategorized'
                                                                 />
                                                             )}
-                                                        </Grid>
-                                                    </Grid>
-                                                </MenuItem>
-                                            )
-                                        })}
-                                    </List>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            })}
+                                        </TableBody>
+                                    </Table>
                                 )}
                                 {isToday && (
-                                    <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />
+                                    <QuickJournalEditor onAdd={isSmall ? () => { } : undefined} />
                                 )}
                             </Grid>
                         </React.Fragment>
