@@ -1,20 +1,22 @@
+import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { DateCalendar, DateView, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { PropsWithChildren, useCallback, useMemo, useState } from "react";
-import { JournalEditorProps } from "./JournalEditor";
+import { PropsWithChildren, useCallback, useContext, useMemo, useState } from "react";
 
-type JournalHeaderProps = PropsWithChildren<JournalEditorProps> & {
-    reversed?: boolean;
-}
+type JournalHeaderProps = PropsWithChildren<{
+    reverseActionOrder?: boolean;
+}>
 
 export default function JournalHeader(props: JournalHeaderProps) {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+    
+    const journalEntryContext = useContext(JournalEntryContext);
 
     const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
-        props.onDateChange(value.format('YYYY-MM-DD'));
+        journalEntryContext.setDate(value.format('YYYY-MM-DD'));
     }
 
     const theme = useTheme();
@@ -24,32 +26,32 @@ export default function JournalHeader(props: JournalHeaderProps) {
     const now = useMemo(() => dayjs(), []);
 
     const nextButtonTooltip = useMemo(() => {
-        if (props.view === 'month') {
+        if (journalEntryContext.view === 'month') {
             return 'Next month';
         }
-        if (props.view === 'year') {
+        if (journalEntryContext.view === 'year') {
             return 'Next year';
         }
-        if (props.view === 'week') {
+        if (journalEntryContext.view === 'week') {
             return 'Next week';
         }
-    }, [props.view]);
+    }, [journalEntryContext.view]);
 
     const prevButtonTooltip = useMemo(() => {
-        if (props.view === 'month') {
+        if (journalEntryContext.view === 'month') {
             return 'Previous month';
         }
-        if (props.view === 'year') {
+        if (journalEntryContext.view === 'year') {
             return 'Previous year';
         }
-        if (props.view === 'week') {
+        if (journalEntryContext.view === 'week') {
             return 'Previous week';
         }
-    }, [props.view]);
+    }, [journalEntryContext.view]);
 
     const formattedDateString = useMemo(() => {
-        const date = dayjs(props.date);
-        switch (props.view) {
+        const date = dayjs(journalEntryContext.date);
+        switch (journalEntryContext.view) {
             case 'month':
                 const isCurrentYear = date.isSame(now, 'year');
                 if (isCurrentYear) {
@@ -67,10 +69,10 @@ export default function JournalHeader(props: JournalHeaderProps) {
                 return `${startOfWeek.format('MMM D')} - ${endOfWeek.format('D, YYYY')}`;
             
         }
-    }, [props.date, props.view]);
+    }, [journalEntryContext.date, journalEntryContext.view]);
 
     const calendarAvailableViews = useMemo((): DateView[] => {
-        switch (props.view) {
+        switch (journalEntryContext.view) {
             case 'month':
             default:
                 return ['month', 'year'];
@@ -79,15 +81,15 @@ export default function JournalHeader(props: JournalHeaderProps) {
             case 'week':
                 return ['year', 'month', 'day'];
         }
-    }, [props.view]);
+    }, [journalEntryContext.view]);
 
     const formattedCurrentDay = useMemo(() => {
         return now.format('dddd, MMMM D');
     }, []);
 
     const jumpToToday = useCallback(() => {
-        props.onDateChange(now.format('YYYY-MM-DD'));
-    }, [props.view]);
+        journalEntryContext.setDate(now.format('YYYY-MM-DD'));
+    }, [journalEntryContext.view]);
 
     return (
         <>
@@ -109,13 +111,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
                 justifyContent='space-between'
                 sx={{ flex: 1, py: 1, px: 2 }}
                 alignItems='center'
-                flexDirection={props.reversed ? 'row-reverse' : 'row'}
+                flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
                 gap={1}
             >
                 <Stack direction='row' alignItems='center' gap={2}>
                     {props.children}
                 </Stack>
-                <Stack direction='row' alignItems='center' gap={2} flexDirection={props.reversed ? 'row-reverse' : 'row'}>
+                <Stack direction='row' alignItems='center' gap={2} flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}>
                     <Tooltip title={formattedCurrentDay}>
                         <IconButton color='inherit' onClick={() => jumpToToday()}>
                             <EventRepeat />
@@ -130,12 +132,12 @@ export default function JournalHeader(props: JournalHeaderProps) {
                         {!hideNextPrevButtons && (
                             <Stack direction='row'>
                                 <Tooltip title={prevButtonTooltip}>
-                                    <IconButton size="small" onClick={() => props.onPrevPage()}>
+                                    <IconButton size="small" onClick={() => journalEntryContext.onPrevPage()}>
                                         <ArrowBack />
                                     </IconButton>
                                 </Tooltip>
                                 <Tooltip title={nextButtonTooltip}>
-                                    <IconButton size="small" onClick={() => props.onNextPage()}>
+                                    <IconButton size="small" onClick={() => journalEntryContext.onNextPage()}>
                                         <ArrowForward />
                                     </IconButton>
                                 </Tooltip>

@@ -1,5 +1,6 @@
 import JournalEditor, { JournalEditorView } from "@/components/journal/JournalEditor";
 import { getLayout } from "@/layouts/main";
+import JournalEntryContextProvider from "@/providers/JournalEntryContextProvider";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo } from "react";
@@ -107,13 +108,17 @@ const JournalYearMonthPage = () => {
     }
 
     return (
-        <JournalEditor
+        <JournalEntryContextProvider
             view={view}
             date={date}
             onNextPage={() => handleNextPage()}
             onPrevPage={() => handlePrevPage()}
-            onDateChange={(date) => handleDateChange(date)}
-        />
+            setDate={(date) => handleDateChange(date)}
+        >
+            <JournalEditor
+                
+            />
+        </JournalEntryContextProvider>
     )
 }
 

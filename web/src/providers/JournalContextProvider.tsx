@@ -6,9 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 
 export default function JournalContextProvider(props: PropsWithChildren) {
-    const view: JournalEditorView = 'week';
-    const date: string = '2024-12-04';
-
     const getCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
         queryKey: ['categories'],
         queryFn: getCategories,
@@ -21,19 +18,11 @@ export default function JournalContextProvider(props: PropsWithChildren) {
         initialData: {},
     });
 
-    const getEnhancedJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
-        queryKey: ['enhancedJournalEntries'],
-        queryFn: async () => getEnhancedJournalEntries(view, date),
-        initialData: {},
-        enabled: true,
-    });
-
     return (
         <JournalContext.Provider
             value={{
                 getCategoriesQuery,
                 getEntryTagsQuery,
-                getEnhancedJournalEntriesQuery
             }}
         >
             {props.children}

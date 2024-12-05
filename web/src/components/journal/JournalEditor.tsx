@@ -11,26 +11,19 @@ import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import JournalEntryList from "./JournalEntryList";
 import { JournalContext } from "@/contexts/JournalContext";
+import { JournalEntryContext } from "@/contexts/JournalEntryContext";
 
 export type JournalEditorView =
     | 'week'
     | 'month'
     | 'year'
 
-export interface JournalEditorProps {
-    view: JournalEditorView;
-    date: string;
-    onNextPage: () => void;
-    onPrevPage: () => void;
-    onDateChange: (date: string) => void;
-}
-
 export interface JournalEntrySelection {
     entry: EnhancedJournalEntry | null;
     anchorEl: HTMLElement | null;
 }
 
-export default function JournalEditor(props: JournalEditorProps) {
+export default function JournalEditor() {
     const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
     const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
@@ -39,7 +32,8 @@ export default function JournalEditor(props: JournalEditorProps) {
     });
 
     const { snackbar } = useContext(NotificationsContext);
-    const { getCategoriesQuery, getEnhancedJournalEntriesQuery } = useContext(JournalContext);
+    const { getCategoriesQuery } = useContext(JournalContext);
+    const { getEnhancedJournalEntriesQuery } = useContext(JournalEntryContext);
 
     const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
@@ -166,14 +160,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                         onSave={() => handleSaveEntry()}
                     />
                 )}
-                <JournalHeader
-                    date={props.date}
-                    view={props.view}
-                    onNextPage={props.onNextPage}
-                    onPrevPage={props.onPrevPage}
-                    onDateChange={props.onDateChange}
-                    reversed
-                />
+                <JournalHeader reverseActionOrder />
                 <Divider />
                 <JournalEntryList
                     journalRecordGroups={journalGroups}
