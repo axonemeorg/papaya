@@ -123,7 +123,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
                     </Tooltip>
                     <Stack direction='row' alignItems='center' gap={1}>
                         <Button color='inherit' endIcon={<ArrowDropDown />} onClick={(e) => setAnchorEl(e.currentTarget)}>
-                            <Typography variant={headingSize} sx={{ fontWeight: 500 }}>
+                            <Typography variant={headingSize} sx={{ fontWeight: 500, minWidth: '9ch', textAlign: 'left' }}>
                                 {formattedDateString}
                             </Typography>
                         </Button>

@@ -6,8 +6,6 @@ import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";
 import { EnhancedJournalEntry } from "@/types/schema";
 import CreateJournalEntryModal from "../modal/CreateJournalEntryModal";
-import { useQuery } from "@tanstack/react-query";
-import { getCategories, getEnhancedJournalEntries } from "@/database/queries";
 import JournalEntryCard from "./JournalEntryCard";
 import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
@@ -39,39 +37,30 @@ export default function JournalEditor(props: JournalEditorProps) {
         entry: null,
         anchorEl: null,
     });
-    const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const { snackbar } = useContext(NotificationsContext);
-    const { getCategoriesQuery } = useContext(JournalContext);
+    const { getCategoriesQuery, getEnhancedJournalEntriesQuery } = useContext(JournalContext);
 
     const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
-    const getJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
-        queryKey: ['enhanced-journal-entries', props.view, props.date],
-        queryFn: async () => {
-            const entries = await getEnhancedJournalEntries(props.view, props.date);
+    const journalGroups = useMemo(() => {
+        const entries = getEnhancedJournalEntriesQuery.data;
+        const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries)
+            .reduce((acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
+                const { date } = entry;
+                if (acc[date]) {
+                    acc[date].push(entry);
+                } else {
+                    acc[date] = [entry];
+                }
 
-            const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries)
-                .reduce((acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
-                    const { date } = entry;
-                    if (acc[date]) {
-                        acc[date].push(entry);
-                    } else {
-                        acc[date] = [entry];
-                    }
+                return acc;
+            }, {
+                [currentDayString]: [],
+            });
 
-                    return acc;
-                }, {
-                    [currentDayString]: [],
-                });
-
-            setJournalGroups(groups);
-
-            return entries;
-        },
-        initialData: {},
-        enabled: true,
-    });
+        return groups;
+    }, [getEnhancedJournalEntriesQuery.data]);
 
     const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
         setSelectedEntry({
@@ -97,7 +86,7 @@ export default function JournalEditor(props: JournalEditorProps) {
 
         try {
             const record = await deleteJournalEntry(entry._id);
-            getJournalEntriesQuery.refetch();
+            getEnhancedJournalEntriesQuery.refetch();
             handleDeselectListItem();
             snackbar({
                 message: 'Deleted 1 entry',
@@ -122,7 +111,7 @@ export default function JournalEditor(props: JournalEditorProps) {
     }
 
     const handleSaveEntry = () => {
-        getJournalEntriesQuery.refetch();
+        getEnhancedJournalEntriesQuery.refetch();
         handleDeselectListItem();
     }
 
@@ -139,7 +128,7 @@ export default function JournalEditor(props: JournalEditorProps) {
                 open={showJournalEntryModal}
                 onClose={() => setShowJournalEntryModal(false)}
                 onSaved={() => {
-                    getJournalEntriesQuery.refetch();
+                    getEnhancedJournalEntriesQuery.refetch();
                     setShowJournalEntryModal(false);
                 }}
                 initialDate={currentDayString}
