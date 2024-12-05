@@ -3,6 +3,7 @@
 import CategoryForm from "@/components/form/CategoryForm";
 import CategoryIcon from "@/components/icon/CategoryIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
+import { JournalContext } from "@/contexts/JournalContext";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { createCategory, deleteCategory, undeleteCategory, updateCategory } from "@/database/actions";
 import { getCategories } from "@/database/queries";
@@ -42,14 +43,9 @@ export default function ManageCategories(props: ManageCategoriesProps) {
     const [formMode, setFormState] = useState<ManageCategoriesFormMode>(ManageCategoriesFormMode.VIEW);
 
     const { snackbar } = useContext(NotificationsContext);
+    const { getCategoriesQuery } = useContext(JournalContext);
 
     const formTitle = FORM_TITLES[formMode] ?? 'Categories';
-
-    const getCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
-        queryKey: ['categories'],
-        queryFn: getCategories,
-        initialData: {},
-    });
 
     const createCategoryForm = useForm<Category>({
         defaultValues: CATEGORY_FORM_CREATE_VALUES,

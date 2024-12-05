@@ -4,35 +4,67 @@ import { Add, Create, Menu } from "@mui/icons-material";
 import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useCallback, useEffect } from "react";
+import React, { ReactNode, useCallback, useContext, useEffect } from "react";
 import AppLogo from "../header/AppLogo";
+import { JournalContext } from "@/contexts/JournalContext";
 
 interface AppMenuProps {
     view: 'desktop' | 'mobile';
 }
 
-interface CreateEntryButtonProps {
+interface CreateEntryButtonProps extends AppMenuProps {
     expanded: boolean;
 }
 
 const CreateEntryButton = (props: CreateEntryButtonProps) => {
+    const journalContext = useContext(JournalContext);
+    if (props.view === 'mobile') {
+        return (
+            <Fab
+                color='primary'
+                aria-label='add'
+                onClick={() => journalContext.openCreateEntryModal()}
+                variant='extended'
+                size='large'
+                sx={(theme) => ({
+                    position: 'fixed',
+                    bottom: theme.spacing(4),
+                    right: theme.spacing(2),
+                })}
+            >
+                <Add />
+                Add
+            </Fab>
+        );
+    }
+
+    const Wrapper = props.expanded
+        ? React.Fragment
+        : ({ children }: { children: React.ReactElement<unknown, any> }) => {
+            return (
+                <Tooltip title='New Entry' placement="right">{children}</Tooltip>
+            );
+        }
+
     return (
-        <Fab
-            color='primary'
-            aria-label='add'
-            // onClick={() => setShowJournalEntryModal(true)}
-            variant={props.expanded ? 'extended' : 'circular'}
-            size={props.expanded ? 'large' : 'medium'}
-            sx={(theme) => ({
-                mx: props.expanded ? 1.5 : -1,
-                borderRadius: theme.spacing(2),
-            })}
-        >
-            <Create sx={{ mr: props.expanded ? 1 : undefined }} />
-            {props.expanded && (
-                <span>New Entry</span>
-            )}
-        </Fab>
+        <Wrapper>
+            <Fab
+                color='primary'
+                aria-label='add'
+                onClick={() => journalContext.openCreateEntryModal()}
+                variant={props.expanded ? 'extended' : 'circular'}
+                size={props.expanded ? 'large' : 'medium'}
+                sx={(theme) => ({
+                    mx: props.expanded ? 1.5 : -1,
+                    borderRadius: theme.spacing(2),
+                })}
+            >
+                <Create sx={{ mr: props.expanded ? 1 : undefined }} />
+                {props.expanded && (
+                    <span>New Entry</span>
+                )}
+            </Fab>
+        </Wrapper>
     )
 }
 
@@ -104,7 +136,7 @@ export default function AppMenu(props: AppMenuProps) {
             return (
                 <MenuItemList>
                     <Box mb={4}>
-                        <CreateEntryButton expanded />
+                        <CreateEntryButton expanded view='desktop' />
                     </Box>
                 </MenuItemList>
             );
@@ -112,7 +144,7 @@ export default function AppMenu(props: AppMenuProps) {
             return (
                 <Stack gap={0.5} px={2} py={1} alignItems={'center'}>
                     <Box mb={2}>
-                        <CreateEntryButton expanded={false} />
+                        <CreateEntryButton expanded={false} view='desktop' />
                     </Box>
                     {Object.entries(APP_MENU).map(([slug, menuItem]) => {
                         const selected = menuItem.pathPattern.test(pathname);
@@ -137,23 +169,26 @@ export default function AppMenu(props: AppMenuProps) {
         }
     } else {
         return (
-            <Drawer
-                anchor='left'
-                open={isDrawerOpen}
-                onClose={() => closeDrawer()}
-                PaperProps={{ sx: { minWidth: '80vw' } }}
-            >
-                <Box p={2}>
-                    <Stack direction='row' alignItems={'center'} gap={2}>
-                        <IconButton onClick={() => closeDrawer()} size='large' sx={{ m: -1 }}>
-                            <Menu />
-                        </IconButton>
-                        <AppLogo />
-                    </Stack>
-                </Box>
-                <Divider />
-                <MenuItemList />
-            </Drawer>
+            <>
+                <CreateEntryButton expanded view='mobile' />
+                <Drawer
+                    anchor='left'
+                    open={isDrawerOpen}
+                    onClose={() => closeDrawer()}
+                    PaperProps={{ sx: { minWidth: '80vw' } }}
+                >
+                    <Box p={2}>
+                        <Stack direction='row' alignItems={'center'} gap={2}>
+                            <IconButton onClick={() => closeDrawer()} size='large' sx={{ m: -1 }}>
+                                <Menu />
+                            </IconButton>
+                            <AppLogo />
+                        </Stack>
+                    </Box>
+                    <Divider />
+                    <MenuItemList />
+                </Drawer>
+            </>
         )
     }
 }

@@ -3,10 +3,9 @@
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps, MenuItem } from "@mui/material";
 
 import CategoryIcon from "../icon/CategoryIcon";
-// import { fetchCategoriesQuery } from "@/database/queries";
 import { Category } from "@/types/schema";
-import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "@/database/queries";
+import { useContext } from "react";
+import { JournalContext } from "@/contexts/JournalContext";
 
 type CategoryAutocompleteProps = 
     & Omit<AutocompleteProps<Category['_id'], false, false, false>, 'options' | 'renderInput'>
@@ -16,13 +15,8 @@ type CategoryAutocompleteProps =
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
     const { label, sx, ...rest } = props;
 
-    const fetchCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
-        queryKey: ['categories'],
-        initialData: {},
-        queryFn: getCategories,
-    });
-
-    const { data, isLoading } = fetchCategoriesQuery;
+    const { getCategoriesQuery } = useContext(JournalContext);
+    const { data, isLoading } = getCategoriesQuery;
 
     return (
         <Autocomplete<Category['_id']>
