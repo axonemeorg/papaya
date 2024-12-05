@@ -1,16 +1,15 @@
-import { ______SomeInterfaceName, JournalEntryContext } from "@/contexts/JournalEntryContext";
+import { JournalEditorState, JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { getEnhancedJournalEntries } from "@/database/queries";
 import { EnhancedJournalEntry } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
 
-type JournalEntryContextProviderProps = PropsWithChildren<______SomeInterfaceName>;
+type JournalEntryContextProviderProps = PropsWithChildren<JournalEditorState>;
 
 export default function JournalEntryContextProvider(props: JournalEntryContextProviderProps) {
     const {
         view,
         date,
-        // setView,
         setDate,
         onNextPage,
         onPrevPage,
@@ -28,7 +27,6 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
             value={{
                 view,
                 date,
-                // setView,
                 setDate,
                 onNextPage,
                 onPrevPage,
