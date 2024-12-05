@@ -31,13 +31,13 @@ export default function JournalEditor() {
     });
 
     const { snackbar } = useContext(NotificationsContext);
-    const { getCategoriesQuery } = useContext(JournalContext);
-    const { getEnhancedJournalEntriesQuery } = useContext(JournalEntryContext);
+    const journalContext = useContext(JournalContext);
+    const journalEntryContext = useContext(JournalEntryContext);
 
     const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
 
     const journalGroups = useMemo(() => {
-        const entries = getEnhancedJournalEntriesQuery.data;
+        const entries = journalEntryContext.getEnhancedJournalEntriesQuery.data;
         const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries)
             .reduce((acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
                 const { date } = entry;
@@ -53,7 +53,7 @@ export default function JournalEditor() {
             });
 
         return groups;
-    }, [getEnhancedJournalEntriesQuery.data]);
+    }, [journalEntryContext.getEnhancedJournalEntriesQuery.data]);
 
     const handleClickListItem = (event: MouseEvent<any>, entry: EnhancedJournalEntry) => {
         setSelectedEntry({
@@ -79,7 +79,7 @@ export default function JournalEditor() {
 
         try {
             const record = await deleteJournalEntry(entry._id);
-            getEnhancedJournalEntriesQuery.refetch();
+            journalEntryContext.getEnhancedJournalEntriesQuery.refetch();
             handleDeselectListItem();
             snackbar({
                 message: 'Deleted 1 entry',
@@ -88,7 +88,7 @@ export default function JournalEditor() {
                     onClick: async () => {
                         undeleteJournalEntry(record)
                             .then(() => {
-                                getCategoriesQuery.refetch();
+                                journalContext.getCategoriesQuery.refetch();
                                 snackbar({ message: 'Category restored' });
                             })
                             .catch((error) => {
@@ -104,7 +104,7 @@ export default function JournalEditor() {
     }
 
     const handleSaveEntry = () => {
-        getEnhancedJournalEntriesQuery.refetch();
+        journalEntryContext.getEnhancedJournalEntriesQuery.refetch();
         handleDeselectListItem();
     }
 
@@ -117,6 +117,15 @@ export default function JournalEditor() {
 
     return (
         <>
+            <CreateJournalEntryModal
+                open={journalContext.showCreateJournalEntryModal}
+                onClose={() => journalContext.closeCreateEntryModal()}
+                onSaved={() => {
+                    journalEntryContext.getEnhancedJournalEntriesQuery.refetch();
+                    journalContext.closeCreateEntryModal();
+                }}
+                initialDate={journalContext.createEntryInitialDate}
+            />
             <SettingsDrawer
                 open={showSettingsDrawer}
                 onClose={() => setShowSettingsDrawer(false)}

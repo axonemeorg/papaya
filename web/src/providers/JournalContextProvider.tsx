@@ -1,14 +1,12 @@
-import { JournalEditorView } from "@/components/journal/JournalEditor";
-import CreateJournalEntryModal from "@/components/modal/CreateJournalEntryModal";
 import { JournalContext } from "@/contexts/JournalContext";
-import { getCategories, getEnhancedJournalEntries, getEntryTags } from "@/database/queries";
-import { Category, EnhancedJournalEntry, EntryTag } from "@/types/schema";
+import { getCategories, getEntryTags } from "@/database/queries";
+import { Category, EntryTag } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren, useState } from "react";
 
 export default function JournalContextProvider(props: PropsWithChildren) {
     const [showCreateJournalEntryModal, setShowCreateJournalEntryModal] = useState<boolean>(false);
-    const [createJournalEntryInitialDate, setCreateJournalEntryInitialDate] = useState<string | undefined | null>(null);
+    const [createEntryInitialDate, setCreateEntryInitialDate] = useState<string | undefined | null>(null);
 
     const getCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
         queryKey: ['categories'],
@@ -23,7 +21,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     });
 
     const openCreateEntryModal = (date?: string) => {
-        setCreateJournalEntryInitialDate(date);
+        setCreateEntryInitialDate(date);
         setShowCreateJournalEntryModal(true);
     }
 
@@ -32,18 +30,12 @@ export default function JournalContextProvider(props: PropsWithChildren) {
             value={{
                 getCategoriesQuery,
                 getEntryTagsQuery,
+                createEntryInitialDate,
                 openCreateEntryModal,
+                showCreateJournalEntryModal,
+                closeCreateEntryModal: () => setShowCreateJournalEntryModal(false),
             }}
         >
-            <CreateJournalEntryModal
-                open={showCreateJournalEntryModal}
-                onClose={() => setShowCreateJournalEntryModal(false)}
-                onSaved={() => {
-                    // getEnhancedJournalEntriesQuery.refetch();
-                    setShowCreateJournalEntryModal(false);
-                }}
-                initialDate={createJournalEntryInitialDate}
-            />
             {props.children}
         </JournalContext.Provider>
     );

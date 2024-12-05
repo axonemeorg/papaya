@@ -1,9 +1,10 @@
 import CreateJournalEntryModal from "@/components/modal/CreateJournalEntryModal";
+import { JournalContext } from "@/contexts/JournalContext";
 import { JournalEditorState, JournalEntryContext } from "@/contexts/JournalEntryContext";
 import { getEnhancedJournalEntries } from "@/database/queries";
 import { EnhancedJournalEntry } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useContext, useEffect, useState } from "react";
 
 type JournalEntryContextProviderProps = PropsWithChildren<JournalEditorState>;
 

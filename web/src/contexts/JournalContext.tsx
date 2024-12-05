@@ -5,6 +5,9 @@ import { createContext } from "react";
 export interface JournalContext {
     getCategoriesQuery: DefinedUseQueryResult<Record<Category['_id'], Category>, Error>;
     getEntryTagsQuery: DefinedUseQueryResult<Record<EntryTag['_id'], EntryTag>, Error>;
+    showCreateJournalEntryModal: boolean;
+    createEntryInitialDate: string | undefined | null;
+    closeCreateEntryModal: () => void;
     openCreateEntryModal: (date?: string) => void;
 }
 
