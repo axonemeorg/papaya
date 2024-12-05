@@ -24,7 +24,6 @@ export interface JournalEntrySelection {
 }
 
 export default function JournalEditor() {
-    const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false);
     const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
     const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
         entry: null,
@@ -118,15 +117,6 @@ export default function JournalEditor() {
 
     return (
         <>
-            <CreateJournalEntryModal
-                open={showJournalEntryModal}
-                onClose={() => setShowJournalEntryModal(false)}
-                onSaved={() => {
-                    getEnhancedJournalEntriesQuery.refetch();
-                    setShowJournalEntryModal(false);
-                }}
-                initialDate={currentDayString}
-            />
             <SettingsDrawer
                 open={showSettingsDrawer}
                 onClose={() => setShowSettingsDrawer(false)}
@@ -136,21 +126,6 @@ export default function JournalEditor() {
                     px: { sm: 0, }
                 }}   
             >
-                <Fab
-                    color='primary'
-                    aria-label='add'
-                    onClick={() => setShowJournalEntryModal(true)}
-                    variant='extended'
-                    size='large'
-                    sx={(theme) => ({
-                        position: 'fixed',
-                        bottom: theme.spacing(4),
-                        right: theme.spacing(2),
-                    })}
-                >
-                    <Add />
-                    Add
-                </Fab>
                 {selectedEntry.entry && (
                     <JournalEntryCard
                         entry={selectedEntry.entry}

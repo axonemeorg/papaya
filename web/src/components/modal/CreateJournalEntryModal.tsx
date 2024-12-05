@@ -5,23 +5,28 @@ import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  Dial
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext, useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
-import dayjs from "dayjs";
+import { useContext, useEffect, useMemo } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { CreateJournalEntryForm, JournalEntry } from "@/types/schema";
-import { db } from "@/database/client";
 import { createOrUpdateJournalEntry } from "@/database/actions";
+import dayjs from "dayjs";
 
 interface JournalEntryModalProps {
     open: boolean;
-    initialDate: string;
+    initialDate: string | undefined | null;
     onClose: () => void;
     onSaved: () => void;
 }
 
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     const { snackbar } = useContext(NotificationsContext);
+
+    const initialDate = useMemo(() => {
+        if (!props.initialDate) {
+            return dayjs().format('YYYY-MM-DD');
+        }
+        return props.initialDate;
+    }, [props.initialDate]);
 
     const handleCreateJournalEntry = async (formData: CreateJournalEntryForm) => {
         await createOrUpdateJournalEntry(formData);
@@ -34,7 +39,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
             parent: {
                 memo: '',
                 amount: '',
-                date: props.initialDate,
+                date: initialDate,
                 categoryIds: [],
                 tagIds: [],
                 artifactIds: [],
@@ -49,8 +54,8 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
     });
 
     useEffect(() => {
-        createJournalEntryForm.setValue('parent.date', props.initialDate);
-    }, [props.initialDate]);
+        createJournalEntryForm.setValue('parent.date', initialDate);
+    }, [initialDate]);
 
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
