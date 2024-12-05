@@ -102,7 +102,6 @@ export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(z.o
     type: z.literal('JOURNAL_ENTRY'),
     parentEntryId: z.string().nullable().optional(),
     childEntryIds: z.array(z.string()).optional(),
-    sequenceNumber: z.number().nullable().optional(),
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
 }));
