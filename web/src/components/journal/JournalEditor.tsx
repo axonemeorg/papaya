@@ -12,6 +12,7 @@ import JournalEntryCard from "./JournalEntryCard";
 import { deleteJournalEntry, undeleteJournalEntry } from "@/database/actions";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import JournalEntryList from "./JournalEntryList";
+import { JournalContext } from "@/contexts/JournalContext";
 
 export type JournalEditorView =
     | 'week'
@@ -41,14 +42,9 @@ export default function JournalEditor(props: JournalEditorProps) {
     const [journalGroups, setJournalGroups] = useState<Record<string, EnhancedJournalEntry[]>>({});
 
     const { snackbar } = useContext(NotificationsContext);
+    const { getCategoriesQuery } = useContext(JournalContext);
 
     const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), []);
-
-    const getCategoriesQuery = useQuery({
-        queryKey: ['categories'],
-        queryFn: getCategories,
-        initialData: {},
-    });
 
     const getJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
         queryKey: ['enhanced-journal-entries', props.view, props.date],

@@ -20,7 +20,7 @@ import {
     ButtonBaseProps,
     TableBodyProps,
 } from "@mui/material";
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { Category, EnhancedJournalEntry } from "@/types/schema";
 import dayjs from "dayjs";
@@ -31,6 +31,7 @@ import { getPriceString } from "@/utils/string";
 import CategoryChip from "../icon/CategoryChip";
 import QuickJournalEditor from "./QuickJournalEditor";
 import { Flag } from "@mui/icons-material";
+import { JournalContext } from "@/contexts/JournalContext";
 
 const TableRow = (props: TableRowProps) => {
     const { sx, ...rest } = props;
@@ -137,12 +138,7 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean
 export default function JournalEntryList(props: JournalEntryListProps) {
     const theme = useTheme();
     const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const getCategoriesQuery = useQuery({
-        queryKey: ['categories'],
-        queryFn: getCategories,
-        initialData: {},
-    });
+    const { getCategoriesQuery } = useContext(JournalContext);
 
     return (
         <Grid

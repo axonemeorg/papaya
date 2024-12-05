@@ -10,11 +10,12 @@ import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, E
 import { Attachment, Delete, Folder, Label } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { getArtifacts, getEntryTags } from "@/database/queries";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
 import { generateArtifactId } from "@/utils/id";
 import { formatFileSize } from "@/utils/string";
+import { JournalContext } from "@/contexts/JournalContext";
 
 interface JournalEntryChildRowProps {
     index: number;
@@ -196,11 +197,7 @@ export default function JournalEntryForm() {
         name: 'artifacts',
     });
 
-    const entryTagQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
-        queryKey: ['entryTags'],
-        queryFn: getEntryTags,
-        initialData: {},
-    });
+    const { getEntryTagsQuery } = useContext(JournalContext);
 
     const handleAddChild = () => {
         childrenFieldArray.append({
@@ -361,7 +358,7 @@ export default function JournalEntryForm() {
                                         index,
                                     })
                                 }}
-                                entryTags={entryTagQuery.data}
+                                entryTags={getEntryTagsQuery.data}
                             />
                         )
                     })}

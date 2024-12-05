@@ -1,8 +1,10 @@
+import { JournalContext } from "@/contexts/JournalContext";
 import { getEntryTags } from "@/database/queries";
 import { EntryTag } from "@/types/schema";
 import { Check, Close } from "@mui/icons-material";
 import { Box, Checkbox, Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useContext } from "react";
 
 interface TransactionTagPicker {
     anchorEl: Element | null;
@@ -15,6 +17,8 @@ export default function EntryTagPicker(props: TransactionTagPicker) {
     const { anchorEl, onClose } = props;
     const open = Boolean(anchorEl);
 
+    const { getEntryTagsQuery } = useContext(JournalContext);
+
     const handleToggleTag = (tagId: EntryTag['_id']) => {
         if (props.value.includes(tagId)) {
             props.onChange(props.value.filter((t) => t !== tagId));
@@ -22,12 +26,6 @@ export default function EntryTagPicker(props: TransactionTagPicker) {
             props.onChange([...props.value, tagId]);
         }
     }
-
-    const entryTagQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
-        queryKey: ['entryTags'],
-        queryFn: getEntryTags,
-        initialData: {},
-    });
 
     return (
         <Popover
@@ -48,7 +46,7 @@ export default function EntryTagPicker(props: TransactionTagPicker) {
             </Box>
             <Divider />
             <MenuList>
-                {Object.values(entryTagQuery.data).map((entryTag) => {
+                {Object.values(getEntryTagsQuery.data).map((entryTag) => {
                     const tagId = entryTag._id;
                     const checked = props.value.includes(tagId);
 

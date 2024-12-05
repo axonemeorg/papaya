@@ -10,6 +10,7 @@ import NotificationsProvider from '@/providers/NotificationsProvider'
 // Imports styles
 import '@/styles/main.scss'
 import RemoteContextProvider from '@/providers/RemoteContextProvider'
+import JournalContextProvider from '@/providers/JournalContextProvider'
 
 const queryClient = new QueryClient();
 
@@ -29,15 +30,17 @@ function MyApp(props: any) {
 			<ThemeProvider theme={appTheme}>
 				<CssBaseline />
 				<main id='root' className={montserrat.className}>
-					<SessionProvider session={session}>
-						<RemoteContextProvider>
-							<QueryClientProvider client={queryClient}>
-								<NotificationsProvider>
-									{getLayout(<Component {...rest} />)}
-								</NotificationsProvider>
-							</QueryClientProvider>
-						</RemoteContextProvider>
-					</SessionProvider>
+					<QueryClientProvider client={queryClient}>
+						<JournalContextProvider>
+							<SessionProvider session={session}>
+								<RemoteContextProvider>
+									<NotificationsProvider>
+										{getLayout(<Component {...rest} />)}
+									</NotificationsProvider>
+								</RemoteContextProvider>
+							</SessionProvider>
+						</JournalContextProvider>
+					</QueryClientProvider>
 				</main>
 			</ThemeProvider>
 		</>

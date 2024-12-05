@@ -13,6 +13,7 @@ import { getArtifacts, getCategories } from "@/database/queries";
 import { useQuery } from "@tanstack/react-query";
 import { JournalEntrySelection } from "./JournalEditor";
 import EditJournalEntryModal from "../modal/EditJournalEntryModal";
+import { JournalContext } from "@/contexts/JournalContext";
 
 
 
@@ -64,11 +65,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
         props.onDelete();
     }
 
-    const getCategoriesQuery = useQuery({
-        queryKey: ['categories'],
-        queryFn: getCategories,
-        initialData: {},
-    });
+    const { getCategoriesQuery } = useContext(JournalContext);
 
     // const getArtifactsQuery = useQuery<Record<EntryArtifact['_id'], EntryArtifact>>({
     //     queryKey: ['entryArtifacts'],
