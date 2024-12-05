@@ -1,5 +1,11 @@
-export default function() {
+import { Stack } from "@mui/material";
+import { PropsWithChildren } from "react";
+import SplashComponent from "../components/SplashComponent";
+
+export default function HomePage() {
     return (
-        <a href='https://app.tryzisk.com'>Go to Zisk</a>
+        <Stack sx={{ minHeight: '100dvh', width: '100dvw' }}>
+            <SplashComponent />
+        </Stack>
     )
 }

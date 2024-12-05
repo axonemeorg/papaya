@@ -1,14 +1,12 @@
-import { Unbounded } from 'next/font/google'
 import type { PropsWithChildren } from 'react'
 import { Box, CssBaseline, Stack, ThemeProvider } from '@mui/material'
 import appTheme from '../theme'
+import { unbounded } from '../fonts/unbounded'
 
 export const metadata = {
   title: 'Zisk',
   description: 'The open-source, local-first personal finance app',
 }
-
-const unboundedFont = Unbounded({ subsets: ['latin'] })
 
 export default async (props: PropsWithChildren) => {
 	return (
@@ -21,7 +19,7 @@ export default async (props: PropsWithChildren) => {
 					href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap"
 				/>
 			</head>
-			<body className={unboundedFont.className}>
+			<body className={unbounded.className}>
 				<ThemeProvider theme={appTheme}>
           <CssBaseline />
 					{props.children}
