@@ -8,8 +8,7 @@ export interface JournalEditorState {
     date: string;
     setDate: (date: string) => void;
     onNextPage: () => void;
-    onPrevPage: () => void;
-    openCreateEntryModal: (date?: string) => void;
+    onPrevPage: () => void;   
 }
 
 interface JournalEntryContext extends JournalEditorState {

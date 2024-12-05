@@ -4,9 +4,9 @@ import { Add, Create, Menu } from "@mui/icons-material";
 import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { PropsWithChildren, ReactNode, useCallback, useContext, useEffect } from "react";
+import React, { ReactNode, useCallback, useContext, useEffect } from "react";
 import AppLogo from "../header/AppLogo";
-import { JournalEntryContext } from "@/contexts/JournalEntryContext";
+import { JournalContext } from "@/contexts/JournalContext";
 
 interface AppMenuProps {
     view: 'desktop' | 'mobile';
@@ -17,13 +17,13 @@ interface CreateEntryButtonProps extends AppMenuProps {
 }
 
 const CreateEntryButton = (props: CreateEntryButtonProps) => {
-    const journalEntryContext = useContext(JournalEntryContext);
+    const journalContext = useContext(JournalContext);
     if (props.view === 'mobile') {
         return (
             <Fab
                 color='primary'
                 aria-label='add'
-                onClick={() => journalEntryContext.openCreateEntryModal()}
+                onClick={() => journalContext.openCreateEntryModal()}
                 variant='extended'
                 size='large'
                 sx={(theme) => ({
@@ -51,7 +51,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
             <Fab
                 color='primary'
                 aria-label='add'
-                onClick={() => journalEntryContext.openCreateEntryModal()}
+                onClick={() => journalContext.openCreateEntryModal()}
                 variant={props.expanded ? 'extended' : 'circular'}
                 size={props.expanded ? 'large' : 'medium'}
                 sx={(theme) => ({
