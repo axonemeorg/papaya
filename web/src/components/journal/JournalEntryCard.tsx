@@ -121,7 +121,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
                         <Stack direction='row' justifyContent="space-between" alignItems={'center'} sx={{ mb: 2 }}>
                             <Box px={1}>
                                 <JournalEntryNumber
-                                    value={props.entry.sequenceNumber}
+                                    value={null}
                                 />
                             </Box>
                             <Stack direction='row' gap={0.5}>

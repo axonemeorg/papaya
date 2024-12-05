@@ -8,15 +8,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
     const now = new Date().toISOString();
 
     const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
-    const { journalEntrySequence } = meta;
 
-    function* makeSequenceGenerator(initialValue: number): Generator<number> {
-        for (let i = initialValue; ; i++) {
-            yield i;
-        }
-    }
-
-    const sequenceGenerator = makeSequenceGenerator(journalEntrySequence);
     const parentDate = formData.parent.date;
 
     const editingChildrenIds = new Set<string>(
@@ -29,16 +21,13 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
     let parent: JournalEntry;
 
     let parentId: string;
-    let parentSequenceNumber: number | undefined | null;
 
     const isEditing = '_id' in formData.parent && Boolean(formData.parent._id);
 
     if (isEditing) {
         parentId = (formData.parent as JournalEntry)._id;
-        parentSequenceNumber = (formData.parent as JournalEntry).sequenceNumber;
     } else {
         parentId = generateJournalEntryId();
-        parentSequenceNumber = sequenceGenerator.next().value;
     }
 
     // Check if form data is for editing. If so, we need to check for children and artifacts to delete
@@ -79,7 +68,6 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
                 _id: generateJournalEntryId(),
                 type: 'JOURNAL_ENTRY',
                 date: parentDate,
-                sequenceNumber: sequenceGenerator.next().value,
                 parentEntryId: parentId,
                 artifactIds: [],
                 createdAt: now,
@@ -120,7 +108,6 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
             ...formData.parent,
             _id: parentId,
             type: 'JOURNAL_ENTRY',
-            sequenceNumber: parentSequenceNumber,
             childEntryIds: children.map(child => child._id),
             artifactIds: artifacts.map(artifact => artifact._id),
             createdAt: now,
@@ -136,7 +123,6 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         ...deletedArtifacts,
         {
             ...meta,
-            journalEntrySequence: journalEntrySequence + children.length + 1,
         }
     ];
 
