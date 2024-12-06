@@ -1,26 +1,19 @@
 'use client';
 
+import { JournalContext } from "@/contexts/JournalContext";
 import { Insights, ReceiptLong, UnfoldMore } from "@mui/icons-material";
-import { Button, ListItemIcon, ListItemText, MenuItem as MuiMenuItem, MenuItemProps, Select, Typography } from "@mui/material";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ReactNode, useMemo, useState } from "react";
-
-const items: any[] = [
-    {
-        key: '1',
-        journalName: 'My Journal',
-        lastSynced: '5 minutes ago'
-    },
-];
+import { Button, ListItemIcon, ListItemText, MenuItem as MuiMenuItem, MenuItemProps, Select, Typography, Tooltip } from "@mui/material";
+import { useContext } from "react";
 
 export default function JournalSelect() {
+    const journalContext = useContext(JournalContext);
+    const { journal, openJournalManager } = journalContext;
 
     return (
-        <>
-            <Button endIcon={<UnfoldMore />}>
-                <Typography variant='h6'>My Journal</Typography>
+        <Tooltip title='Manage Journals'>
+            <Button endIcon={<UnfoldMore />} onClick={() => openJournalManager()}>
+                <Typography variant='h6'>{journal?.journalName}</Typography>
             </Button>
-        </>
+        </Tooltip>
     )
 }
