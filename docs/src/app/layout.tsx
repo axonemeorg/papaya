@@ -3,6 +3,8 @@ import { Box, CssBaseline, Stack, ThemeProvider } from '@mui/material'
 import appTheme from '../theme'
 import { unbounded } from '../fonts/unbounded'
 
+import '../main.scss';
+
 export const metadata = {
   title: 'Zisk',
   description: 'The open-source, local-first personal finance app',
