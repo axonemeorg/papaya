@@ -104,7 +104,7 @@ export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalM
         }
     });
 
-    return Object.fromEntries((result.docs as JournalMeta[])
+    return Object.fromEntries((result.docs as unknown as JournalMeta[])
         .map(journal => [journal._id, journal]));
 }
 

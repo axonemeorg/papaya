@@ -2,7 +2,9 @@ import { RemoteContext, SyncStatusEnum } from "@/contexts/RemoteContext";
 import { getSession, useSession } from "next-auth/react";
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import PouchDB from 'pouchdb';
-import { db } from "@/database/client";
+import { getDatabaseClient } from "@/database/client";
+
+const db = getDatabaseClient();
 
 const REMOTE_DB_API_PATH = 'api/remote-db';
 const REMOTE_DB_PROXY_PATH = `${REMOTE_DB_API_PATH}/proxy`;
