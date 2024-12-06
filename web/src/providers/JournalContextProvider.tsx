@@ -73,13 +73,13 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
     const handleSelectJournal = (journal: JournalMeta) => {
         setActiveJournal(journal);
-        updateActiveJournal(journal._id);
     }
 
     useEffect(() => {
         if (!activeJournal) {
             return;
         }
+        updateActiveJournal(activeJournal._id);
         setShowManageJournalsModal(false);
     }, [activeJournal]);
 

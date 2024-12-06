@@ -5,7 +5,7 @@ import { Insights, ReceiptLong, UnfoldMore } from "@mui/icons-material";
 import { Button, ListItemIcon, ListItemText, MenuItem as MuiMenuItem, MenuItemProps, Select, Typography, Tooltip } from "@mui/material";
 import { useContext } from "react";
 
-export default function JournalSelect() {
+export default function ActiveJournal() {
     const journalContext = useContext(JournalContext);
     const { journal, openJournalManager } = journalContext;
 
