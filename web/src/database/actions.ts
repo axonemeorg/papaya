@@ -1,6 +1,6 @@
-import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
+import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateJournalMeta, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry, JournalMeta } from "@/types/schema";
 import { getDatabaseClient } from "./client";
-import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
+import { generateArtifactId, generateCategoryId, generateJournalEntryId, generateJournalId } from "@/utils/id";
 import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
@@ -194,4 +194,19 @@ export const deleteCategory = async (categoryId: string): Promise<Category> => {
 
 export const undeleteCategory = async (category: Category) => {
     await db.put(category);
+}
+
+export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
+    const newJournal: JournalMeta = {
+        ...journal,
+        type: 'JOURNAL',
+        journalVersion: 1,
+        _id: generateJournalId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+    };
+
+    await db.put(newJournal);
+
+    return newJournal;
 }

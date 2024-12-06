@@ -170,11 +170,16 @@ export const ZiskMeta = IdentifierMetadata.merge(z.object({
 
 export type ZiskMeta = z.output<typeof ZiskMeta>;
 
-export const JournalMeta = IdentifierMetadata.merge(z.object({
+export const CreateJournalMeta = z.object({
+    journalName: z.string().min(1, 'Journal name must be at least 1 character'),
+    avatar: Avatar,
+});
+
+export type CreateJournalMeta = z.output<typeof CreateJournalMeta>;
+
+export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(z.object({
     type: z.literal('JOURNAL'),
     journalVersion: z.number(),
-    journalName: z.string(),
-    avatar: Avatar,
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
 }));
