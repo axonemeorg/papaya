@@ -22,10 +22,12 @@ const AppLogo = () => (
 
 export default function SplashComponent() {
     const link = process.env.NEXT_PUBLIC_APP_PROD_URL;
+    const sourceCodeLink = process.env.NEXT_PUBLIC_APP_SOURCE_CODE_URL;
+
     return (
         <Container maxWidth='md' disableGutters>
-            <Typography variant='h2' component='h1'>
-                <a style={{ color: 'inherit', textDecoration: 'none' }} href={link}>Zisk <SpanChip><AppLogo /></SpanChip></a> is the open-source <SpanChip>🌐</SpanChip>, local-first <SpanChip>🏡</SpanChip> personal finance <SpanChip>💸</SpanChip> app.
+            <Typography variant='h3' component='h1'>
+                <a style={{ color: 'inherit', textDecoration: 'none' }} href={link}>Zisk <SpanChip><AppLogo /></SpanChip></a> is the <a href={sourceCodeLink} style={{ color: 'inherit' }} target='_blank'>open-source</a> <SpanChip>🌐</SpanChip>, local-first <SpanChip>🏡</SpanChip> personal finance <SpanChip>💸</SpanChip> app.
             </Typography>
             <Button
                 variant='contained'

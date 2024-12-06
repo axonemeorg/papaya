@@ -13,9 +13,10 @@ export default function SpanChip(props: SpanChipProps) {
             sx={{
                 display: 'inline-block',
                 borderRadius: '64px',
-                backgroundColor: props.backgroundColor ?? '#000',
                 px: 3,
-                // py: 1,
+                backgroundColor: `rgba(255, 255, 255, .19)`,
+                backdropFilter: `blur(5px)`,
+                border: `1px solid rgba(200, 200, 200, 0.28)`,
             }}
         >
             {props.children}
