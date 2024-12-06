@@ -5,6 +5,7 @@ import { Box, Grid2 as Grid, Stack, Tab, Tabs, Typography } from "@mui/material"
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { formatFileSize } from "@/utils/string";
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal";
 
 interface JournalDetailsAndActivityProps {
     details: JournalMeta | null;
@@ -62,8 +63,8 @@ export default function JournalDetailsAndActivity(props: JournalDetailsAndActivi
                     <Box sx={{ '& > * ': { fontSize: '36px !important' } }}>
                         <AvatarIcon avatar={props.details.avatar}/>
                     </Box>
-                    <Typography variant='h5'>
-                        {props.details.journalName}
+                    <Typography variant='h5' sx={{ 'fontStyle': !props.details?.journalName ? 'italic' : undefined }}>
+                        {props.details.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
                     </Typography>
                 </Stack>
             )}

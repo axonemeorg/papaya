@@ -1,4 +1,5 @@
 import ManageJournalsModal from "@/components/journal/ManageJournalsModal";
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal";
 import { JournalContext } from "@/contexts/JournalContext";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { updateActiveJournal } from "@/database/actions";
@@ -77,7 +78,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     const handleSelectJournal = (journal: JournalMeta) => {
         setActiveJournal((prev) => {
             if (prev) {
-                snackbar({ message: `Switched to ${journal.journalName}` });
+                snackbar({ message: `Switched to ${journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}` });
             }
             return journal
         });

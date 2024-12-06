@@ -1,11 +1,12 @@
 import { JournalContext } from "@/contexts/JournalContext";
 import { JournalMeta } from "@/types/schema";
 import { Add, Person } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import JournalDetailsAndActivity from "./JournalDetailsAndActivity";
 import AvatarIcon from "../icon/AvatarIcon";
 import JournalCreator from "./JournalCreator";
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal";
 
 type ManageJournalsModalMode = 'SELECT' | 'CREATE';
 
@@ -57,7 +58,11 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
                                     <ListItemIcon>
                                         <AvatarIcon avatar={journal.avatar} />
                                     </ListItemIcon>
-                                    <ListItemText primary={journal.journalName} />
+                                    <ListItemText primary={
+                                        <Typography sx={{ 'fontStyle': !journal.journalName ? 'italic' : undefined }}>
+                                            {journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
+                                        </Typography>
+                                    } />
                                 </MenuItem>
                             );
                         })}
