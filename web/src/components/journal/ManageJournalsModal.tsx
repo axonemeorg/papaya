@@ -1,46 +1,42 @@
 import { JournalContext } from "@/contexts/JournalContext";
 import { JournalMeta } from "@/types/schema";
-import { Person } from "@mui/icons-material";
+import { Add, Person } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import JournalDetailsAndActivity from "./JournalDetailsAndActivity";
+import AvatarIcon from "../icon/AvatarIcon";
+import JournalCreator from "./JournalCreator";
+
+type ManageJournalsModalMode = 'SELECT' | 'CREATE';
 
 interface ManageJournalsModal {
     open: boolean;
+    initialMode: ManageJournalsModalMode
     onClose: () => void;
+    onSelect: (journal: JournalMeta) => void;
 }
 
 export default function ManageJournalsModal(props: ManageJournalsModal) {
+    const [mode, setMode] = useState<ManageJournalsModalMode>(props.initialMode);
+    const [selectedJournal, setSelectedJournal] = useState<JournalMeta | null>(null);
+
     const journalContext = useContext(JournalContext);
 
-    const journals: JournalMeta[] = [
-        {
-            _id: '1',
-            type: 'JOURNAL',
-            journalName: 'Journal 1',
-            journalVersion: 1,
-            createdAt: new Date('2024-12-05').toISOString(),
-            updatedAt: null,
-            avatar: {
-                variant: 'PICTORIAL',
-                content: 'book',
-                primaryColor: '#2196f3',
-            },
-        },
-        {
-            _id: '2',
-            type: 'JOURNAL',
-            journalName: 'Journal_old',
-            journalVersion: 1,
-            createdAt: new Date('2022-01-01').toISOString(),
-            updatedAt: null,
-            avatar: {
-                variant: 'PICTORIAL',
-                content: 'book',
-                primaryColor: '#2196f3',
-            },
+    const journals: JournalMeta[] = useMemo(() => {
+        return Object.values(journalContext.getJournalsQuery.data);
+    }, [journalContext.getJournalsQuery.data]);
+
+    const handleSelectJournal = (journal: JournalMeta) => {
+        setSelectedJournal(journal);
+        setMode('SELECT');
+    }
+
+    const handleContinue = () => {
+        if (!selectedJournal) {
+            return;
         }
-    ]
+        props.onSelect(selectedJournal);
+    }
 
     return (
         <Dialog open={props.open} onClose={props.onClose} fullWidth maxWidth='md'>
@@ -52,25 +48,33 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
                     <MenuList>
                         {journals.map(journal => {
                             return (
-                                <MenuItem key={journal._id}>
+                                <MenuItem key={journal._id} onClick={() => handleSelectJournal(journal)}>
                                     <ListItemIcon>
-                                        <Person />
+                                        <AvatarIcon avatar={journal.avatar} />
                                     </ListItemIcon>
                                     <ListItemText primary={journal.journalName} />
                                 </MenuItem>
                             );
                         })}
                     </MenuList>
+                    <DialogContent sx={{ pt: 0 }}>
+                        <Button onClick={() => setMode('CREATE')} startIcon={<Add />}>Create New Journal</Button>
+                    </DialogContent>
                 </Grid>
                 <Grid size={7}>
                     <DialogContent>
-                        <JournalDetailsAndActivity details={null} size={null} lastActivity={null} activity={[]} />
+                        {mode === 'SELECT' ? (
+                            <JournalDetailsAndActivity details={selectedJournal} size={null} lastActivity={null} activity={[]} />
+                        ) : (
+                            <JournalCreator onCreated={setSelectedJournal} />
+                        )}
                     </DialogContent>
                 </Grid>
             </Grid>
             <DialogActions>
-                <Button onClick={props.onClose}>Close</Button>
+                <Button variant='contained' disabled={!selectedJournal} onClick={() => handleContinue()}>Continue</Button>
             </DialogActions>
+
         </Dialog>
     );
 }

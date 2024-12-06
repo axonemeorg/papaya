@@ -21,8 +21,12 @@ db.createIndex({
 
 export default function JournalContextProvider(props: PropsWithChildren) {
     const [showCreateJournalEntryModal, setShowCreateJournalEntryModal] = useState<boolean>(false);
+    const [showManageJournalsModal, setShowManageJournalsModal] = useState<boolean>(false);
+    const [manageJournalsModalInitialMode, setManageJournalsModalInitialMode] = useState<'SELECT' | 'CREATE'>('SELECT');
     const [createEntryInitialDate, setCreateEntryInitialDate] = useState<string | undefined | null>(null);
     const [activeJournal, setActiveJournal] = useState<JournalMeta | null>(null);
+
+    const hasSelectedJournal = Boolean(activeJournal);
 
     const getZiskMetaQuery = useQuery<ZiskMeta | null>({
         queryKey: ['ziskMeta'],
@@ -41,12 +45,14 @@ export default function JournalContextProvider(props: PropsWithChildren) {
         queryKey: ['categories'],
         queryFn: getCategories,
         initialData: {},
+        enabled: hasSelectedJournal,
     });
 
     const getEntryTagsQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
         queryKey: ['entryTags'],
         queryFn: getEntryTags,
         initialData: {},
+        enabled: hasSelectedJournal,
     });
 
     const openCreateEntryModal = (date?: string) => {
@@ -55,18 +61,31 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     }
 
     const promptCreateJournal = () => {
-        // alert('Prompt create journal');
+        setManageJournalsModalInitialMode('CREATE');
+        setShowManageJournalsModal(true);
     }
 
     const promptSelectJournal = () => {
-        // alert('Prompt select journal');
+        setManageJournalsModalInitialMode('SELECT');
+        setShowManageJournalsModal(true);
+    }
+
+    const handleSelectJournal = (journal: JournalMeta) => {
+        setActiveJournal(journal);
     }
 
     useEffect(() => {
-        console.log('getZiskMetaQuery.data', getZiskMetaQuery.data);
-        console.log('getZiskMetaQuery.isFetched', getZiskMetaQuery.isFetched);
-        console.log('getJournalsQuery.data', getJournalsQuery.data);
-        console.log('getJournalsQuery.isFetched', getJournalsQuery.isFetched);
+        if (!activeJournal) {
+            return;
+        }
+        setShowManageJournalsModal(false);
+    }, [activeJournal]);
+
+    useEffect(() => {
+        // console.log('getZiskMetaQuery.data', getZiskMetaQuery.data);
+        // console.log('getZiskMetaQuery.isFetched', getZiskMetaQuery.isFetched);
+        // console.log('getJournalsQuery.data', getJournalsQuery.data);
+        // console.log('getJournalsQuery.isFetched', getJournalsQuery.isFetched);
         if (!getZiskMetaQuery.data || !getJournalsQuery.data) {
             return;
         } else if (!getZiskMetaQuery.isFetched || !getJournalsQuery.isFetched) {
@@ -99,7 +118,12 @@ export default function JournalContextProvider(props: PropsWithChildren) {
                 getJournalsQuery,
             }}
         >
-            <ManageJournalsModal open={true} onClose={() => {}} />
+            <ManageJournalsModal
+                open={showManageJournalsModal}
+                initialMode={manageJournalsModalInitialMode}
+                onClose={() => setShowManageJournalsModal(false)}
+                onSelect={handleSelectJournal}
+            />
             {props.children}
         </JournalContext.Provider>
     );
