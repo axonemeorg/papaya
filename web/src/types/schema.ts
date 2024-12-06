@@ -163,3 +163,19 @@ export const ZiskDocument = z.union([
 ]);
 
 export type ZiskDocument = z.output<typeof ZiskDocument>;
+
+export const ZiskMeta = IdentifierMetadata.merge(z.object({
+    activeJournalId: z.string().nullable(),
+}));
+
+export type ZiskMeta = z.output<typeof ZiskMeta>;
+
+export const JournalMeta = IdentifierMetadata.merge(z.object({
+    type: z.literal('JOURNAL'),
+    journalVersion: z.number(),
+    journalName: z.string(),
+    createdAt: z.string(),
+    updatedAt: z.string().nullable(),
+}));
+
+export type JournalMeta = z.output<typeof JournalMeta>;
