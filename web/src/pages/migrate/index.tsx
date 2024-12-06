@@ -1,6 +1,8 @@
-import { db } from "@/database/client";
+import { getDatabaseClient } from "@/database/client";
 import { Button, Stack, TextField } from "@mui/material";
 import { useState } from "react";
+
+const db = getDatabaseClient();
 
 
 export default function MigratePage() {

@@ -17,12 +17,27 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
         onPrevPage,
     } = props;
 
+    const journalContext = useContext(JournalContext);
+    const hasSelectedJournal = Boolean(journalContext.journal);
+
     const getEnhancedJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
         queryKey: ['enhancedJournalEntries', view, date],
         queryFn: async () => getEnhancedJournalEntries(view, date),
         initialData: {},
-        enabled: true,
+        enabled: hasSelectedJournal,
     });
+
+    const refetchAllDependantQueries = () => {
+        getEnhancedJournalEntriesQuery.refetch();
+    }
+
+    useEffect(() => {
+        if (!journalContext.journal) {
+            return;
+        }
+
+        refetchAllDependantQueries();
+    }, [journalContext.journal]);
 
     return (
         <JournalEntryContext.Provider

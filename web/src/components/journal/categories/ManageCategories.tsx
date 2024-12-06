@@ -1,7 +1,7 @@
 'use client';
 
 import CategoryForm from "@/components/form/CategoryForm";
-import CategoryIcon from "@/components/icon/CategoryIcon";
+import AvatarIcon from "@/components/icon/AvatarIcon";
 import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { JournalContext } from "@/contexts/JournalContext";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
@@ -152,7 +152,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                         return (
                             <MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category._id}>
                                 <ListItemIcon>
-                                    <CategoryIcon category={category} />
+                                    <AvatarIcon avatar={category?.avatar} />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={category.label}

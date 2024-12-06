@@ -5,7 +5,7 @@ import AppLogo from "./AppLogo";
 import { Menu, Search, Settings } from "@mui/icons-material";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
 import { PropsWithChildren } from "react";
-import JournalSelect from "./JournalSelect";
+import ActiveJournal from "./ActiveJournal";
 import SearchWidget from "./SearchWidget";
 import SyncStatus from "./SyncStatus";
 import UserWidget from "./UserWidget";
@@ -54,7 +54,7 @@ export default function Header(props: HeaderProps) {
                     <AppLogo />
                 )}
                 <Stack direction='row' alignItems='center' gap={1} ml={showLogo ? 2 : undefined}>
-                    <JournalSelect />
+                    <ActiveJournal />
                     <SyncStatus />
                 </Stack>
             </Stack>

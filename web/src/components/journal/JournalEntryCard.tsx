@@ -2,7 +2,7 @@
 
 import { Close, Delete, Edit, MoreVert } from "@mui/icons-material";
 import { Box, IconButton, Popover, Stack, Typography } from "@mui/material";
-import CategoryIcon from "../icon/CategoryIcon";
+import AvatarIcon from "@/components/icon/AvatarIcon";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
@@ -150,7 +150,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
                                 {getPriceString(netAmount)}
                             </Typography>
                             <Stack direction='row' gap={1}>
-                                <CategoryIcon category={category} />
+                                <AvatarIcon avatar={category?.avatar} />
                                 <Typography>{memo}</Typography>
                             </Stack>
                         </Stack>

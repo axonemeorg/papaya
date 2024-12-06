@@ -1,13 +1,15 @@
-import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
-import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
-import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
-import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
+import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateJournalMeta, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry, JournalMeta } from "@/types/schema";
+import { getDatabaseClient } from "./client";
+import { generateArtifactId, generateCategoryId, generateJournalEntryId, generateJournalId } from "@/utils/id";
+import { getJournalEntryArtifacts, getJournalEntryChildren, getOrCreateZiskMeta } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
+
+const db = getDatabaseClient();
 
 export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
     const now = new Date().toISOString();
 
-    const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
+    // const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
 
     const parentDate = formData.parent.date;
 
@@ -121,12 +123,10 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         ...deletedChildren,
         ...artifacts,
         ...deletedArtifacts,
-        {
-            ...meta,
-        }
+        // {
+        //     ...meta,
+        // }
     ];
-
-    console.log('createOrUpdateJournalEntry.docs', docs);
 
     return db.bulkDocs(docs);
 }
@@ -194,4 +194,27 @@ export const deleteCategory = async (categoryId: string): Promise<Category> => {
 
 export const undeleteCategory = async (category: Category) => {
     await db.put(category);
+}
+
+export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
+    const newJournal: JournalMeta = {
+        ...journal,
+        type: 'JOURNAL',
+        journalVersion: 1,
+        _id: generateJournalId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+    };
+
+    await db.put(newJournal);
+
+    return newJournal;
+}
+
+export const updateActiveJournal = async (journalId: string) => {
+    const meta = await getOrCreateZiskMeta();
+    await db.put({
+        ...meta,
+        activeJournalId: journalId,
+    });
 }
