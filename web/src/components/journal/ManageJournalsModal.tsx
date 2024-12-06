@@ -2,7 +2,7 @@ import { JournalContext } from "@/contexts/JournalContext";
 import { JournalMeta } from "@/types/schema";
 import { Add, Person } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import JournalDetailsAndActivity from "./JournalDetailsAndActivity";
 import AvatarIcon from "../icon/AvatarIcon";
 import JournalCreator from "./JournalCreator";
@@ -18,9 +18,14 @@ interface ManageJournalsModal {
 
 export default function ManageJournalsModal(props: ManageJournalsModal) {
     const [mode, setMode] = useState<ManageJournalsModalMode>(props.initialMode);
-    const [selectedJournal, setSelectedJournal] = useState<JournalMeta | null>(null);
 
     const journalContext = useContext(JournalContext);
+
+    const [selectedJournal, setSelectedJournal] = useState<JournalMeta | null>(journalContext.journal);
+
+    useEffect(() => {
+        setSelectedJournal(journalContext.journal);
+    }, [journalContext.journal]);
 
     const journals: JournalMeta[] = useMemo(() => {
         return Object.values(journalContext.getJournalsQuery.data);
@@ -39,7 +44,7 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
     }
 
     return (
-        <Dialog open={props.open} onClose={props.onClose} fullWidth maxWidth='md'>
+        <Dialog open={props.open} fullWidth maxWidth='md'>
             <Grid container columns={12}>
                 <Grid size={5}>
                     <DialogContent>
@@ -72,9 +77,11 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
                 </Grid>
             </Grid>
             <DialogActions>
-                <Button variant='contained' disabled={!selectedJournal} onClick={() => handleContinue()}>Continue</Button>
+                {journalContext.journal && (
+                    <Button onClick={() => props.onClose()}>Cancel</Button>
+                )}
+                <Button variant='contained' disabled={!selectedJournal} onClick={() => handleContinue()}>Switch</Button>
             </DialogActions>
-
         </Dialog>
     );
 }

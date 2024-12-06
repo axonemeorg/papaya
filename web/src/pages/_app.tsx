@@ -30,17 +30,17 @@ function MyApp(props: any) {
 			<ThemeProvider theme={appTheme}>
 				<CssBaseline />
 				<main id='root' className={montserrat.className}>
-					<QueryClientProvider client={queryClient}>
-						<JournalContextProvider>
-							<SessionProvider session={session}>
-								<RemoteContextProvider>
-									<NotificationsProvider>
-										{getLayout(<Component {...rest} />)}
-									</NotificationsProvider>
-								</RemoteContextProvider>
-							</SessionProvider>
-						</JournalContextProvider>
-					</QueryClientProvider>
+					<NotificationsProvider>
+						<QueryClientProvider client={queryClient}>
+							<JournalContextProvider>
+								<SessionProvider session={session}>
+									<RemoteContextProvider>
+											{getLayout(<Component {...rest} />)}
+									</RemoteContextProvider>
+								</SessionProvider>
+							</JournalContextProvider>
+						</QueryClientProvider>
+					</NotificationsProvider>
 				</main>
 			</ThemeProvider>
 		</>

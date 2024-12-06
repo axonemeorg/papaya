@@ -1,11 +1,12 @@
 import ManageJournalsModal from "@/components/journal/ManageJournalsModal";
 import { JournalContext } from "@/contexts/JournalContext";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { updateActiveJournal } from "@/database/actions";
 import { getDatabaseClient } from "@/database/client";
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from "@/database/queries";
 import { Category, EntryTag, JournalMeta, ZiskMeta } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useContext, useEffect, useState } from "react";
 
 
 const db = getDatabaseClient();
@@ -26,6 +27,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     const [manageJournalsModalInitialMode, setManageJournalsModalInitialMode] = useState<'SELECT' | 'CREATE'>('SELECT');
     const [createEntryInitialDate, setCreateEntryInitialDate] = useState<string | undefined | null>(null);
     const [activeJournal, setActiveJournal] = useState<JournalMeta | null>(null);
+
+    const { snackbar } = useContext(NotificationsContext);
 
     const hasSelectedJournal = Boolean(activeJournal);
 
@@ -72,7 +75,17 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     }
 
     const handleSelectJournal = (journal: JournalMeta) => {
-        setActiveJournal(journal);
+        setActiveJournal((prev) => {
+            if (prev) {
+                snackbar({ message: `Switched to ${journal.journalName}` });
+            }
+            return journal
+        });
+    }
+
+    const refetchAllDependantQueries = () => {
+        getCategoriesQuery.refetch();
+        getEntryTagsQuery.refetch();
     }
 
     useEffect(() => {
@@ -81,6 +94,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
         }
         updateActiveJournal(activeJournal._id);
         setShowManageJournalsModal(false);
+        refetchAllDependantQueries();
     }, [activeJournal]);
 
     useEffect(() => {

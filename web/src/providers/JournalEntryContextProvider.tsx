@@ -27,6 +27,18 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
         enabled: hasSelectedJournal,
     });
 
+    const refetchAllDependantQueries = () => {
+        getEnhancedJournalEntriesQuery.refetch();
+    }
+
+    useEffect(() => {
+        if (!journalContext.journal) {
+            return;
+        }
+
+        refetchAllDependantQueries();
+    }, [journalContext.journal]);
+
     return (
         <JournalEntryContext.Provider
             value={{
