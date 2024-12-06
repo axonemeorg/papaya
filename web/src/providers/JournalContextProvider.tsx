@@ -1,3 +1,4 @@
+import ManageJournalsModal from "@/components/journal/ManageJournalsModal";
 import { JournalContext } from "@/contexts/JournalContext";
 import { getDatabaseClient } from "@/database/client";
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from "@/database/queries";
@@ -54,11 +55,11 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     }
 
     const promptCreateJournal = () => {
-        alert('Prompt create journal');
+        // alert('Prompt create journal');
     }
 
     const promptSelectJournal = () => {
-        alert('Prompt select journal');
+        // alert('Prompt select journal');
     }
 
     useEffect(() => {
@@ -95,8 +96,10 @@ export default function JournalContextProvider(props: PropsWithChildren) {
                 showCreateJournalEntryModal,
                 closeCreateEntryModal: () => setShowCreateJournalEntryModal(false),
                 journal: activeJournal,
+                getJournalsQuery,
             }}
         >
+            <ManageJournalsModal open={true} onClose={() => {}} />
             {props.children}
         </JournalContext.Provider>
     );

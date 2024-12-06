@@ -174,6 +174,7 @@ export const JournalMeta = IdentifierMetadata.merge(z.object({
     type: z.literal('JOURNAL'),
     journalVersion: z.number(),
     journalName: z.string(),
+    avatar: Avatar,
     createdAt: z.string(),
     updatedAt: z.string().nullable(),
 }));

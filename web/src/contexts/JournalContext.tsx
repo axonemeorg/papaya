@@ -3,6 +3,7 @@ import { DefinedUseQueryResult } from "@tanstack/react-query";
 import { createContext } from "react";
 
 export interface JournalContext {
+    getJournalsQuery: DefinedUseQueryResult<Record<JournalMeta['_id'], JournalMeta>, Error>;
     getCategoriesQuery: DefinedUseQueryResult<Record<Category['_id'], Category>, Error>;
     getEntryTagsQuery: DefinedUseQueryResult<Record<EntryTag['_id'], EntryTag>, Error>;
     showCreateJournalEntryModal: boolean;
