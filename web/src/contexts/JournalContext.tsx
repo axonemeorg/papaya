@@ -11,6 +11,7 @@ export interface JournalContext {
     journal: JournalMeta | null;
     closeCreateEntryModal: () => void;
     openCreateEntryModal: (date?: string) => void;
+    openJournalManager: () => void;
 }
 
 export const JournalContext = createContext<JournalContext>({} as JournalContext);

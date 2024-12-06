@@ -1,7 +1,7 @@
 import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateJournalMeta, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry, JournalMeta } from "@/types/schema";
 import { getDatabaseClient } from "./client";
 import { generateArtifactId, generateCategoryId, generateJournalEntryId, generateJournalId } from "@/utils/id";
-import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
+import { getJournalEntryArtifacts, getJournalEntryChildren, getOrCreateZiskMeta } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
 const db = getDatabaseClient();
@@ -209,4 +209,12 @@ export const createJournal = async (journal: CreateJournalMeta): Promise<Journal
     await db.put(newJournal);
 
     return newJournal;
+}
+
+export const updateActiveJournal = async (journalId: string) => {
+    const meta = await getOrCreateZiskMeta();
+    await db.put({
+        ...meta,
+        activeJournalId: journalId,
+    });
 }

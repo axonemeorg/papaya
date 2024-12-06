@@ -1,5 +1,6 @@
 import ManageJournalsModal from "@/components/journal/ManageJournalsModal";
 import { JournalContext } from "@/contexts/JournalContext";
+import { updateActiveJournal } from "@/database/actions";
 import { getDatabaseClient } from "@/database/client";
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from "@/database/queries";
 import { Category, EntryTag, JournalMeta, ZiskMeta } from "@/types/schema";
@@ -72,6 +73,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
     const handleSelectJournal = (journal: JournalMeta) => {
         setActiveJournal(journal);
+        updateActiveJournal(journal._id);
     }
 
     useEffect(() => {
@@ -82,10 +84,6 @@ export default function JournalContextProvider(props: PropsWithChildren) {
     }, [activeJournal]);
 
     useEffect(() => {
-        // console.log('getZiskMetaQuery.data', getZiskMetaQuery.data);
-        // console.log('getZiskMetaQuery.isFetched', getZiskMetaQuery.isFetched);
-        // console.log('getJournalsQuery.data', getJournalsQuery.data);
-        // console.log('getJournalsQuery.isFetched', getJournalsQuery.isFetched);
         if (!getZiskMetaQuery.data || !getJournalsQuery.data) {
             return;
         } else if (!getZiskMetaQuery.isFetched || !getJournalsQuery.isFetched) {
@@ -116,6 +114,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
                 closeCreateEntryModal: () => setShowCreateJournalEntryModal(false),
                 journal: activeJournal,
                 getJournalsQuery,
+                openJournalManager: () => promptSelectJournal(),
             }}
         >
             <ManageJournalsModal
