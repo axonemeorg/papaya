@@ -44,7 +44,7 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
 
     return (
         <Dialog open={props.open} onClose={props.onClose} fullWidth>
-            <Grid columns={12}>
+            <Grid container columns={12}>
                 <Grid size={6}>
                     <DialogContent>
                         <DialogContentText>Please select a journal.</DialogContentText>

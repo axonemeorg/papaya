@@ -56,11 +56,11 @@ export default function JournalDetailsAndActivity(props: JournalDetailsAndActivi
                 <Tab label="Activity" />
             </Tabs>
             {tab === 0 && (
-                <Grid columns={12}>
+                <Grid container columns={12}>
                     {properties.map((property) => (
                         <Grid size={12} sx={{ display: 'flex', flexFlow: 'column nowrap' }} key={property.label}>
-                            <Typography variant="caption">{property.label}</Typography>
-                            <Typography>{property.value}</Typography>
+                            <Typography variant="body1">{property.label}</Typography>
+                            <Typography variant='body2'>{property.value}</Typography>
                         </Grid>
                     ))}
                 </Grid>
