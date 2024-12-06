@@ -3,13 +3,13 @@ import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
 import { ImageAvatar } from "../pickers/ImageAvatarPicker";
 import { AvatarVariant, Category } from "@/types/schema";
 
-interface CategoryIconProps {
+interface AvatarIconProps {
 	category?: Category;
     compact?: boolean;
     sx?: SxProps<Theme>
 }
 
-export default function CategoryIcon(props: CategoryIconProps) {
+export default function AvatarIcon(props: AvatarIconProps) {
 	const avatar = props.category?.avatar ?? DEFAULT_AVATAR;
 
 	switch (avatar.variant) {

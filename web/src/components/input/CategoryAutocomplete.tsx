@@ -2,7 +2,7 @@
 
 import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps, MenuItem } from "@mui/material";
 
-import CategoryIcon from "../icon/CategoryIcon";
+import AvatarIcon from "../icon/AvatarIcon";
 import { Category } from "@/types/schema";
 import { useContext } from "react";
 import { JournalContext } from "@/contexts/JournalContext";
@@ -36,7 +36,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
                         {...optionProps}
                     >
                         <ListItemIcon>
-                            <CategoryIcon category={category} />
+                            <AvatarIcon category={category} />
                         </ListItemIcon>
                         <ListItemText primary={category?.label} />
                     </ListItem>

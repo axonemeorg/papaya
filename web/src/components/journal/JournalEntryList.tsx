@@ -26,7 +26,7 @@ import { Category, EnhancedJournalEntry } from "@/types/schema";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/database/queries";
-import CategoryIcon from "../icon/CategoryIcon";
+import AvatarIcon from "../icon/AvatarIcon";
 import { getPriceString } from "@/utils/string";
 import CategoryChip from "../icon/CategoryChip";
 import QuickJournalEditor from "./QuickJournalEditor";
@@ -191,7 +191,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
                                                         onClick={(event) => props.onClickListItem(event, entry)}
                                                     >
                                                         <TableCell sx={{ width: "0%", borderBottom: 'none' }}>
-                                                            <CategoryIcon category={category} compact={isSmall} />
+                                                            <AvatarIcon category={category} compact={isSmall} />
                                                         </TableCell>
                                                         <TableCell sx={{ width: "0%" }}>
                                                             <Flag sx={{ display: 'block' }} />
