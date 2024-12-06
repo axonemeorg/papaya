@@ -5,7 +5,7 @@ class MyDocument extends Document {
     return (
       <Html lang='en'>
         <Head>
-          <link rel="icon" href="favicon.ico" />
+          <link rel="icon" href="/images/logo/logo-mark.svg" type="image/svg+xml" />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/icon?family=Material+Icons"

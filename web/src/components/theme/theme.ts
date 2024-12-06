@@ -13,6 +13,24 @@ const appTheme = createTheme({
         //     main: 'rgb(251, 202, 4)'
         // }
     },
+    // colorSchemes: {
+    //     light: {
+    //         palette: {
+    //             mode: 'light',
+    //             primary:{
+    //                 main: 'rgb(85, 42, 90)',
+    //             }
+    //         },
+    //     },
+    //     dark: {
+    //         palette: {
+    //             mode: 'dark',
+    //             primary:{
+    //                 main: 'rgb(208, 165, 213)',
+    //             }
+    //         },
+    //     }
+    // },
     typography: {
         fontFamily: montserrat.style.fontFamily
     },
