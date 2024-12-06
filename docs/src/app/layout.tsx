@@ -14,6 +14,7 @@ export default async (props: PropsWithChildren) => {
 			<head>
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" />
+				<link rel="icon" href="/images/logo/logo-mark.svg" type="image/svg+xml" />
 				<link
 					rel="stylesheet"
 					href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap"
@@ -21,7 +22,7 @@ export default async (props: PropsWithChildren) => {
 			</head>
 			<body className={unbounded.className}>
 				<ThemeProvider theme={appTheme}>
-          <CssBaseline />
+          			<CssBaseline />
 					{props.children}
 				</ThemeProvider>
 			</body>
