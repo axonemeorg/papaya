@@ -1,8 +1,33 @@
 import { JournalContext } from "@/contexts/JournalContext";
+import { getDatabaseClient } from "@/database/client";
 import { getCategories, getEntryTags } from "@/database/queries";
 import { Category, EntryTag } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren, useState } from "react";
+
+
+const db = getDatabaseClient();
+
+// export interface ZiskJournalMeta {
+//     _id: typeof ZISK_JOURNAL_META_KEY;
+//     journalVersion: number;
+// }
+
+// const newMetaDoc: ZiskJournalMeta = {
+//     _id: ZISK_JOURNAL_META_KEY,
+//     journalVersion: 1,
+// }
+
+
+db.createIndex({
+    index: {
+        fields: [
+            'type',
+            'date',
+            'parentEntryId',
+        ]
+    }
+});
 
 export default function JournalContextProvider(props: PropsWithChildren) {
     const [showCreateJournalEntryModal, setShowCreateJournalEntryModal] = useState<boolean>(false);

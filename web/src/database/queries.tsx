@@ -1,8 +1,10 @@
 import { Category, EnhancedJournalEntry, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
-import { db } from "./client";
+import { getDatabaseClient } from "./client";
 import { JournalEditorView } from "@/components/journal/JournalEditor";
 import dayjs from "dayjs";
 import { enhanceJournalEntry } from "@/utils/journal";
+
+const db = getDatabaseClient();
 
 export const getCategories = async (): Promise<Record<Category['_id'], Category>> => {
     const result = await db.find({

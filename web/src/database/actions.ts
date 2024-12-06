@@ -1,13 +1,15 @@
 import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry } from "@/types/schema";
-import { db, ZISK_JOURNAL_META_KEY, ZiskJournalMeta } from "./client";
+import { getDatabaseClient } from "./client";
 import { generateArtifactId, generateCategoryId, generateJournalEntryId } from "@/utils/id";
 import { getJournalEntryArtifacts, getJournalEntryChildren } from "./queries";
 import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
+const db = getDatabaseClient();
+
 export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
     const now = new Date().toISOString();
 
-    const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
+    // const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
 
     const parentDate = formData.parent.date;
 
@@ -121,12 +123,10 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         ...deletedChildren,
         ...artifacts,
         ...deletedArtifacts,
-        {
-            ...meta,
-        }
+        // {
+        //     ...meta,
+        // }
     ];
-
-    console.log('createOrUpdateJournalEntry.docs', docs);
 
     return db.bulkDocs(docs);
 }
