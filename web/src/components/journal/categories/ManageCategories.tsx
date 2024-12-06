@@ -152,7 +152,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
                         return (
                             <MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category._id}>
                                 <ListItemIcon>
-                                    <AvatarIcon category={category} />
+                                    <AvatarIcon avatar={category?.avatar} />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={category.label}

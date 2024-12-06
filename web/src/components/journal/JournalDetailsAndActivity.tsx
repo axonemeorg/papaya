@@ -1,13 +1,15 @@
 import { JournalMeta } from "@/types/schema";
+import AvatarIcon from "@/components/icon/AvatarIcon";
 import { getRelativeTime } from "@/utils/date";
-import { Grid2 as Grid, Stack, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Grid2 as Grid, Stack, Tab, Tabs, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
+import { formatFileSize } from "@/utils/string";
 
 interface JournalDetailsAndActivityProps {
-    details: JournalMeta;
-    size: number;
-    lastActivity: string;
+    details: JournalMeta | null;
+    size: number | null;
+    lastActivity: string | null;
     activity: never[];
 }
 
@@ -27,23 +29,27 @@ export default function JournalDetailsAndActivity(props: JournalDetailsAndActivi
         return [
             {
                 label: 'Type',
-                value: JOURNAL_TYPE_LABEL_MAP[props.details.type],
+                value: props.details?.type ? JOURNAL_TYPE_LABEL_MAP[props.details?.type] : '',
             },
             {
                 label: 'Last Activity',
-                value: getRelativeTime(props.lastActivity),
+                value: props.lastActivity ? getRelativeTime(props.lastActivity) : '',
             },
             {
                 label: 'Version',
-                value: String(props.details.journalVersion),
+                value: props.details ? String(props.details.journalVersion) : '',
+            },
+            {
+                label: 'Size',
+                value: props.size === null ? '' : formatFileSize(props.size),
             },
             {
                 label: 'Modified',
-                value: props.details.updatedAt ? new Date(props.details.updatedAt).toLocaleDateString() : 'Never',
+                value: props.details?.updatedAt ? dayjs(props.details.updatedAt).format('MMM D, YYYY') : '',
             },
             {
                 label: 'Created',
-                value: dayjs(props.details.createdAt).format('MMM D, YYYY'),
+                value: props.details?.createdAt ? dayjs(props.details.createdAt).format('MMM D, YYYY') : '',
             },
         ];
 
@@ -51,16 +57,26 @@ export default function JournalDetailsAndActivity(props: JournalDetailsAndActivi
 
     return (
         <Stack>
-            <Tabs value={tab} onChange={(_, value) => setTab(value)}>
+            {props.details && (
+                <Stack direction='row' gap={2} alignItems={'center'}>
+                    <Box sx={{ '& > * ': { fontSize: '36px !important' } }}>
+                        <AvatarIcon avatar={props.details.avatar}/>
+                    </Box>
+                    <Typography variant='h5'>
+                        {props.details.journalName}
+                    </Typography>
+                </Stack>
+            )}
+            <Tabs value={tab} onChange={(_, value) => setTab(value)} sx={{ mb: 2 }}>
                 <Tab label="Details" />
                 <Tab label="Activity" />
             </Tabs>
             {tab === 0 && (
-                <Grid container columns={12}>
+                <Grid container columns={12} spacing={2}>
                     {properties.map((property) => (
-                        <Grid size={12} sx={{ display: 'flex', flexFlow: 'column nowrap' }} key={property.label}>
+                        <Grid size={6} sx={{ display: 'flex', flexFlow: 'column nowrap' }} key={property.label}>
                             <Typography variant="body1">{property.label}</Typography>
-                            <Typography variant='body2'>{property.value}</Typography>
+                            <Typography variant='body2'>{property.value || '--'}</Typography>
                         </Grid>
                     ))}
                 </Grid>

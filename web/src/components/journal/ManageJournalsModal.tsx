@@ -1,7 +1,7 @@
 import { JournalContext } from "@/contexts/JournalContext";
 import { JournalMeta } from "@/types/schema";
 import { Person } from "@mui/icons-material";
-import { Dialog, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList } from "@mui/material";
 import { useContext } from "react";
 import JournalDetailsAndActivity from "./JournalDetailsAndActivity";
 
@@ -43,9 +43,9 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
     ]
 
     return (
-        <Dialog open={props.open} onClose={props.onClose} fullWidth>
+        <Dialog open={props.open} onClose={props.onClose} fullWidth maxWidth='md'>
             <Grid container columns={12}>
-                <Grid size={6}>
+                <Grid size={5}>
                     <DialogContent>
                         <DialogContentText>Please select a journal.</DialogContentText>
                     </DialogContent>
@@ -62,10 +62,15 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
                         })}
                     </MenuList>
                 </Grid>
-                <Grid size={6}>
-                    <JournalDetailsAndActivity details={journals[0]} size={12} lastActivity="2024-12-05" activity={[]} />
+                <Grid size={7}>
+                    <DialogContent>
+                        <JournalDetailsAndActivity details={null} size={null} lastActivity={null} activity={[]} />
+                    </DialogContent>
                 </Grid>
             </Grid>
+            <DialogActions>
+                <Button onClick={props.onClose}>Close</Button>
+            </DialogActions>
         </Dialog>
     );
 }
