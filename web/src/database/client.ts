@@ -1,19 +1,18 @@
-import PouchDB from 'pouchdb';
-import PouchDBFind from 'pouchdb-find';
+import PouchDB from 'pouchdb'
+import PouchDBFind from 'pouchdb-find'
 
-const POUCH_DB_NAME = '__zisk__db';
+const POUCH_DB_NAME = '__zisk__db'
 
-PouchDB.plugin(PouchDBFind);
+PouchDB.plugin(PouchDBFind)
 
-let db: PouchDB.Database | null = null;
+let db: PouchDB.Database | null = null
 
 export const getDatabaseClient = () => {
-    if (!db) {
-        db = new PouchDB(POUCH_DB_NAME);
-    }
-    return db;
+	if (!db) {
+		db = new PouchDB(POUCH_DB_NAME)
+	}
+	return db
 }
-
 
 // db.get(ZISK_JOURNAL_META_KEY)
 //     .catch((error) => {
@@ -122,5 +121,5 @@ export const getDatabaseClient = () => {
 //         "createdAt": new Date().toISOString(),
 //         "updatedAt": null
 //     },
-    
+
 // ]);
