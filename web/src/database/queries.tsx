@@ -16,10 +16,13 @@ import { createDefaultZiskMeta } from '@/utils/database'
 
 const db = getDatabaseClient()
 
-export const getCategories = async (): Promise<Record<Category['_id'], Category>> => {
+export const getCategories = async (journalId: string): Promise<Record<Category['_id'], Category>> => {
 	const result = await db.find({
 		selector: {
-			type: 'CATEGORY',
+			'$and': [
+				{ type: 'CATEGORY' },
+			 	{ journalId },
+			],
 		},
 	})
 
@@ -28,20 +31,28 @@ export const getCategories = async (): Promise<Record<Category['_id'], Category>
 
 export const getJournalEntries = async (
 	view: JournalEditorView,
-	date: string
+	date: string,
+	journalId: string
 ): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
 	const startDate = dayjs(date).startOf(view).format('YYYY-MM-DD')
 
 	const endDate = dayjs(date).endOf(view).format('YYYY-MM-DD')
 
-	const result = await db.find({
-		selector: {
-			type: 'JOURNAL_ENTRY',
-			date: {
+	const selector = {
+		'$and': [
+			{ type: 'JOURNAL_ENTRY' },
+			 { journalId },
+			{ date: {
 				$gte: startDate,
 				$lte: endDate,
-			},
-		},
+			} },
+		],
+	}
+
+	console.log('selector', selector)
+
+	const result = await db.find({
+		selector
 	})
 
 	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
@@ -49,10 +60,11 @@ export const getJournalEntries = async (
 
 export const getEnhancedJournalEntries = async (
 	view: JournalEditorView,
-	date: string
+	date: string,
+	journalId: string
 ): Promise<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>> => {
-	const journalEntries = await getJournalEntries(view, date)
-	const allArtifacts = await getArtifacts()
+	const journalEntries = await getJournalEntries(view, date, journalId)
+	const allArtifacts = await getArtifacts(journalId)
 
 	const result = Object.fromEntries(
 		Object.values(journalEntries).reduce((acc: [EnhancedJournalEntry['_id'], EnhancedJournalEntry][], entry) => {
@@ -77,10 +89,13 @@ export const getEnhancedJournalEntries = async (
 	return result
 }
 
-export const getEntryTags = async (): Promise<Record<EntryTag['_id'], EntryTag>> => {
+export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['_id'], EntryTag>> => {
 	const result = await db.find({
 		selector: {
-			type: 'ENTRY_TAG',
+			'$and': [
+				{ type: 'ENTRY_TAG' },
+			 	{ journalId },
+			],
 		},
 	})
 
@@ -114,10 +129,13 @@ export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalM
 	return Object.fromEntries((result.docs as unknown as JournalMeta[]).map((journal) => [journal._id, journal]))
 }
 
-export const getArtifacts = async (): Promise<Record<EntryArtifact['_id'], EntryArtifact>> => {
+export const getArtifacts = async (journalId: string): Promise<Record<EntryArtifact['_id'], EntryArtifact>> => {
 	const result = await db.find({
 		selector: {
-			type: 'ENTRY_ARTIFACT',
+			'$and': [
+				{ type: 'ENTRY_ARTIFACT' },
+			 	{ journalId },
+			],
 		},
 	})
 
@@ -127,8 +145,10 @@ export const getArtifacts = async (): Promise<Record<EntryArtifact['_id'], Entry
 export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Promise<JournalEntry[]> => {
 	const result = await db.find({
 		selector: {
-			type: 'JOURNAL_ENTRY',
-			parentEntryId: entryId,
+			'$and': [
+				{ type: 'JOURNAL_ENTRY' },
+				{ parentEntryId: entryId },
+			],
 		},
 	})
 
@@ -141,10 +161,12 @@ export const getJournalEntryArtifacts = async (entryId: JournalEntry['_id']): Pr
 
 	const result = await db.find({
 		selector: {
-			type: 'ENTRY_ARTIFACT',
-			_id: {
-				$in: artifactIds,
-			},
+			'$and': [
+				{ type: 'ENTRY_ARTIFACT' },
+				{ _id: {
+					$in: artifactIds,
+				} },
+			],
 		},
 	})
 

@@ -65,8 +65,9 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
 					</DialogContent>
 					<MenuList>
 						{journals.map((journal) => {
+							const selected = selectedJournal?._id === journal._id
 							return (
-								<MenuItem key={journal._id} onClick={() => handleSelectJournal(journal)}>
+								<MenuItem key={journal._id} onClick={() => handleSelectJournal(journal)} selected={selected}>
 									<ListItemIcon>
 										<AvatarIcon avatar={journal.avatar} />
 									</ListItemIcon>
@@ -97,7 +98,7 @@ export default function ManageJournalsModal(props: ManageJournalsModal) {
 								activity={[]}
 							/>
 						) : (
-							<JournalCreator onCreated={setSelectedJournal} />
+							<JournalCreator onCreated={handleSelectJournal} />
 						)}
 					</DialogContent>
 				</Grid>

@@ -4,6 +4,10 @@ export const IdentifierMetadata = z.object({
 	_id: z.string(),
 })
 
+export const BelongsToJournal = z.object({
+    journalId: z.string(),
+})
+
 export const DocumentMetadata = IdentifierMetadata.merge(
 	z.object({
 		_rev: z.string().optional(),
@@ -33,7 +37,7 @@ export const CreateCategory = z.object({
 
 export type CreateCategory = z.output<typeof CreateCategory>
 
-export const Category = DocumentMetadata.merge(CreateCategory).merge(
+export const Category = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
 		type: z.literal('CATEGORY'),
 		createdAt: z.string(),
@@ -78,7 +82,7 @@ export const CreateEntryArtifact = IdentifierMetadata.merge(
 
 export type CreateEntryArtifact = z.output<typeof CreateEntryArtifact>
 
-export const EntryArtifact = DocumentMetadata.merge(CreateEntryArtifact).merge(
+export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryArtifact).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
 		parentEntryId: z.string(),
@@ -101,7 +105,7 @@ export const CreateJournalEntry = CreateJournalEntryChild.merge(
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 
-export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(
+export const JournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(CreateJournalEntry).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
 		parentEntryId: z.string().nullable().optional(),
@@ -155,7 +159,7 @@ export const CreateEntryTag = z.object({
 
 export type CreateEntryTag = z.output<typeof CreateEntryTag>
 
-export const EntryTag = DocumentMetadata.merge(CreateEntryTag).merge(
+export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
 	z.object({
 		type: z.literal('ENTRY_TAG'),
 		createdAt: z.string(),

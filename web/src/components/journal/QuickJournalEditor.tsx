@@ -7,6 +7,7 @@ import { useContext, useState } from 'react'
 import { CreateQuickJournalEntry } from '@/types/schema'
 import { createQuickJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
+import { JournalContext } from '@/contexts/JournalContext'
 
 interface QuickJournalEditorProps {
 	onAdd?: () => void
@@ -16,6 +17,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 	const [isActive, setIsActive] = useState<boolean>(false)
 
 	const { snackbar } = useContext(NotificationsContext)
+	const { journal } = useContext(JournalContext)
 
 	const createQuickJournalEntryForm = useForm<CreateQuickJournalEntry>({
 		defaultValues: {
@@ -27,8 +29,11 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 	})
 
 	const handleCreateQuickJournalEntry = async (formData: CreateQuickJournalEntry) => {
+		if (!journal) {
+			return
+		}
 		const now = new Date().toISOString()
-		createQuickJournalEntry(formData, now).then(() => {
+		createQuickJournalEntry(formData, now, journal._id).then(() => {
 			createQuickJournalEntryForm.reset()
 		})
 		snackbar({ message: 'Created journal entry.' })

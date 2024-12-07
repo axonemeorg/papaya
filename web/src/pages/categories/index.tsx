@@ -1,10 +1,9 @@
+import ManageCategories from '@/components/journal/categories/ManageCategories'
 import { getLayout } from '@/layouts/main'
 
 const CategoriesPage = () => {
 	return (
-		<div>
-			<h1>Categories</h1>
-		</div>
+		<ManageCategories onClose={() => {}} />
 	)
 }
 

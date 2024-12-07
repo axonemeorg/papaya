@@ -10,6 +10,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { CreateJournalEntryForm } from '@/types/schema'
 import { createOrUpdateJournalEntry } from '@/database/actions'
 import dayjs from 'dayjs'
+import { JournalContext } from '@/contexts/JournalContext'
 
 interface JournalEntryModalProps {
 	open: boolean
@@ -20,6 +21,7 @@ interface JournalEntryModalProps {
 
 export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
+	const { journal } = useContext(JournalContext)
 
 	const initialDate = useMemo(() => {
 		if (!props.initialDate) {
@@ -29,7 +31,10 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
 	}, [props.initialDate])
 
 	const handleCreateJournalEntry = async (formData: CreateJournalEntryForm) => {
-		await createOrUpdateJournalEntry(formData)
+		if (!journal) {
+			return
+		}
+		await createOrUpdateJournalEntry(formData, journal._id)
 		snackbar({ message: 'Created journal entry' })
 		props.onSaved()
 	}

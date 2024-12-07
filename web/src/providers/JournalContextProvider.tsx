@@ -13,7 +13,12 @@ const db = getDatabaseClient()
 
 db.createIndex({
 	index: {
-		fields: ['type', 'date', 'parentEntryId'],
+		fields: [
+			'type',
+			'date',
+			'parentEntryId',
+			'journalId',
+		],
 	},
 })
 
@@ -43,14 +48,24 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
 	const getCategoriesQuery = useQuery<Record<Category['_id'], Category>>({
 		queryKey: ['categories'],
-		queryFn: getCategories,
+		queryFn: async () => {
+			if (!activeJournal) {
+				return {}
+			}
+			return getCategories(activeJournal._id)
+		},
 		initialData: {},
 		enabled: hasSelectedJournal,
 	})
 
 	const getEntryTagsQuery = useQuery<Record<EntryTag['_id'], EntryTag>>({
 		queryKey: ['entryTags'],
-		queryFn: getEntryTags,
+		queryFn: async () => {
+			if (!activeJournal) {
+				return {}
+			}
+			return getEntryTags(activeJournal._id)
+		},
 		initialData: {},
 		enabled: hasSelectedJournal,
 	})
