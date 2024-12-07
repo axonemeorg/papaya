@@ -5,6 +5,10 @@
 
 The open-source, local-first personal finance app.
 
+> [!IMPORTANT]
+> Zisk is in a pre-alpha state, and only suitable for use by developers
+>
+
 ## Starting the backend
 ```
 make clean
