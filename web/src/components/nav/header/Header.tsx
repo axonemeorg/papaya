@@ -1,71 +1,67 @@
-'use client';
+'use client'
 
-import { IconButton, Stack, useMediaQuery, useTheme } from "@mui/material";
-import AppLogo from "./AppLogo";
-import { Menu, Settings } from "@mui/icons-material";
-import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
-import ActiveJournal from "./ActiveJournal";
-import SearchWidget from "./SearchWidget";
-import SyncStatus from "./SyncStatus";
-import UserWidget from "./UserWidget";
+import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
+import AppLogo from './AppLogo'
+import { Menu, Settings } from '@mui/icons-material'
+import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
+import ActiveJournal from './ActiveJournal'
+import SearchWidget from './SearchWidget'
+import SyncStatus from './SyncStatus'
+import UserWidget from './UserWidget'
 
 interface HeaderProps {
-    view: 'desktop' | 'mobile';
+	view: 'desktop' | 'mobile'
 }
 
 export default function Header(props: HeaderProps) {
-    const theme = useTheme();
-    const showLogo = !useMediaQuery(theme.breakpoints.down('md'));
+	const theme = useTheme()
+	const showLogo = !useMediaQuery(theme.breakpoints.down('md'))
 
-    // Get toggle menu function from zustand store
-    const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded);
-    const openDrawer = useAppMenuStateStore((state) => state.openDrawer);
+	// Get toggle menu function from zustand store
+	const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded)
+	const openDrawer = useAppMenuStateStore((state) => state.openDrawer)
 
-    const handleClickMenuButton = () => {
-        // If the screen is small, open the drawer. Otherwise, toggle the menu
-        if (props.view === 'mobile') {
-            openDrawer();
-        } else {
-            toggleExpanded();
-        }
-    }
+	const handleClickMenuButton = () => {
+		// If the screen is small, open the drawer. Otherwise, toggle the menu
+		if (props.view === 'mobile') {
+			openDrawer()
+		} else {
+			toggleExpanded()
+		}
+	}
 
-
-    return (
-        <Stack
-            component='header'
-            direction='row'
-            gap={1}
-            alignItems='center'
-            justifyContent={'space-between'}
-            sx={{
-                py: 1,
-                px: 1.5,
-                color: 'inherit',
-                textDecoration: 'none',
-            }}
-        >
-            <Stack direction='row' gap={1} alignItems={'center'}>
-                <IconButton onClick={() => handleClickMenuButton()} size="large">
-                    <Menu />
-                </IconButton>
-                {showLogo && (
-                    <AppLogo />
-                )}
-                <Stack direction='row' alignItems='center' gap={1} ml={showLogo ? 2 : undefined}>
-                    <ActiveJournal />
-                    <SyncStatus />
-                </Stack>
-            </Stack>
-            <Stack direction='row' gap={1} alignItems={'center'}>
-                <SearchWidget />
-                <IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
-                    <Settings />
-                </IconButton>
-                <UserWidget />
-            </Stack>
-        </Stack>
-    )    
+	return (
+		<Stack
+			component="header"
+			direction="row"
+			gap={1}
+			alignItems="center"
+			justifyContent={'space-between'}
+			sx={{
+				py: 1,
+				px: 1.5,
+				color: 'inherit',
+				textDecoration: 'none',
+			}}>
+			<Stack direction="row" gap={1} alignItems={'center'}>
+				<IconButton onClick={() => handleClickMenuButton()} size="large">
+					<Menu />
+				</IconButton>
+				{showLogo && <AppLogo />}
+				<Stack direction="row" alignItems="center" gap={1} ml={showLogo ? 2 : undefined}>
+					<ActiveJournal />
+					<SyncStatus />
+				</Stack>
+			</Stack>
+			<Stack direction="row" gap={1} alignItems={'center'}>
+				<SearchWidget />
+				<IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
+					<Settings />
+				</IconButton>
+				<UserWidget />
+			</Stack>
+		</Stack>
+	)
 }
 
 // const Shortcut = (props: PropsWithChildren) => {

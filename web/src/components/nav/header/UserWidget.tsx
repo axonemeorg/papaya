@@ -1,85 +1,83 @@
 'use client'
 
-import { Menu as MenuIcon } from "@mui/icons-material";
-import { Avatar, Badge, Box, Button, Menu, MenuItem, Typography } from "@mui/material";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useState } from "react";
+import { Menu as MenuIcon } from '@mui/icons-material'
+import { Avatar, Badge, Box, Button, Menu, MenuItem, Typography } from '@mui/material'
+import { useSession, signIn, signOut } from 'next-auth/react'
+import { useState } from 'react'
 
 export default function UserWidget() {
-    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+	const [anchorEl, setAnchorEl] = useState<Element | null>(null)
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    }
+	const handleClose = () => {
+		setAnchorEl(null)
+	}
 
-    
-    const session = useSession();
+	const session = useSession()
 
-    const isLoggedIn = session.data?.user ? true : false;
-    
-    const email = session.data?.user?.email;
-    const image = session.data?.user?.image;
-    const name = session.data?.user?.name;
+	const isLoggedIn = session.data?.user ? true : false
 
-    const handleSignIn = () => {
-        signIn();
-        // handleClose();
-    }
+	const email = session.data?.user?.email
+	const image = session.data?.user?.image
+	const name = session.data?.user?.name
 
-    const handleSignOut = () => {
-        signOut();
-        // handleClose();
-    }
+	const handleSignIn = () => {
+		signIn()
+		// handleClose();
+	}
 
-    return (
-        <>
-            <Button sx={(theme) => ({ borderRadius: 56, ml: 1, color: theme.palette.grey[500] })} onClick={(event) => {
-                setAnchorEl(event.currentTarget);
-            }}>
-                <MenuIcon sx={(theme) => ({ color: theme.palette.grey[500] })} />
-                <Badge>
-                    <Avatar
-                        sx={(theme) => ({
-                            background: theme.palette.background.paper,
-                            outline: `2px solid ${theme.palette.divider}`,
-                            ml: 1,
-                            color: theme.palette.text.primary
-                        })}
-                        src={image ?? ''}
-                    />
-                </Badge>
-            </Button>
-            <Menu
-                id='header-profile-menu'
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right'
-                }}
-                    transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right'
-                }}
-                MenuListProps={{
-                    sx: { minWidth: 250 }
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                anchorEl={anchorEl}
-            >
-                <Box component='li' sx={{ px: 2, pb: 1 }}>
-                    <Typography variant='subtitle1'>
-                        <strong>{name}</strong>
-                    </Typography>
-                    <Typography variant='body2'>
-                        {email}
-                    </Typography>
-                </Box>
-                {isLoggedIn ? (
-                    <MenuItem onClick={() => handleSignOut()}>Sign Out</MenuItem>
-                ) : (
-                    <MenuItem onClick={() => handleSignIn()}>Sign In</MenuItem>
-                )}
-            </Menu>
-        </>
-    );
+	const handleSignOut = () => {
+		signOut()
+		// handleClose();
+	}
+
+	return (
+		<>
+			<Button
+				sx={(theme) => ({ borderRadius: 56, ml: 1, color: theme.palette.grey[500] })}
+				onClick={(event) => {
+					setAnchorEl(event.currentTarget)
+				}}>
+				<MenuIcon sx={(theme) => ({ color: theme.palette.grey[500] })} />
+				<Badge>
+					<Avatar
+						sx={(theme) => ({
+							background: theme.palette.background.paper,
+							outline: `2px solid ${theme.palette.divider}`,
+							ml: 1,
+							color: theme.palette.text.primary,
+						})}
+						src={image ?? ''}
+					/>
+				</Badge>
+			</Button>
+			<Menu
+				id="header-profile-menu"
+				anchorOrigin={{
+					vertical: 'bottom',
+					horizontal: 'right',
+				}}
+				transformOrigin={{
+					vertical: 'top',
+					horizontal: 'right',
+				}}
+				MenuListProps={{
+					sx: { minWidth: 250 },
+				}}
+				open={Boolean(anchorEl)}
+				onClose={handleClose}
+				anchorEl={anchorEl}>
+				<Box component="li" sx={{ px: 2, pb: 1 }}>
+					<Typography variant="subtitle1">
+						<strong>{name}</strong>
+					</Typography>
+					<Typography variant="body2">{email}</Typography>
+				</Box>
+				{isLoggedIn ? (
+					<MenuItem onClick={() => handleSignOut()}>Sign Out</MenuItem>
+				) : (
+					<MenuItem onClick={() => handleSignIn()}>Sign In</MenuItem>
+				)}
+			</Menu>
+		</>
+	)
 }
