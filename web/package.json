@@ -55,6 +55,7 @@
     "eslint": "^9.16.0",
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.13.0",
+    "prettier": "3.4.2",
     "typescript": "5.4.5",
     "typescript-eslint": "^8.17.0"
   },
@@ -63,7 +64,9 @@
     "dev": "next -p 9475",
     "build": "next build",
     "start": "next start -p 9475",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
+    "format-fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\""
   }
 }
