@@ -3,19 +3,15 @@
 import { Close, Delete, Edit, MoreVert } from "@mui/icons-material";
 import { Box, IconButton, Popover, Stack, Typography } from "@mui/material";
 import AvatarIcon from "@/components/icon/AvatarIcon";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from "./JournalEntryLoupe";
 import { useRouter } from "next/router";
 import { getPriceString } from "@/utils/string";
-import { Category, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact } from "@/types/schema";
-import { getArtifacts, getCategories } from "@/database/queries";
-import { useQuery } from "@tanstack/react-query";
+import { Category, EditJournalEntryForm, EnhancedJournalEntry } from "@/types/schema";
 import { JournalEntrySelection } from "./JournalEditor";
 import EditJournalEntryModal from "../modal/EditJournalEntryModal";
 import { JournalContext } from "@/contexts/JournalContext";
-
-
 
 interface JournalEntryCardProps extends JournalEntrySelection {
     entry: EnhancedJournalEntry;

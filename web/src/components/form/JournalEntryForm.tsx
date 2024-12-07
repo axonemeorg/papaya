@@ -1,15 +1,13 @@
 'use client';
 
-import { Avatar as MuiAvatar, Box, Button, Card, CardActionArea, CardMedia, Chip, Collapse, Grid2 as Grid, Icon, IconButton, InputAdornment, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Avatar as MuiAvatar, Box, Button, Card, CardMedia, Chip, Collapse, Grid2 as Grid, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext } from "react-hook-form";
 import CategoryAutocomplete from "../input/CategoryAutocomplete";
-import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
-import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryArtifact, EntryTag, JournalEntry } from "@/types/schema";
-import { Attachment, Delete, Folder, Label } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
-import { getArtifacts, getEntryTags } from "@/database/queries";
+import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryTag } from "@/types/schema";
+import { Delete, Folder, Label } from "@mui/icons-material";
 import { useContext, useMemo, useState } from "react";
 import EntryTagPicker from "../pickers/EntryTagPicker";
 import { AttachmentButton, AttachmentDropzone } from "../input/AttachmentPicker";
@@ -180,7 +178,7 @@ const AttachmentRow = (props: AttachmentRowProps) => {
 }
 
 export default function JournalEntryForm() {
-    const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>();
+    const { setValue, control, watch } = useFormContext<CreateJournalEntryForm>();
 
     const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null, index: number }>({
         anchorEl: null,

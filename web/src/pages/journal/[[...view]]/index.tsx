@@ -15,8 +15,8 @@ const JournalYearMonthPage = () => {
     const router = useRouter();
 
     const viewParams: string[] = router.query.view as string[] ?? [];
-    let viewShorthand: string = viewParams[0] ?? 'm';
-    let view: JournalEditorView = VIEW_SHORTHAND_TO_VIEW[viewShorthand] ?? 'month';
+    const viewShorthand: string = viewParams[0] ?? 'm';
+    const view: JournalEditorView = VIEW_SHORTHAND_TO_VIEW[viewShorthand] ?? 'month';
     
     const now = useMemo(() => dayjs(), []);
     
@@ -34,7 +34,7 @@ const JournalYearMonthPage = () => {
     }, [view, viewShorthand]);
 
     const date = useMemo(() => {
-        let year: number = viewParams[1] ? Number(viewParams[1]) : now.year();
+        const year: number = viewParams[1] ? Number(viewParams[1]) : now.year();
         let month: number;
     
         if (viewParams[2]) {

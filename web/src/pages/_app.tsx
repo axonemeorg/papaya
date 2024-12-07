@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@mui/material'
-import { CssBaseline, Stack } from '@mui/material'
+import { CssBaseline } from '@mui/material'
 import appTheme from '@/components/theme/theme'
 import { montserrat } from '@/fonts/montserrat'
 import Head from 'next/head'

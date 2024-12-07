@@ -1,9 +1,6 @@
 import { JournalContext } from "@/contexts/JournalContext";
-import { getEntryTags } from "@/database/queries";
 import { EntryTag } from "@/types/schema";
-import { Check, Close } from "@mui/icons-material";
 import { Box, Checkbox, Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 
 interface TransactionTagPicker {

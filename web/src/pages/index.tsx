@@ -1,6 +1,4 @@
-import { NextPageContext } from "next";
-
-export async function getServerSideProps(context: NextPageContext) {
+export async function getServerSideProps() {
     return {
         redirect: {
             destination: '/journal',

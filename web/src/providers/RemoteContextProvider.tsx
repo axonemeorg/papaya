@@ -1,5 +1,5 @@
 import { RemoteContext, SyncStatusEnum } from "@/contexts/RemoteContext";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from "react";
 import PouchDB from 'pouchdb';
 import { getDatabaseClient } from "@/database/client";

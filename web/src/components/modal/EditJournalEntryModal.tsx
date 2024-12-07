@@ -1,14 +1,13 @@
 'use client';
 
 import { Save } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent,  DialogContentText,  DialogTitle, useMediaQuery, useTheme} from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme} from "@mui/material";
 import JournalEntryForm from "../form/JournalEntryForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useContext, useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
+import { useContext, useEffect } from "react";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { CreateJournalEntryForm, EditJournalEntryForm } from "@/types/schema";
+import { EditJournalEntryForm } from "@/types/schema";
 import { createOrUpdateJournalEntry } from "@/database/actions";
 
 interface EditJournalEntryModalProps {

@@ -1,10 +1,10 @@
 
-import { Box, Button, Fade, Icon, InputAdornment, Popover, Stack, Tab, Tabs, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Button, Icon, InputAdornment, Stack, TextField } from '@mui/material';
 import { FixedSizeGrid } from 'react-window';
 
 import icons from '@/constants/icons';
-import { ReactNode, useMemo, useState } from 'react';
-import ColorPicker, { ColorPickerProps } from '../pickers/ColorPicker';
+import { useMemo, useState } from 'react';
+import ColorPicker from '../pickers/ColorPicker';
 import { Search, Shuffle } from '@mui/icons-material';
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth';
 import Fuse from 'fuse.js';

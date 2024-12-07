@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, colors, FormControl, Grid, InputLabel, MenuItem, Paper, Popover, Popper, Select, Stack, Tooltip } from '@mui/material';
+import { FormControl,MenuItem, Paper,Select, Tooltip } from '@mui/material';
 import * as _muiColors from '@mui/material/colors';
 
 const muiColors = { ..._muiColors } as unknown as Record<string, Record<number, string>>
@@ -146,8 +146,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                 onChange={(event) => {
                     props.onChange?.(event.target.value)
                 }}
-                renderValue={(value: string) => {
-                    // const color = getMuiColor(value);
+                renderValue={() => {
                     return (
                         <Swatch color={color} />
                     )

@@ -1,13 +1,13 @@
 'use client';
 
-import { AutocompleteProps, Avatar as MuiAvatar, Box, Button, ButtonGroup, Fade, FormHelperText, Grid, Icon, InputLabel, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { useContext, useMemo, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Box, FormHelperText, Stack, TextField } from "@mui/material";
+import { useMemo } from "react";
+import { useFormContext } from "react-hook-form";
 import AvatarPicker from "../pickers/AvatarPicker";
 import { Avatar, Category, CreateCategory } from "@/types/schema";
 
 export default function CategoryForm() {
-    const { register, control, setValue, watch } = useFormContext<CreateCategory | Category>();
+    const { register, setValue, watch } = useFormContext<CreateCategory | Category>();
 
     const currentIcon: Avatar | null = useMemo(() => {
         const { avatar } = watch();

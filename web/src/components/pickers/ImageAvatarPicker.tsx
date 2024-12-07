@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, AvatarVariant } from "@/types/schema";
-import { AddPhotoAlternate, Photo, RemoveCircle } from "@mui/icons-material";
+import { AddPhotoAlternate, RemoveCircle } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from "@mui/material";
 import { useMemo, useRef, useState } from "react";

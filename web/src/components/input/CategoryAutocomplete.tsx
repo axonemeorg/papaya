@@ -1,6 +1,6 @@
 'use client'
 
-import { Autocomplete, ListItem, ListItemIcon, ListItemText, Icon, TextField, AutocompleteProps, MenuItem } from "@mui/material";
+import { Autocomplete, ListItem, ListItemIcon, ListItemText, TextField, AutocompleteProps } from "@mui/material";
 
 import AvatarIcon from "@/components/icon/AvatarIcon";
 import { Category } from "@/types/schema";

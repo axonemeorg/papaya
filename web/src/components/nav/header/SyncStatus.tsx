@@ -1,8 +1,8 @@
 'use client';
 
 import { RemoteContext, SyncStatusEnum } from "@/contexts/RemoteContext";
-import { CloudDone, CloudOff, CloudSync, Computer, Insights, MoreVert, ReceiptLong, Sync, SyncProblem, UnfoldMore } from "@mui/icons-material";
-import { Button, CardActions, CardContent, CardHeader, CircularProgress, Collapse, Divider, Grow, IconButton, IconProps, LinearProgress, ListItemText, Popover, SvgIconOwnProps, Typography } from "@mui/material";
+import { CloudDone, CloudOff, Computer,Sync, SyncProblem } from "@mui/icons-material";
+import { Button, CardActions, CardHeader, CircularProgress, Divider, Grow, LinearProgress, Popover, SvgIconOwnProps, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type IconColor = SvgIconOwnProps['color'];

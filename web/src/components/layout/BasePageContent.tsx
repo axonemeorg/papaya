@@ -1,5 +1,5 @@
-import { Box, Stack, Typography } from "@mui/material"
-import { PropsWithChildren, ReactNode } from "react"
+import { Stack, Typography } from "@mui/material"
+import { PropsWithChildren } from "react"
 
 
 type IBasePageContentProps = PropsWithChildren<{

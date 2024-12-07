@@ -3,7 +3,6 @@ import {
     Avatar,
     Button,
     Chip, Grid2 as Grid,
-    ListItemIcon,
     ListItemText,
     Stack,
     Table,
@@ -15,9 +14,6 @@ import {
     useTheme,
     TableRowProps,
     TableCellProps,
-    ButtonBase,
-    ButtonProps,
-    ButtonBaseProps,
     TableBodyProps,
 } from "@mui/material";
 import React, { useContext } from 'react';
@@ -90,8 +86,8 @@ interface JournalEntryListProps {
 }
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs, isToday: boolean }) => {
-    const theme = useTheme();
-    const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+    // const theme = useTheme();
+    // const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <Stack

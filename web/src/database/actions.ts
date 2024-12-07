@@ -1,8 +1,7 @@
-import { Category, CreateCategory, CreateEntryArtifact, CreateJournalEntry, type CreateJournalEntryForm, CreateJournalMeta, CreateQuickJournalEntry, EditJournalEntryForm, EnhancedJournalEntry, EntryArtifact, type JournalEntry, JournalMeta } from "@/types/schema";
+import { Category, CreateCategory, type CreateJournalEntryForm, CreateJournalMeta, CreateQuickJournalEntry, EditJournalEntryForm, EntryArtifact, type JournalEntry, JournalMeta } from "@/types/schema";
 import { getDatabaseClient } from "./client";
-import { generateArtifactId, generateCategoryId, generateJournalEntryId, generateJournalId } from "@/utils/id";
+import { generateCategoryId, generateJournalEntryId, generateJournalId } from "@/utils/id";
 import { getJournalEntryArtifacts, getJournalEntryChildren, getOrCreateZiskMeta } from "./queries";
-import { isCreateJournalEntryForm, isEditJournalEntryForm } from "@/utils/journal";
 
 const db = getDatabaseClient();
 
@@ -117,7 +116,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
         };
     }
 
-    const docs: Object[] = [
+    const docs: object[] = [
         parent,
         ...children,
         ...deletedChildren,

@@ -1,7 +1,6 @@
 import Header from "@/components/nav/header/Header";
 import AppMenu from "@/components/nav/menu/AppMenu";
 import { Paper, Stack, useMediaQuery, useTheme } from "@mui/material";
-import { NextPage } from "next";
 import { PropsWithChildren } from "react";
 
 const MainLayout = (props: PropsWithChildren) => {

@@ -1,5 +1,5 @@
 import { JournalEntryContext } from "@/contexts/JournalEntryContext";
-import { ArrowBack, ArrowBackIos, ArrowDropDown, ArrowForward, ArrowForwardIos, ChevronLeft, ChevronRight, EventRepeat, Today } from "@mui/icons-material";
+import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat } from "@mui/icons-material";
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { DateCalendar, DateView, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -51,9 +51,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
     const formattedDateString = useMemo(() => {
         const date = dayjs(journalEntryContext.date);
+        let isCurrentYear;
+        let startOfWeek;
+        let endOfWeek;
+
         switch (journalEntryContext.view) {
             case 'month':
-                const isCurrentYear = date.isSame(now, 'year');
+                isCurrentYear = date.isSame(now, 'year');
                 if (isCurrentYear) {
                     return date.format('MMMM');
                 }
@@ -63,8 +67,8 @@ export default function JournalHeader(props: JournalHeaderProps) {
                 return date.format('YYYY');
             case 'week':
             default:
-                const startOfWeek = date.startOf('week');
-                const endOfWeek = date.endOf('week');
+                startOfWeek = date.startOf('week');
+                endOfWeek = date.endOf('week');
                 // Format into form "Jan 1 - 7, 2022"
                 return `${startOfWeek.format('MMM D')} - ${endOfWeek.format('D, YYYY')}`;
             

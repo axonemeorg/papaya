@@ -1,6 +1,5 @@
 import { Category, Insights, ReceiptLong } from "@mui/icons-material";
 import { ReactNode } from "react";
-import { string } from "zod";
 
 type NavMenuItem = {
     icon: ReactNode;

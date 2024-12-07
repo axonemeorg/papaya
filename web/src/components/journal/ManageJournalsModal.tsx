@@ -1,6 +1,6 @@
 import { JournalContext } from "@/contexts/JournalContext";
 import { JournalMeta } from "@/types/schema";
-import { Add, Person } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, ListItemIcon, ListItemText, MenuItem, MenuList, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import JournalDetailsAndActivity from "./JournalDetailsAndActivity";

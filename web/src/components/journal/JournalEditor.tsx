@@ -1,6 +1,5 @@
-import React, { MouseEvent, useContext, useEffect, useMemo, useState } from "react";
-import { alpha, Avatar, Box, Button, Chip, Divider, Fab, Grid2 as Grid, IconButton, List, ListItemIcon, ListItemText, MenuItem, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import React, { MouseEvent, useContext, useMemo, useState } from "react";
+import { Box, Divider  } from "@mui/material";
 import dayjs from "dayjs";
 import JournalHeader from "./JournalHeader";
 import SettingsDrawer from "./categories/SettingsDrawer";

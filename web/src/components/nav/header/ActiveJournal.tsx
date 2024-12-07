@@ -2,8 +2,8 @@
 
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal";
 import { JournalContext } from "@/contexts/JournalContext";
-import { Insights, ReceiptLong, UnfoldMore } from "@mui/icons-material";
-import { Button, ListItemIcon, ListItemText, MenuItem as MuiMenuItem, MenuItemProps, Select, Typography, Tooltip } from "@mui/material";
+import { UnfoldMore } from "@mui/icons-material";
+import { Button, Typography, Tooltip } from "@mui/material";
 import { useContext } from "react";
 
 export default function ActiveJournal() {

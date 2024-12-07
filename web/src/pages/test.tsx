@@ -1,5 +1,4 @@
 import { getLayout } from "@/layouts/main";
-import { Paper } from "@mui/material";
 
 
 const TestPage = () => {

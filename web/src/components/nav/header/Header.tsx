@@ -1,10 +1,9 @@
 'use client';
 
-import { Avatar, Button, Chip, IconButton, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { IconButton, Stack, useMediaQuery, useTheme } from "@mui/material";
 import AppLogo from "./AppLogo";
-import { Menu, Search, Settings } from "@mui/icons-material";
+import { Menu, Settings } from "@mui/icons-material";
 import { useAppMenuStateStore } from "@/store/useAppMenuStateStore";
-import { PropsWithChildren } from "react";
 import ActiveJournal from "./ActiveJournal";
 import SearchWidget from "./SearchWidget";
 import SyncStatus from "./SyncStatus";

@@ -1,15 +1,11 @@
 'use client'
 
 import { Menu as MenuIcon } from "@mui/icons-material";
-import { Avatar, Badge, Box, Button, Menu, MenuItem, Paper, Typography } from "@mui/material";
-import { User } from "lucia";
+import { Avatar, Badge, Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import { useSession, signIn, signOut } from "next-auth/react";
-import Link from "next/link";
 import { useState } from "react";
 
-type UserWidgetProps = {};
-
-export default function UserWidget(props: UserWidgetProps) {
+export default function UserWidget() {
     const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
     const handleClose = () => {

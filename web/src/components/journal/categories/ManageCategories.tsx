@@ -6,13 +6,11 @@ import { DEFAULT_AVATAR } from "@/components/pickers/AvatarPicker";
 import { JournalContext } from "@/contexts/JournalContext";
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { createCategory, deleteCategory, undeleteCategory, updateCategory } from "@/database/actions";
-import { getCategories } from "@/database/queries";
 import { Category, CreateCategory } from "@/types/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Add, ArrowBack, Close, Delete, NavigateNext, Save } from "@mui/icons-material";
 import { Button, IconButton, List, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Stack, Typography } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 enum ManageCategoriesFormMode {
@@ -69,7 +67,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 
     const handleCreateCategory = async (formData: Category) => {
         try {
-            const response = await createCategory(formData);
+            await createCategory(formData);
             snackbar({ message: 'Created category' })
             setFormState(ManageCategoriesFormMode.VIEW);
             getCategoriesQuery.refetch();

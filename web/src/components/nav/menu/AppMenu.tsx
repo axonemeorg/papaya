@@ -4,7 +4,7 @@ import { Add, Create, Menu } from "@mui/icons-material";
 import { Box, Divider, Drawer, Fab, IconButton, ListItemIcon, ListItemText, MenuItem, MenuList, Stack, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { ReactNode, useCallback, useContext, useEffect } from "react";
+import React, { ReactNode, useContext, useEffect } from "react";
 import AppLogo from "../header/AppLogo";
 import { JournalContext } from "@/contexts/JournalContext";
 
