@@ -51,7 +51,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 	const [formMode, setFormState] = useState<ManageCategoriesFormMode>(ManageCategoriesFormMode.VIEW)
 
 	const { snackbar } = useContext(NotificationsContext)
-	const { getCategoriesQuery } = useContext(JournalContext)
+	const { getCategoriesQuery, journal } = useContext(JournalContext)
 
 	const formTitle = FORM_TITLES[formMode] ?? 'Categories'
 
@@ -76,8 +76,11 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 	}
 
 	const handleCreateCategory = async (formData: Category) => {
+		if (!journal) {
+			return
+		}
 		try {
-			await createCategory(formData)
+			await createCategory(formData, journal._id)
 			snackbar({ message: 'Created category' })
 			setFormState(ManageCategoriesFormMode.VIEW)
 			getCategoriesQuery.refetch()

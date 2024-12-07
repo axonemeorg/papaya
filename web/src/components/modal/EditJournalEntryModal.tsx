@@ -9,6 +9,7 @@ import { useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { EditJournalEntryForm } from '@/types/schema'
 import { createOrUpdateJournalEntry } from '@/database/actions'
+import { JournalContext } from '@/contexts/JournalContext'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -19,11 +20,13 @@ interface EditJournalEntryModalProps {
 
 export default function EditJournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
+	const { journal } = useContext(JournalContext)
 
 	const handleUpdateJournalEntry = (formData: EditJournalEntryForm) => {
-		console.log('handleUpdateJournalEntry', formData)
-		console.log('props.initialValues:', props.initialValues)
-		createOrUpdateJournalEntry(formData)
+		if (!journal) {
+			return
+		}
+		createOrUpdateJournalEntry(formData, journal._id)
 			.then(() => {
 				props.onClose()
 				snackbar({ message: 'Updated journal entry' })

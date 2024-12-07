@@ -15,7 +15,12 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 
 	const getEnhancedJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
 		queryKey: ['enhancedJournalEntries', view, date],
-		queryFn: async () => getEnhancedJournalEntries(view, date),
+		queryFn: async () => {
+			if (!journalContext.journal) {
+				return {}
+			}
+			return getEnhancedJournalEntries(view, date, journalContext.journal._id)
+		},
 		initialData: {},
 		enabled: hasSelectedJournal,
 	})

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useMemo, useState } from 'react'
+import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Divider } from '@mui/material'
 import dayjs from 'dayjs'
 import JournalHeader from './JournalHeader'
@@ -11,6 +11,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { getDatabaseClient } from '@/database/client'
 
 export type JournalEditorView = 'week' | 'month' | 'year'
 
@@ -107,11 +108,12 @@ export default function JournalEditor() {
 	}
 
 	// show all docs
-	// useEffect(() => {
-	//     db.allDocs({ include_docs: true }).then((result) => {
-	//         console.log('all docs', result);
-	//     });
-	// }, []);
+	useEffect(() => {
+		const db = getDatabaseClient()
+	    db.allDocs({ include_docs: true }).then((result) => {
+	        console.log('all docs', result);
+	    })
+	}, []);
 
 	return (
 		<>

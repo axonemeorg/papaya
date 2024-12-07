@@ -38,17 +38,21 @@ export const getJournalEntries = async (
 
 	const endDate = dayjs(date).endOf(view).format('YYYY-MM-DD')
 
+	const selector = {
+		'$and': [
+			{ type: 'JOURNAL_ENTRY' },
+			 { journalId },
+			{ date: {
+				$gte: startDate,
+				$lte: endDate,
+			} },
+		],
+	}
+
+	console.log('selector', selector)
+
 	const result = await db.find({
-		selector: {
-			'$and': [
-				{ type: 'JOURNAL_ENTRY' },
-			 	{ journalId },
-				{ date: {
-					$gte: startDate,
-					$lte: endDate,
-				} },
-			],
-		},
+		selector
 	})
 
 	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
