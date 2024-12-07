@@ -4,6 +4,10 @@ export const IdentifierMetadata = z.object({
     _id: z.string(),
 });
 
+export const BelongsToJournal = z.object({
+    journalId: z.string(),
+});
+
 export const DocumentMetadata = IdentifierMetadata.merge(z.object({
     _rev: z.string().optional(),
     _deleted: z.boolean().optional(),
