@@ -1,81 +1,81 @@
 @property --bg-angle {
-  inherits: false;
-  initial-value: 0deg;
-  syntax: "<angle>";
+	inherits: false;
+	initial-value: 0deg;
+	syntax: '<angle>';
 }
 
 @property --bg-border-width {
-  inherits: false;
-  initial-value: 0px;
-  syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+	syntax: '<length>';
 }
 
 @keyframes spin {
-  0% {
-    --bg-angle: 0deg;
-    --bg-border-width: 0px;
-  }
-  25% {
-    --bg-angle: 90deg;
-    --bg-border-width: 2px;
-  }
-  50% {
-    --bg-angle: 180deg;
-    --bg-border-width: 3px;
-  }
-  75% {
-    --bg-angle: 270deg;
-    --bg-border-width: 2px;
-  }
-  100% {
-    --bg-angle: 360deg;
-    --bg-border-width: 0px;
-  }
+	0% {
+		--bg-angle: 0deg;
+		--bg-border-width: 0px;
+	}
+	25% {
+		--bg-angle: 90deg;
+		--bg-border-width: 2px;
+	}
+	50% {
+		--bg-angle: 180deg;
+		--bg-border-width: 3px;
+	}
+	75% {
+		--bg-angle: 270deg;
+		--bg-border-width: 2px;
+	}
+	100% {
+		--bg-angle: 360deg;
+		--bg-border-width: 0px;
+	}
 }
 
 .ai-effect {
-  display: block;
-  animation: spin 0.5s cubic-bezier( 0.73, 0.04, 0.17, 0.97 ) paused;
-  border-radius: 2px;
+	display: block;
+	animation: spin 0.5s cubic-bezier(0.73, 0.04, 0.17, 0.97) paused;
+	border-radius: 2px;
 
-  border: var(--bg-border-width) solid;
-  margin: calc(-1 * var(--bg-border-width));
+	border: var(--bg-border-width) solid;
+	margin: calc(-1 * var(--bg-border-width));
 
-  // Working example:
-  // border-image: linear-gradient(var(--bg-angle), green, yellow) 1;
+	// Working example:
+	// border-image: linear-gradient(var(--bg-angle), green, yellow) 1;
 
-  border-image: linear-gradient(var(--bg-angle),
-    hsl(0, 100%, 50%),
-    hsl(30, 100%, 50%),
-    hsl(60, 100%, 50%),
-    hsl(90, 100%, 50%),
-    hsl(120, 100%, 50%),
-    hsl(150, 100%, 50%),
-    hsl(180, 100%, 50%),
-    hsl(210, 100%, 50%),
-    hsl(240, 100%, 50%),
-    hsl(270, 100%, 50%),
-    hsl(300, 100%, 50%),
-    hsl(330, 100%, 50%),
-    hsl(360, 100%, 50%)
-  ) 1;
+	border-image: linear-gradient(
+			var(--bg-angle),
+			hsl(0, 100%, 50%),
+			hsl(30, 100%, 50%),
+			hsl(60, 100%, 50%),
+			hsl(90, 100%, 50%),
+			hsl(120, 100%, 50%),
+			hsl(150, 100%, 50%),
+			hsl(180, 100%, 50%),
+			hsl(210, 100%, 50%),
+			hsl(240, 100%, 50%),
+			hsl(270, 100%, 50%),
+			hsl(300, 100%, 50%),
+			hsl(330, 100%, 50%),
+			hsl(360, 100%, 50%)
+		)
+		1;
 
-  // background:
-  //   inherit
-  //     padding-box,
-  //   conic-gradient(
-  //       from var(--bg-angle) in oklch longer hue,
-  //       oklch(0.85 0.37 0) 0 0
-  //     )
-  //     border-box;
-  
-  
+	// background:
+	//   inherit
+	//     padding-box,
+	//   conic-gradient(
+	//       from var(--bg-angle) in oklch longer hue,
+	//       oklch(0.85 0.37 0) 0 0
+	//     )
+	//     border-box;
 
-  &:hover {
-    animation-play-state: running;
-  }
+	&:hover {
+		animation-play-state: running;
+	}
 }
 
 a {
-  color: unset;
+	color: unset;
 }

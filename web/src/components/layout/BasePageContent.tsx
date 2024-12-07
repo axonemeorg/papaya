@@ -1,10 +1,9 @@
-import { Box, Stack, Typography } from "@mui/material"
-import { PropsWithChildren, ReactNode } from "react"
-
+import { Stack, Typography } from '@mui/material'
+import { PropsWithChildren } from 'react'
 
 type IBasePageContentProps = PropsWithChildren<{
-    pageTitle: string
-    pageDescription: string
+	pageTitle: string
+	pageDescription: string
 }>
 
 /**
@@ -12,15 +11,15 @@ type IBasePageContentProps = PropsWithChildren<{
  * description to a page.
  */
 export default function BasePageContent(props: IBasePageContentProps) {
-    return (
-        <Stack flex={1}>
-            <Stack mb={2} direction='row' gap={1} justifyContent='space-between'>
-                <Typography variant='h2'>{props.pageTitle}</Typography>
-            </Stack>
-            <Typography>{props.pageDescription}</Typography>
-            <Stack flex={1} mt={3}>
-                {props.children}
-            </Stack>
-        </Stack>
-    )
+	return (
+		<Stack flex={1}>
+			<Stack mb={2} direction="row" gap={1} justifyContent="space-between">
+				<Typography variant="h2">{props.pageTitle}</Typography>
+			</Stack>
+			<Typography>{props.pageDescription}</Typography>
+			<Stack flex={1} mt={3}>
+				{props.children}
+			</Stack>
+		</Stack>
+	)
 }

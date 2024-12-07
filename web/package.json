@@ -44,6 +44,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.16.0",
     "@faker-js/faker": "^8.4.1",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "20.14.0",
@@ -51,12 +52,21 @@
     "@types/pouchdb": "^6.4.2",
     "@types/react": "18.3.3",
     "@types/react-window": "^1.8.8",
-    "typescript": "5.4.5"
+    "eslint": "^9.16.0",
+    "eslint-plugin-react": "^7.37.2",
+    "globals": "^15.13.0",
+    "prettier": "3.4.2",
+    "typescript": "5.4.5",
+    "typescript-eslint": "^8.17.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "next -p 9475",
     "build": "next build",
-    "start": "next start -p 9475"
+    "start": "next start -p 9475",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
+    "format-fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\""
   }
 }

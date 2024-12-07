@@ -1,14 +1,13 @@
-import { getLayout } from "@/layouts/main";
-
+import { getLayout } from '@/layouts/main'
 
 const CategoriesPage = () => {
-    return (
-        <div>
-        <h1>Categories</h1>
-        </div>
-    );
-};
+	return (
+		<div>
+			<h1>Categories</h1>
+		</div>
+	)
+}
 
-CategoriesPage.getLayout = getLayout;
+CategoriesPage.getLayout = getLayout
 
-export default CategoriesPage;
+export default CategoriesPage
