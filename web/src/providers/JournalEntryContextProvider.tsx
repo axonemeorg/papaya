@@ -30,7 +30,7 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 		}
 
 		refetchAllDependantQueries()
-	}, [journalContext.journal])
+	}, [journalContext.journal, journalContext.getCategoriesQuery.data, journalContext.getEntryTagsQuery.data])
 
 	return (
 		<JournalEntryContext.Provider
