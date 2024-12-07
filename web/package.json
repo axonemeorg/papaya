@@ -67,6 +67,6 @@
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
-    "format-fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\""
+    "format:fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\""
   }
 }
