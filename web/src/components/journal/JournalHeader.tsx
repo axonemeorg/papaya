@@ -1,5 +1,5 @@
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat } from '@mui/icons-material'
+import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat, FilterList } from '@mui/icons-material'
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -121,7 +121,11 @@ export default function JournalHeader(props: JournalHeaderProps) {
 					direction="row"
 					alignItems="center"
 					gap={2}
-					flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}>
+					flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
+				>
+					<Button startIcon={<FilterList />} color='inherit' variant='outlined'>
+						Filters
+					</Button>	
 					<Tooltip title={formattedCurrentDay}>
 						<IconButton color="inherit" onClick={() => jumpToToday()}>
 							<EventRepeat />
