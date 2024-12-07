@@ -15,7 +15,10 @@ import { getJournalEntryArtifacts, getJournalEntryChildren, getOrCreateZiskMeta 
 
 const db = getDatabaseClient()
 
-export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryForm | EditJournalEntryForm) => {
+export const createOrUpdateJournalEntry = async (
+	formData: CreateJournalEntryForm | EditJournalEntryForm,
+	journalId: string
+) => {
 	const now = new Date().toISOString()
 
 	// const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
@@ -83,6 +86,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
 				artifactIds: [],
 				createdAt: now,
 				updatedAt: null,
+				journalId,
 			}
 		}
 	})
@@ -102,6 +106,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
 				parentEntryId: parentId,
 				createdAt: now,
 				updatedAt: null,
+				journalId,
 			}
 		}
 	})
@@ -123,6 +128,7 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
 			artifactIds: artifacts.map((artifact) => artifact._id),
 			createdAt: now,
 			updatedAt: null,
+			journalId,
 		}
 	}
 
@@ -140,7 +146,11 @@ export const createOrUpdateJournalEntry = async (formData: CreateJournalEntryFor
 	return db.bulkDocs(docs)
 }
 
-export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry, date: string) => {
+export const createQuickJournalEntry = async (
+	formData: CreateQuickJournalEntry,
+	date: string,
+	journalId: string,
+) => {
 	const journalEntryFormData: CreateJournalEntryForm = {
 		parent: {
 			memo: formData.memo,
@@ -158,7 +168,7 @@ export const createQuickJournalEntry = async (formData: CreateQuickJournalEntry,
 		artifacts: [],
 	}
 
-	return createOrUpdateJournalEntry(journalEntryFormData)
+	return createOrUpdateJournalEntry(journalEntryFormData, journalId)
 }
 
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
@@ -173,13 +183,14 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 	await db.put(journalEntry)
 }
 
-export const createCategory = async (formData: CreateCategory) => {
+export const createCategory = async (formData: CreateCategory, journalId: string) => {
 	const category: Category = {
 		...formData,
 		type: 'CATEGORY',
 		_id: generateCategoryId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
+		journalId,
 	}
 
 	return db.put(category)
