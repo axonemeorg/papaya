@@ -7,17 +7,24 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { createCategory, deleteCategory, undeleteCategory, updateCategory } from '@/database/actions'
 import { Category, CreateCategory } from '@/types/schema'
+import { pluralize as p } from '@/utils/string'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Add, ArrowBack, Close, Delete, NavigateNext, Save } from '@mui/icons-material'
+import { Add, Save, Search } from '@mui/icons-material'
 import {
 	Button,
+	Divider,
 	IconButton,
 	List,
+	ListItem,
+	ListItemButton,
 	ListItemIcon,
 	ListItemSecondaryAction,
 	ListItemText,
 	MenuItem,
+	MenuList,
+	Paper,
 	Stack,
+	TextField,
 	Typography,
 } from '@mui/material'
 import { useContext, useState } from 'react'
@@ -55,9 +62,9 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 
 	const formTitle = FORM_TITLES[formMode] ?? 'Categories'
 
-	const createCategoryForm = useForm<Category>({
+	const createCategoryForm = useForm<CreateCategory>({
 		defaultValues: CATEGORY_FORM_CREATE_VALUES,
-		resolver: zodResolver(Category),
+		resolver: zodResolver(CreateCategory),
 	})
 
 	const updateCategoryForm = useForm<Category>({
@@ -75,7 +82,7 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 		setFormState(ManageCategoriesFormMode.CREATE)
 	}
 
-	const handleCreateCategory = async (formData: Category) => {
+	const handleCreateCategory = async (formData: CreateCategory) => {
 		if (!journal) {
 			return
 		}
@@ -128,43 +135,55 @@ export default function ManageCategories(props: ManageCategoriesProps) {
 		}
 	}
 
+	const categories = Object.values(getCategoriesQuery.data)
+
 	return (
-		<Stack>
+		<Stack gap={3}>
 			<Stack direction="row" justifyContent="space-between" alignItems="center">
-				<Stack direction="row" gap={1} alignItems="center">
-					<IconButton onClick={() => handleCancel()}>
-						{formMode === ManageCategoriesFormMode.VIEW ? <Close /> : <ArrowBack />}
-					</IconButton>
-					<Typography variant="h6">{formTitle}</Typography>
-				</Stack>
-				{formMode === ManageCategoriesFormMode.VIEW && (
-					<Button startIcon={<Add />} onClick={() => beginCreateCategory()} variant="text">
-						Add Category
-					</Button>
-				)}
+				<TextField
+					slotProps={{
+						input: {
+							startAdornment: <Search />,
+						}
+					}}
+					label="Search all categories"
+					size='small'
+				/>
+				<Button startIcon={<Add />} onClick={() => beginCreateCategory()} variant="contained" size='small'>
+					Add Category
+				</Button>
+{/* 			
 				{formMode === ManageCategoriesFormMode.EDIT && (
 					<Button startIcon={<Delete />} onClick={() => handleDeleteCategory()} variant="text" color="error">
 						Delete
 					</Button>
-				)}
+				)} */}
 			</Stack>
-			{formMode === ManageCategoriesFormMode.VIEW && (
-				<List dense>
+			<Paper>
+				<Stack p={2} direction="row" justifyContent="space-between" alignItems="center">
+					<Typography>
+						<>{categories.length} {p(categories.length, 'categor', 'y', 'ies')}</>
+					</Typography>
+				</Stack>
+				<Divider />
+				<MenuList>
 					{Object.values(getCategoriesQuery.data).map((category) => {
 						return (
-							<MenuItem onClick={() => handleSelectCategoryForEdit(category)} key={category._id}>
+							<ListItem
+								onClick={() => handleSelectCategoryForEdit(category)} key={category._id}
+								secondaryAction={
+									<Button>Hello</Button>
+								}
+							>
 								<ListItemIcon>
 									<AvatarIcon avatar={category?.avatar} />
 								</ListItemIcon>
 								<ListItemText primary={category.label} />
-								<ListItemSecondaryAction>
-									<NavigateNext />
-								</ListItemSecondaryAction>
-							</MenuItem>
+							</ListItem>
 						)
 					})}
-				</List>
-			)}
+				</MenuList>
+			</Paper>
 			{formMode === ManageCategoriesFormMode.EDIT && (
 				<FormProvider {...updateCategoryForm}>
 					<form onSubmit={updateCategoryForm.handleSubmit(handleUpdateCategory)}>

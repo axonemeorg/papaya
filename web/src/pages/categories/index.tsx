@@ -1,9 +1,12 @@
 import ManageCategories from '@/components/journal/categories/ManageCategories'
 import { getLayout } from '@/layouts/main'
+import { Container } from '@mui/material'
 
 const CategoriesPage = () => {
 	return (
-		<ManageCategories onClose={() => {}} />
+		<Container maxWidth="xl" sx={{ pt: 2 }}>
+			<ManageCategories onClose={() => {}} />
+		</Container>
 	)
 }
 
