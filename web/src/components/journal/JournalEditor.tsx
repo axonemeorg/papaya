@@ -2,7 +2,6 @@ import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'rea
 import { Box, Divider } from '@mui/material'
 import dayjs from 'dayjs'
 import JournalHeader from './JournalHeader'
-import SettingsDrawer from './categories/SettingsDrawer'
 import { EnhancedJournalEntry } from '@/types/schema'
 import CreateJournalEntryModal from '../modal/CreateJournalEntryModal'
 import JournalEntryCard from './JournalEntryCard'
@@ -21,7 +20,6 @@ export interface JournalEntrySelection {
 }
 
 export default function JournalEditor() {
-	const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false)
 	const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
 		entry: null,
 		anchorEl: null,
@@ -126,7 +124,6 @@ export default function JournalEditor() {
 				}}
 				initialDate={journalContext.createEntryInitialDate}
 			/>
-			<SettingsDrawer open={showSettingsDrawer} onClose={() => setShowSettingsDrawer(false)} />
 			<Box
 				sx={{
 					px: { sm: 0 },
