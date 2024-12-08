@@ -21,7 +21,7 @@ export const getCategories = async (journalId: string): Promise<Record<Category[
 		selector: {
 			'$and': [
 				{ type: 'CATEGORY' },
-			 	{ journalId },
+				{ journalId },
 			],
 		},
 	})
@@ -34,22 +34,24 @@ export const getJournalEntries = async (
 	date: string,
 	journalId: string
 ): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
-	const startDate = dayjs(date).startOf(view).format('YYYY-MM-DD')
-
-	const endDate = dayjs(date).endOf(view).format('YYYY-MM-DD')
-
-	const selector = {
-		'$and': [
-			{ type: 'JOURNAL_ENTRY' },
-			 { journalId },
-			{ date: {
+	const selectorClauses: any[] = [
+		{ type: 'JOURNAL_ENTRY' },
+		{ journalId },
+	]
+	if (view !== 'all') {
+		const startDate = dayjs(date).startOf(view).format('YYYY-MM-DD')
+		const endDate = dayjs(date).endOf(view).format('YYYY-MM-DD')
+		selectorClauses.push({
+			date: {
 				$gte: startDate,
 				$lte: endDate,
-			} },
-		],
+			}
+		});
 	}
 
-	console.log('selector', selector)
+	const selector = {
+		'$and': selectorClauses,
+	}
 
 	const result = await db.find({
 		selector
@@ -94,7 +96,7 @@ export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['
 		selector: {
 			'$and': [
 				{ type: 'ENTRY_TAG' },
-			 	{ journalId },
+				{ journalId },
 			],
 		},
 	})
@@ -134,7 +136,7 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 		selector: {
 			'$and': [
 				{ type: 'ENTRY_ARTIFACT' },
-			 	{ journalId },
+				{ journalId },
 			],
 		},
 	})
@@ -163,9 +165,11 @@ export const getJournalEntryArtifacts = async (entryId: JournalEntry['_id']): Pr
 		selector: {
 			'$and': [
 				{ type: 'ENTRY_ARTIFACT' },
-				{ _id: {
-					$in: artifactIds,
-				} },
+				{
+					_id: {
+						$in: artifactIds,
+					}
+				},
 			],
 		},
 	})

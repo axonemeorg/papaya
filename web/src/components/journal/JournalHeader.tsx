@@ -22,7 +22,8 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	}
 
 	const theme = useTheme()
-	const hideNextPrevButtons = useMediaQuery(theme.breakpoints.down('md'))
+	const hideTodayButton = journalEntryContext.view === 'all'
+	const hideNextPrevButtons = hideTodayButton || useMediaQuery(theme.breakpoints.down('md'))
 	const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
 
 	const now = useMemo(() => dayjs(), [])
@@ -58,6 +59,9 @@ export default function JournalHeader(props: JournalHeaderProps) {
 		let endOfWeek
 
 		switch (journalEntryContext.view) {
+			case 'all':
+				// TODO: Implement all time view to show the timestamp range from the first entry to today/the last entry
+				return 'All Time'
 			case 'month':
 				isCurrentYear = date.isSame(now, 'year')
 				if (isCurrentYear) {
@@ -141,11 +145,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							minTransactionAmount: 0
 						}}
 					/>
-					<Tooltip title={formattedCurrentDay}>
-						<IconButton color="inherit" onClick={() => jumpToToday()}>
-							<EventRepeat />
-						</IconButton>
-					</Tooltip>
+					{!hideTodayButton && (
+						<Tooltip title={formattedCurrentDay}>
+							<IconButton color="inherit" onClick={() => jumpToToday()}>
+								<EventRepeat />
+							</IconButton>
+						</Tooltip>
+					)}
 					<Stack direction="row" alignItems="center" gap={1}>
 						<Button
 							color="inherit"
