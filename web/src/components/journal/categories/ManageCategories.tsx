@@ -1,4 +1,5 @@
 import AvatarIcon from '@/components/icon/AvatarIcon'
+import CategoryChip from '@/components/icon/CategoryChip'
 import CreateCategoryModal from '@/components/modal/CreateCategoryModal'
 import EditCategoryModal from '@/components/modal/EditCategoryModal'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -12,7 +13,6 @@ import {
 	Divider,
 	ListItem,
 	ListItemIcon,
-	ListItemText,
 	MenuList,
 	Paper,
 	Stack,
@@ -120,7 +120,8 @@ export default function ManageCategories() {
 									<ListItemIcon>
 										<AvatarIcon avatar={category?.avatar} />
 									</ListItemIcon>
-									<ListItemText primary={category.label} />
+									<CategoryChip category={category} contrast />
+									{/* <ListItemText primary={category.label} /> */}
 								</ListItem>
 							)
 						})}
