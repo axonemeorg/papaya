@@ -13,12 +13,14 @@ import {
 	Divider,
 	ListItem,
 	ListItemIcon,
+	ListItemText,
 	MenuList,
 	Paper,
 	Stack,
 	TextField,
 	Typography,
 } from '@mui/material'
+import Link from 'next/link'
 import { useContext, useState } from 'react'
 
 export default function ManageCategories() {
@@ -120,8 +122,9 @@ export default function ManageCategories() {
 									<ListItemIcon>
 										<AvatarIcon avatar={category?.avatar} />
 									</ListItemIcon>
-									<CategoryChip category={category} contrast />
-									{/* <ListItemText primary={category.label} /> */}
+									<Link href={`/journal/a?cs=${category._id}`}>
+										<CategoryChip category={category} contrast />
+									</Link>
 								</ListItem>
 							)
 						})}
