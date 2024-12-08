@@ -1,17 +1,19 @@
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat } from '@mui/icons-material'
+import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat, FilterList } from '@mui/icons-material'
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react'
+import JournalFilters from './JournalFilters'
 
 type JournalHeaderProps = PropsWithChildren<{
 	reverseActionOrder?: boolean
 }>
 
 export default function JournalHeader(props: JournalHeaderProps) {
-	const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+	const [datePickerAnchorEl, setDatePickerAnchorEl] = useState<HTMLButtonElement | null>(null)
+	const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
 
 	const journalEntryContext = useContext(JournalEntryContext)
 
@@ -96,7 +98,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
 	return (
 		<>
-			<Popover open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
+			<Popover open={Boolean(datePickerAnchorEl)} onClose={() => setDatePickerAnchorEl(null)} anchorEl={datePickerAnchorEl}>
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DateCalendar
 						views={calendarAvailableViews}
@@ -121,7 +123,24 @@ export default function JournalHeader(props: JournalHeaderProps) {
 					direction="row"
 					alignItems="center"
 					gap={2}
-					flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}>
+					flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
+				>
+					<Button
+						startIcon={<FilterList />}
+						color='inherit'
+						variant='outlined'
+						onClick={(event) => setJournalFiltersAnchorEl(event.currentTarget)}
+					>
+						Filters
+					</Button>
+					<JournalFilters
+						anchorEl={journalFiltersAnchorEl}
+						onClose={() => setJournalFiltersAnchorEl(null)}
+						filterConfig={{
+							maxTransactionAmount: 1000,
+							minTransactionAmount: 0
+						}}
+					/>
 					<Tooltip title={formattedCurrentDay}>
 						<IconButton color="inherit" onClick={() => jumpToToday()}>
 							<EventRepeat />
@@ -131,7 +150,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 						<Button
 							color="inherit"
 							endIcon={<ArrowDropDown />}
-							onClick={(e) => setAnchorEl(e.currentTarget)}>
+							onClick={(e) => setDatePickerAnchorEl(e.currentTarget)}>
 							<Typography
 								variant={headingSize}
 								sx={{ fontWeight: 500, minWidth: '9ch', textAlign: 'left' }}>

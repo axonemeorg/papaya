@@ -18,6 +18,8 @@ export const DocumentMetadata = IdentifierMetadata.merge(
 
 export const EntryType = z.enum(['DEBIT', 'CREDIT'])
 
+export type EntryType = z.output<typeof EntryType>
+
 export const AvatarVariant = z.enum(['TEXT', 'PICTORIAL', 'IMAGE'])
 
 export const Avatar = z.object({
