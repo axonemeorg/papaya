@@ -9,6 +9,7 @@ const VIEW_SHORTHAND_TO_VIEW: Record<string, JournalEditorView> = {
 	m: 'month',
 	y: 'year',
 	w: 'week',
+	a: 'all',
 }
 
 const JournalYearMonthPage = () => {

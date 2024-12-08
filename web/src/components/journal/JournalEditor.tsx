@@ -13,7 +13,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 import { getDatabaseClient } from '@/database/client'
 
-export type JournalEditorView = 'week' | 'month' | 'year'
+export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
 
 export interface JournalEntrySelection {
 	entry: EnhancedJournalEntry | null
