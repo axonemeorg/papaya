@@ -1,9 +1,7 @@
-import { JournalEntryContext } from "@/contexts/JournalEntryContext"
 import useQueryFilters from "@/hooks/useQueryFilters"
 import { EntryType } from "@/types/schema"
 import { Category, ChevronRight } from "@mui/icons-material"
 import { ListItemButton, ListItemIcon, ListItemText, Menu } from "@mui/material"
-import { useContext } from "react"
 
 interface JournalFilterConfig {
     maxTransactionAmount: number
@@ -29,7 +27,6 @@ interface JournalFiltersProps {
 }
 
 export default function JournalFilters(props: JournalFiltersProps) {
-    const journalEntryContext = useContext(JournalEntryContext);
     const { setFilters } = useQueryFilters();
 
     const testClick = () => {

@@ -43,7 +43,6 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 			value={{
 				view,
 				date,
-				// filters,
 				setDate,
 				onNextPage,
 				onPrevPage,
