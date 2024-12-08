@@ -11,6 +11,7 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 	const { view, date, setDate, onNextPage, onPrevPage } = props
 
 	const journalContext = useContext(JournalContext)
+
 	const hasSelectedJournal = Boolean(journalContext.journal)
 
 	const getEnhancedJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
