@@ -13,7 +13,6 @@ import {
 	Divider,
 	ListItem,
 	ListItemIcon,
-	ListItemText,
 	MenuList,
 	Paper,
 	Stack,
