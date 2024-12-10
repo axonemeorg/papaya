@@ -11,11 +11,16 @@ export default function AmountField(props: AmountFieldProps) {
     const isIncome = value.startsWith('+')
 
     const toggleSign = () => {
-        const syntheticEvent = isIncome
-            ? { target: { value: value.slice(1) } }
-            : { target: { value: '+' + value } };
+        const event = new Event('change', { bubbles: true });
+        const syntheticEvent = {
+            ...event,
+            target: {
+                ...event.target,
+                value: isIncome ? value.slice(1) : '+' + value,
+            },
+        };
 
-        props.onChange?.(syntheticEvent)
+        props.onChange?.(syntheticEvent as unknown as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,6 +38,7 @@ export default function AmountField(props: AmountFieldProps) {
             .replace(/[^0-9.,+]/g, '') // Remove non-numeric characters except for dot, comma, or plus sign
             .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
             .replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
+            .replace(/[-+](?!.)/g, '') // Remove any pluses or minuses that are not at the beginning of the string
 
         props.onChange?.({ ...event, target: { ...event.target, value: newValue } })
     }
