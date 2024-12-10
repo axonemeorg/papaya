@@ -42,9 +42,9 @@ export const enhanceJournalEntry = (
 
 	const netAmount = children.reduce(
 		(acc, child) => {
-			return acc + parseFloat(child.amount)
+			return acc + child.amount
 		},
-		parseFloat(parent.amount)
+		parent.amount
 	)
 
 	return {
