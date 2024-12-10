@@ -4,8 +4,6 @@ import { TextField, InputAdornment, TextFieldProps, IconButton } from "@mui/mate
 
 type AmountFieldProps = TextFieldProps
 
-export const AMOUNT_VALIDATION_PATTERN = /[-+]?\d{1,3}(,\d{3})*(\.\d+)?/;
-
 export default function AmountField(props: AmountFieldProps) {
     const value = String(props.value ?? '');
     const isIncome = value.startsWith('+')

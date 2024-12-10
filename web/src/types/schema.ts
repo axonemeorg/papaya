@@ -45,12 +45,24 @@ export const Category = DocumentMetadata.merge(BelongsToJournal).merge(CreateCat
 
 export type Category = z.output<typeof Category>
 
-export const CreateJournalEntryChild = z.object({
+const amountValidationPattern = /[-+]?\d{1,3}(,\d{3})*(\.\d+)?/;
+
+const AmountRecord = z.object({
+	amount: z.string()
+		.regex(amountValidationPattern, 'A valid amount is required')
+		.transform((value) => {
+			const sanitizedValue = Number(value.replace(/[^0-9.]/g, ''))
+			return sanitizedValue * (value.startsWith('+') ? 1 : -1)
+		}),
+})
+
+export type AmountRecord = z.output<typeof AmountRecord>
+
+export const CreateJournalEntryChild = AmountRecord.merge(z.object({
 	memo: z.string(),
-	amount: z.string().min(0, 'A positive number is required'),
 	tagIds: z.array(z.string()).optional(),
 	categoryIds: z.array(z.string()).optional(),
-})
+}))
 
 export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>
 
@@ -141,11 +153,10 @@ export const EditJournalEntryForm = z.object({
 
 export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>
 
-export const CreateQuickJournalEntry = z.object({
+export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string(),
 	categoryIds: z.array(z.string()),
-	amount: z.string().min(0, 'A positive number is required'),
-})
+}))
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
 
