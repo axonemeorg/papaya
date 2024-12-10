@@ -28,6 +28,7 @@ import { AttachmentButton, AttachmentDropzone } from '../input/AttachmentPicker'
 import { generateArtifactId } from '@/utils/id'
 import { formatFileSize } from '@/utils/string'
 import { JournalContext } from '@/contexts/JournalContext'
+import AmountField from '../input/AmountField'
 
 interface JournalEntryChildRowProps {
 	index: number
@@ -269,17 +270,11 @@ export default function JournalEntryForm() {
 							control={control}
 							name="parent.amount"
 							render={({ field }) => (
-								<TextField
-									label="Amount"
+								<AmountField
 									{...field}
-									onChange={(event) => {
-										const value = event.target.value
-										const newValue = value
-											.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-											.replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-											.replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
-										field.onChange(newValue)
-									}}
+									// onChange={(event) => {
+									// 	field.onChange(event.target.value)
+									// }}
 									fullWidth
 									InputProps={{
 										startAdornment: <InputAdornment position="start">$</InputAdornment>,
