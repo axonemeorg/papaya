@@ -20,7 +20,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { Category, CreateEntryArtifact, CreateJournalEntryForm, EntryTag } from '@/types/schema'
-import { Delete, Folder, Label } from '@mui/icons-material'
+import { Delete, FilterList, Folder, Label } from '@mui/icons-material'
 import { useContext, useMemo, useState } from 'react'
 import EntryTagPicker from '../pickers/EntryTagPicker'
 import { AttachmentButton, AttachmentDropzone } from '../input/AttachmentPicker'
@@ -89,7 +89,7 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
 					<IconButton onClick={props.onClickTagButton}>
 						<Label />
 					</IconButton>
-					<IconButton onClick={() => props.remove(props.index)} disabled={props.fieldArray.length <= 1}>
+					<IconButton onClick={() => props.remove(props.index)}>
 						<Delete />
 					</IconButton>
 				</Stack>
@@ -228,7 +228,7 @@ export default function JournalEntryForm() {
 			/>
 			<Box sx={{ position: 'relative' }}>
 				<Grid container columns={12} spacing={1} rowSpacing={1} mb={1}>
-					<Grid size={8}>
+					<Grid size={12}>
 						<Controller
 							control={control}
 							name="parent.memo"
@@ -254,7 +254,7 @@ export default function JournalEntryForm() {
 							)}
 						/>
 					</Grid>
-					<Grid size={4}>
+					<Grid size={8}>
 						<Controller
 							control={control}
 							name="parent.amount"
@@ -269,7 +269,7 @@ export default function JournalEntryForm() {
 							)}
 						/>
 					</Grid>
-					<Grid size={6}>
+					<Grid size={4}>
 						<Controller
 							control={control}
 							name="parent.date"
@@ -294,7 +294,14 @@ export default function JournalEntryForm() {
 							)}
 						/>
 					</Grid>
-					<Grid size={6}>
+					<Grid size={12}>
+						<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
+							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+								Test
+							</Button>
+						</Stack>
+					</Grid>
+					<Grid size={12}>
 						<Controller
 							control={control}
 							name="parent.categoryIds"
