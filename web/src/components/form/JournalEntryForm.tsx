@@ -10,7 +10,6 @@ import {
 	Collapse,
 	Grid2 as Grid,
 	IconButton,
-	InputAdornment,
 	Stack,
 	TextField,
 	Typography,
@@ -28,6 +27,7 @@ import { AttachmentButton, AttachmentDropzone } from '../input/AttachmentPicker'
 import { generateArtifactId } from '@/utils/id'
 import { formatFileSize } from '@/utils/string'
 import { JournalContext } from '@/contexts/JournalContext'
+import AmountField from '../input/AmountField'
 
 interface JournalEntryChildRowProps {
 	index: number
@@ -53,23 +53,12 @@ const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
 					control={control}
 					name={`children.${props.index}.amount` as const}
 					render={({ field }) => (
-						<TextField
-							label="Amount"
+						<AmountField
 							{...field}
-							onChange={(event) => {
-								const value = event.target.value
-								const newValue = value
-									.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-									.replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-									.replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
-								field.onChange(newValue)
-							}}
 							fullWidth
-							InputProps={{
-								startAdornment: <InputAdornment position="start">$</InputAdornment>,
-							}}
 							sx={{ flex: 1 }}
-							size="small"
+							autoComplete="off"
+							size='small'
 						/>
 					)}
 				/>
@@ -196,7 +185,6 @@ export default function JournalEntryForm() {
 		childrenFieldArray.append({
 			amount: '',
 			memo: '',
-			entryType: 'CREDIT',
 		})
 	}
 
@@ -271,22 +259,10 @@ export default function JournalEntryForm() {
 							control={control}
 							name="parent.amount"
 							render={({ field }) => (
-								<TextField
-									label="Amount"
+								<AmountField
 									variant='filled'
 									{...field}
-									onChange={(event) => {
-										const value = event.target.value
-										const newValue = value
-											.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-											.replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-											.replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
-										field.onChange(newValue)
-									}}
 									fullWidth
-									InputProps={{
-										startAdornment: <InputAdornment position="start">$</InputAdornment>,
-									}}
 									sx={{ flex: 1 }}
 									autoComplete="off"
 								/>
