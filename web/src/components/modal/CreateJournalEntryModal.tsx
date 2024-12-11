@@ -43,7 +43,7 @@ export default function CreateJournalEntryModal(props: JournalEntryModalProps) {
 		defaultValues: {
 			parent: {
 				memo: '',
-				amount: '' as unknown as number,
+				amount: '',
 				date: initialDate,
 				categoryIds: [],
 				tagIds: [],

@@ -50,10 +50,6 @@ const amountValidationPattern = /[-+]?\d{1,3}(,\d{3})*(\.\d+)?/;
 const AmountRecord = z.object({
 	amount: z.string()
 		.regex(amountValidationPattern, 'A valid amount is required')
-		.transform((value) => {
-			const sanitizedValue = Number(value.replace(/[^0-9.]/g, ''))
-			return sanitizedValue * (value.startsWith('+') ? 1 : -1)
-		}),
 })
 
 export type AmountRecord = z.output<typeof AmountRecord>
