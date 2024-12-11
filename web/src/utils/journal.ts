@@ -31,6 +31,27 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
 	}
 }
 
+export const parseJournalEntryAmount = (amount: string): number => {
+	const sanitizedAmount = String(amount).replace(/[^0-9.-]/g, '');
+	if (!amount || !sanitizedAmount) {
+		return 0;
+	}
+
+	const parsedAmount = parseFloat(sanitizedAmount)
+	if (isNaN(parsedAmount)) {
+		return parsedAmount
+	} else if (amount.startsWith('+')) {
+		return parsedAmount
+	} else {
+		return -parsedAmount
+	}
+}
+
+export const serializeJournalEntryAmount = (amount: number): string => {
+	const leadingSign = amount < 0 ? '' : '+'
+	return `${leadingSign}${amount.toFixed(2)}`
+}
+
 export const enhanceJournalEntry = (
 	parent: JournalEntry,
 	children: JournalEntry[],
@@ -40,15 +61,11 @@ export const enhanceJournalEntry = (
 		new Set([...(parent.categoryIds ?? []), ...children.flatMap((child) => child.categoryIds ?? [])])
 	)
 
-	const netAmount = children.reduce(
-		(acc, child) => {
-			if (child.entryType === 'CREDIT') {
-				return acc - parseFloat(child.amount)
-			} else {
-				return acc + parseFloat(child.amount)
-			}
+	const netAmount: number = children.reduce(
+		(acc: number, child) => {
+			return acc + parseJournalEntryAmount(child.amount)
 		},
-		parseFloat(parent.amount) * (parent.entryType === 'CREDIT' ? -1 : 1)
+		parseJournalEntryAmount(parent.amount)
 	)
 
 	return {

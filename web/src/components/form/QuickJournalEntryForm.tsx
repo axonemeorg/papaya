@@ -1,9 +1,10 @@
 'use client'
 
-import { Grid2 as Grid, InputAdornment, TextField } from '@mui/material'
+import { Grid2 as Grid, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Category, CreateQuickJournalEntry } from '@/types/schema'
 import CategoryAutocomplete from '../input/CategoryAutocomplete'
+import AmountField from '../input/AmountField'
 
 export default function QuickJournalEntryForm() {
 	// const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
@@ -51,22 +52,11 @@ export default function QuickJournalEntryForm() {
 					control={control}
 					name={`amount`}
 					render={({ field }) => (
-						<TextField
+						<AmountField
 							label="Amount"
 							{...field}
-							onChange={(event) => {
-								const value = event.target.value
-								const newValue = value
-									.replace(/[^0-9.]/g, '') // Remove non-numeric characters except the dot
-									.replace(/(\..*?)\..*/g, '$1') // Allow only one dot
-									.replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
-								field.onChange(newValue)
-							}}
 							fullWidth
 							size="small"
-							InputProps={{
-								startAdornment: <InputAdornment position="start">$</InputAdornment>,
-							}}
 						/>
 					)}
 				/>
