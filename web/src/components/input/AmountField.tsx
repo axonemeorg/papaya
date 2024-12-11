@@ -1,6 +1,8 @@
 
 import { SwapHoriz } from "@mui/icons-material";
-import { TextField, InputAdornment, TextFieldProps, IconButton } from "@mui/material"
+import { TextField, InputAdornment, TextFieldProps, Stack } from "@mui/material"
+import { IconButton } from "@mui/material"
+// import { ToggleButtonGroup, ToggleButton } from "@mui/material"
 
 type AmountFieldProps = TextFieldProps
 
@@ -44,32 +46,43 @@ export default function AmountField(props: AmountFieldProps) {
     const { slotProps, sx, ...rest } = props
 
     return (
-        <TextField
-            label="Amount"
-            fullWidth
-            slotProps={{
-                htmlInput: {
-                    inputMode: 'decimal',
-                },
-                input: {  
-                    startAdornment: (
-                        <InputAdornment position="start">$</InputAdornment>
-                    ),
-                    endAdornment: (
-                        <IconButton onClick={() => toggleSign()}>
-                            <SwapHoriz />
-                        </IconButton>
-                    ),
-                    sx: (theme) => ({
-                        color: isIncome ? theme.palette.success.main : undefined,
-                    }),
-                },
-            }}
-            sx={{ flex: 1 }}
-            autoComplete="off"
-            {...rest}
-            onChange={handleChange}
-            value={value}
-        />
+        <Stack direction='row' gap={1}>
+            <TextField
+                label="Amount"
+                fullWidth
+                slotProps={{
+                    htmlInput: {
+                        inputMode: 'decimal',
+                    },
+                    input: {  
+                        startAdornment: (
+                            <InputAdornment position="start">$</InputAdornment>
+                        ),
+                        endAdornment: (
+                            <IconButton onClick={() => toggleSign()}>
+                                <SwapHoriz />
+                            </IconButton>
+                        ),
+                        sx: (theme) => ({
+                            color: isIncome ? theme.palette.success.main : undefined,
+                        }),
+                    },
+                }}
+                sx={{ flex: 1 }}
+                autoComplete="off"
+                {...rest}
+                onChange={handleChange}
+                value={value}
+            />
+            {/* <ToggleButtonGroup
+                color='primary'
+                value={isIncome ? 'income' : 'expense'}
+                exclusive
+                onChange={() => toggleSign()}
+            >
+                <ToggleButton value='income' tabIndex={isIncome ? -1 : undefined}>Income</ToggleButton>
+                <ToggleButton value='expense' tabIndex={isIncome ? undefined : -1}>Expense</ToggleButton>
+            </ToggleButtonGroup> */}
+        </Stack>
     )
 }

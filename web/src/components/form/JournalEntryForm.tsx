@@ -226,139 +226,160 @@ export default function JournalEntryForm() {
 					setValue(`children.${entryTagPickerData.index}.tagIds`, tagIds)
 				}}
 			/>
-			<Box sx={{ position: 'relative' }}>
-				<Grid container columns={12} spacing={1} rowSpacing={1} mb={1}>
-					<Grid size={12}>
-						<Controller
-							control={control}
-							name="parent.memo"
-							render={({ field }) => (
-								<TextField
-									label="Memo"
-									variant='filled'
-									autoFocus
-									{...field}
-									ref={null}
-									value={field.value}
-									onChange={(event) => {
-										const value = event.target.value
-										setValue(field.name, value)
-										// if (!manuallySetCategory && enableAutoDetectCategory) {
-										//     handleDetectCategoryWithAi(value);
-										// }
+			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
+				<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
+					<Grid size={7}>
+						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
+							
+							<Grid size={12}>
+								<Controller
+									control={control}
+									name="parent.memo"
+									render={({ field }) => (
+										<TextField
+											label="Memo"
+											variant='filled'
+											autoFocus
+											{...field}
+											ref={null}
+											value={field.value}
+											onChange={(event) => {
+												const value = event.target.value
+												setValue(field.name, value)
+												// if (!manuallySetCategory && enableAutoDetectCategory) {
+												//     handleDetectCategoryWithAi(value);
+												// }
+											}}
+											fullWidth
+											multiline
+											maxRows={3}
+										/>
+									)}
+								/>
+							</Grid>
+							<Grid size={6}>
+								<Controller
+									control={control}
+									name="parent.amount"
+									render={({ field }) => (
+										<AmountField
+											variant='filled'
+											{...field}
+											fullWidth
+											sx={{ flex: 1 }}
+											autoComplete="off"
+										/>
+									)}
+								/>
+							</Grid>
+							<Grid size={2}>
+								<Controller
+									control={control}
+									name="parent.date"
+									render={({ field }) => (
+										<LocalizationProvider dateAdapter={AdapterDayjs}>
+											<DatePicker
+												{...field}
+												value={dayjs(field.value)}
+												onChange={(value) => {
+													setValue(field.name, value?.format('YYYY-MM-DD') ?? '')
+												}}
+												format="ddd, MMM D"
+												label="Date"
+												slotProps={{
+													textField: {
+														fullWidth: true,
+														variant: 'filled'
+													},
+												}}
+											/>
+										</LocalizationProvider>
+									)}
+								/>
+							</Grid>
+							<Grid size={12}>
+								<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
+									<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+										Test
+									</Button>
+								</Stack>
+							</Grid>
+							<Grid size={12}>
+								<Controller
+									control={control}
+									name="parent.categoryIds"
+									render={({ field }) => {
+										const categoryIds = watch('parent.categoryIds')
+										const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+
+										return (
+											<CategoryAutocomplete
+												{...field}
+												ref={null}
+												variant='filled'
+												value={categoryId}
+												onChange={(_event, newValue) => {
+													// setManuallySetCategory(Boolean(newValue))
+													setValue(field.name, newValue ? [newValue] : [])
+												}}
+											/>
+										)
 									}}
-									fullWidth
-									multiline
-									maxRows={3}
 								/>
-							)}
-						/>
-					</Grid>
-					<Grid size={8}>
-						<Controller
-							control={control}
-							name="parent.amount"
-							render={({ field }) => (
-								<AmountField
-									variant='filled'
-									{...field}
-									fullWidth
-									sx={{ flex: 1 }}
-									autoComplete="off"
-								/>
-							)}
-						/>
-					</Grid>
-					<Grid size={4}>
-						<Controller
-							control={control}
-							name="parent.date"
-							render={({ field }) => (
-								<LocalizationProvider dateAdapter={AdapterDayjs}>
-									<DatePicker
-										{...field}
-										value={dayjs(field.value)}
-										onChange={(value) => {
-											setValue(field.name, value?.format('YYYY-MM-DD') ?? '')
+							</Grid>
+						</Grid>
+						<Stack>
+							{childrenFieldArray.fields.map((field, index) => {
+								return (
+									<JournalEntryChildRow
+										key={field.id}
+										index={index}
+										fieldArray={childrenFieldArray.fields}
+										remove={childrenFieldArray.remove}
+										onClickTagButton={(event) => {
+											setEntryTagPickerData({
+												anchorEl: event.currentTarget,
+												index,
+											})
 										}}
-										format="ddd, MMM D"
-										label="Date"
-										slotProps={{
-											textField: {
-												fullWidth: true,
-												variant: 'filled'
-											},
-										}}
+										entryTags={getEntryTagsQuery.data}
 									/>
-								</LocalizationProvider>
-							)}
-						/>
+								)
+							})}
+						</Stack>
+						<Button onClick={() => handleAddChild()}>Add Child</Button>
+						<Stack>
+							{artifactsFieldArray.fields.map((field, index) => {
+								return (
+									<AttachmentRow
+										key={field.id}
+										onRemove={() => artifactsFieldArray.remove(index)}
+										index={index}
+									/>
+								)
+							})}
+						</Stack>
 					</Grid>
-					<Grid size={12}>
-						<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
+					<Grid size={5}>
+						<Stack>
+							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+								Test
+							</Button>
+							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+								Test
+							</Button>
+							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+								Test
+							</Button>
 							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
 								Test
 							</Button>
 						</Stack>
 					</Grid>
-					<Grid size={12}>
-						<Controller
-							control={control}
-							name="parent.categoryIds"
-							render={({ field }) => {
-								const categoryIds = watch('parent.categoryIds')
-								const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
-
-								return (
-									<CategoryAutocomplete
-										{...field}
-										ref={null}
-										variant='filled'
-										value={categoryId}
-										onChange={(_event, newValue) => {
-											// setManuallySetCategory(Boolean(newValue))
-											setValue(field.name, newValue ? [newValue] : [])
-										}}
-									/>
-								)
-							}}
-						/>
-					</Grid>
-				</Grid>
-				<Stack>
-					{childrenFieldArray.fields.map((field, index) => {
-						return (
-							<JournalEntryChildRow
-								key={field.id}
-								index={index}
-								fieldArray={childrenFieldArray.fields}
-								remove={childrenFieldArray.remove}
-								onClickTagButton={(event) => {
-									setEntryTagPickerData({
-										anchorEl: event.currentTarget,
-										index,
-									})
-								}}
-								entryTags={getEntryTagsQuery.data}
-							/>
-						)
-					})}
-				</Stack>
-				<Button onClick={() => handleAddChild()}>Add Child</Button>
-				<Stack>
-					{artifactsFieldArray.fields.map((field, index) => {
-						return (
-							<AttachmentRow
-								key={field.id}
-								onRemove={() => artifactsFieldArray.remove(index)}
-								index={index}
-							/>
-						)
-					})}
-				</Stack>
-				<AttachmentDropzone onFilesAdded={handleAddFiles}>
+				{/* <AttachmentDropzone onFilesAdded={handleAddFiles}>
 					<AttachmentButton />
-				</AttachmentDropzone>
+				</AttachmentDropzone> */}
+				</Grid>
 			</Box>
 		</>
 	)
