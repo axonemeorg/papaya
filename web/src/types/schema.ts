@@ -202,3 +202,20 @@ export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 )
 
 export type JournalMeta = z.output<typeof JournalMeta>
+
+export const ReservedTagKey = z.enum([
+	'FLAGGED',
+	'NEEDS_REVIEW',
+	'WAS_REVIEWED',
+])
+
+export type ReservedTagKey = z.output<typeof ReservedTagKey>
+
+export const ReservedTag = z.object({
+	type: z.literal('RESERVED_TAG'),
+	value: ReservedTagKey,
+	label: z.string(),
+	archived: z.boolean().optional(),
+})
+
+export type ReservedTag = z.output<typeof ReservedTag>
