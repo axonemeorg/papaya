@@ -7,7 +7,7 @@ import { Category } from '@/types/schema'
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
 
-type CategoryAutocompleteProps = Omit<
+export type CategoryAutocompleteProps = Omit<
 	AutocompleteProps<Category['_id'], false, false, false>,
 	'options' | 'renderInput'
 > &

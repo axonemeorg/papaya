@@ -28,6 +28,7 @@ import { generateArtifactId } from '@/utils/id'
 import { formatFileSize } from '@/utils/string'
 import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
+import CategorySelector from '../input/CategorySelector'
 
 interface JournalEntryChildRowProps {
 	index: number
@@ -362,18 +363,27 @@ export default function JournalEntryForm() {
 					</Grid>
 					<Grid size={5}>
 						<Stack>
-							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-								Test
-							</Button>
-							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-								Test
-							</Button>
-							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-								Test
-							</Button>
-							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-								Test
-							</Button>
+							<Controller
+								control={control}
+								name="parent.categoryIds"
+								render={({ field }) => {
+									const categoryIds = watch('parent.categoryIds')
+									const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+
+									return (
+										<CategorySelector
+											{...field}
+											ref={null}
+											variant='filled'
+											value={categoryId}
+											onChange={(_event, newValue) => {
+												// setManuallySetCategory(Boolean(newValue))
+												setValue(field.name, newValue ? [newValue] : [])
+											}}
+										/>
+									)
+								}}
+							/>
 						</Stack>
 					</Grid>
 				{/* <AttachmentDropzone onFilesAdded={handleAddFiles}>
