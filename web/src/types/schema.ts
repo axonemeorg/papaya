@@ -110,7 +110,7 @@ export const CreateJournalEntry = CreateJournalEntryChild.merge(
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 
-export const JournalEntry = DocumentMetadata.merge(CreateJournalEntry).merge(
+export const JournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(CreateJournalEntry).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
 		parentEntryId: z.string().nullable().optional(),
