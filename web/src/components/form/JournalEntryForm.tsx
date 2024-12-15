@@ -240,7 +240,7 @@ export default function JournalEntryForm() {
 											value={field.value}
 											onChange={(event) => {
 												const value = event.target.value
-												setValue(field.name, value)
+												setValue(field.name, value, { shouldDirty: true })
 												// if (!manuallySetCategory && enableAutoDetectCategory) {
 												//     handleDetectCategoryWithAi(value);
 												// }
@@ -277,7 +277,7 @@ export default function JournalEntryForm() {
 												{...field}
 												value={dayjs(field.value)}
 												onChange={(value) => {
-													setValue(field.name, value?.format('YYYY-MM-DD') ?? '')
+													setValue(field.name, value?.format('YYYY-MM-DD') ?? '', { shouldDirty: true })
 												}}
 												format="ddd, MMM D"
 												label="Date"
@@ -315,7 +315,7 @@ export default function JournalEntryForm() {
 												value={categoryId}
 												onChange={(_event, newValue) => {
 													// setManuallySetCategory(Boolean(newValue))
-													setValue(field.name, newValue ? [newValue] : [])
+													setValue(field.name, newValue ? [newValue] : [], { shouldDirty: true })
 												}}
 											/>
 										)
@@ -372,7 +372,7 @@ export default function JournalEntryForm() {
 											value={categoryId}
 											onChange={(_event, newValue) => {
 												// setManuallySetCategory(Boolean(newValue))
-												setValue(field.name, newValue ? [newValue] : [])
+												setValue(field.name, newValue ? [newValue] : [], { shouldDirty: true })
 											}}
 										/>
 									)

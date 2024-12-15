@@ -1,10 +1,10 @@
 'use client'
 
 import { Save } from '@mui/icons-material'
-import { Button, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { Button, debounce, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider } from 'react-hook-form'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalEntry } from '@/types/schema'
 import { putJournalEntry } from '@/database/actions'
@@ -22,6 +22,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { journal, journalEntryForm } = useContext(JournalContext)
 
 	const handleUpdateJournalEntry = (formData: JournalEntry) => {
+		console.log('errors:', journalEntryForm.formState.errors)
 		if (!journal) {
 			return
 		}
@@ -34,6 +35,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 				snackbar({ message: 'Failed to update journal entry' })
 			})
 	}
+
+	const debouncedHandleUpdateJournalEntry = debounce(handleUpdateJournalEntry, 1000)
+
+	useEffect(() => {
+		console.log('watchedForm.formState:', journalEntryForm.formState)
+		debouncedHandleUpdateJournalEntry(journalEntryForm.getValues())
+	}, [journalEntryForm.watch()])
 
 	return (
 		<FormProvider {...journalEntryForm}>

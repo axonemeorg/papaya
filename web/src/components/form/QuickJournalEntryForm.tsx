@@ -36,7 +36,7 @@ export default function QuickJournalEntryForm() {
 							value={field.value}
 							onChange={(event) => {
 								const value = event.target.value
-								setValue(field.name, value)
+								setValue(field.name, value, { shouldDirty: true })
 								// if (!manuallySetCategory && enableAutoDetectCategory) {
 								//     handleDetectCategoryWithAi(value);
 								// }
@@ -76,7 +76,7 @@ export default function QuickJournalEntryForm() {
 								value={categoryId}
 								onChange={(_event, newValue) => {
 									// setManuallySetCategory(Boolean(newValue))
-									setValue(field.name, newValue ? [newValue] : [])
+									setValue(field.name, newValue ? [newValue] : [], { shouldDirty: true })
 								}}
 								size="small"
 							/>
