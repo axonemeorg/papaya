@@ -1,10 +1,9 @@
 import {
-	CreateJournalEntryForm,
-	EditJournalEntryForm,
 	EnhancedJournalEntry,
 	EntryArtifact,
 	type JournalEntry,
 } from '@/types/schema'
+import { generateJournalEntryId } from './id'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -77,14 +76,17 @@ export const enhanceJournalEntry = (
 	}
 }
 
-export const isCreateJournalEntryForm = (
-	form: CreateJournalEntryForm | EditJournalEntryForm
-): form is CreateJournalEntryForm => {
-	return '_id' in form.parent
-}
+export const createJournalEntry = (formData: Partial<JournalEntry>): JournalEntry => {
+	const now = new Date().toISOString()
 
-export const isEditJournalEntryForm = (
-	form: CreateJournalEntryForm | EditJournalEntryForm
-): form is EditJournalEntryForm => {
-	return !('_id' in form.parent)
+	const journalEntry: JournalEntry = {
+		...formData,
+		_id: generateJournalEntryId(),
+		type: 'JOURNAL_ENTRY',
+		createdAt: now,
+		amount: formData.amount || '',
+		memo: formData.memo || '',
+	}
+
+	return journalEntry
 }

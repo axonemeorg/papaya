@@ -36,7 +36,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 			<Fab
 				color="primary"
 				aria-label="add"
-				onClick={() => journalContext.openCreateEntryModal()}
+				onClick={() => journalContext.createJournalEntry()}
 				variant="extended"
 				size="large"
 				sx={(theme) => ({
@@ -65,7 +65,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 			<Fab
 				color="primary"
 				aria-label="add"
-				onClick={() => journalContext.openCreateEntryModal()}
+				onClick={() => journalContext.createJournalEntry()}
 				variant={props.expanded ? 'extended' : 'circular'}
 				size={props.expanded ? 'large' : 'medium'}
 				sx={(theme) => ({

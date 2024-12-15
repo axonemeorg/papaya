@@ -1,14 +1,18 @@
 import CreateJournalModal from '@/components/journal/CreateJournalModal'
 import SelectJournalModal from '@/components/journal/SelectJournalModal'
+import JournalEntryModal from '@/components/modal/JournalEntryModal'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { updateActiveJournal } from '@/database/actions'
+import { putJournalEntry, updateActiveJournal } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from '@/database/queries'
-import { Category, EntryTag, JournalMeta, ZiskMeta } from '@/types/schema'
+import { Category, EntryTag, JournalEntry, JournalMeta, ZiskMeta } from '@/types/schema'
+import { createJournalEntry } from '@/utils/journal'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 const db = getDatabaseClient()
 
@@ -24,10 +28,9 @@ db.createIndex({
 })
 
 export default function JournalContextProvider(props: PropsWithChildren) {
-	const [showCreateJournalEntryModal, setShowCreateJournalEntryModal] = useState<boolean>(false)
+	const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false)
 	const [showSelectJournalModal, setShowSelectJournalModal] = useState<boolean>(false)
 	const [showCreateJournalModal, setShowCreateJournalModal] = useState(false)
-	const [createEntryInitialDate, setCreateEntryInitialDate] = useState<string | undefined | null>(null)
 
 	// The currently active journal
 	const [activeJournal, setActiveJournal] = useState<JournalMeta | null>(null)
@@ -76,8 +79,15 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	})
 
 	const openCreateEntryModal = (date?: string) => {
-		setCreateEntryInitialDate(date)
-		setShowCreateJournalEntryModal(true)
+		const journalEntry: JournalEntry = createJournalEntry({ date })
+		journalEntryForm.reset(journalEntry)
+		putJournalEntry(journalEntry)
+		setShowJournalEntryModal(true)
+	}
+
+	const openEditEntryModal = (entry: JournalEntry) => {
+		journalEntryForm.reset(entry)
+		setShowJournalEntryModal(true)
 	}
 
 	const promptCreateJournal = () => {
@@ -134,17 +144,23 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		}
 	}, [getZiskMetaQuery.data, getZiskMetaQuery.isFetched, getJournalsQuery.data, getJournalsQuery.isFetched])
 
+	const journalEntryForm = useForm<JournalEntry>({
+		defaultValues: {},
+		resolver: zodResolver(JournalEntry),
+	})
+
 	return (
 		<JournalContext.Provider
 			value={{
 				getCategoriesQuery,
 				getEntryTagsQuery,
-				createEntryInitialDate,
-				openCreateEntryModal,
-				showCreateJournalEntryModal,
-				closeCreateEntryModal: () => setShowCreateJournalEntryModal(false),
-				journal: activeJournal,
+				showJournalEntryModal,
 				getJournalsQuery,
+				journal: activeJournal,
+				journalEntryForm,
+				createJournalEntry: openCreateEntryModal,
+				editJournalEntry: openEditEntryModal,
+				closeEntryModal: () => setShowJournalEntryModal(false),
 				openJournalManager: () => promptSelectJournal(),
 			}}>
 			<SelectJournalModal
@@ -164,6 +180,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 					setShowSelectJournalModal(true)
 				}}
 			/>
+			<JournalEntryModal open={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
 			{props.children}
 		</JournalContext.Provider>
 	)

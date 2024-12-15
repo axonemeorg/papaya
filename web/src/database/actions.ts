@@ -1,173 +1,40 @@
 import {
 	Category,
 	CreateCategory,
-	type CreateJournalEntryForm,
 	CreateJournalMeta,
-	CreateQuickJournalEntry,
-	EditJournalEntryForm,
-	EntryArtifact,
-	type JournalEntry,
+	JournalEntry,
 	JournalMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
-import { generateCategoryId, generateJournalEntryId, generateJournalId } from '@/utils/id'
-import { getJournalEntryArtifacts, getJournalEntryChildren, getOrCreateZiskMeta } from './queries'
+import { generateCategoryId, generateJournalId } from '@/utils/id'
+import { getJournalEntryChildren, getOrCreateZiskMeta } from './queries'
 
 const db = getDatabaseClient()
 
-export const createOrUpdateJournalEntry = async (
-	formData: CreateJournalEntryForm | EditJournalEntryForm,
-	journalId: string
-) => {
+export const putJournalEntry = async (formData: JournalEntry) => {
 	const now = new Date().toISOString()
 
-	// const meta = await db.get(ZISK_JOURNAL_META_KEY) as ZiskJournalMeta;
+	const parentDate = formData.date
+	const parentId: string = formData._id
 
-	const parentDate = formData.parent.date
-
-	const editingChildrenIds = new Set<string>(
-		formData.children.map((child) => (child as JournalEntry)._id).filter(Boolean)
-	)
-
-	const deletedChildren: JournalEntry[] = []
-	const deletedArtifacts: EntryArtifact[] = []
-
-	let parent: JournalEntry
-
-	let parentId: string
-
-	const isEditing = '_id' in formData.parent && Boolean(formData.parent._id)
-
-	if (isEditing) {
-		parentId = (formData.parent as JournalEntry)._id
-	} else {
-		parentId = generateJournalEntryId()
-	}
-
-	// Check if form data is for editing. If so, we need to check for children and artifacts to delete
-	if (isEditing) {
-		const currentChildren = await getJournalEntryChildren(parentId)
-		currentChildren.forEach((child) => {
-			if (!editingChildrenIds.has(child._id)) {
-				deletedChildren.push({
-					...child,
-					_deleted: true,
-				})
-			}
-		})
-
-		const currentArtifacts = await getJournalEntryArtifacts(parentId)
-		currentArtifacts.forEach((artifact) => {
-			if (!formData.artifacts.some((art) => art._id === artifact._id)) {
-				deletedArtifacts.push({
-					...artifact,
-					_deleted: true,
-				})
-			}
-		})
-	}
-
-	const children: JournalEntry[] = formData.children.map((child) => {
-		if ('_id' in child) {
-			// Child entry was edited
-			return {
-				...child,
-				date: parentDate,
-				updatedAt: now,
-			}
-		} else {
-			// New child entry
-			return {
-				...child,
-				_id: generateJournalEntryId(),
-				type: 'JOURNAL_ENTRY',
-				date: parentDate,
-				parentEntryId: parentId,
-				artifactIds: [],
-				createdAt: now,
-				updatedAt: null,
-				journalId,
-			}
+	// Update children to sync date with parent
+	const currentChildren = await getJournalEntryChildren(parentId)
+	const updateChildren: JournalEntry[] = currentChildren.map((child) => {
+		return {
+			...child,
+			date: parentDate,
 		}
 	})
-
-	const artifacts: EntryArtifact[] = formData.artifacts.map((artifact) => {
-		if ('parentEntryId' in artifact) {
-			// Artifact was edited
-			return {
-				...artifact,
-				updatedAt: now,
-			}
-		} else {
-			// New artifact
-			return {
-				...artifact,
-				type: 'ENTRY_ARTIFACT',
-				parentEntryId: parentId,
-				createdAt: now,
-				updatedAt: null,
-				journalId,
-			}
-		}
-	})
-
-	if ('_id' in formData.parent) {
-		// Updating
-		parent = {
-			...formData.parent,
-			childEntryIds: children.map((child) => child._id),
-			artifactIds: artifacts.map((artifact) => artifact._id),
-			updatedAt: now,
-		}
-	} else {
-		parent = {
-			...formData.parent,
-			_id: parentId,
-			type: 'JOURNAL_ENTRY',
-			childEntryIds: children.map((child) => child._id),
-			artifactIds: artifacts.map((artifact) => artifact._id),
-			createdAt: now,
-			updatedAt: null,
-			journalId,
-		}
-	}
 
 	const docs: object[] = [
-		parent,
-		...children,
-		...deletedChildren,
-		...artifacts,
-		...deletedArtifacts,
-		// {
-		//     ...meta,
-		// }
+		{
+			...formData,
+			updatedAt: now,
+		},
+		...updateChildren,
 	]
 
 	return db.bulkDocs(docs)
-}
-
-export const createQuickJournalEntry = async (
-	formData: CreateQuickJournalEntry,
-	date: string,
-	journalId: string,
-) => {
-	const journalEntryFormData: CreateJournalEntryForm = {
-		parent: {
-			memo: formData.memo,
-			amount: formData.amount,
-			date,
-			paymentMethodId: null,
-			relatedEntryIds: [],
-			categoryIds: [],
-			tagIds: [],
-			artifactIds: [],
-			notes: '',
-		},
-		children: [],
-		artifacts: [],
-	}
-
-	return createOrUpdateJournalEntry(journalEntryFormData, journalId)
 }
 
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
