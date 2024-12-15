@@ -3,7 +3,6 @@ import { Box, Divider } from '@mui/material'
 import dayjs from 'dayjs'
 import JournalHeader from './JournalHeader'
 import { EnhancedJournalEntry } from '@/types/schema'
-import CreateJournalEntryModal from '../modal/CreateJournalEntryModal'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
@@ -115,15 +114,6 @@ export default function JournalEditor() {
 
 	return (
 		<>
-			<CreateJournalEntryModal
-				open={journalContext.showCreateJournalEntryModal}
-				onClose={() => journalContext.closeCreateEntryModal()}
-				onSaved={() => {
-					journalEntryContext.getEnhancedJournalEntriesQuery.refetch()
-					journalContext.closeCreateEntryModal()
-				}}
-				initialDate={journalContext.createEntryInitialDate}
-			/>
 			<Box
 				sx={{
 					px: { sm: 0 },
