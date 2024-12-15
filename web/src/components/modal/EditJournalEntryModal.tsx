@@ -1,7 +1,7 @@
 'use client'
 
 import { Save } from '@mui/icons-material'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
+import { Button, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,6 +10,8 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { EditJournalEntryForm } from '@/types/schema'
 import { createOrUpdateJournalEntry } from '@/database/actions'
 import { JournalContext } from '@/contexts/JournalContext'
+import DetailsDrawer from '../DetailsDrawer'
+import AvatarIcon from '../icon/AvatarIcon'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -55,14 +57,16 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
 		}
 	}, [props.open])
 
-	const theme = useTheme()
-	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-
 	return (
 		<FormProvider {...editJournalEntryForm}>
-			<Dialog open={props.open} fullScreen={fullScreen} fullWidth onClose={props.onClose} maxWidth="md">
+			<DetailsDrawer open={props.open} onClose={props.onClose}>
 				<form onSubmit={editJournalEntryForm.handleSubmit(handleUpdateJournalEntry)}>
-					<DialogTitle>Edit Entry</DialogTitle>
+					<DialogTitle>
+						<Stack direction='row' gap={1} alignItems='center'>
+							<AvatarIcon />
+							<Typography variant='inherit'>{editJournalEntryForm.watch('parent.memo') || 'New Entry'}</Typography>
+						</Stack>
+					</DialogTitle>				
 					<DialogContent sx={{ overflow: 'initial' }}>
 						<JournalEntryForm />
 					</DialogContent>
@@ -73,7 +77,7 @@ export default function EditJournalEntryModal(props: EditJournalEntryModalProps)
 						</Button>
 					</DialogActions>
 				</form>
-			</Dialog>
+			</DetailsDrawer>
 		</FormProvider>
 	)
 }
