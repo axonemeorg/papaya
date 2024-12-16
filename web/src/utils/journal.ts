@@ -76,7 +76,7 @@ export const enhanceJournalEntry = (
 	}
 }
 
-export const createJournalEntry = (formData: Partial<JournalEntry>, journalId: string): JournalEntry => {
+export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: string): JournalEntry => {
 	const now = new Date().toISOString()
 
 	const journalEntry: JournalEntry = {
@@ -84,6 +84,7 @@ export const createJournalEntry = (formData: Partial<JournalEntry>, journalId: s
 		_id: generateJournalEntryId(),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
+		date: formData.date || now,
 		amount: formData.amount || '',
 		memo: formData.memo || '',
 		journalId,

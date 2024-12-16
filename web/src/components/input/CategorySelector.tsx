@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import CategoryAutocomplete, { CategoryAutocompleteProps } from "./CategoryAutocomplete";
-import { AutocompleteCloseReason, Box, Button, Divider, InputBase, Popover, Stack, TextField } from "@mui/material";
+import { AutocompleteCloseReason, Box, Button, Popover, Stack, TextField } from "@mui/material";
 import { Close, Done, Settings } from "@mui/icons-material";
 import { Category } from "@/types/schema";
 import CategoryChip from "../icon/CategoryChip";
@@ -37,7 +37,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                 <Stack direction='row' alignItems='flex-start'>
                     {selectedCategories.map((category) => {
                         return (
-                            <CategoryChip icon category={category} />
+                            <CategoryChip key={category._id} icon category={category} />
                         )
                     })}
                 </Stack>
@@ -48,7 +48,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                         {...props}
                         open
                         onClose={(
-                            event: React.ChangeEvent<{}>,
+                            _event,
                             reason: AutocompleteCloseReason,
                         ) => {
                             if (reason === 'escape') {
@@ -94,7 +94,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                                         // style={{ backgroundColor: option.color }}
                                     />
                                     <Stack direction='row' gap={1}
-                                        sx={(t) => ({
+                                        sx={{
                                             flexGrow: 1,
                                             '& span': {
                                                 // color: '#8b949e',
@@ -102,7 +102,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                                                 //     color: '#586069',
                                                 // }),
                                             },
-                                        })}
+                                        }}
                                     >
                                         <AvatarIcon avatar={category.avatar} />
                                         {category.label}

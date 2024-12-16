@@ -4,11 +4,11 @@ import JournalEntryModal from '@/components/modal/JournalEntryModal'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { putJournalEntry, updateActiveJournal } from '@/database/actions'
+import { updateActiveJournal, createJournalEntry } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from '@/database/queries'
 import { Category, EntryTag, JournalEntry, JournalMeta, ZiskMeta } from '@/types/schema'
-import { createJournalEntry } from '@/utils/journal'
+import { makeJournalEntry } from '@/utils/journal'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useContext, useEffect, useState } from 'react'
@@ -79,9 +79,12 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	})
 
 	const openCreateEntryModal = (date?: string) => {
-		const journalEntry: JournalEntry = createJournalEntry({ date })
+		if (!activeJournal) {
+			return
+		}
+		const journalEntry: JournalEntry = makeJournalEntry({ date }, activeJournal?._id)
 		journalEntryForm.reset(journalEntry)
-		putJournalEntry(journalEntry)
+		createJournalEntry(journalEntry)
 		setShowJournalEntryModal(true)
 	}
 

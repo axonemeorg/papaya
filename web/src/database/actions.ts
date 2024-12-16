@@ -11,7 +11,23 @@ import { getJournalEntryChildren, getOrCreateZiskMeta } from './queries'
 
 const db = getDatabaseClient()
 
-export const putJournalEntry = async (formData: JournalEntry) => {
+export const createJournalEntry = async (formData: JournalEntry): Promise<JournalEntry> => {
+	const now = new Date().toISOString()
+
+	const newJournalEntry: JournalEntry = {
+		...formData,
+		type: 'JOURNAL_ENTRY',
+		createdAt: now,
+	}
+
+	await db.put(newJournalEntry)
+	return newJournalEntry
+}
+
+export const updateJournalEntry = async (formData: JournalEntry) => {
+	console.log('updateJournalEntry', formData)
+	const existingRecord = await db.get(formData._id)
+
 	const now = new Date().toISOString()
 
 	const parentDate = formData.date
@@ -28,6 +44,7 @@ export const putJournalEntry = async (formData: JournalEntry) => {
 
 	const docs: object[] = [
 		{
+			...existingRecord,
 			...formData,
 			updatedAt: now,
 		},

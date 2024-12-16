@@ -1,31 +1,20 @@
 'use client'
 
 import {
-	Avatar as MuiAvatar,
 	Box,
 	Button,
-	Card,
-	CardMedia,
-	Chip,
-	Collapse,
 	Grid2 as Grid,
-	IconButton,
 	Stack,
 	TextField,
-	Typography,
 } from '@mui/material'
-import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 import CategoryAutocomplete from '../input/CategoryAutocomplete'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { Category, CreateEntryArtifact, EntryTag, JournalEntry } from '@/types/schema'
-import { Delete, FilterList, Folder, Label } from '@mui/icons-material'
-import { useContext, useMemo, useState } from 'react'
-import EntryTagPicker from '../pickers/EntryTagPicker'
-import { generateArtifactId } from '@/utils/id'
-import { formatFileSize } from '@/utils/string'
-import { JournalContext } from '@/contexts/JournalContext'
+import { Category, JournalEntry } from '@/types/schema'
+import { FilterList } from '@mui/icons-material'
+// import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 
@@ -164,17 +153,17 @@ import CategorySelector from '../input/CategorySelector'
 export default function JournalEntryForm() {
 	const { setValue, control, watch } = useFormContext<JournalEntry>()
 
-	const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null; index: number }>({
-		anchorEl: null,
-		index: 0,
-	})
+	// const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null; index: number }>({
+	// 	anchorEl: null,
+	// 	index: 0,
+	// })
 
 	// const artifactsFieldArray = useFieldArray<CreateJournalEntryForm>({
 	// 	control,
 	// 	name: 'artifacts',
 	// })
 
-	const { getEntryTagsQuery } = useContext(JournalContext)
+	// const { getEntryTagsQuery } = useContext(JournalContext)
 
 	// const handleAddChild = () => {
 	// 	childrenFieldArray.append({

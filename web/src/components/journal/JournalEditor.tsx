@@ -32,9 +32,13 @@ export default function JournalEditor() {
 
 	const journalGroups = useMemo(() => {
 		const entries = journalEntryContext.getEnhancedJournalEntriesQuery.data
+		console.log('entries', entries)
 		const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries).reduce(
 			(acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
 				const { date } = entry
+				if (!date) {
+					throw Error('Entry missing date:' + JSON.stringify(entry))
+				}
 				if (acc[date]) {
 					acc[date].push(entry)
 				} else {
@@ -99,10 +103,10 @@ export default function JournalEditor() {
 		}
 	}
 
-	const handleSaveEntry = () => {
-		journalEntryContext.getEnhancedJournalEntriesQuery.refetch()
-		handleDeselectListItem()
-	}
+	// const handleSaveEntry = () => {
+	// 	journalEntryContext.getEnhancedJournalEntriesQuery.refetch()
+	// 	handleDeselectListItem()
+	// }
 
 	// show all docs
 	useEffect(() => {
@@ -124,7 +128,6 @@ export default function JournalEditor() {
 						anchorEl={selectedEntry.anchorEl}
 						onClose={() => handleDeselectListItem()}
 						onDelete={() => handleDeleteEntry(selectedEntry.entry)}
-						onSave={() => handleSaveEntry()}
 					/>
 				)}
 				<JournalHeader reverseActionOrder />
