@@ -11,7 +11,6 @@ import NotificationsProvider from '@/providers/NotificationsProvider'
 import '@/styles/main.scss'
 import RemoteContextProvider from '@/providers/RemoteContextProvider'
 import JournalContextProvider from '@/providers/JournalContextProvider'
-import { DebounceContextProvider } from '@/providers/DebounceContextProvider'
 
 const queryClient = new QueryClient()
 
@@ -33,13 +32,11 @@ function MyApp(props: any) {
 				<main id="root" className={montserrat.className}>
 					<NotificationsProvider>
 						<QueryClientProvider client={queryClient}>
-							<DebounceContextProvider>
-								<JournalContextProvider>
-									<SessionProvider session={session}>
-										<RemoteContextProvider>{getLayout(<Component {...rest} />)}</RemoteContextProvider>
-									</SessionProvider>
-								</JournalContextProvider>
-							</DebounceContextProvider>
+							<JournalContextProvider>
+								<SessionProvider session={session}>
+									<RemoteContextProvider>{getLayout(<Component {...rest} />)}</RemoteContextProvider>
+								</SessionProvider>
+							</JournalContextProvider>
 						</QueryClientProvider>
 					</NotificationsProvider>
 				</main>

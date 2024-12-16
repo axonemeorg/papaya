@@ -11,7 +11,8 @@ import DetailsDrawer from '../DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
 import { updateJournalEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { DebounceContext } from '@/contexts/DebounceContext'
+import { useDebounce } from '@/hooks/useDebounce'
+import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -21,7 +22,13 @@ interface EditJournalEntryModalProps {
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
 	const { journal, journalEntryForm } = useContext(JournalContext)
-	const { registerDebouncedCallback } = useContext(DebounceContext);
+	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning(true)
+
+	useEffect(() => {
+		if (props.open) {
+			enableUnsavedChangesWarning()
+		}
+	}, [props.open])
 
 	const handleSaveFormWithCurrentValues = useCallback(async () => {
 		if (!journal) {
@@ -40,13 +47,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
 
-	const debouncedOnChange = registerDebouncedCallback('journalEntryForm', handleSaveFormWithCurrentValues, 1000)
+	const debouncedOnChange = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
 	const handleClose = () => {
-		debouncedOnChange()
-		// handleSaveFormWithCurrentValues().then(() => {
-			// snackbar({ message: 'Saved journal entry.' })
-		// })
+		debouncedOnChange().then(() => {
+			snackbar({ message: 'Saved journal entry.' })
+			disableUnsavedChangesWarning()
+		})
 		props.onClose();
 	}
 
@@ -56,7 +63,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 				open={props.open}
 				onClose={handleClose}
 			>
-				<form onChange={debouncedOnChange}>
+				<form onChange={() => debouncedOnChange()}>
 					<DialogTitle>
 						<Stack direction='row' gap={1} alignItems='center'>
 							<AvatarIcon />

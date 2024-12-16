@@ -1,40 +1,60 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
-/**
- * Custom hook to debounce a function.
- *
- * @param fn - The function to debounce.
- * @param delay - The delay in milliseconds for the debounce.
- * @returns A debounced version of the input function.
- */
-function useDebounce<T extends (...args: any[]) => void>(fn: T, delay: number): T {
-    const timeoutRef = useRef<number | undefined>();
-    const savedCallback = useRef<T>(fn);
+type AsyncFunction<Args extends any[], R> = (...args: Args) => Promise<R>;
 
-    // Update the savedCallback whenever the function changes
-    useEffect(() => {
-        savedCallback.current = fn;
-    }, [fn]);
-
-    const debouncedFunction = useCallback((...args: Parameters<T>) => {
-        if (timeoutRef.current !== undefined) {
-            clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = window.setTimeout(() => {
-            savedCallback.current(...args);
-        }, delay);
-    }, [delay]);
-
-    // Cleanup the timeout on component unmount
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current !== undefined) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
-
-    return debouncedFunction as T;
+interface PendingCall<R> {
+    resolve: (value: R | PromiseLike<R>) => void;
+    reject: (reason?: any) => void;
 }
 
-export default useDebounce;
+export function useDebounce<Args extends any[], R>(
+    fn: AsyncFunction<Args, R>,
+    delay: number
+): (...args: Args) => Promise<R> {
+    const timerIdRef = useRef<number | undefined>(undefined);
+    const pendingRef = useRef<PendingCall<R> | null>(null);
+    const argsRef = useRef<Args | null>(null);
+
+    const debouncedFn = useCallback(
+        (...args: Args) => {
+            // Clear previous timer if any
+            if (timerIdRef.current !== undefined) {
+                window.clearTimeout(timerIdRef.current);
+            }
+
+            // Create a new promise that will be resolved/rejected after `fn` is called
+            const promise = new Promise<R>((resolve, reject) => {
+                pendingRef.current = { resolve, reject };
+            });
+
+            // Store the latest arguments
+            argsRef.current = args;
+
+            // Set up a new timer
+            timerIdRef.current = window.setTimeout(async () => {
+                timerIdRef.current = undefined;
+                const currentPending = pendingRef.current;
+                pendingRef.current = null;
+
+                if (!currentPending) {
+                    // No pending call, nothing to do
+                    return;
+                }
+
+                try {
+                    // Call the async function with the last arguments
+                    const result = await fn(...(argsRef.current as Args));
+                    currentPending.resolve(result);
+                } catch (error) {
+                    currentPending.reject(error);
+                }
+            }, delay);
+
+            // Return the promise so the caller can `.then(...)` if they want
+            return promise;
+        },
+        [fn, delay]
+    );
+
+    return debouncedFn;
+}

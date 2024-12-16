@@ -241,7 +241,7 @@ export default function JournalEntryForm() {
 									)}
 								/>
 							</Grid>
-							<Grid size={2}>
+							<Grid size={6}>
 								<Controller
 									control={control}
 									name="date"
