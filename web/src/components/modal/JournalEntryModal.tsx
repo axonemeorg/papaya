@@ -11,6 +11,7 @@ import DetailsDrawer from '../DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
 import { updateJournalEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
+import { DebounceContext } from '@/contexts/DebounceContext'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -20,6 +21,7 @@ interface EditJournalEntryModalProps {
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
 	const { journal, journalEntryForm } = useContext(JournalContext)
+	const { registerDebouncedCallback } = useContext(DebounceContext);
 
 	const handleSaveFormWithCurrentValues = useCallback(async () => {
 		if (!journal) {
@@ -38,42 +40,15 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
 
-	// Ref to store the debounce timeout ID
-	const debounceTimeout = useRef<number | null>(null);
-
-	// Inline debounced onChange handler
-	const debouncedOnChange = useCallback(() => {
-		// Clear any existing timeout
-		if (debounceTimeout.current !== null) {
-			clearTimeout(debounceTimeout.current);
-		}
-
-		// Set a new timeout
-		debounceTimeout.current = window.setTimeout(() => {
-			handleSaveFormWithCurrentValues();
-		}, 1000);
-	}, [handleSaveFormWithCurrentValues, journalEntryForm]);
+	const debouncedOnChange = registerDebouncedCallback('journalEntryForm', handleSaveFormWithCurrentValues, 1000)
 
 	const handleClose = () => {
-		// Clear the debounce timeout on close
-		if (debounceTimeout.current !== null) {
-			clearTimeout(debounceTimeout.current);
-			debounceTimeout.current = null;
-		}
-		journal
-		handleSaveFormWithCurrentValues().then(() => {
-			snackbar({ message: 'Saved journal entry.' })
-		})
+		debouncedOnChange()
+		// handleSaveFormWithCurrentValues().then(() => {
+			// snackbar({ message: 'Saved journal entry.' })
+		// })
 		props.onClose();
 	}
-
-	// Clear the debounce timeout when the drawer is closed
-	useEffect(() => {
-		if (!props.open && debounceTimeout.current !== null) {
-			clearTimeout(debounceTimeout.current);
-			debounceTimeout.current = null;
-		}
-	}, [props.open]);
 
 	return (
 		<FormProvider {...journalEntryForm}>
