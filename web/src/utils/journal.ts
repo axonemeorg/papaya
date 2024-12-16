@@ -4,6 +4,7 @@ import {
 	type JournalEntry,
 } from '@/types/schema'
 import { generateJournalEntryId } from './id'
+import dayjs from 'dayjs'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -84,7 +85,7 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 		_id: generateJournalEntryId(),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
-		date: formData.date || now,
+		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
 		memo: formData.memo || '',
 		journalId,
