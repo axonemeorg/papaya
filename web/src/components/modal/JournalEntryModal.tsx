@@ -26,6 +26,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	useEffect(() => {
 		if (props.open) {
+			// Prevents the user from closing the browser tab with potentially unsaved changes
 			enableUnsavedChangesWarning()
 		}
 	}, [props.open])
@@ -47,10 +48,11 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
 
-	const debouncedOnChange = useDebounce(handleSaveFormWithCurrentValues, 1000)
+	const [debouncedOnChange, flush] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
 	const handleClose = () => {
-		debouncedOnChange().then(() => {
+		flush()
+		handleSaveFormWithCurrentValues().then(() => {
 			snackbar({ message: 'Saved journal entry.' })
 			disableUnsavedChangesWarning()
 		})
