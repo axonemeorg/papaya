@@ -27,6 +27,7 @@ import CategoryChip from '../icon/CategoryChip'
 import QuickJournalEditor from './QuickJournalEditor'
 import { Flag } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
+import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -187,7 +188,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 															<Flag sx={{ display: 'block' }} />
 														</TableCell>
 														<TableCell sx={{ width: '40%' }}>
-															<ListItemText>{entry.memo}</ListItemText>
+															<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
 														</TableCell>
 														<TableCell align="right" sx={{ width: '10%' }}>
 															<Typography

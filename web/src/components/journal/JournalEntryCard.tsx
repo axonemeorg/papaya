@@ -11,6 +11,7 @@ import { getPriceString } from '@/utils/string'
 import { Category, EnhancedJournalEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
+import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
 	entry: EnhancedJournalEntry
@@ -65,7 +66,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const categoryId: string | undefined = entry?.categoryIds?.[0]
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const netAmount: number = entry?.netAmount ?? 0
-	const memo = entry?.memo ?? ''
+	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
 
 	return (
 		<Popover

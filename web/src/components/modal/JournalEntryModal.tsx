@@ -11,6 +11,7 @@ import DetailsDrawer from '../DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
 import { updateJournalEntry } from '@/database/actions'
 import useDebounce from '@/hooks/useDebounce'
+import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -48,7 +49,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 					<DialogTitle>
 						<Stack direction='row' gap={1} alignItems='center'>
 							<AvatarIcon />
-							<Typography variant='inherit'>{currentMmemoValue || 'New Entry'}</Typography>
+							<Typography variant='inherit'>{currentMmemoValue || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</Typography>
 						</Stack>
 					</DialogTitle>				
 					<DialogContent sx={{ overflow: 'initial' }}>
