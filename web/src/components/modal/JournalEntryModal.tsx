@@ -3,7 +3,7 @@
 import { Save } from '@mui/icons-material'
 import { Button, debounce, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
-import { FormProvider } from 'react-hook-form'
+import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalEntry } from '@/types/schema'
@@ -36,6 +36,8 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			})
 	}, [journal]);
 
+	const currentMmemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
+
 	const debouncedOnChange = useDebounce(() => {
 		return handleUpdateJournalEntry(journalEntryForm.watch())
 	}, 1000)
@@ -47,7 +49,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 					<DialogTitle>
 						<Stack direction='row' gap={1} alignItems='center'>
 							<AvatarIcon />
-							<Typography variant='inherit'>{journalEntryForm.watch('memo') || 'New Entry'}</Typography>
+							<Typography variant='inherit'>{currentMmemoValue || 'New Entry'}</Typography>
 						</Stack>
 					</DialogTitle>				
 					<DialogContent sx={{ overflow: 'initial' }}>

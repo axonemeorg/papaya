@@ -17,6 +17,7 @@ import { FilterList } from '@mui/icons-material'
 // import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
+import { register } from 'module'
 
 // interface JournalEntryChildRowProps {
 // 	index: number
@@ -151,7 +152,7 @@ import CategorySelector from '../input/CategorySelector'
 // }
 
 export default function JournalEntryForm() {
-	const { setValue, control, watch } = useFormContext<JournalEntry>()
+	const { setValue, control, watch, register } = useFormContext<JournalEntry>()
 
 	// const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null; index: number }>({
 	// 	anchorEl: null,
@@ -214,31 +215,16 @@ export default function JournalEntryForm() {
 				<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
 					<Grid size={7}>
 						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
-							
 							<Grid size={12}>
-								<Controller
-									control={control}
-									name="memo"
-									render={({ field }) => (
-										<TextField
-											label="Memo"
-											variant='filled'
-											autoFocus
-											{...field}
-											ref={null}
-											value={field.value}
-											onChange={(event) => {
-												const value = event.target.value
-												setValue(field.name, value, { shouldDirty: true })
-												// if (!manuallySetCategory && enableAutoDetectCategory) {
-												//     handleDetectCategoryWithAi(value);
-												// }
-											}}
-											fullWidth
-											multiline
-											maxRows={3}
-										/>
-									)}
+								<TextField
+									label="Memo"
+									variant='filled'
+									autoFocus
+									// ref={null}
+									{...register('memo')}
+									fullWidth
+									multiline
+									maxRows={3}
 								/>
 							</Grid>
 							<Grid size={6}>
