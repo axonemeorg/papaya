@@ -17,7 +17,6 @@ import { FilterList } from '@mui/icons-material'
 // import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
-import { register } from 'module'
 
 // interface JournalEntryChildRowProps {
 // 	index: number

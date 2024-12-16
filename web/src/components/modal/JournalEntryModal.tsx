@@ -1,7 +1,6 @@
 'use client'
 
-import { Save } from '@mui/icons-material'
-import { Button, debounce, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext } from 'react'
@@ -55,12 +54,6 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 					<DialogContent sx={{ overflow: 'initial' }}>
 						<JournalEntryForm />
 					</DialogContent>
-					<DialogActions>
-						<Button onClick={() => props.onClose()}>Cancel</Button>
-						<Button type="submit" variant="contained" startIcon={<Save />}>
-							Save
-						</Button>
-					</DialogActions>
 				</form>
 			</DetailsDrawer>
 		</FormProvider>

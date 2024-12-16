@@ -32,12 +32,11 @@ export default function JournalEditor() {
 
 	const journalGroups = useMemo(() => {
 		const entries = journalEntryContext.getEnhancedJournalEntriesQuery.data
-		console.log('entries', entries)
 		const groups: Record<string, EnhancedJournalEntry[]> = Object.values(entries).reduce(
 			(acc: Record<string, EnhancedJournalEntry[]>, entry: EnhancedJournalEntry) => {
 				const { date } = entry
 				if (!date) {
-					throw Error('Entry missing date:' + JSON.stringify(entry))
+					return acc
 				}
 				if (acc[date]) {
 					acc[date].push(entry)
