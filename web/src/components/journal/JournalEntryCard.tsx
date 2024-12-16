@@ -54,6 +54,7 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 
 export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const { entry, anchorEl } = props
+	const { getCategoriesQuery, editJournalEntry } = useContext(JournalContext)
 
 	const isNetPositive = Boolean(entry && entry.netAmount > 0)
 
@@ -61,7 +62,10 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 		props.onDelete()
 	}
 
-	const { getCategoriesQuery, editJournalEntry, showJournalEntryModal } = useContext(JournalContext)
+	const handleEditJournalEntry = (entry: EnhancedJournalEntry) => {
+		editJournalEntry(entry)
+		props.onClose()
+	}
 
 	const categoryId: string | undefined = entry?.categoryIds?.[0]
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
@@ -71,7 +75,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	return (
 		<Popover
 			anchorEl={anchorEl}
-			open={Boolean(anchorEl) && !showJournalEntryModal}
+			open={Boolean(anchorEl)}
 			onClose={props.onClose}
 			anchorOrigin={{
 				vertical: 'top',
@@ -88,7 +92,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 							<JournalEntryNumber value={null} />
 						</Box>
 						<Stack direction="row" gap={0.5}>
-							<IconButton size="small" onClick={() => editJournalEntry(entry)}>
+							<IconButton size="small" onClick={() => handleEditJournalEntry(entry)}>
 								<Edit fontSize="small" />
 							</IconButton>
 

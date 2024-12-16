@@ -11,10 +11,10 @@ interface DetailsDrawerProps extends PropsWithChildren {
 export default function DetailsDrawer(props: DetailsDrawerProps) {
     return (
         <Drawer anchor="right" open={props.open} onClose={props.onClose}>
-            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+            <Stack direction='row' alignItems='center' justifyContent='space-between' px={1} py={2}>
                 <Stack direction='row' alignItems='center'>
-                    <IconButton onClick={props.onClose}>
-                        <KeyboardDoubleArrowLeft />
+                    <IconButton onClick={props.onClose} size='large'>
+                        <KeyboardDoubleArrowLeft fontSize="large" />
                     </IconButton>
                 </Stack>
                 {props.actions && (
