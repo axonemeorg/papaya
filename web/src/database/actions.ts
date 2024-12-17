@@ -25,11 +25,10 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 }
 
 export const updateJournalEntry = async (formData: JournalEntry) => {
-	console.log('updateJournalEntry', formData)
+	delete formData._rev
+
 	const existingRecord = await db.get(formData._id)
-
 	const now = new Date().toISOString()
-
 	const parentDate = formData.date
 	const parentId: string = formData._id
 

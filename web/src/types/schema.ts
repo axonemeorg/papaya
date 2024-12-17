@@ -122,16 +122,14 @@ export const JournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(Creat
 
 export type JournalEntry = z.output<typeof JournalEntry>
 
-export const EnhancedJournalEntry = JournalEntry.merge(
-	z.object({
-		children: z.array(JournalEntry),
-		artifacts: z.array(EntryArtifact),
-		allCategoryIds: z.array(z.string()),
-		netAmount: z.number(),
-	})
-)
+export const RichJournalEntryMetadata = z.object({
+	children: z.array(JournalEntry),
+	artifacts: z.array(EntryArtifact),
+	allCategoryIds: z.array(z.string()),
+	netAmount: z.number(),
+})
 
-export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>
+export type RichJournalEntryMetadata = z.output<typeof RichJournalEntryMetadata>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string(),

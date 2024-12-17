@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import React, { useContext } from 'react'
 
-import { Category, EnhancedJournalEntry } from '@/types/schema'
+import { Category, JournalEntry, RichJournalEntryMetadata } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -28,6 +28,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
+import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -82,8 +83,8 @@ const TableBody = (props: TableBodyProps) => {
 }
 
 interface JournalEntryListProps {
-	journalRecordGroups: Record<string, EnhancedJournalEntry[]>
-	onClickListItem: (event: any, entry: EnhancedJournalEntry) => void
+	journalRecordGroups: Record<string, JournalEntry[]>
+	onClickListItem: (event: any, entry: JournalEntry) => void
 }
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean }) => {
@@ -131,6 +132,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery } = useContext(JournalContext)
+	const { getEnhancedJournalEntriesQuery } = useContext(JournalEntryContext)
+	const { richJournalEntryMetadataRecords } = getEnhancedJournalEntriesQuery.data
 
 	return (
 		<Grid
@@ -174,7 +177,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												const category: Category | undefined = categoryId
 													? getCategoriesQuery.data[categoryId]
 													: undefined
-												const netAmount = entry.netAmount
+												const richJournalEntryMetadata = richJournalEntryMetadataRecords[entry._id]
+												const netAmount = richJournalEntryMetadata.netAmount
 												const isNetPositive = netAmount > 0
 
 												return (

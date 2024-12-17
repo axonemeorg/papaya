@@ -1,5 +1,5 @@
 import {
-	EnhancedJournalEntry,
+	RichJournalEntryMetadata,
 	EntryArtifact,
 	type JournalEntry,
 } from '@/types/schema'
@@ -56,7 +56,7 @@ export const enhanceJournalEntry = (
 	parent: JournalEntry,
 	children: JournalEntry[],
 	artifacts: EntryArtifact[]
-): EnhancedJournalEntry => {
+): RichJournalEntryMetadata => {
 	const allCategoryIds = Array.from(
 		new Set([...(parent.categoryIds ?? []), ...children.flatMap((child) => child.categoryIds ?? [])])
 	)
@@ -69,7 +69,6 @@ export const enhanceJournalEntry = (
 	)
 
 	return {
-		...parent,
 		children,
 		artifacts,
 		allCategoryIds,
