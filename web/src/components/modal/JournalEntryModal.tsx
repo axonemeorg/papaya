@@ -25,7 +25,6 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { journal, journalEntryForm } = useContext(JournalContext)
 	const queryClient = useQueryClient()
 	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning(true)
-	const [hasMounted, setHasMounted] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (props.open) {
@@ -57,8 +56,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
 	useEffect(() => {
-		if (!hasMounted) {
-			setHasMounted(true)
+		if (!journalEntryForm.formState.isDirty) {
 			return
 		}
 		debouncedhandleSaveFormWithCurrentValues()
@@ -66,13 +64,16 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}, [currentFormState])
 
 	const handleClose = () => {
+		props.onClose();
+		if (!journalEntryForm.formState.isDirty) {
+			return
+		}
 		flushSaveFormDebounce()
 		handleSaveFormWithCurrentValues().then(() => {
 			queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'enhancedJournalEntries' })
 			snackbar({ message: 'Saved journal entry.' })
 			disableUnsavedChangesWarning()
 		})
-		props.onClose();
 	}
 
 	return (
