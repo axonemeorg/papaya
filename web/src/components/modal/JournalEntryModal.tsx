@@ -13,6 +13,7 @@ import { updateJournalEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -22,6 +23,7 @@ interface EditJournalEntryModalProps {
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
 	const { journal, journalEntryForm } = useContext(JournalContext)
+	const queryClient = useQueryClient()
 	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning(true)
 
 	useEffect(() => {
@@ -59,6 +61,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const handleClose = () => {
 		flushSaveFormDebounce()
 		handleSaveFormWithCurrentValues().then(() => {
+			queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'enhancedJournalEntries' })
 			snackbar({ message: 'Saved journal entry.' })
 			disableUnsavedChangesWarning()
 		})

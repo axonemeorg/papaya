@@ -40,7 +40,6 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 		journalContext.journal,
 		journalContext.getCategoriesQuery.data,
 		journalContext.getEntryTagsQuery.data,
-		journalContext.showJournalEntryModal,
 	])
 
 	return (
