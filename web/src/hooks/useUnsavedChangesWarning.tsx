@@ -1,39 +1,47 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface UseUnsavedChangesWarning {
-    enableUnsavedChangesWarning: () => void;
-    disableUnsavedChangesWarning: () => void;
+    enableUnsavedChangesWarning: (key: string) => void;
+    disableUnsavedChangesWarning: (key: string) => void;
 }
 
-export default function useUnsavedChangesWarning(enabled = false): UseUnsavedChangesWarning {
-    const [isWarningEnabled, setIsWarningEnabled] = useState(enabled);
+export default function useUnsavedChangesWarning(): UseUnsavedChangesWarning {
+    const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
 
-    const enableUnsavedChangesWarning = () => setIsWarningEnabled(true);
-    const disableUnsavedChangesWarning = () => setIsWarningEnabled(false);
+    const enableUnsavedChangesWarning = useCallback((key: string) => {
+        setActiveKeys((prev) => new Set([...prev, key]));
+    }, []);
+
+    const disableUnsavedChangesWarning = useCallback((key: string) => {
+        setActiveKeys((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(key);
+            return newSet;
+        });
+    }, []);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isWarningEnabled) {
+            if (activeKeys.size > 0) {
                 event.preventDefault();
                 event.returnValue = ''; // Required for modern browsers
                 return '';
             }
         };
 
-        if (isWarningEnabled) {
+        if (activeKeys.size > 0) {
             window.addEventListener('beforeunload', handleBeforeUnload);
         } else {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         }
 
-        // Cleanup on unmount
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [isWarningEnabled]);
+    }, [activeKeys]);
 
     return {
         enableUnsavedChangesWarning,
         disableUnsavedChangesWarning,
     };
-};
+}

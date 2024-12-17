@@ -21,16 +21,18 @@ interface EditJournalEntryModalProps {
 	onClose: () => void
 }
 
+const JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY = 'JOURNAL_ENTRY'
+
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
 	const { journal, journalEntryForm } = useContext(JournalContext)
 	const queryClient = useQueryClient()
-	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning(true)
+	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning()
 
 	useEffect(() => {
 		if (props.open) {
 			// Prevents the user from closing the browser tab with potentially unsaved changes
-			enableUnsavedChangesWarning()
+			enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 		}
 	}, [props.open])
 
@@ -42,7 +44,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		return updateJournalEntry(formData)
 			.then(() => {
 				console.log('Put journal entry.')
-				disableUnsavedChangesWarning()
+				disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 			})
 			.catch((error: any) => {
 				console.error(error)
@@ -60,7 +62,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			return
 		}
 		debouncedhandleSaveFormWithCurrentValues()
-		enableUnsavedChangesWarning()
+		enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 	}, [currentFormState])
 
 	const refreshJournalEntriesQuery = () => {
@@ -76,7 +78,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		handleSaveFormWithCurrentValues().then(() => {
 			refreshJournalEntriesQuery()
 			snackbar({ message: 'Saved journal entry.' })
-			disableUnsavedChangesWarning()
+			disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 		})
 	}
 
@@ -85,7 +87,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		deleteJournalEntry(formData._id).then(() => {
 			refreshJournalEntriesQuery()
 			snackbar({ message: 'Deleted journal entry.' })
-			disableUnsavedChangesWarning()
+			disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 			props.onClose()
 		}).catch((error: any) => {
 			console.error(error)
