@@ -7,7 +7,7 @@ import {
 	Stack,
 	TextField,
 } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import CategoryAutocomplete from '../input/CategoryAutocomplete'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -200,6 +200,9 @@ export default function JournalEntryForm() {
 	// 	return watch(`children.${entryTagPickerData.index}.tagIds`) ?? []
 	// }, [entryTagPickerData.index, watch(`children.${entryTagPickerData.index}.tagIds`)])
 
+	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+
 	return (
 		<>
 			{/* <EntryTagPicker
@@ -278,8 +281,7 @@ export default function JournalEntryForm() {
 									control={control}
 									name="categoryIds"
 									render={({ field }) => {
-										const categoryIds = watch('categoryIds')
-										const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+										
 
 										return (
 											<CategoryAutocomplete

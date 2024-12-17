@@ -3,7 +3,7 @@
 import { DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
-import { useCallback, useContext, useRef, useEffect } from 'react'
+import { useCallback, useContext, useRef, useEffect, useState } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -25,6 +25,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { journal, journalEntryForm } = useContext(JournalContext)
 	const queryClient = useQueryClient()
 	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning(true)
+	const [hasMounted, setHasMounted] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (props.open) {
@@ -49,14 +50,20 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			})
 	}, [journal]);
 
-	const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
+	// const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
+	const currentFormState = useWatch({ control: journalEntryForm.control })
+	const currentMemoValue = currentFormState.memo
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
-	const handleChange = () => {
+	useEffect(() => {
+		if (!hasMounted) {
+			setHasMounted(true)
+			return
+		}
 		debouncedhandleSaveFormWithCurrentValues()
 		enableUnsavedChangesWarning()
-	}
+	}, [currentFormState])
 
 	const handleClose = () => {
 		flushSaveFormDebounce()
@@ -74,7 +81,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 				open={props.open}
 				onClose={handleClose}
 			>
-				<form onChange={() => handleChange()}>
+				<form>
 					<DialogTitle>
 						<Stack direction='row' gap={1} alignItems='center'>
 							<AvatarIcon />
