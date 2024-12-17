@@ -1,6 +1,6 @@
 'use client'
 
-import { DialogContent, DialogTitle, Stack, Typography } from '@mui/material'
+import { DialogContent, DialogTitle, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useRef, useEffect, useState } from 'react'
@@ -9,11 +9,12 @@ import { JournalEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
-import { updateJournalEntry } from '@/database/actions'
+import { deleteJournalEntry, updateJournalEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
+import { Delete } from '@mui/icons-material'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -49,7 +50,6 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			})
 	}, [journal]);
 
-	// const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
 	const currentFormState = useWatch({ control: journalEntryForm.control })
 	const currentMemoValue = currentFormState.memo
 
@@ -63,6 +63,10 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		enableUnsavedChangesWarning()
 	}, [currentFormState])
 
+	const refreshJournalEntriesQuery = () => {
+		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'enhancedJournalEntries' })
+	}
+
 	const handleClose = () => {
 		props.onClose();
 		if (!journalEntryForm.formState.isDirty) {
@@ -70,17 +74,39 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		}
 		flushSaveFormDebounce()
 		handleSaveFormWithCurrentValues().then(() => {
-			queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'enhancedJournalEntries' })
+			refreshJournalEntriesQuery()
 			snackbar({ message: 'Saved journal entry.' })
 			disableUnsavedChangesWarning()
 		})
 	}
+
+	const handleDelete = useCallback(async () => {
+		const formData: JournalEntry = journalEntryForm.getValues()
+		deleteJournalEntry(formData._id).then(() => {
+			refreshJournalEntriesQuery()
+			snackbar({ message: 'Deleted journal entry.' })
+			disableUnsavedChangesWarning()
+			props.onClose()
+		}).catch((error: any) => {
+			console.error(error)
+			snackbar({ message: 'Failed to delete journal entry' })
+		})
+	}, [journal])
 
 	return (
 		<FormProvider {...journalEntryForm}>
 			<DetailsDrawer
 				open={props.open}
 				onClose={handleClose}
+				actions={
+					<>
+						<Tooltip title='Delete'>
+							<IconButton onClick={() => handleDelete()}>
+								<Delete />
+							</IconButton>
+						</Tooltip>
+					</>
+				}
 			>
 				<form>
 					<DialogTitle>
