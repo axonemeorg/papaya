@@ -38,7 +38,8 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		const formData: JournalEntry = journalEntryForm.getValues()
 		return updateJournalEntry(formData)
 			.then(() => {
-				console.log('Put successful')
+				console.log('Put journal entry.')
+				disableUnsavedChangesWarning()
 			})
 			.catch((error: any) => {
 				console.error(error)
@@ -48,10 +49,15 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const currentMemoValue = useWatch({ control: journalEntryForm.control, name: 'memo' })
 
-	const [debouncedOnChange, flush] = useDebounce(handleSaveFormWithCurrentValues, 1000)
+	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
+
+	const handleChange = () => {
+		debouncedhandleSaveFormWithCurrentValues()
+		enableUnsavedChangesWarning()
+	}
 
 	const handleClose = () => {
-		flush()
+		flushSaveFormDebounce()
 		handleSaveFormWithCurrentValues().then(() => {
 			snackbar({ message: 'Saved journal entry.' })
 			disableUnsavedChangesWarning()
@@ -65,7 +71,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 				open={props.open}
 				onClose={handleClose}
 			>
-				<form onChange={() => debouncedOnChange()}>
+				<form onChange={() => handleChange()}>
 					<DialogTitle>
 						<Stack direction='row' gap={1} alignItems='center'>
 							<AvatarIcon />
