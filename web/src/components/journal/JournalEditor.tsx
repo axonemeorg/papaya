@@ -82,7 +82,7 @@ export default function JournalEditor() {
 
 		try {
 			const record = await deleteJournalEntry(entry._id)
-			journalEntryContext.getEnhancedJournalEntriesQuery.refetch()
+			journalEntryContext.refetchAllDependantQueries()
 			handleDeselectListItem()
 			snackbar({
 				message: 'Deleted 1 entry',

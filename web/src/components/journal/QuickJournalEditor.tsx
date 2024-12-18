@@ -4,10 +4,12 @@ import QuickJournalEntryForm from '../form/QuickJournalEntryForm'
 import { Box, Button, Stack } from '@mui/material'
 import { Add, Save } from '@mui/icons-material'
 import { useContext, useState } from 'react'
-import { CreateQuickJournalEntry } from '@/types/schema'
-import { createQuickJournalEntry } from '@/database/actions'
+import { CreateQuickJournalEntry, JournalEntry } from '@/types/schema'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
+import { makeJournalEntry } from '@/utils/journal'
+import { createJournalEntry } from '@/database/actions'
+import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 
 interface QuickJournalEditorProps {
 	onAdd?: () => void
@@ -17,6 +19,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 	const [isActive, setIsActive] = useState<boolean>(false)
 
 	const { snackbar } = useContext(NotificationsContext)
+	const { refetchAllDependantQueries } = useContext(JournalEntryContext)
 	const { journal } = useContext(JournalContext)
 
 	const createQuickJournalEntryForm = useForm<CreateQuickJournalEntry>({
@@ -32,11 +35,18 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 		if (!journal) {
 			return
 		}
-		const now = new Date().toISOString()
-		createQuickJournalEntry(formData, now, journal._id).then(() => {
-			createQuickJournalEntryForm.reset()
-		})
+		const journalEntry: JournalEntry = makeJournalEntry({
+			amount: formData.amount,
+			memo: formData.memo,
+			categoryIds: formData.categoryIds
+		}, journal._id)
+
+		await createJournalEntry(journalEntry)
+		refetchAllDependantQueries()
+		setIsActive(false)
 		snackbar({ message: 'Created journal entry.' })
+		props.onAdd?.()
+		createQuickJournalEntryForm.reset()
 	}
 
 	return (

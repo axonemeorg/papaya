@@ -56,6 +56,7 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 				onNextPage,
 				onPrevPage,
 				getEnhancedJournalEntriesQuery,
+				refetchAllDependantQueries,
 			}}>
 			{props.children}
 		</JournalEntryContext.Provider>

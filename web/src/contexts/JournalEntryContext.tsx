@@ -16,6 +16,7 @@ interface JournalEntryContext extends JournalEditorState {
 		GetEnhancedJournalEntriesResults,
 		Error
 	>
+	refetchAllDependantQueries: () => void
 }
 
 export const JournalEntryContext = createContext<JournalEntryContext>({} as JournalEntryContext)

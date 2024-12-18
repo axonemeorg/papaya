@@ -132,8 +132,8 @@ export const RichJournalEntryMetadata = z.object({
 export type RichJournalEntryMetadata = z.output<typeof RichJournalEntryMetadata>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
-	memo: z.string(),
-	categoryIds: z.array(z.string()),
+	memo: z.string().optional(),
+	categoryIds: z.array(z.string()).optional(),
 }))
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
