@@ -156,11 +156,14 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 					<JournalDetailsAndActivity
 						{...props.details}
 					/>
+				</DialogContent>
+				<DialogActions>
 					<JournalActions
 						onPromptDeleteJournal={() => setShowDeleteMenu(true)}
 						onPromptResetJournal={() => setShowResetMenu(true)}
 					/>
-				</DialogContent>
+					<Button onClick={() => props.onClose()}>Close</Button>
+				</DialogActions>
 			</Dialog>
 		</>
 	)
