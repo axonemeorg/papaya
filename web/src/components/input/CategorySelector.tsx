@@ -61,7 +61,6 @@ export default function CategorySelector(props: CategorySelectorProps) {
                 <CategoryAutocomplete
                     {...props}
                     open
-                    multiple
                     onClose={(
                         _event,
                         reason: AutocompleteCloseReason,
