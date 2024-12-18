@@ -117,3 +117,24 @@ export const updateActiveJournal = async (journalId: string) => {
 		activeJournalId: journalId,
 	})
 }
+
+export const getAllJournalObjects = async (journalId: string) => {
+	const result = await db.find({
+		selector: {
+			journalId,
+		},
+	})
+	return result.docs
+}
+
+export const resetJournal = async (journalId: string) => {
+	const docs = await getAllJournalObjects(journalId)
+	const deleted = docs.map((doc) => ({ ...doc, _deleted: true }))
+	return db.bulkDocs(deleted)
+}
+
+export const deleteJournal = async (journalId: string) => {
+	await resetJournal(journalId)
+	const record = await db.get(journalId)
+	await db.remove(record)
+}

@@ -1,11 +1,15 @@
 import { JournalMeta } from '@/types/schema'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getRelativeTime } from '@/utils/date'
-import { Box, Dialog, DialogContent, Grid2 as Grid, Stack, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, Stack, Tab, Tabs, Typography } from '@mui/material'
 import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { formatFileSize } from '@/utils/string'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
+import JournalActions from './JournalActions'
+import { deleteJournal, resetJournal } from '@/database/actions'
+import { NotificationsContext } from '@/contexts/NotificationsContext'
+import { JournalContext } from '@/contexts/JournalContext'
 
 interface JournalDetailsAndActivityProps {
 	journal: JournalMeta | null
@@ -21,8 +25,10 @@ type JournalProperty = {
 
 interface ManageJournalModalProps {
 	open: boolean
-	onClose: () => void
 	details: JournalDetailsAndActivityProps
+	onClose: () => void
+	onResetJournal: (journal: JournalMeta) => void
+	onDeletedJournal: (journal: JournalMeta) => void
 }
 
 const JOURNAL_TYPE_LABEL_MAP = {
@@ -97,13 +103,65 @@ function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {
 }
 
 export default function ManageJournalModal(props: ManageJournalModalProps) {
+	const [showResetMenu, setShowResetMenu] = useState(false)
+	const [showDeleteMenu, setShowDeleteMenu] = useState(false)
+
+	const { snackbar } = useContext(NotificationsContext)
+	const journalContext = useContext(JournalContext)
+
+	const handleResetJournal = async () => {
+		if (!props.details.journal) {
+			return
+		}
+		await resetJournal(props.details.journal._id)
+		setShowResetMenu(false)
+		snackbar({ message: 'Journal reset.' })
+		props.onResetJournal(props.details.journal)
+	}
+
+	const handleDeleteJournal = async () => {
+		if (!props.details.journal) {
+			return
+		}
+		await deleteJournal(props.details.journal._id)
+		await journalContext.getJournalsQuery.refetch()
+		setShowDeleteMenu(false)
+		snackbar({ message: 'Journal deleted.' })
+		props.onDeletedJournal(props.details.journal)
+		props.onClose()
+	}
+
 	return (
-		<Dialog open={props.open} onClose={props.onClose}>
-			<DialogContent>
-				<JournalDetailsAndActivity
-					{...props.details}
-				/>
-			</DialogContent>
-		</Dialog>
+		<>
+			<Dialog open={showDeleteMenu} onClose={() => setShowDeleteMenu(false)}>
+				<DialogContent>
+					<DialogContentText>Are you sure you want to delete this journal?</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setShowDeleteMenu(false)}>Cancel</Button>
+					<Button color='error' onClick={() => handleDeleteJournal()}>Delete</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog open={showResetMenu} onClose={() => setShowResetMenu(false)}>
+				<DialogContent>
+					<DialogContentText>Are you sure you want to reset this journal?</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setShowResetMenu(false)}>Cancel</Button>
+					<Button color='error' onClick={() => handleResetJournal()}>Reset</Button>
+				</DialogActions>
+			</Dialog>
+			<Dialog open={props.open} onClose={props.onClose}>
+				<DialogContent>
+					<JournalDetailsAndActivity
+						{...props.details}
+					/>
+					<JournalActions
+						onPromptDeleteJournal={() => setShowDeleteMenu(true)}
+						onPromptResetJournal={() => setShowResetMenu(true)}
+					/>
+				</DialogContent>
+			</Dialog>
+		</>
 	)
 }
