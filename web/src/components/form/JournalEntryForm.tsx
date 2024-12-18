@@ -7,12 +7,11 @@ import {
 	Stack,
 	TextField,
 } from '@mui/material'
-import { Controller, useFormContext, useWatch } from 'react-hook-form'
-import CategoryAutocomplete from '../input/CategoryAutocomplete'
+import { Controller, useFormContext } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { Category, JournalEntry } from '@/types/schema'
+import { JournalEntry } from '@/types/schema'
 import { FilterList } from '@mui/icons-material'
 // import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
@@ -200,9 +199,6 @@ export default function JournalEntryForm() {
 	// 	return watch(`children.${entryTagPickerData.index}.tagIds`) ?? []
 	// }, [entryTagPickerData.index, watch(`children.${entryTagPickerData.index}.tagIds`)])
 
-	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
-
 	return (
 		<>
 			{/* <EntryTagPicker
@@ -214,8 +210,15 @@ export default function JournalEntryForm() {
 				}}
 			/> */}
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
-				<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
-					<Grid size={7}>
+				<Grid container columns={12} spacing={3} rowSpacing={2} mb={1} sx={{ px: 0 }}>
+					<Grid size={12}>
+						<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
+							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
+								Test
+							</Button>
+						</Stack>
+					</Grid>
+					<Grid size={8}>
 						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
 							<Grid size={12}>
 								<TextField
@@ -229,7 +232,7 @@ export default function JournalEntryForm() {
 									maxRows={3}
 								/>
 							</Grid>
-							<Grid size={6}>
+							<Grid size={8}>
 								<Controller
 									control={control}
 									name="amount"
@@ -244,7 +247,7 @@ export default function JournalEntryForm() {
 									)}
 								/>
 							</Grid>
-							<Grid size={6}>
+							<Grid size={4}>
 								<Controller
 									control={control}
 									name="date"
@@ -267,35 +270,6 @@ export default function JournalEntryForm() {
 											/>
 										</LocalizationProvider>
 									)}
-								/>
-							</Grid>
-							<Grid size={12}>
-								<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
-									<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-										Test
-									</Button>
-								</Stack>
-							</Grid>
-							<Grid size={12}>
-								<Controller
-									control={control}
-									name="categoryIds"
-									render={({ field }) => {
-										
-
-										return (
-											<CategoryAutocomplete
-												{...field}
-												ref={null}
-												variant='filled'
-												value={categoryId}
-												onChange={(_event, newValue) => {
-													// setManuallySetCategory(Boolean(newValue))
-													setValue(field.name, newValue ? [newValue] : [], { shouldDirty: true })
-												}}
-											/>
-										)
-									}}
 								/>
 							</Grid>
 						</Grid>
@@ -331,24 +305,24 @@ export default function JournalEntryForm() {
 							})}
 						</Stack> */}
 					</Grid>
-					<Grid size={5}>
+					<Grid size={4}>
 						<Stack>
 							<Controller
 								control={control}
 								name="categoryIds"
 								render={({ field }) => {
-									const categoryIds = watch('categoryIds')
-									const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+									const categoryIds = watch('categoryIds') ?? []
+									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
 
 									return (
 										<CategorySelector
 											{...field}
-											ref={null}
-											variant='filled'
-											value={categoryId}
+											// ref={null}
+											// variant='filled'
+											value={categoryIds}
 											onChange={(_event, newValue) => {
 												// setManuallySetCategory(Boolean(newValue))
-												setValue(field.name, newValue ? [newValue] : [], { shouldDirty: true })
+												setValue(field.name, newValue ?? [], { shouldDirty: true })
 											}}
 										/>
 									)
