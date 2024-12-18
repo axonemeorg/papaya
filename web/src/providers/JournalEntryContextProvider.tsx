@@ -1,7 +1,6 @@
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { getEnhancedJournalEntries } from '@/database/queries'
-import { EnhancedJournalEntry } from '@/types/schema'
+import { getEnhancedJournalEntries, GetEnhancedJournalEntriesResults } from '@/database/queries'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useContext, useEffect } from 'react'
 
@@ -14,15 +13,21 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 
 	const hasSelectedJournal = Boolean(journalContext.journal)
 
-	const getEnhancedJournalEntriesQuery = useQuery<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>>({
+	const getEnhancedJournalEntriesQuery = useQuery<GetEnhancedJournalEntriesResults>({
 		queryKey: ['enhancedJournalEntries', view, date],
 		queryFn: async () => {
 			if (!journalContext.journal) {
-				return {}
+				return {
+					entries: {},
+					richJournalEntryMetadataRecords: {},
+				}
 			}
 			return getEnhancedJournalEntries(view, date, journalContext.journal._id)
 		},
-		initialData: {},
+		initialData: {
+			entries: {},
+			richJournalEntryMetadataRecords: {},
+		},
 		enabled: hasSelectedJournal,
 	})
 
@@ -36,7 +41,11 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 		}
 
 		refetchAllDependantQueries()
-	}, [journalContext.journal, journalContext.getCategoriesQuery.data, journalContext.getEntryTagsQuery.data])
+	}, [
+		journalContext.journal,
+		journalContext.getCategoriesQuery.data,
+		journalContext.getEntryTagsQuery.data,
+	])
 
 	return (
 		<JournalEntryContext.Provider
@@ -47,6 +56,7 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 				onNextPage,
 				onPrevPage,
 				getEnhancedJournalEntriesQuery,
+				refetchAllDependantQueries,
 			}}>
 			{props.children}
 		</JournalEntryContext.Provider>

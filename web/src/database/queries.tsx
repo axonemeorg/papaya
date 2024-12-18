@@ -1,6 +1,6 @@
 import {
 	Category,
-	EnhancedJournalEntry,
+	RichJournalEntryMetadata,
 	EntryArtifact,
 	EntryTag,
 	JournalEntry,
@@ -60,16 +60,21 @@ export const getJournalEntries = async (
 	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
 }
 
+export interface GetEnhancedJournalEntriesResults {
+	entries: Record<JournalEntry['_id'], JournalEntry>
+	richJournalEntryMetadataRecords: Record<JournalEntry['_id'], RichJournalEntryMetadata>
+}
+
 export const getEnhancedJournalEntries = async (
 	view: JournalEditorView,
 	date: string,
 	journalId: string
-): Promise<Record<EnhancedJournalEntry['_id'], EnhancedJournalEntry>> => {
+): Promise<GetEnhancedJournalEntriesResults> => {
 	const journalEntries = await getJournalEntries(view, date, journalId)
 	const allArtifacts = await getArtifacts(journalId)
 
 	const result = Object.fromEntries(
-		Object.values(journalEntries).reduce((acc: [EnhancedJournalEntry['_id'], EnhancedJournalEntry][], entry) => {
+		Object.values(journalEntries).reduce((acc: [JournalEntry['_id'], RichJournalEntryMetadata][], entry) => {
 			if (entry.parentEntryId) {
 				return acc
 			}
@@ -88,7 +93,10 @@ export const getEnhancedJournalEntries = async (
 		}, [])
 	)
 
-	return result
+	return {
+		entries: journalEntries,
+		richJournalEntryMetadataRecords: result,
+	}
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['_id'], EntryTag>> => {

@@ -100,9 +100,9 @@ export type EntryArtifact = z.output<typeof EntryArtifact>
 
 export const CreateJournalEntry = CreateJournalEntryChild.merge(
 	z.object({
-		date: z.string(),
+		date: z.string().optional(),
 		notes: z.string().optional(),
-		artifactIds: z.array(z.string()),
+		artifactIds: z.array(z.string()).optional(),
 		paymentMethodId: z.string().nullable().optional(),
 		relatedEntryIds: z.array(z.string()).optional(),
 	})
@@ -116,42 +116,24 @@ export const JournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(Creat
 		parentEntryId: z.string().nullable().optional(),
 		childEntryIds: z.array(z.string()).optional(),
 		createdAt: z.string(),
-		updatedAt: z.string().nullable(),
+		updatedAt: z.string().nullable().optional(),
 	})
 )
 
 export type JournalEntry = z.output<typeof JournalEntry>
 
-export const EnhancedJournalEntry = JournalEntry.merge(
-	z.object({
-		children: z.array(JournalEntry),
-		artifacts: z.array(EntryArtifact),
-		allCategoryIds: z.array(z.string()),
-		netAmount: z.number(),
-	})
-)
-
-export type EnhancedJournalEntry = z.output<typeof EnhancedJournalEntry>
-
-export const CreateJournalEntryForm = z.object({
-	parent: CreateJournalEntry,
-	children: z.array(CreateJournalEntryChild),
-	artifacts: z.array(CreateEntryArtifact),
+export const RichJournalEntryMetadata = z.object({
+	children: z.array(JournalEntry),
+	artifacts: z.array(EntryArtifact),
+	allCategoryIds: z.array(z.string()),
+	netAmount: z.number(),
 })
 
-export type CreateJournalEntryForm = z.output<typeof CreateJournalEntryForm>
-
-export const EditJournalEntryForm = z.object({
-	parent: JournalEntry,
-	children: z.array(z.union([JournalEntry, CreateJournalEntryChild])),
-	artifacts: z.array(z.union([EntryArtifact, CreateEntryArtifact])),
-})
-
-export type EditJournalEntryForm = z.output<typeof EditJournalEntryForm>
+export type RichJournalEntryMetadata = z.output<typeof RichJournalEntryMetadata>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
-	memo: z.string(),
-	categoryIds: z.array(z.string()),
+	memo: z.string().optional(),
+	categoryIds: z.array(z.string()).optional(),
 }))
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>

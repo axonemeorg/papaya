@@ -23,7 +23,7 @@ export default function CategoryForm() {
 			<Stack gap={2}>
 				<Stack direction="row" alignItems="center" gap={2}>
 					<TextField {...register('label')} label="Label" placeholder="Groceries" fullWidth multiline />
-					<AvatarPicker value={currentIcon} onChange={(avatar) => setValue('avatar', avatar)} />
+					<AvatarPicker value={currentIcon} onChange={(avatar) => setValue('avatar', avatar, { shouldDirty: true })} />
 				</Stack>
 				<TextField
 					{...register('description')}

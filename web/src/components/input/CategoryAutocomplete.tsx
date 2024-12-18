@@ -1,32 +1,24 @@
 'use client'
 
-import { Autocomplete, ListItem, ListItemIcon, ListItemText, TextField, AutocompleteProps } from '@mui/material'
+import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, TextField } from '@mui/material'
 
-import AvatarIcon from '@/components/icon/AvatarIcon'
-import { Category } from '@/types/schema'
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
+import AvatarIcon from '../icon/AvatarIcon'
 
-type CategoryAutocompleteProps = Omit<
-	AutocompleteProps<Category['_id'], false, false, false>,
-	'options' | 'renderInput'
-> &
-	Partial<Pick<AutocompleteProps<Category['_id'], false, false, false>, 'options' | 'renderInput'>> & {
-		label?: string
-	}
+export type CategoryAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
-	const { label, sx, ...rest } = props
+	const { loading, ...rest } = props
 
 	const { getCategoriesQuery } = useContext(JournalContext)
 	const { data, isLoading } = getCategoriesQuery
 
 	return (
-		<Autocomplete<Category['_id']>
-			loading={isLoading}
+		<Autocomplete
+			loading={isLoading || loading}
 			options={Object.keys(data)}
-			// isOptionEqualToValue={(option, value) => option._id === value}
-			renderInput={(params) => <TextField {...params} label={label ?? 'Category'} />}
+			renderInput={(params) => <TextField {...params} label={'Category'} />}
 			getOptionLabel={(option) => data[option]?.label}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props
@@ -42,10 +34,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 				)
 			}}
 			{...rest}
-			sx={{
-				flex: 1,
-				...sx,
-			}}
+			multiple
 		/>
 	)
 }

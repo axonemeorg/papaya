@@ -1,10 +1,10 @@
 import {
-	CreateJournalEntryForm,
-	EditJournalEntryForm,
-	EnhancedJournalEntry,
+	RichJournalEntryMetadata,
 	EntryArtifact,
 	type JournalEntry,
 } from '@/types/schema'
+import { generateJournalEntryId } from './id'
+import dayjs from 'dayjs'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -56,7 +56,7 @@ export const enhanceJournalEntry = (
 	parent: JournalEntry,
 	children: JournalEntry[],
 	artifacts: EntryArtifact[]
-): EnhancedJournalEntry => {
+): RichJournalEntryMetadata => {
 	const allCategoryIds = Array.from(
 		new Set([...(parent.categoryIds ?? []), ...children.flatMap((child) => child.categoryIds ?? [])])
 	)
@@ -69,7 +69,6 @@ export const enhanceJournalEntry = (
 	)
 
 	return {
-		...parent,
 		children,
 		artifacts,
 		allCategoryIds,
@@ -77,14 +76,19 @@ export const enhanceJournalEntry = (
 	}
 }
 
-export const isCreateJournalEntryForm = (
-	form: CreateJournalEntryForm | EditJournalEntryForm
-): form is CreateJournalEntryForm => {
-	return '_id' in form.parent
-}
+export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: string): JournalEntry => {
+	const now = new Date().toISOString()
 
-export const isEditJournalEntryForm = (
-	form: CreateJournalEntryForm | EditJournalEntryForm
-): form is EditJournalEntryForm => {
-	return !('_id' in form.parent)
+	const journalEntry: JournalEntry = {
+		_id: generateJournalEntryId(),
+		type: 'JOURNAL_ENTRY',
+		createdAt: now,
+		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
+		amount: formData.amount || '',
+		memo: formData.memo || '',
+		journalId,
+		...formData,
+	}
+
+	return journalEntry
 }

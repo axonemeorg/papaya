@@ -2,7 +2,7 @@
 
 import { Grid2 as Grid, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
-import { Category, CreateQuickJournalEntry } from '@/types/schema'
+import { CreateQuickJournalEntry } from '@/types/schema'
 import CategoryAutocomplete from '../input/CategoryAutocomplete'
 import AmountField from '../input/AmountField'
 
@@ -36,7 +36,7 @@ export default function QuickJournalEntryForm() {
 							value={field.value}
 							onChange={(event) => {
 								const value = event.target.value
-								setValue(field.name, value)
+								setValue(field.name, value, { shouldDirty: true })
 								// if (!manuallySetCategory && enableAutoDetectCategory) {
 								//     handleDetectCategoryWithAi(value);
 								// }
@@ -67,16 +67,16 @@ export default function QuickJournalEntryForm() {
 					name="categoryIds"
 					render={({ field }) => {
 						const categoryIds = watch('categoryIds')
-						const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null
+						// const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null
 
 						return (
 							<CategoryAutocomplete
 								{...field}
 								ref={null}
-								value={categoryId}
+								value={categoryIds}
 								onChange={(_event, newValue) => {
 									// setManuallySetCategory(Boolean(newValue))
-									setValue(field.name, newValue ? [newValue] : [])
+									setValue(field.name, newValue, { shouldDirty: true })
 								}}
 								size="small"
 							/>
