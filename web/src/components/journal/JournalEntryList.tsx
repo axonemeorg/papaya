@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import React, { useContext } from 'react'
 
-import { Category, JournalEntry, RichJournalEntryMetadata } from '@/types/schema'
+import { Category, JournalEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'

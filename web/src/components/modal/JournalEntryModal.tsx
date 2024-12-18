@@ -3,7 +3,7 @@
 import { DialogContent, DialogTitle, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
-import { useCallback, useContext, useRef, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
