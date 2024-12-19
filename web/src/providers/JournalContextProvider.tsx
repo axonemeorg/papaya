@@ -112,6 +112,11 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 			return journal
 		})
 	}
+	
+	const closeActiveJournal = () => {
+		setActiveJournal(null)
+		promptSelectJournal()
+	}
 
 	const refetchAllDependantQueries = () => {
 		getCategoriesQuery.refetch()
@@ -165,12 +170,12 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 				editJournalEntry: openEditEntryModal,
 				closeEntryModal: () => setShowJournalEntryModal(false),
 				openJournalManager: () => promptSelectJournal(),
+				closeActiveJournal,
 			}}>
 			<SelectJournalModal
 				open={showSelectJournalModal}
 				onClose={() => setShowSelectJournalModal(false)}
 				initialSelection={selectedJournal}
-
 				onSelect={handleSelectJournal}
 				onPromptCreate={() => setShowCreateJournalModal(true)}
 			/>

@@ -14,6 +14,7 @@ export interface JournalContext {
 	createJournalEntry: (date?: string) => void
 	editJournalEntry: (entry: JournalEntry) => void
 	openJournalManager: () => void
+	closeActiveJournal: () => void
 }
 
 export const JournalContext = createContext<JournalContext>({} as JournalContext)

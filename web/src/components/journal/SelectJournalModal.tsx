@@ -23,7 +23,6 @@ import AvatarIcon from '../icon/AvatarIcon'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import ManageJournalModal from './ManageJournalModal'
 
-
 interface SelectJournalModal {
 	open: boolean
 	initialSelection: JournalMeta | null
@@ -59,6 +58,17 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 	const handleManageJournal = (journal: JournalMeta) => {
 		setSelectedJournal(journal)
 		setShowManageJournalModal(true)
+	}
+
+	const handleDeletedJournal = (journal: JournalMeta) => {
+		// If the deleted journal is the active journal, reset the active journal
+		if (journal._id === journalContext.journal?._id) {
+			journalContext.closeActiveJournal()
+		}
+	}
+
+	const handleResetJournal = () => {
+		// TODO refetch journal details
 	}
 
 	const hasSelectedJournal = Boolean(journalContext.journal)
@@ -143,6 +153,8 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 					size: null,
 					lastActivity: null,
 				}}
+				onDeletedJournal={handleDeletedJournal}
+				onResetJournal={handleResetJournal}
 			/>
 		</>
 	)
