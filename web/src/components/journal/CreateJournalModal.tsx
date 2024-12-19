@@ -1,7 +1,7 @@
 import { JournalContext } from '@/contexts/JournalContext'
 import { CreateJournalMeta, JournalMeta } from '@/types/schema'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import AvatarPicker, { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,6 +39,12 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
 		props.onCreated(newJournal)
 	}
 
+	useEffect(() => {
+		if (!props.open) {
+			createJournalForm.reset()
+		}
+	}, [props.open])
+
 	return (
 		<Dialog open={props.open} onClose={props.onClose}>
 			<FormProvider {...createJournalForm}>
@@ -51,7 +57,7 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
 								render={({ field }) => <AvatarPicker value={field.value} onChange={field.onChange} />}
 								control={createJournalForm.control}
 							/>
-							<TextField {...createJournalForm.register('journalName')} fullWidth label="Journal Name" />
+							<TextField {...createJournalForm.register('journalName')} fullWidth label="Journal name" />
 						</Stack>
 					</DialogContent>
 					<DialogActions>
