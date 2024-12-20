@@ -110,19 +110,17 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 					</>
 				}
 			>
-				<form>
-					<DialogTitle>
-						<Stack direction='row' gap={1} alignItems='center'>
-							<AvatarIcon />
-							<Typography variant='inherit'>
-								{currentMemoValue.trim() || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
-							</Typography>
-						</Stack>
-					</DialogTitle>
-					<DialogContent sx={{ overflow: 'initial' }}>
-						<JournalEntryForm />
-					</DialogContent>
-				</form>
+				<DialogTitle>
+					<Stack direction='row' gap={1} alignItems='center'>
+						<AvatarIcon />
+						<Typography variant='inherit'>
+							{currentMemoValue.trim() || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
+						</Typography>
+					</Stack>
+				</DialogTitle>
+				<DialogContent sx={{ overflow: 'initial' }}>
+					<JournalEntryForm />
+				</DialogContent>
 			</DetailsDrawer>
 		</FormProvider>
 	)

@@ -40,6 +40,9 @@ export default function JournalEditor() {
 				const { date } = entry
 				if (!date) {
 					return acc
+				} else if (entry.parentEntryId) {
+					// Exclude child entries from the list
+					return acc
 				}
 				if (acc[date]) {
 					acc[date].push(entry)

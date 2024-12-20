@@ -53,6 +53,20 @@ export const updateJournalEntry = async (formData: JournalEntry) => {
 	return db.bulkDocs(docs)
 }
 
+export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
+	const now = new Date().toISOString()
+
+	const updatedChildren = children.map((child) => {
+		delete child._rev
+		return {
+			...child,
+			updatedAt: now,
+		}
+	})
+
+	return db.bulkDocs(updatedChildren)
+}
+
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
 	const record = await db.get(journalEntryId)
 	const children = await getJournalEntryChildren(journalEntryId)
