@@ -73,14 +73,25 @@ export const getEnhancedJournalEntries = async (
 	const journalEntries = await getJournalEntries(view, date, journalId)
 	const allArtifacts = await getArtifacts(journalId)
 
+	const jounralEntryChildren = Object.values(journalEntries).reduce((acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
+		if (entry.parentEntryId) {
+			const parentEntryId = entry.parentEntryId
+			if (acc[parentEntryId]) {
+				acc[parentEntryId].push(entry)
+			} else {
+				acc[parentEntryId] = [entry]
+			}
+		}
+		return acc
+	}, {})
+
 	const result = Object.fromEntries(
 		Object.values(journalEntries).reduce((acc: [JournalEntry['_id'], RichJournalEntryMetadata][], entry) => {
 			if (entry.parentEntryId) {
 				return acc
 			}
 
-			const children: JournalEntry[] = (entry.childEntryIds ?? [])
-				.map((childId) => journalEntries[childId])
+			const children: JournalEntry[] = jounralEntryChildren[entry._id] ?? []
 				.filter(Boolean)
 
 			const artifacts: EntryArtifact[] = (entry.artifactIds ?? [])

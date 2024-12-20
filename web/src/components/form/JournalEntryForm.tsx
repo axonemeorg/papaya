@@ -26,84 +26,6 @@ import { useQuery } from '@tanstack/react-query'
 import { getJournalEntryChildren } from '@/database/queries'
 import { useDebounce } from '@/hooks/useDebounce'
 
-// interface JournalEntryChildRowProps {
-// 	index: number
-// 	fieldArray: UseFieldArrayReturn<CreateJournalEntryForm>['fields']
-// 	entryTags: Record<string, EntryTag>
-// 	remove: UseFieldArrayReturn<CreateJournalEntryForm>['remove']
-// 	onClickTagButton: (event: React.MouseEvent<HTMLButtonElement>) => void
-// }
-
-// const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
-// 	const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>()
-
-// 	const childTagIds = watch(`children.${props.index}.tagIds`) ?? []
-// 	const childTags = childTagIds.map((tagId) => props.entryTags[tagId]).filter(Boolean)
-// 	const hasTags = childTagIds.length > 0
-// 	const categoryIds = (watch(`children.${props.index}.categoryIds`) as string[] | undefined) ?? []
-// 	const categoryId: string | undefined = categoryIds.length > 0 ? categoryIds[0] : undefined
-
-// 	return (
-// 		<Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
-// 			<Grid size={'grow'}>
-// 				<Controller
-// 					control={control}
-// 					name={`children.${props.index}.amount` as const}
-// 					render={({ field }) => (
-// 						<AmountField
-// 							{...field}
-// 							fullWidth
-// 							sx={{ flex: 1 }}
-// 							autoComplete="off"
-// 							size='small'
-// 						/>
-// 					)}
-// 				/>
-// 			</Grid>
-// 			<Grid size={4}>
-// 				<Controller
-// 					control={control}
-// 					name={`children.${props.index}.categoryIds` as const}
-// 					render={({ field }) => (
-// 						<CategoryAutocomplete
-// 							{...field}
-// 							ref={null}
-// 							value={categoryId}
-// 							onChange={(_event, newValue) => {
-// 								setValue(field.name, newValue ? [newValue] : [])
-// 							}}
-// 							label="Category"
-// 							size="small"
-// 						/>
-// 					)}
-// 				/>
-// 			</Grid>
-// 			<Grid size={4}>
-// 				<TextField label="Memo" {...register(`children.${props.index}.memo`)} fullWidth size="small" />
-// 			</Grid>
-// 			<Grid size="auto">
-// 				<Stack direction="row">
-// 					<IconButton onClick={props.onClickTagButton}>
-// 						<Label />
-// 					</IconButton>
-// 					<IconButton onClick={() => props.remove(props.index)}>
-// 						<Delete />
-// 					</IconButton>
-// 				</Stack>
-// 			</Grid>
-// 			<Grid size={12}>
-// 				<Collapse in={hasTags}>
-// 					<Stack gap={1} sx={{ pt: 1.25, pb: 0.75, flexFlow: 'row wrap' }}>
-// 						{childTags.map((entryTag: EntryTag) => {
-// 							return <Chip size="small" key={entryTag._id} label={entryTag.label} />
-// 						})}
-// 					</Stack>
-// 				</Collapse>
-// 			</Grid>
-// 		</Grid>
-// 	)
-// }
-
 // interface AttachmentRowProps {
 // 	onRemove: () => void
 // 	index: number
@@ -167,7 +89,6 @@ export default function JournalEntryForm() {
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
 	const date = useWatch({ control, name: 'date' })
 	const parentEntryId = useWatch({ control, name: '_id' })
-	const childEntryIds = useWatch({ control, name: 'childEntryIds' })
 
 	const handleAddChildEntry = () => {
 		if (!journalContext.journal) {
@@ -175,11 +96,11 @@ export default function JournalEntryForm() {
 		}
 		const newChildEntry: JournalEntry = makeJournalEntry({ date, parentEntryId }, journalContext.journal._id)
 		setChildren((prev) => ({ ...prev, [newChildEntry._id]: newChildEntry }))
-		setValue('childEntryIds', [...childEntryIds, newChildEntry._id])
 		createJournalEntry(newChildEntry)
 	}
 
 	const handleChangeChildEntry = (entry: JournalEntry) => {
+		console.log('handleChangeChildEntry', entry)
 		setChildren((prev) => ({ ...prev, [entry._id]: entry }))
 	}
 
@@ -193,7 +114,9 @@ export default function JournalEntryForm() {
 
 	const handleUpdateChildrenEntries = async () => {
 		const childrenEntries = Object.values(children)
-		updateJournalEntryChildren(childrenEntries)
+		updateJournalEntryChildren(childrenEntries).then(() => {
+			console.log('updated children entries:', childrenEntries)
+		})
 	}
 
 	const [debouncedhandleSaveChildrenWithCurrentValues, flushUpdateChildrenDebounce] = useDebounce(handleUpdateChildrenEntries, 1000)
@@ -206,6 +129,7 @@ export default function JournalEntryForm() {
 	}, [journalEntryChildrenQuery.data])
 
 	useEffect(() => {
+		console.log('children changed')
 		debouncedhandleSaveChildrenWithCurrentValues()
 		return () => {
 			flushUpdateChildrenDebounce()
@@ -314,20 +238,20 @@ export default function JournalEntryForm() {
 							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
 						</Stack>
 						<Stack mt={2} mx={-1} spacing={1}>
-							{childEntryIds.map((childEntryId) => {
+							{Object.values(children).map((entry) => {
 								return (
 									<ChildJournalEntryForm
-										key={childEntryId}
-										entry={children[childEntryId]}
+										key={entry._id}
+										entry={entry}
 										onChange={handleChangeChildEntry}
-										selected={selectedRowsSet.has(childEntryId)}
+										selected={selectedRowsSet.has(entry._id)}
 										onSelectedChange={(selected) => {
 											setSelectedRowsSet((prev) => {
 												const newSet = new Set(prev)
 												if (selected) {
-													newSet.add(childEntryId)
+													newSet.add(entry._id)
 												} else {
-													newSet.delete(childEntryId)
+													newSet.delete(entry._id)
 												}
 												return newSet
 											})

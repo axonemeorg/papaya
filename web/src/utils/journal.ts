@@ -84,7 +84,6 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
 		parentEntryId: formData.parentEntryId,
-		childEntryIds: [],
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
 		memo: formData.memo || '',
