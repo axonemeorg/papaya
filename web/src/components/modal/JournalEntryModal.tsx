@@ -53,7 +53,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}, [journal]);
 
 	const currentFormState = useWatch({ control: journalEntryForm.control })
-	const currentMemoValue = currentFormState.memo
+	const currentMemoValue = currentFormState.memo ?? ''
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
@@ -66,7 +66,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}, [currentFormState])
 
 	const refreshJournalEntriesQuery = () => {
-		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'enhancedJournalEntries' })
+		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'journalEntries' })
 	}
 
 	const handleClose = () => {
@@ -102,7 +102,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 				onClose={handleClose}
 				actions={
 					<>
-						<Tooltip title='Delete'>
+						<Tooltip title='Delete Entry'>
 							<IconButton onClick={() => handleDelete()}>
 								<Delete />
 							</IconButton>
@@ -110,19 +110,17 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 					</>
 				}
 			>
-				<form>
-					<DialogTitle>
-						<Stack direction='row' gap={1} alignItems='center'>
-							<AvatarIcon />
-							<Typography variant='inherit'>
-								{currentMemoValue || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
-							</Typography>
-						</Stack>
-					</DialogTitle>
-					<DialogContent sx={{ overflow: 'initial' }}>
-						<JournalEntryForm />
-					</DialogContent>
-				</form>
+				<DialogTitle>
+					<Stack direction='row' gap={1} alignItems='center'>
+						<AvatarIcon />
+						<Typography variant='inherit'>
+							{currentMemoValue.trim() || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
+						</Typography>
+					</Stack>
+				</DialogTitle>
+				<DialogContent sx={{ overflow: 'initial' }}>
+					<JournalEntryForm />
+				</DialogContent>
 			</DetailsDrawer>
 		</FormProvider>
 	)

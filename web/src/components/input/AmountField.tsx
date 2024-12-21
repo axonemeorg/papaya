@@ -49,6 +49,7 @@ export default function AmountField(props: AmountFieldProps) {
         <Stack direction='row' gap={1}>
             <TextField
                 label="Amount"
+                placeholder="00.00"
                 fullWidth
                 slotProps={{
                     htmlInput: {

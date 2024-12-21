@@ -1,6 +1,5 @@
 import {
 	Category,
-	RichJournalEntryMetadata,
 	EntryArtifact,
 	EntryTag,
 	JournalEntry,
@@ -10,7 +9,6 @@ import {
 import { getDatabaseClient } from './client'
 import { JournalEditorView } from '@/components/journal/JournalEditor'
 import dayjs from 'dayjs'
-import { enhanceJournalEntry } from '@/utils/journal'
 import { ZISK_META_KEY } from '@/constants/database'
 import { createDefaultZiskMeta } from '@/utils/database'
 
@@ -58,45 +56,6 @@ export const getJournalEntries = async (
 	})
 
 	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
-}
-
-export interface GetEnhancedJournalEntriesResults {
-	entries: Record<JournalEntry['_id'], JournalEntry>
-	richJournalEntryMetadataRecords: Record<JournalEntry['_id'], RichJournalEntryMetadata>
-}
-
-export const getEnhancedJournalEntries = async (
-	view: JournalEditorView,
-	date: string,
-	journalId: string
-): Promise<GetEnhancedJournalEntriesResults> => {
-	const journalEntries = await getJournalEntries(view, date, journalId)
-	const allArtifacts = await getArtifacts(journalId)
-
-	const result = Object.fromEntries(
-		Object.values(journalEntries).reduce((acc: [JournalEntry['_id'], RichJournalEntryMetadata][], entry) => {
-			if (entry.parentEntryId) {
-				return acc
-			}
-
-			const children: JournalEntry[] = (entry.childEntryIds ?? [])
-				.map((childId) => journalEntries[childId])
-				.filter(Boolean)
-
-			const artifacts: EntryArtifact[] = (entry.artifactIds ?? [])
-				.map((artifactId) => allArtifacts[artifactId])
-				.filter(Boolean)
-
-			acc.push([entry._id, enhanceJournalEntry(entry, children, artifacts)])
-
-			return acc
-		}, [])
-	)
-
-	return {
-		entries: journalEntries,
-		richJournalEntryMetadataRecords: result,
-	}
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['_id'], EntryTag>> => {
@@ -150,19 +109,6 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 	})
 
 	return Object.fromEntries((result.docs as EntryArtifact[]).map((artifact) => [artifact._id, artifact]))
-}
-
-export const getJournalEntryChildren = async (entryId: JournalEntry['_id']): Promise<JournalEntry[]> => {
-	const result = await db.find({
-		selector: {
-			'$and': [
-				{ type: 'JOURNAL_ENTRY' },
-				{ parentEntryId: entryId },
-			],
-		},
-	})
-
-	return result.docs as JournalEntry[]
 }
 
 export const getJournalEntryArtifacts = async (entryId: JournalEntry['_id']): Promise<EntryArtifact[]> => {

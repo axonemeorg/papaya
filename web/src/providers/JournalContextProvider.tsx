@@ -21,7 +21,7 @@ db.createIndex({
 		fields: [
 			'type',
 			'date',
-			'parentEntryId',
+			'children',
 			'journalId',
 		],
 	},

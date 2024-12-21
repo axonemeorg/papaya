@@ -7,7 +7,7 @@ import {
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
 import { generateCategoryId, generateJournalId } from '@/utils/id'
-import { getJournalEntryChildren, getOrCreateZiskMeta } from './queries'
+import { getOrCreateZiskMeta } from './queries'
 
 const db = getDatabaseClient()
 
@@ -29,17 +29,6 @@ export const updateJournalEntry = async (formData: JournalEntry) => {
 
 	const existingRecord = await db.get(formData._id)
 	const now = new Date().toISOString()
-	const parentDate = formData.date
-	const parentId: string = formData._id
-
-	// Update children to sync date with parent
-	const currentChildren = await getJournalEntryChildren(parentId)
-	const updateChildren: JournalEntry[] = currentChildren.map((child) => {
-		return {
-			...child,
-			date: parentDate,
-		}
-	})
 
 	const docs: object[] = [
 		{
@@ -47,17 +36,28 @@ export const updateJournalEntry = async (formData: JournalEntry) => {
 			...formData,
 			updatedAt: now,
 		},
-		...updateChildren,
 	]
 
 	return db.bulkDocs(docs)
 }
 
+export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
+	const now = new Date().toISOString()
+
+	const updatedChildren = children.map((child) => {
+		delete child._rev
+		return {
+			...child,
+			updatedAt: now,
+		}
+	})
+
+	return db.bulkDocs(updatedChildren)
+}
+
 export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
 	const record = await db.get(journalEntryId)
-	const children = await getJournalEntryChildren(journalEntryId)
-	const docs = [{ ...record, _deleted: true }, ...children.map((child) => ({ ...child, _deleted: true }))]
-	await db.bulkDocs(docs)
+	await db.remove(record)
 	return record as JournalEntry
 }
 

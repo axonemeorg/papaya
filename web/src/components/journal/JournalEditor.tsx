@@ -2,7 +2,7 @@ import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'rea
 import { Box, Divider } from '@mui/material'
 import dayjs from 'dayjs'
 import JournalHeader from './JournalHeader'
-import { JournalEntry, RichJournalEntryMetadata } from '@/types/schema'
+import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
@@ -15,14 +15,12 @@ export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
-	richJournalEntryMetadata: RichJournalEntryMetadata | null
 	anchorEl: HTMLElement | null
 }
 
 export default function JournalEditor() {
 	const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
 		entry: null,
-		richJournalEntryMetadata: null,
 		anchorEl: null,
 	})
 
@@ -31,12 +29,11 @@ export default function JournalEditor() {
 	const journalEntryContext = useContext(JournalEntryContext)
 
 	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
-	const { richJournalEntryMetadataRecords } = journalEntryContext.getEnhancedJournalEntriesQuery.data
 
 	const journalGroups = useMemo(() => {
-		const { entries } = journalEntryContext.getEnhancedJournalEntriesQuery.data
-		const groups: Record<string, JournalEntry[]> = Object.values(entries).reduce(
-			(acc: Record<string, JournalEntry[]>, entry: JournalEntry) => {
+		const entries = journalEntryContext.getJournalEntriesQuery.data
+		const groups: Record<JournalEntry['_id'], JournalEntry[]> = Object.values(entries).reduce(
+			(acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
 				const { date } = entry
 				if (!date) {
 					return acc
@@ -55,13 +52,12 @@ export default function JournalEditor() {
 		)
 
 		return groups
-	}, [journalEntryContext.getEnhancedJournalEntriesQuery.data])
+	}, [journalEntryContext.getJournalEntriesQuery.data])
 
 	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
 		setSelectedEntry({
 			anchorEl: event.currentTarget,
 			entry: entry,
-			richJournalEntryMetadata: richJournalEntryMetadataRecords[entry._id] ?? null,
 		})
 	}
 
@@ -125,10 +121,9 @@ export default function JournalEditor() {
 				sx={{
 					px: { sm: 0 },
 				}}>
-				{selectedEntry.entry && selectedEntry.richJournalEntryMetadata && (
+				{selectedEntry.entry && (
 					<JournalEntryCard
 						entry={selectedEntry.entry}
-						richJournalEntryMetadata={selectedEntry.richJournalEntryMetadata}
 						anchorEl={selectedEntry.anchorEl}
 						onClose={() => handleDeselectListItem()}
 						onDelete={() => handleDeleteEntry(selectedEntry.entry)}

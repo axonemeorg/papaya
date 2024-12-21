@@ -54,14 +54,6 @@ const AmountRecord = z.object({
 
 export type AmountRecord = z.output<typeof AmountRecord>
 
-export const CreateJournalEntryChild = AmountRecord.merge(z.object({
-	memo: z.string(),
-	tagIds: z.array(z.string()).optional(),
-	categoryIds: z.array(z.string()).optional(),
-}))
-
-export type CreateJournalEntryChild = z.output<typeof CreateJournalEntryChild>
-
 export const AttachmentContent = z.any()
 
 // export const AttachmentContent = z.object({
@@ -90,7 +82,6 @@ export type CreateEntryArtifact = z.output<typeof CreateEntryArtifact>
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryArtifact).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
-		parentEntryId: z.string(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
 	})
@@ -98,38 +89,34 @@ export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(Crea
 
 export type EntryArtifact = z.output<typeof EntryArtifact>
 
-export const CreateJournalEntry = CreateJournalEntryChild.merge(
-	z.object({
-		date: z.string().optional(),
-		notes: z.string().optional(),
-		artifactIds: z.array(z.string()).optional(),
-		paymentMethodId: z.string().nullable().optional(),
-		relatedEntryIds: z.array(z.string()).optional(),
-	})
-)
+export const CreateJournalEntry = AmountRecord.merge(z.object({
+	memo: z.string(),
+	tagIds: z.array(z.string()).optional(),
+	categoryIds: z.array(z.string()).optional(),
+	date: z.string().optional(),
+	notes: z.string().optional(),
+	artifactIds: z.array(z.string()).optional(),
+	paymentMethodId: z.string().nullable().optional(),
+	relatedEntryIds: z.array(z.string()).optional(),
+}))
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 
-export const JournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(CreateJournalEntry).merge(
+export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(CreateJournalEntry).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
-		parentEntryId: z.string().nullable().optional(),
-		childEntryIds: z.array(z.string()).optional(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
 )
 
+export const JournalEntry = BaseJournalEntry.merge(
+	z.object({
+		children: z.array(BaseJournalEntry).optional(),
+	})
+)
+
 export type JournalEntry = z.output<typeof JournalEntry>
-
-export const RichJournalEntryMetadata = z.object({
-	children: z.array(JournalEntry),
-	artifacts: z.array(EntryArtifact),
-	allCategoryIds: z.array(z.string()),
-	netAmount: z.number(),
-})
-
-export type RichJournalEntryMetadata = z.output<typeof RichJournalEntryMetadata>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string().optional(),

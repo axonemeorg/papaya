@@ -6,94 +6,21 @@ import {
 	Grid2 as Grid,
 	Stack,
 	TextField,
+	Typography,
 } from '@mui/material'
-import { Controller, useFormContext } from 'react-hook-form'
+import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { JournalEntry } from '@/types/schema'
-import { FilterList } from '@mui/icons-material'
+import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 // import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
-
-// interface JournalEntryChildRowProps {
-// 	index: number
-// 	fieldArray: UseFieldArrayReturn<CreateJournalEntryForm>['fields']
-// 	entryTags: Record<string, EntryTag>
-// 	remove: UseFieldArrayReturn<CreateJournalEntryForm>['remove']
-// 	onClickTagButton: (event: React.MouseEvent<HTMLButtonElement>) => void
-// }
-
-// const JournalEntryChildRow = (props: JournalEntryChildRowProps) => {
-// 	const { setValue, control, watch, register } = useFormContext<CreateJournalEntryForm>()
-
-// 	const childTagIds = watch(`children.${props.index}.tagIds`) ?? []
-// 	const childTags = childTagIds.map((tagId) => props.entryTags[tagId]).filter(Boolean)
-// 	const hasTags = childTagIds.length > 0
-// 	const categoryIds = (watch(`children.${props.index}.categoryIds`) as string[] | undefined) ?? []
-// 	const categoryId: string | undefined = categoryIds.length > 0 ? categoryIds[0] : undefined
-
-// 	return (
-// 		<Grid container columns={12} spacing={1} rowSpacing={0} sx={{ alignItems: 'center' }}>
-// 			<Grid size={'grow'}>
-// 				<Controller
-// 					control={control}
-// 					name={`children.${props.index}.amount` as const}
-// 					render={({ field }) => (
-// 						<AmountField
-// 							{...field}
-// 							fullWidth
-// 							sx={{ flex: 1 }}
-// 							autoComplete="off"
-// 							size='small'
-// 						/>
-// 					)}
-// 				/>
-// 			</Grid>
-// 			<Grid size={4}>
-// 				<Controller
-// 					control={control}
-// 					name={`children.${props.index}.categoryIds` as const}
-// 					render={({ field }) => (
-// 						<CategoryAutocomplete
-// 							{...field}
-// 							ref={null}
-// 							value={categoryId}
-// 							onChange={(_event, newValue) => {
-// 								setValue(field.name, newValue ? [newValue] : [])
-// 							}}
-// 							label="Category"
-// 							size="small"
-// 						/>
-// 					)}
-// 				/>
-// 			</Grid>
-// 			<Grid size={4}>
-// 				<TextField label="Memo" {...register(`children.${props.index}.memo`)} fullWidth size="small" />
-// 			</Grid>
-// 			<Grid size="auto">
-// 				<Stack direction="row">
-// 					<IconButton onClick={props.onClickTagButton}>
-// 						<Label />
-// 					</IconButton>
-// 					<IconButton onClick={() => props.remove(props.index)}>
-// 						<Delete />
-// 					</IconButton>
-// 				</Stack>
-// 			</Grid>
-// 			<Grid size={12}>
-// 				<Collapse in={hasTags}>
-// 					<Stack gap={1} sx={{ pt: 1.25, pb: 0.75, flexFlow: 'row wrap' }}>
-// 						{childTags.map((entryTag: EntryTag) => {
-// 							return <Chip size="small" key={entryTag._id} label={entryTag.label} />
-// 						})}
-// 					</Stack>
-// 				</Collapse>
-// 			</Grid>
-// 		</Grid>
-// 	)
-// }
+import ChildJournalEntryForm from './ChildJournalEntryForm'
+import { useCallback, useContext, useState } from 'react'
+import { makeJournalEntry } from '@/utils/journal'
+import { JournalContext } from '@/contexts/JournalContext'
 
 // interface AttachmentRowProps {
 // 	onRemove: () => void
@@ -150,54 +77,32 @@ import CategorySelector from '../input/CategorySelector'
 // }
 
 export default function JournalEntryForm() {
-	const { setValue, control, watch, register } = useFormContext<JournalEntry>()
+	const { setValue, control, register } = useFormContext<JournalEntry>()
+	const [selectedRows, setSelectedRows] = useState<string[]>([])
 
-	// const [entryTagPickerData, setEntryTagPickerData] = useState<{ anchorEl: Element | null; index: number }>({
-	// 	anchorEl: null,
-	// 	index: 0,
-	// })
+	const journalContext = useContext(JournalContext)
 
-	// const artifactsFieldArray = useFieldArray<CreateJournalEntryForm>({
-	// 	control,
-	// 	name: 'artifacts',
-	// })
+	const childEntriesFieldArray = useFieldArray({
+		control,
+		name: 'children',
+		keyName: '_id',
+	})
 
-	// const { getEntryTagsQuery } = useContext(JournalContext)
+	const _date = useWatch({ control, name: 'date' })
+	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const children = useWatch({ control, name: 'children' })
 
-	// const handleAddChild = () => {
-	// 	childrenFieldArray.append({
-	// 		amount: '',
-	// 		memo: '',
-	// 	})
-	// }
-
-	// const handleAddFiles = async (files: File[]) => {
-	// 	const artifacts: CreateEntryArtifact[] = files.map((file) => {
-	// 		const filename = file.name
-	// 		const artifact: CreateEntryArtifact = {
-	// 			_id: generateArtifactId(),
-	// 			_attachments: {
-	// 				[filename]: {
-	// 					content_type: file.type,
-	// 					data: file,
-	// 				},
-	// 			},
-	// 			description: '',
-	// 			filename,
-	// 			filesize: file.size,
-	// 		}
-
-	// 		return artifact
-	// 	})
-
-	// 	artifacts.forEach((artifact) => {
-	// 		artifactsFieldArray.append(artifact)
-	// 	})
-	// }
-
-	// const entryTagPickerSelectedTags = useMemo(() => {
-	// 	return watch(`children.${entryTagPickerData.index}.tagIds`) ?? []
-	// }, [entryTagPickerData.index, watch(`children.${entryTagPickerData.index}.tagIds`)])
+	const handleAddChildEntry = useCallback(() => {
+		if (!journalContext.journal) {
+			return
+		}
+		const newEntry = makeJournalEntry({}, journalContext.journal._id)
+		if (children) {
+			childEntriesFieldArray.append(newEntry)
+		} else {
+			setValue('children', [newEntry])
+		}
+	}, [children])
 
 	return (
 		<>
@@ -213,8 +118,8 @@ export default function JournalEntryForm() {
 				<Grid container columns={12} spacing={3} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>
 						<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
-							<Button variant='outlined' startIcon={<FilterList />} onClick={() => {}}>
-								Test
+							<Button variant='outlined' startIcon={<SubdirectoryArrowRight />} onClick={() => handleAddChildEntry()}>
+								Add Sub-Entry
 							</Button>
 						</Stack>
 					</Grid>
@@ -292,7 +197,17 @@ export default function JournalEntryForm() {
 								)
 							})}
 						</Stack> */}
-						<Button onClick={() => {}}>Add Child</Button>
+						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={4}>
+							<Typography>Sub-Entries (0)</Typography>
+							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
+						</Stack>
+						<Stack mt={2} mx={-1} spacing={1}>
+							<ChildJournalEntryForm
+								fieldArray={childEntriesFieldArray}
+								selection={selectedRows}
+								onSelectionChange={setSelectedRows}
+							/>								
+						</Stack>
 						{/* <Stack>
 							{artifactsFieldArray.fields.map((field, index) => {
 								return (
@@ -311,7 +226,6 @@ export default function JournalEntryForm() {
 								control={control}
 								name="categoryIds"
 								render={({ field }) => {
-									const categoryIds = watch('categoryIds') ?? []
 									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
 
 									return (
