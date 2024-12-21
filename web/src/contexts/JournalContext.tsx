@@ -1,4 +1,4 @@
-import { Category, EntryTag, JournalEntry, JournalMeta } from '@/types/schema'
+import { AttachmentMeta, Category, EntryArtifact, EntryTag, JournalEntry, JournalMeta } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -15,6 +15,8 @@ export interface JournalContext {
 	editJournalEntry: (entry: JournalEntry) => void
 	openJournalManager: () => void
 	closeActiveJournal: () => void
+	writeAttachment: (artifact: EntryArtifact, file: File) => Promise<AttachmentMeta>
+	readAttachment: (artifact: EntryArtifact) => Promise<AttachmentMeta>
 }
 
 export const JournalContext = createContext<JournalContext>({} as JournalContext)

@@ -1,4 +1,5 @@
 import {
+	AttachmentMeta,
 	Category,
 	CreateCategory,
 	CreateJournalMeta,
@@ -10,6 +11,7 @@ import { getDatabaseClient } from './client'
 import { generateCategoryId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
 import { makeEntryArtifact } from '@/utils/journal'
+import { getImageBase64 } from '@/utils/file'
 
 const db = getDatabaseClient()
 
@@ -141,25 +143,20 @@ export const deleteJournal = async (journalId: string) => {
 	await db.remove(record)
 }
 
-export const createEntryArtifactsFromFiles = async (files: File[], journalId: string): Promise<EntryArtifact[]> => {
-	const now = new Date().toISOString()
+export const writeAttachmentToJournal = async (journalId: string, artifact: EntryArtifact, file: File): Promise<AttachmentMeta> => {
+	const base64Data = await getImageBase64(file)
 
-	const artifacts: EntryArtifact[] = files.map((file) => {
-		const artifact: EntryArtifact = makeEntryArtifact({
-			originalFileName: file.name,
-			contentType: file.type,
-			_attachments: {
-				[file.name]: {
-					content_type: file.type,
-					data: file,
-				}
-			}
-		}, journalId)
+	await db.putAttachment(journalId, artifact._id, base64Data, artifact.contentType)
+	return {
+		data: base64Data,
+		content_type: artifact.contentType,
+	}
+}
 
-		return artifact
-	})
-
-	
-	await db.bulkDocs(artifacts)
-	return artifacts
+export const readAttachmentFromJournal = async (journalId: string, artifact: EntryArtifact) => {
+	const attachment = await db.getAttachment(journalId, artifact._id)
+	return {
+		data: attachment.toString('base64'),
+		content_type: artifact.contentType,
+	}
 }

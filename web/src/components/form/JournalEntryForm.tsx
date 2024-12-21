@@ -14,7 +14,7 @@ import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { JournalEntry } from '@/types/schema'
+import { EntryArtifact, JournalEntry } from '@/types/schema'
 import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
@@ -69,19 +69,29 @@ export default function JournalEntryForm() {
 
 		
 		const files = await promptForFiles("image/*", true)
-		if (Array.isArray(files)) {
-			for (const file of files) {
-				
 
-				console.log('File uploaded to PouchDB with attachment:', file.name);
-			}
+		if (!Array.isArray(files)) {
+			return
 		}
-		// const artifact = makeEntryArtifact({}, journalContext.journal._id)
-		// if (artifacts) {
-		// 	entriesArtifactsFieldArray.prepend(artifact)
-		// } else {
-		// 	setValue('artifacts', [artifact])
-		// }
+	
+		const newArtifacts: EntryArtifact[] = await Promise.all(files.map(async (file): Promise<EntryArtifact> => {
+			if (!journalContext.journal) {
+				return Promise.reject(new Error('No active journal'))
+			}
+			const artifact: EntryArtifact = makeEntryArtifact({
+				originalFileName: file.name,
+				contentType: file.type,
+			}, journalContext.journal._id)
+
+			await journalContext.writeAttachment(artifact, file)
+			return artifact
+		}))
+
+		if (artifacts) {
+			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
+		} else {
+			setValue('artifacts', newArtifacts)
+		}
 	}, [artifacts])
 
 	return (

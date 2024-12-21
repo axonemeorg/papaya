@@ -4,10 +4,10 @@ import JournalEntryModal from '@/components/modal/JournalEntryModal'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { updateActiveJournal, createJournalEntry } from '@/database/actions'
+import { updateActiveJournal, createJournalEntry, writeAttachmentToJournal, readAttachmentFromJournal } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
 import { getCategories, getEntryTags, getJournals, getOrCreateZiskMeta } from '@/database/queries'
-import { Category, EntryTag, JournalEntry, JournalMeta, ZiskMeta } from '@/types/schema'
+import { AttachmentMeta, Category, EntryArtifact, EntryTag, JournalEntry, JournalMeta, ZiskMeta } from '@/types/schema'
 import { makeJournalEntry } from '@/utils/journal'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -31,6 +31,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false)
 	const [showSelectJournalModal, setShowSelectJournalModal] = useState<boolean>(false)
 	const [showCreateJournalModal, setShowCreateJournalModal] = useState(false)
+	const [attachmentCache, setAttachmentCache] = useState<Record<string, AttachmentMeta>>({})
 
 	// The currently active journal
 	const [activeJournal, setActiveJournal] = useState<JournalMeta | null>(null)
@@ -123,6 +124,28 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		getEntryTagsQuery.refetch()
 	}
 
+	const writeAttachment = async (artifact: EntryArtifact, file: File): Promise<AttachmentMeta> => {
+		if (!activeJournal) {
+			return Promise.reject(new Error('No active journal'))
+		}
+		const attachmentMeta = await writeAttachmentToJournal(activeJournal._id, artifact, file)
+		setAttachmentCache((prev) => ({ ...prev, [artifact._id]: attachmentMeta }))
+		return attachmentMeta
+	}
+
+	const readAttachment = async (artifact: EntryArtifact) => {
+		if (!activeJournal) {
+			return Promise.reject(new Error('No active journal'))
+		} if (attachmentCache[artifact._id]) {
+			return attachmentCache[artifact._id]
+		} else {
+			const attachmentMeta = await readAttachmentFromJournal(activeJournal._id, artifact)
+			setAttachmentCache((prev) => ({ ...prev, [artifact._id]: attachmentMeta }))
+			return attachmentMeta	
+		}
+
+	}
+
 	useEffect(() => {
 		if (!activeJournal) {
 			return
@@ -171,6 +194,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 				closeEntryModal: () => setShowJournalEntryModal(false),
 				openJournalManager: () => promptSelectJournal(),
 				closeActiveJournal,
+				writeAttachment,
+				readAttachment,
 			}}>
 			<SelectJournalModal
 				open={showSelectJournalModal}

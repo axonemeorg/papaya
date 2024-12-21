@@ -8,11 +8,18 @@ export const BelongsToJournal = z.object({
     journalId: z.string(),
 })
 
+export const AttachmentMeta = z.object({
+	content_type: z.string(),
+	data: z.string(),
+})
+
+export type AttachmentMeta = z.output<typeof AttachmentMeta>
+
 export const DocumentMetadata = IdentifierMetadata.merge(
 	z.object({
 		_rev: z.string().optional(),
 		_deleted: z.boolean().optional(),
-		_attachments: z.any().optional(),
+		_attachments: z.record(z.string(), AttachmentMeta).optional(),
 		type: z.string(),
 	})
 )
@@ -58,6 +65,7 @@ export type AmountRecord = z.output<typeof AmountRecord>
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
+		// attachmentId: z.string(), // The ID of the _attachment record attached to the journal object
 		originalFileName: z.string(),
 		contentType: z.string(),
 		description: z.string().optional(),
