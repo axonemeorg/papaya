@@ -88,7 +88,7 @@ export default function JournalEntryForm() {
 		keyName: '_id',
 	})
 
-	const date = useWatch({ control, name: 'date' })
+	const _date = useWatch({ control, name: 'date' })
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
 	const children = useWatch({ control, name: 'children' })
 

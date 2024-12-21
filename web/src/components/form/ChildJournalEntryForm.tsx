@@ -16,7 +16,7 @@ interface ChildJournalEntryFormProps {
 export default function ChildJournalEntryForm(props: ChildJournalEntryFormProps) {
     const isFlagged = false
     const handleToggleFlagged = (event: ChangeEvent<HTMLInputElement>) => {
-        const flagged = event.target.checked
+        const _flagged = event.target.checked
         
     }
 
@@ -77,7 +77,7 @@ export default function ChildJournalEntryForm(props: ChildJournalEntryFormProps)
                                     value={entry.categoryIds}
                                     onChange={(_event, newValue) => {
                                         if (newValue) {
-                                            props.fieldArray.update(index, { categoryIds: newValue })
+                                            props.fieldArray.update(index, { ...entry, categoryIds: newValue })
                                         }
                                     }}
                                 />
