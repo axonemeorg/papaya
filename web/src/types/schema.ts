@@ -54,57 +54,28 @@ const AmountRecord = z.object({
 
 export type AmountRecord = z.output<typeof AmountRecord>
 
-export const AttachmentContent = z.any()
-
-// export const AttachmentContent = z.object({
-//     content_type: z.string(),
-//     data: z.any(),
-//     // TODO need to reconcile this
-//     // length: z.number(),
-//     // digest: z.string(),
-//     // revpos: z.number(),
-//     // stub: z.boolean(),
-// });
-
-export type AttachmentContent = z.output<typeof AttachmentContent>
-
-export const CreateEntryArtifact = IdentifierMetadata.merge(
-	z.object({
-		filename: z.string(),
-		filesize: z.number(),
-		description: z.string(),
-		_attachments: z.record(z.string(), AttachmentContent),
-	})
-)
-
-export type CreateEntryArtifact = z.output<typeof CreateEntryArtifact>
-
-export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryArtifact).merge(
+export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
+		description: z.string().optional(),
 		createdAt: z.string(),
-		updatedAt: z.string().nullable(),
+		updatedAt: z.string().nullable().optional(),
 	})
 )
 
 export type EntryArtifact = z.output<typeof EntryArtifact>
 
-export const CreateJournalEntry = AmountRecord.merge(z.object({
-	memo: z.string(),
-	tagIds: z.array(z.string()).optional(),
-	categoryIds: z.array(z.string()).optional(),
-	date: z.string().optional(),
-	notes: z.string().optional(),
-	artifactIds: z.array(z.string()).optional(),
-	paymentMethodId: z.string().nullable().optional(),
-	relatedEntryIds: z.array(z.string()).optional(),
-}))
-
-export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
-
-export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(CreateJournalEntry).merge(
+export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
+		memo: z.string(),
+		tagIds: z.array(z.string()).optional(),
+		categoryIds: z.array(z.string()).optional(),
+		date: z.string().optional(),
+		notes: z.string().optional(),
+		artifacts: z.array(EntryArtifact).optional(),
+		paymentMethodId: z.string().nullable().optional(),
+		relatedEntryIds: z.array(z.string()).optional(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
