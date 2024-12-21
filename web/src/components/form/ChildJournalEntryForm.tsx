@@ -1,11 +1,10 @@
-import { Checkbox, Grid2 as Grid, IconButton, Stack } from "@mui/material"
+import { Checkbox, Collapse, Grid2 as Grid, Grow, IconButton, Stack } from "@mui/material"
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
 import { Delete, Flag, FlagOutlined } from "@mui/icons-material"
 import { ChangeEvent } from "react"
 import { JournalEntry } from "@/types/schema"
 import { Controller, UseFieldArrayReturn, useFormContext } from "react-hook-form"
-
 
 interface ChildJournalEntryFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "children", "_id">
@@ -57,19 +56,19 @@ export default function ChildJournalEntryForm(props: ChildJournalEntryFormProps)
                                     name={`children.${index}.amount`}
                                 /> */}
                                 <Controller
-									control={control}
-									name={`children.${index}.amount`}
-									render={({ field }) => (
-										<AmountField
-											// variant='filled'
-											{...field}
-											// fullWidth
-											// sx={{ flex: 1 }}
-											// autoComplete="off"
+                                    control={control}
+                                    name={`children.${index}.amount`}
+                                    render={({ field }) => (
+                                        <AmountField
+                                            // variant='filled'
+                                            {...field}
+                                            // fullWidth
+                                            // sx={{ flex: 1 }}
+                                            // autoComplete="off"
                                             size="small"
-										/>
-									)}
-								/>
+                                        />
+                                    )}
+                                />
                             </Grid>
                             <Grid size={6}>
                                 <CategoryAutocomplete

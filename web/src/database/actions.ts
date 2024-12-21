@@ -2,12 +2,14 @@ import {
 	Category,
 	CreateCategory,
 	CreateJournalMeta,
+	EntryArtifact,
 	JournalEntry,
 	JournalMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
 import { generateCategoryId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
+import { makeEntryArtifact } from '@/utils/journal'
 
 const db = getDatabaseClient()
 
@@ -137,4 +139,27 @@ export const deleteJournal = async (journalId: string) => {
 	await resetJournal(journalId)
 	const record = await db.get(journalId)
 	await db.remove(record)
+}
+
+export const createEntryArtifactsFromFiles = async (files: File[], journalId: string): Promise<EntryArtifact[]> => {
+	const now = new Date().toISOString()
+
+	const artifacts: EntryArtifact[] = files.map((file) => {
+		const artifact: EntryArtifact = makeEntryArtifact({
+			originalFileName: file.name,
+			contentType: file.type,
+			_attachments: {
+				[file.name]: {
+					content_type: file.type,
+					data: file,
+				}
+			}
+		}, journalId)
+
+		return artifact
+	})
+
+	
+	await db.bulkDocs(artifacts)
+	return artifacts
 }

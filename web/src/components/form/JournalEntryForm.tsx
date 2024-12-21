@@ -3,6 +3,7 @@
 import {
 	Box,
 	Button,
+	Collapse,
 	Grid2 as Grid,
 	Link,
 	Stack,
@@ -19,8 +20,11 @@ import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
 import { useCallback, useContext, useState } from 'react'
-import { makeJournalEntry } from '@/utils/journal'
+import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
+import { TransitionGroup } from 'react-transition-group';
+import EntryArtifactsForm from './EntryArtifactsForm'
+import { useFilePrompt } from '@/hooks/useFilePrompt'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -28,9 +32,17 @@ export default function JournalEntryForm() {
 
 	const journalContext = useContext(JournalContext)
 
+	const promptForFiles = useFilePrompt()
+
 	const childEntriesFieldArray = useFieldArray({
 		control,
 		name: 'children',
+		keyName: '_id',
+	})
+
+	const entriesArtifactsFieldArray = useFieldArray({
+		control,
+		name: 'artifacts',
 		keyName: '_id',
 	})
 
@@ -44,17 +56,32 @@ export default function JournalEntryForm() {
 		}
 		const newEntry = makeJournalEntry({}, journalContext.journal._id)
 		if (children) {
-			childEntriesFieldArray.append(newEntry)
+			childEntriesFieldArray.prepend(newEntry)
 		} else {
 			setValue('children', [newEntry])
 		}
 	}, [children])
 
-	const handleAddArtifact = useCallback(() => {
+	const handleAddArtifact = useCallback(async () => {
 		if (!journalContext.journal) {
 			return
 		}
-		// 
+
+		
+		const files = await promptForFiles("image/*", true)
+		if (Array.isArray(files)) {
+			for (const file of files) {
+				
+
+				console.log('File uploaded to PouchDB with attachment:', file.name);
+			}
+		}
+		// const artifact = makeEntryArtifact({}, journalContext.journal._id)
+		// if (artifacts) {
+		// 	entriesArtifactsFieldArray.prepend(artifact)
+		// } else {
+		// 	setValue('artifacts', [artifact])
+		// }
 	}, [artifacts])
 
 	return (
@@ -168,16 +195,16 @@ export default function JournalEntryForm() {
 						</Stack>
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
 							<Typography>Attachments (-1)</Typography>
-							<Button onClick={() => handleAddAttachment()} startIcon={<Add />}>Add Attachment</Button>
+							<Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
 						</Stack>
-						{children.length === 0 && (
+						{artifacts.length === 0 && (
 							<Typography variant='body2' color='textSecondary'>
 								No attachments. <Link onClick={() => handleAddArtifact()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
 							</Typography>
 						)}
 						<Stack mt={2} mx={-1} spacing={1}>
-							<ChildJournalEntryForm
-								fieldArray={childEntriesFieldArray}
+							<EntryArtifactsForm
+								fieldArray={entriesArtifactsFieldArray}
 								selection={selectedRows}
 								onSelectionChange={setSelectedRows}
 							/>								

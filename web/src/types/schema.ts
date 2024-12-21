@@ -12,6 +12,7 @@ export const DocumentMetadata = IdentifierMetadata.merge(
 	z.object({
 		_rev: z.string().optional(),
 		_deleted: z.boolean().optional(),
+		_attachments: z.any().optional(),
 		type: z.string(),
 	})
 )
@@ -57,6 +58,8 @@ export type AmountRecord = z.output<typeof AmountRecord>
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
+		originalFileName: z.string(),
+		contentType: z.string(),
 		description: z.string().optional(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
