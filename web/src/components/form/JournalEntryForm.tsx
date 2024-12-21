@@ -4,6 +4,7 @@ import {
 	Box,
 	Button,
 	Grid2 as Grid,
+	Link,
 	Stack,
 	TextField,
 	Typography,
@@ -90,7 +91,7 @@ export default function JournalEntryForm() {
 
 	const _date = useWatch({ control, name: 'date' })
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const children = useWatch({ control, name: 'children' })
+	const children = useWatch({ control, name: 'children' }) ?? []
 
 	const handleAddChildEntry = useCallback(() => {
 		if (!journalContext.journal) {
@@ -201,6 +202,11 @@ export default function JournalEntryForm() {
 							<Typography>Sub-Entries (0)</Typography>
 							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
 						</Stack>
+						{children.length === 0 && (
+							<Typography variant='body2' color='textSecondary'>
+								No sub-entries. <Link onClick={() => handleAddChildEntry()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
+							</Typography>
+						)}
 						<Stack mt={2} mx={-1} spacing={1}>
 							<ChildJournalEntryForm
 								fieldArray={childEntriesFieldArray}
