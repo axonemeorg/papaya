@@ -1,6 +1,4 @@
 import {
-	RichJournalEntryMetadata,
-	EntryArtifact,
 	type JournalEntry,
 } from '@/types/schema'
 import { generateJournalEntryId } from './id'
@@ -52,28 +50,16 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const enhanceJournalEntry = (
-	parent: JournalEntry,
-	children: JournalEntry[],
-	artifacts: EntryArtifact[]
-): RichJournalEntryMetadata => {
-	const allCategoryIds = Array.from(
-		new Set([...(parent.categoryIds ?? []), ...children.flatMap((child) => child.categoryIds ?? [])])
-	)
-
+export const calculateNetAmount = (entry: JournalEntry): number => {
+	const children: JournalEntry[] = entry.children ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
 			return acc + parseJournalEntryAmount(child.amount)
 		},
-		parseJournalEntryAmount(parent.amount)
+		parseJournalEntryAmount(entry.amount)
 	)
 
-	return {
-		children,
-		artifacts,
-		allCategoryIds,
-		netAmount,
-	}
+	return netAmount
 }
 
 export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: string): JournalEntry => {
@@ -83,7 +69,6 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 		_id: generateJournalEntryId(),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
-		parentEntryId: formData.parentEntryId,
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
 		memo: formData.memo || '',

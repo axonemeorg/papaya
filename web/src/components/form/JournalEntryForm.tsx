@@ -8,7 +8,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import { Controller, useFormContext, useWatch } from 'react-hook-form'
+import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
@@ -18,13 +18,9 @@ import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useState } from 'react'
 import { makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
-import { createJournalEntry, updateJournalEntryChildren } from '@/database/actions'
-import { useQuery } from '@tanstack/react-query'
-import { getJournalEntryChildren } from '@/database/queries'
-import { useDebounce } from '@/hooks/useDebounce'
 
 // interface AttachmentRowProps {
 // 	onRemove: () => void
@@ -81,64 +77,32 @@ import { useDebounce } from '@/hooks/useDebounce'
 // }
 
 export default function JournalEntryForm() {
-	const journalContext = useContext(JournalContext)
 	const { setValue, control, register } = useFormContext<JournalEntry>()
-	const [selectedRowsSet, setSelectedRowsSet] = useState<Set<string>>(new Set<string>([]))
-	const [children, setChildren] = useState<Record<JournalEntry['_id'], JournalEntry>>({})
+	const [selectedRows, setSelectedRows] = useState<string[]>([])
 
-	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const journalContext = useContext(JournalContext)
+
+	const childEntriesFieldArray = useFieldArray({
+		control,
+		name: 'children',
+		keyName: '_id',
+	})
+
 	const date = useWatch({ control, name: 'date' })
-	const parentEntryId = useWatch({ control, name: '_id' })
+	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const children = useWatch({ control, name: 'children' })
 
-	const handleAddChildEntry = () => {
+	const handleAddChildEntry = useCallback(() => {
 		if (!journalContext.journal) {
 			return
 		}
-		const newChildEntry: JournalEntry = makeJournalEntry({ date, parentEntryId }, journalContext.journal._id)
-		setChildren((prev) => ({ ...prev, [newChildEntry._id]: newChildEntry }))
-		createJournalEntry(newChildEntry)
-	}
-
-	const handleChangeChildEntry = (entry: JournalEntry) => {
-		console.log('handleChangeChildEntry', entry)
-		setChildren((prev) => ({ ...prev, [entry._id]: entry }))
-	}
-
-	const journalEntryChildrenQuery = useQuery({
-		queryKey: ['journalEntryChildrenByJournalEntryId', parentEntryId],
-		queryFn: async () => {
-			return getJournalEntryChildren(parentEntryId)
-		},
-		initialData: [],
-	})
-
-	const handleUpdateChildrenEntries = async () => {
-		const childrenEntries = Object.values(children)
-		updateJournalEntryChildren(childrenEntries).then(() => {
-			console.log('updated children entries:', childrenEntries)
-		})
-	}
-
-	const [debouncedhandleSaveChildrenWithCurrentValues, flushUpdateChildrenDebounce] = useDebounce(handleUpdateChildrenEntries, 1000)
-
-	useEffect(() => {
-		if (!journalEntryChildrenQuery.data.length) {
-			return
-		}
-		setChildren(Object.fromEntries(journalEntryChildrenQuery.data.map((entry) => [entry._id, entry])))
-	}, [journalEntryChildrenQuery.data])
-
-	useEffect(() => {
-		console.log('children changed')
-		debouncedhandleSaveChildrenWithCurrentValues()
-		return () => {
-			flushUpdateChildrenDebounce()
+		const newEntry = makeJournalEntry({}, journalContext.journal._id)
+		if (children) {
+			childEntriesFieldArray.append(newEntry)
+		} else {
+			setValue('children', [newEntry])
 		}
 	}, [children])
-
-	console.log('journalEntryChildrenQuery.data', journalEntryChildrenQuery.data)
-
-	// console.log('childrenFieldArray', childrenFieldArray)
 
 	return (
 		<>
@@ -238,29 +202,11 @@ export default function JournalEntryForm() {
 							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
 						</Stack>
 						<Stack mt={2} mx={-1} spacing={1}>
-							{Object.values(children).map((entry) => {
-								return (
-									<ChildJournalEntryForm
-										key={entry._id}
-										entry={entry}
-										onChange={handleChangeChildEntry}
-										selected={selectedRowsSet.has(entry._id)}
-										onSelectedChange={(selected) => {
-											setSelectedRowsSet((prev) => {
-												const newSet = new Set(prev)
-												if (selected) {
-													newSet.add(entry._id)
-												} else {
-													newSet.delete(entry._id)
-												}
-												return newSet
-											})
-										}}
-									
-									/>
-								)
-							})}
-								
+							<ChildJournalEntryForm
+								fieldArray={childEntriesFieldArray}
+								selection={selectedRows}
+								onSelectionChange={setSelectedRows}
+							/>								
 						</Stack>
 						{/* <Stack>
 							{artifactsFieldArray.fields.map((field, index) => {

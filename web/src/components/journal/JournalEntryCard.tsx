@@ -8,14 +8,14 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from './JournalEntryLoupe'
 import { useRouter } from 'next/router'
 import { getPriceString } from '@/utils/string'
-import { Category, JournalEntry, RichJournalEntryMetadata } from '@/types/schema'
+import { Category, JournalEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
+import { calculateNetAmount } from '@/utils/journal'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
 	entry: JournalEntry
-	richJournalEntryMetadata: RichJournalEntryMetadata
 	onClose: () => void
 	onDelete: () => void
 }
@@ -54,10 +54,14 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 }
 
 export default function JournalEntryCard(props: JournalEntryCardProps) {
-	const { entry, richJournalEntryMetadata, anchorEl } = props
+	const { entry, anchorEl } = props
 	const { getCategoriesQuery, editJournalEntry } = useContext(JournalContext)
 
-	const isNetPositive = Boolean(richJournalEntryMetadata && richJournalEntryMetadata.netAmount > 0)
+	const netAmount = calculateNetAmount(entry)
+	const isNetPositive = netAmount > 0
+	const categoryId: string | undefined = entry?.categoryIds?.[0]
+	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
+	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
 
 	const handleDeleteEntry = () => {
 		props.onDelete()
@@ -67,11 +71,6 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 		editJournalEntry(entry)
 		props.onClose()
 	}
-
-	const categoryId: string | undefined = entry?.categoryIds?.[0]
-	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
-	const netAmount: number = richJournalEntryMetadata?.netAmount ?? 0
-	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
 
 	return (
 		<Popover

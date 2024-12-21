@@ -28,7 +28,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { calculateNetAmount } from '@/utils/journal'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -132,8 +132,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery } = useContext(JournalContext)
-	const { getEnhancedJournalEntriesQuery } = useContext(JournalEntryContext)
-	const { richJournalEntryMetadataRecords } = getEnhancedJournalEntriesQuery.data
 
 	return (
 		<Grid
@@ -177,8 +175,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												const category: Category | undefined = categoryId
 													? getCategoriesQuery.data[categoryId]
 													: undefined
-												const richJournalEntryMetadata = richJournalEntryMetadataRecords[entry._id]
-												const netAmount = richJournalEntryMetadata.netAmount
+												const netAmount = calculateNetAmount(entry)
 												const isNetPositive = netAmount > 0
 
 												return (
