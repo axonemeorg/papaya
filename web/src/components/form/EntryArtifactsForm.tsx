@@ -9,14 +9,15 @@ import { getJournalEntryWithAttachments } from "@/database/queries"
 
 interface EntryArtifactsFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "artifacts", "_id">
+    control: Todo
     selection: string[]
     onSelectionChange: (selection: string[]) => void
 }
 
 export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
-    const { control } = useFormContext<JournalEntry>()
+    const { setValue } = useFormContext<JournalEntry>()
+    const { control } = props
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
-    const journalEntryId = useWatch({ control, name: '_id' })
 
     const handleToggleSelected = (artifactId: EntryArtifact['_id']) => {
         const isSelected = props.selection.includes(artifactId)
@@ -30,6 +31,14 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
     const handleDownloadFile = (file: File) => {
         const objectURL = URL.createObjectURL(file)
         window.open(objectURL)
+    }
+
+    const handleDeleteArtifact = (artifactId: EntryArtifact['_id'], index: number) => {
+        props.fieldArray.remove(index)
+        props.onSelectionChange(props.selection.filter((id) => id !== artifactId))
+        const newAttachments = { ...attachments }
+        delete newAttachments[artifactId]
+        setValue('_attachments', newAttachments)
     }
 
     return (
@@ -54,6 +63,7 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
                                         <Typography variant='body2'>{file?.size} bytes</Typography>
                                     </Stack>
                                     <Controller
+                                        key={artifact._id}
                                         control={control}
                                         name={`artifacts.${index}.description`}
                                         render={({ field }) => (
@@ -74,7 +84,7 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title='Delete'>
-                                <IconButton onClick={() => props.fieldArray.remove(index)}>
+                                <IconButton onClick={() => handleDeleteArtifact(artifact._id, index)}>
                                     <Delete />
                                 </IconButton>
                             </Tooltip>

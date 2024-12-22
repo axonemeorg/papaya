@@ -84,6 +84,7 @@ export default function JournalEntryForm() {
 				contentType: file.type,
 				size: file.size,
 				originalFileName: file.name,
+				description: '',
 			}, journalId)
 			console.log('NEW artifact:', artifact)
 
@@ -232,6 +233,7 @@ export default function JournalEntryForm() {
 						)}
 						<Stack mt={2} mx={-1} spacing={1}>
 							<EntryArtifactsForm
+								control={control}
 								fieldArray={entriesArtifactsFieldArray}
 								selection={selectedRows}
 								onSelectionChange={setSelectedRows}
