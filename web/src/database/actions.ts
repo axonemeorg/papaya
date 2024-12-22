@@ -1,17 +1,13 @@
 import {
-	AttachmentMeta,
 	Category,
 	CreateCategory,
 	CreateJournalMeta,
-	EntryArtifact,
 	JournalEntry,
 	JournalMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
 import { generateCategoryId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
-import { makeEntryArtifact } from '@/utils/journal'
-import { getImageBase64 } from '@/utils/file'
 
 const db = getDatabaseClient()
 
@@ -141,22 +137,4 @@ export const deleteJournal = async (journalId: string) => {
 	await resetJournal(journalId)
 	const record = await db.get(journalId)
 	await db.remove(record)
-}
-
-export const writeAttachmentToJournal = async (journalId: string, artifact: EntryArtifact, file: File): Promise<AttachmentMeta> => {
-	const base64Data = await getImageBase64(file)
-
-	await db.putAttachment(journalId, artifact._id, base64Data, artifact.contentType)
-	return {
-		data: base64Data,
-		content_type: artifact.contentType,
-	}
-}
-
-export const readAttachmentFromJournal = async (journalId: string, artifact: EntryArtifact) => {
-	const attachment = await db.getAttachment(journalId, artifact._id)
-	return {
-		data: attachment.toString('base64'),
-		content_type: artifact.contentType,
-	}
 }

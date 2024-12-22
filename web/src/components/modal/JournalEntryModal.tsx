@@ -54,6 +54,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const currentFormState = useWatch({ control: journalEntryForm.control })
 	const currentMemoValue = currentFormState.memo ?? ''
+	console.log('current form state:', currentFormState)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 

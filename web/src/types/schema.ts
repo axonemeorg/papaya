@@ -67,6 +67,7 @@ export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 		type: z.literal('ENTRY_ARTIFACT'),
 		// attachmentId: z.string(), // The ID of the _attachment record attached to the journal object
 		originalFileName: z.string(),
+		size: z.number(),
 		contentType: z.string(),
 		description: z.string().optional(),
 		createdAt: z.string(),

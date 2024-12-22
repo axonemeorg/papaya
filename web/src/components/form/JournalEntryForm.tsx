@@ -3,7 +3,6 @@
 import {
 	Box,
 	Button,
-	Collapse,
 	Grid2 as Grid,
 	Link,
 	Stack,
@@ -14,7 +13,7 @@ import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { EntryArtifact, JournalEntry } from '@/types/schema'
+import { AttachmentMeta, EntryArtifact, JournalEntry } from '@/types/schema'
 import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
@@ -22,9 +21,9 @@ import ChildJournalEntryForm from './ChildJournalEntryForm'
 import { useCallback, useContext, useState } from 'react'
 import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
-import { TransitionGroup } from 'react-transition-group';
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { useFilePrompt } from '@/hooks/useFilePrompt'
+import { fileToBase64 } from '@/utils/file'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -37,24 +36,23 @@ export default function JournalEntryForm() {
 	const childEntriesFieldArray = useFieldArray({
 		control,
 		name: 'children',
-		keyName: '_id',
 	})
 
 	const entriesArtifactsFieldArray = useFieldArray({
 		control,
 		name: 'artifacts',
-		keyName: '_id',
 	})
 
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
 	const children = useWatch({ control, name: 'children' }) ?? []
 	const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
+	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 
 	const handleAddChildEntry = useCallback(() => {
 		if (!journalContext.journal) {
 			return
 		}
-		const newEntry = makeJournalEntry({}, journalContext.journal._id)
+		const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
 		if (children) {
 			childEntriesFieldArray.prepend(newEntry)
 		} else {
@@ -62,10 +60,12 @@ export default function JournalEntryForm() {
 		}
 	}, [children])
 
-	const handleAddArtifact = useCallback(async () => {
+	const handleAddArtifact = async () => {
 		if (!journalContext.journal) {
 			return
 		}
+
+		const journalId = journalContext.journal._id
 
 		
 		const files = await promptForFiles("image/*", true)
@@ -73,26 +73,36 @@ export default function JournalEntryForm() {
 		if (!Array.isArray(files)) {
 			return
 		}
-	
-		const newArtifacts: EntryArtifact[] = await Promise.all(files.map(async (file): Promise<EntryArtifact> => {
-			if (!journalContext.journal) {
-				return Promise.reject(new Error('No active journal'))
-			}
-			const artifact: EntryArtifact = makeEntryArtifact({
-				originalFileName: file.name,
+
+		const newArtifacts: EntryArtifact[] = [];
+		const newAttachments: Record<string, AttachmentMeta> = {}
+
+		for (const file of files) {
+			const artifact = makeEntryArtifact({
 				contentType: file.type,
-			}, journalContext.journal._id)
+				size: file.size,
+				originalFileName: file.name,
+			}, journalId)
+			console.log('NEW artifact:', artifact)
 
-			await journalContext.writeAttachment(artifact, file)
-			return artifact
-		}))
+			newArtifacts.push(artifact)
+			newAttachments[artifact._id] = {
+				content_type: file.type,
+				data: await fileToBase64(file),
+			}
+		}
 
+		console.log('new artifacts:', newArtifacts)
 		if (artifacts) {
 			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
 		} else {
 			setValue('artifacts', newArtifacts)
 		}
-	}, [artifacts])
+
+		setValue('_attachments', { ...attachments, ...newAttachments })
+	}
+
+	console.log('artifacts:', artifacts)
 
 	return (
 		<>
@@ -204,7 +214,7 @@ export default function JournalEntryForm() {
 							/>								
 						</Stack>
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
-							<Typography>Attachments (-1)</Typography>
+							<Typography>Attachments ({artifacts.length})</Typography>
 							<Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
 						</Stack>
 						{artifacts.length === 0 && (

@@ -1,10 +1,8 @@
-import { Checkbox, Collapse, Grid2 as Grid, Grow, IconButton, Stack, TextField } from "@mui/material"
-import AmountField from "../input/AmountField"
-import CategoryAutocomplete from "../input/CategoryAutocomplete"
-import { Delete, Flag, FlagOutlined } from "@mui/icons-material"
-import { ChangeEvent } from "react"
+import { Checkbox, Grid2 as Grid, IconButton, Stack, TextField } from "@mui/material"
+import { Delete } from "@mui/icons-material"
 import { EntryArtifact, JournalEntry } from "@/types/schema"
-import { Controller, UseFieldArrayReturn, useFormContext } from "react-hook-form"
+import { Controller, UseFieldArrayReturn, useFormContext, useWatch } from "react-hook-form"
+import FilePreview from "../file/FilePreview"
 
 interface EntryArtifactsFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "artifacts", "_id">
@@ -13,7 +11,8 @@ interface EntryArtifactsFormProps {
 }
 
 export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
-    const { control, register } = useFormContext<JournalEntry>()
+    const { control } = useFormContext<JournalEntry>()
+    const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 
     const handleToggleSelected = (artifactId: EntryArtifact['_id']) => {
         const isSelected = props.selection.includes(artifactId)
@@ -26,16 +25,19 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
 
     return (
         <>
-            {props.fieldArray.fields.map((entry, index) => {
+            {props.fieldArray.fields.map((artifact, index) => {
+                console.log('artifact:', artifact)
+                console.log('attachments:', attachments)
+                console.log('attachments[artifact._id]:', attachments[artifact._id])
                 return (
-                    <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
+                    <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={artifact._id}>
                         <Checkbox
-                            checked={props.selection.includes(entry._id)}
-                            onChange={() => handleToggleSelected(entry._id)}
+                            checked={props.selection.includes(artifact._id)}
+                            onChange={() => handleToggleSelected(artifact._id)}
                         />
                         <Grid container columns={12} spacing={1} sx={{ flex: '1', ml: 1 }}>
                             <Grid size={6}>
-                                <span>preview here</span>
+                                <FilePreview meta={attachments[artifact._id]} />
                             </Grid>
                             <Grid size={6}>
                                 <Controller
