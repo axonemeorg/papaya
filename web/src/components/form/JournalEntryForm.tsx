@@ -18,12 +18,13 @@ import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useCallback, useContext, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { useFilePrompt } from '@/hooks/useFilePrompt'
 import { fileToBase64 } from '@/utils/file'
+import { getJournalEntryWithAttachments } from '@/database/queries'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -47,6 +48,7 @@ export default function JournalEntryForm() {
 	const children = useWatch({ control, name: 'children' }) ?? []
 	const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
+	const journalEntryId = useWatch({ control, name: '_id' })
 
 	const handleAddChildEntry = useCallback(() => {
 		if (!journalContext.journal) {
@@ -88,11 +90,11 @@ export default function JournalEntryForm() {
 			newArtifacts.push(artifact)
 			newAttachments[artifact._id] = {
 				content_type: file.type,
-				data: await fileToBase64(file),
+				// data: await fileToBase64(file),
+				data: file
 			}
 		}
 
-		console.log('new artifacts:', newArtifacts)
 		if (artifacts) {
 			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
 		} else {
@@ -102,7 +104,13 @@ export default function JournalEntryForm() {
 		setValue('_attachments', { ...attachments, ...newAttachments })
 	}
 
-	console.log('artifacts:', artifacts)
+	useEffect(() => {
+		getJournalEntryWithAttachments(journalEntryId)
+			.then((entry) => {
+				setValue('_attachments', { ...attachments, ...(entry._attachments ?? {}) })
+			})
+			.catch()
+	}, [journalEntryId])
 
 	return (
 		<>

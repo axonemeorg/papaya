@@ -4,7 +4,7 @@ import { Avatar, Card, CardMedia } from "@mui/material";
 import { useEffect, useState } from "react";
 
 interface FilePreviewProps {
-    meta: AttachmentMeta | undefined | null
+    file: File | undefined
 }
 
 export default function FilePreview(props: FilePreviewProps) {
@@ -12,13 +12,13 @@ export default function FilePreview(props: FilePreviewProps) {
     console.log('FilePreview props:', props)
 
     useEffect(() => {
-        if (!props.meta) {
+        if (!props.file) {
             return
         }
 
-        if (props.meta?.content_type.startsWith('image')) {
-            // const objectURL = URL.createObjectURL(props.meta.data);
-            setImageSrc(props.meta.data)
+        if (props.file.type.startsWith('image')) {
+            const objectURL = URL.createObjectURL(props.file);
+            setImageSrc(objectURL)
         }
 
         return () => {
@@ -26,7 +26,7 @@ export default function FilePreview(props: FilePreviewProps) {
                 URL.revokeObjectURL(imageSrc)
             }
         }
-    }, [props.meta])
+    }, [props.file])
 
     return (
         <Card sx={{ aspectRatio: 4 / 5, width: 128 }}>

@@ -110,3 +110,8 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 
 	return Object.fromEntries((result.docs as EntryArtifact[]).map((artifact) => [artifact._id, artifact]))
 }
+
+export const getJournalEntryWithAttachments = async (journalEntryId: string): Promise<JournalEntry> => {
+	const entry = await db.get(journalEntryId, { attachments: true, binary: true }) as JournalEntry
+	return entry
+}

@@ -10,7 +10,7 @@ export const BelongsToJournal = z.object({
 
 export const AttachmentMeta = z.object({
 	content_type: z.string(),
-	data: z.string(),
+	data: z.any(),
 })
 
 export type AttachmentMeta = z.output<typeof AttachmentMeta>
