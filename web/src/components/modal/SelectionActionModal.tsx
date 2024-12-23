@@ -8,6 +8,7 @@ import {
     Paper,
     Popper,
     Stack,
+    Tooltip,
     Typography
 } from "@mui/material"
 
@@ -20,11 +21,20 @@ interface SelectionActionModalProps {
     open: boolean
     numSelected: number
     numTotalSelectable: number
-    onSelectAllChange: () => void
     actions?: SelectionActionModalActions
+    onSelectAll: () => void
+    onDeselectAll: () => void
 }
 
 export default function SelectionActionModal(props: SelectionActionModalProps) {
+    const handleSelectAllChange = () => {
+        if (props.numSelected === props.numTotalSelectable) {
+            props.onDeselectAll()
+        } else {
+            props.onSelectAll()
+        }
+    }
+
     return (
         <Popper
             open={props.open}
@@ -51,28 +61,28 @@ export default function SelectionActionModal(props: SelectionActionModalProps) {
                             }}
                         >
                             <Button
-                                onClick={() => props.onSelectAllChange()}
-                                sx={{ gap: 1 }}
+                                onClick={() => handleSelectAllChange()}
+                                sx={{ gap: 1, px: 2 }}
                                 tabIndex={-1}
                                 disableFocusRipple
                             >
-                                {/* <Stack direction='row' gap={1} px={1} alignItems='center'> */}
-                                    <Checkbox
-                                        indeterminate={props.numSelected > 0 && props.numSelected < props.numTotalSelectable}
-                                        checked={props.numSelected > 0 && props.numSelected === props.numTotalSelectable}
-                                        disabled={props.numTotalSelectable <= 0}
-                                        sx={{ mx: -1 }}
-                                        disableTouchRipple
-                                    />
-                                    <Typography color='inherit'>{props.numSelected} selected</Typography>
-                                {/* </Stack> */}
+                                <Checkbox
+                                    indeterminate={props.numSelected > 0 && props.numSelected < props.numTotalSelectable}
+                                    checked={props.numSelected > 0 && props.numSelected === props.numTotalSelectable}
+                                    disabled={props.numTotalSelectable <= 0}
+                                    sx={{ mx: -1 }}
+                                    disableTouchRipple
+                                />
+                                <Typography color='inherit'>{props.numSelected} selected</Typography>
                             </Button>
                             {props.actions?.onDelete && (
                                 <>
                                     <Divider orientation="vertical" flexItem />
-                                    <IconButton onClick={() => props.actions?.onDelete()}>
-                                        <Delete />
-                                    </IconButton>
+                                    <Tooltip title='Delete'>
+                                        <IconButton onClick={() => props.actions?.onDelete()}>
+                                            <Delete />
+                                        </IconButton>
+                                    </Tooltip>
                                 </>
                             )}                            
                         </Stack>

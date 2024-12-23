@@ -14,12 +14,12 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { AttachmentMeta, EntryArtifact, JournalEntry } from '@/types/schema'
-import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
+import { Add } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useCallback, useContext, useEffect } from 'react'
-import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
+import { useContext, useEffect } from 'react'
+import { makeEntryArtifact } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { useFilePrompt } from '@/hooks/useFilePrompt'
@@ -32,33 +32,17 @@ export default function JournalEntryForm() {
 
 	const promptForFiles = useFilePrompt()
 
-	const childEntriesFieldArray = useFieldArray({
-		control,
-		name: 'children',
-	})
-
 	const entriesArtifactsFieldArray = useFieldArray({
 		control,
 		name: 'artifacts',
 	})
 
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const children = useWatch({ control, name: 'children' }) ?? []
 	const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
 
-	const handleAddChildEntry = useCallback(() => {
-		if (!journalContext.journal) {
-			return
-		}
-		const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
-		if (children) {
-			childEntriesFieldArray.prepend(newEntry)
-		} else {
-			setValue('children', [newEntry])
-		}
-	}, [children])
+	
 
 	const handleAddArtifact = async () => {
 		if (!journalContext.journal) {
@@ -124,11 +108,11 @@ export default function JournalEntryForm() {
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
 				<Grid container columns={12} spacing={3} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>
-						<Stack direction='row' sx={{ pt: 0, pb: 2 }}>
+						{/* <Stack direction='row' sx={{ pt: 0, pb: 2 }}>
 							<Button variant='outlined' startIcon={<SubdirectoryArrowRight />} onClick={() => handleAddChildEntry()}>
 								Add Sub-Entry
 							</Button>
-						</Stack>
+						</Stack> */}
 					</Grid>
 					<Grid size={8}>
 						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
@@ -204,18 +188,8 @@ export default function JournalEntryForm() {
 								)
 							})}
 						</Stack> */}
-						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={4}>
-							<Typography>Sub-Entries ({children.length})</Typography>
-							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
-						</Stack>
-						{children.length === 0 && (
-							<Typography variant='body2' color='textSecondary'>
-								No sub-entries. <Link onClick={() => handleAddChildEntry()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
-							</Typography>
-						)}
 					
 						<ChildJournalEntryForm
-							fieldArray={childEntriesFieldArray}
 						/>								
 
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>

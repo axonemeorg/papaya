@@ -1,9 +1,11 @@
 import { Checkbox, Grid2 as Grid, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material"
 import { Delete, Download } from "@mui/icons-material"
 import { EntryArtifact, JournalEntry } from "@/types/schema"
-import { Controller, UseFieldArrayReturn, useFormContext, useWatch } from "react-hook-form"
+import { Controller, useFieldArray, UseFieldArrayReturn, useFormContext, useWatch } from "react-hook-form"
 import FilePreview from "../file/FilePreview"
-import { useState } from "react"
+import { useCallback, useContext, useState } from "react"
+import { JournalContext } from "@/contexts/JournalContext"
+import { makeJournalEntry } from "@/utils/journal"
 
 interface EntryArtifactsFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "artifacts", "_id">
@@ -12,6 +14,7 @@ interface EntryArtifactsFormProps {
 export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const { setValue, control } = useFormContext<JournalEntry>()
+
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 
     const handleToggleSelected = (key: string) => {
