@@ -90,6 +90,7 @@ export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: s
 		type: 'ENTRY_ARTIFACT',
 		originalFileName: formData.originalFileName ?? '',
     	contentType: formData.contentType ?? '',
+		size: formData.size ?? 0,
 		createdAt: now,
 		journalId,
 	}

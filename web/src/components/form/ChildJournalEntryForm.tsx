@@ -1,4 +1,4 @@
-import { Checkbox, Collapse, Grid2 as Grid, Grow, IconButton, Stack } from "@mui/material"
+import { Checkbox, Grid2 as Grid, IconButton, Stack } from "@mui/material"
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
 import { Delete, Flag, FlagOutlined } from "@mui/icons-material"

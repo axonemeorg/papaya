@@ -23,7 +23,6 @@ import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { useFilePrompt } from '@/hooks/useFilePrompt'
-import { fileToBase64 } from '@/utils/file'
 import { getJournalEntryWithAttachments } from '@/database/queries'
 
 export default function JournalEntryForm() {
@@ -233,7 +232,6 @@ export default function JournalEntryForm() {
 						)}
 						<Stack mt={2} mx={-1} spacing={1}>
 							<EntryArtifactsForm
-								control={control}
 								fieldArray={entriesArtifactsFieldArray}
 								selection={selectedRows}
 								onSelectionChange={setSelectedRows}

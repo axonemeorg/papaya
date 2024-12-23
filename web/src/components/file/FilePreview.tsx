@@ -1,4 +1,3 @@
-import { AttachmentMeta } from "@/types/schema";
 import { Folder } from "@mui/icons-material";
 import { Avatar, Card, CardMedia } from "@mui/material";
 import { useEffect, useState } from "react";

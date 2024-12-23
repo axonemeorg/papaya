@@ -1,22 +1,17 @@
 import { Checkbox, Grid2 as Grid, IconButton, Stack, TextField, Tooltip, Typography } from "@mui/material"
 import { Delete, Download } from "@mui/icons-material"
-import { AttachmentMeta, EntryArtifact, JournalEntry } from "@/types/schema"
+import { EntryArtifact, JournalEntry } from "@/types/schema"
 import { Controller, UseFieldArrayReturn, useFormContext, useWatch } from "react-hook-form"
 import FilePreview from "../file/FilePreview"
-import { useEffect } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { getJournalEntryWithAttachments } from "@/database/queries"
 
 interface EntryArtifactsFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "artifacts", "_id">
-    control: Todo
     selection: string[]
     onSelectionChange: (selection: string[]) => void
 }
 
 export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
-    const { setValue } = useFormContext<JournalEntry>()
-    const { control } = props
+    const { setValue, control } = useFormContext<JournalEntry>()
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 
     const handleToggleSelected = (artifactId: EntryArtifact['_id']) => {

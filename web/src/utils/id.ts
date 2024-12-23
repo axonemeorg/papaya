@@ -1,5 +1,6 @@
 const generateGenericUniqueId = () => {
-	return crypto.randomUUID()
+	// return crypto.randomUUID()
+	return new Date().toISOString()
 }
 
 export const generateJournalEntryId = generateGenericUniqueId
