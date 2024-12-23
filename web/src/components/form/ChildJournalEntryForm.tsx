@@ -2,18 +2,19 @@ import { Checkbox, Grid2 as Grid, IconButton, Stack } from "@mui/material"
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
 import { Delete, Flag, FlagOutlined } from "@mui/icons-material"
-import { ChangeEvent } from "react"
+import { ChangeEvent, useRef, useState } from "react"
 import { JournalEntry } from "@/types/schema"
 import { Controller, UseFieldArrayReturn, useFormContext } from "react-hook-form"
 import SelectionActionModal from "../modal/SelectionActionModal"
 
 interface ChildJournalEntryFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "children", "_id">
-    selection: string[]
-    onSelectionChange: (selection: string[]) => void
 }
 
 export default function ChildJournalEntryForm(props: ChildJournalEntryFormProps) {
+    const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const selectionMenuAnchorRef = useRef<HTMLDivElement>(null);
+    
     const isFlagged = false
     const handleToggleFlagged = (event: ChangeEvent<HTMLInputElement>) => {
         const _flagged = event.target.checked
@@ -22,27 +23,46 @@ export default function ChildJournalEntryForm(props: ChildJournalEntryFormProps)
 
     const { control } = useFormContext<JournalEntry>()
 
-    const handleToggleSelected = (entryId: JournalEntry['_id']) => {
-        const isSelected = props.selection.includes(entryId)
+    const handleToggleSelected = (key: string) => {
+        const isSelected = selectedRows.includes(key)
         if (isSelected) {
-            props.onSelectionChange(props.selection.filter((id) => id !== entryId))
+            setSelectedRows(selectedRows.filter((id) => id !== key))
         } else {
-            props.onSelectionChange([...props.selection, entryId])
+            setSelectedRows([...selectedRows, key])
         }
+    }
+
+    const handleSelectAllChange = () => {
+        if (selectedRows.length === props.fieldArray.fields.length) {
+            setSelectedRows([])
+        } else {
+            setSelectedRows(props.fieldArray.fields.map((entry) => entry._id))
+        }
+    }
+
+    const handleDeleteSelectedChildren = () => {
+        //
     }
 
     return (
         <>
             <SelectionActionModal
-                anchorEl={}
+                anchorEl={selectionMenuAnchorRef.current}
+                open={true}
+                numSelected={selectedRows.length}
+                onSelectAllChange={() => handleSelectAllChange()}
+                numTotalSelectable={props.fieldArray.fields.length}
+                actions={{
+                    onDelete: handleDeleteSelectedChildren
+                }}
             />
-            <Stack mt={2} mx={-1} spacing={1}>
+            <Stack mt={2} mx={-1} spacing={1} ref={selectionMenuAnchorRef}>
                 {props.fieldArray.fields.map((entry, index) => {
                     return (
                         <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
                             <Stack direction='row' spacing={-1}>
                                 <Checkbox
-                                    checked={props.selection.includes(entry._id)}
+                                    checked={selectedRows.includes(entry._id)}
                                     onChange={() => handleToggleSelected(entry._id)}
                                 />
                                 <Checkbox

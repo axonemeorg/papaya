@@ -3,23 +3,31 @@ import { Delete, Download } from "@mui/icons-material"
 import { EntryArtifact, JournalEntry } from "@/types/schema"
 import { Controller, UseFieldArrayReturn, useFormContext, useWatch } from "react-hook-form"
 import FilePreview from "../file/FilePreview"
+import { useState } from "react"
 
 interface EntryArtifactsFormProps {
     fieldArray: UseFieldArrayReturn<JournalEntry, "artifacts", "_id">
-    selection: string[]
-    onSelectionChange: (selection: string[]) => void
 }
 
 export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
+    const [selectedRows, setSelectedRows] = useState<string[]>([])
     const { setValue, control } = useFormContext<JournalEntry>()
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 
-    const handleToggleSelected = (artifactId: EntryArtifact['_id']) => {
-        const isSelected = props.selection.includes(artifactId)
+    const handleToggleSelected = (key: string) => {
+        const isSelected = selectedRows.includes(key)
         if (isSelected) {
-            props.onSelectionChange(props.selection.filter((id) => id !== artifactId))
+            setSelectedRows(selectedRows.filter((id) => id !== key))
         } else {
-            props.onSelectionChange([...props.selection, artifactId])
+            setSelectedRows([...selectedRows, key])
+        }
+    }
+
+    const handleSelectAllChange = () => {
+        if (selectedRows.length === props.fieldArray.fields.length) {
+            setSelectedRows([])
+        } else {
+            setSelectedRows(props.fieldArray.fields.map((entry) => entry._id))
         }
     }
 
@@ -30,7 +38,7 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
 
     const handleDeleteArtifact = (artifactId: EntryArtifact['_id'], index: number) => {
         props.fieldArray.remove(index)
-        props.onSelectionChange(props.selection.filter((id) => id !== artifactId))
+        setSelectedRows(selectedRows.filter((id) => id !== artifactId))
         const newAttachments = { ...attachments }
         delete newAttachments[artifactId]
         setValue('_attachments', newAttachments)
@@ -44,7 +52,7 @@ export default function EntryArtifactsForm(props: EntryArtifactsFormProps) {
                 return (
                     <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={artifact._id}>
                         <Checkbox
-                            checked={props.selection.includes(artifact._id)}
+                            checked={selectedRows.includes(artifact._id)}
                             onChange={() => handleToggleSelected(artifact._id)}
                         />
                         <Grid container columns={12} spacing={1} sx={{ flex: '1', ml: 1 }}>

@@ -18,7 +18,7 @@ import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import EntryArtifactsForm from './EntryArtifactsForm'
@@ -27,7 +27,6 @@ import { getJournalEntryWithAttachments } from '@/database/queries'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
-	const [selectedRows, setSelectedRows] = useState<string[]>([])
 
 	const journalContext = useContext(JournalContext)
 
@@ -217,8 +216,6 @@ export default function JournalEntryForm() {
 					
 						<ChildJournalEntryForm
 							fieldArray={childEntriesFieldArray}
-							selection={selectedRows}
-							onSelectionChange={setSelectedRows}
 						/>								
 
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
@@ -233,8 +230,6 @@ export default function JournalEntryForm() {
 						<Stack mt={2} mx={-1} spacing={1}>
 							<EntryArtifactsForm
 								fieldArray={entriesArtifactsFieldArray}
-								selection={selectedRows}
-								onSelectionChange={setSelectedRows}
 							/>								
 						</Stack>
 					</Grid>
