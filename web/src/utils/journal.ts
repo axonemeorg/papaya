@@ -1,7 +1,8 @@
 import {
+	EntryArtifact,
 	type JournalEntry,
 } from '@/types/schema'
-import { generateJournalEntryId } from './id'
+import { generateArtifactId, generateJournalEntryId } from './id'
 import dayjs from 'dayjs'
 
 /**
@@ -66,7 +67,7 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 	const now = new Date().toISOString()
 
 	const journalEntry: JournalEntry = {
-		_id: generateJournalEntryId(),
+		_id: formData._id ?? generateJournalEntryId(),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
@@ -76,4 +77,23 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 	}
 
 	return journalEntry
+}
+
+export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: string): EntryArtifact => {
+	const now = new Date().toISOString()
+
+	const entryArtifact: EntryArtifact = {
+		_id: formData._id ?? generateArtifactId(),
+		_attachments: {
+			...formData._attachments,
+		},
+		type: 'ENTRY_ARTIFACT',
+		originalFileName: formData.originalFileName ?? '',
+    	contentType: formData.contentType ?? '',
+		size: formData.size ?? 0,
+		createdAt: now,
+		journalId,
+	}
+
+	return entryArtifact
 }

@@ -4,6 +4,7 @@ import {
 	Box,
 	Button,
 	Grid2 as Grid,
+	Link,
 	Stack,
 	TextField,
 	Typography,
@@ -12,69 +13,17 @@ import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { JournalEntry } from '@/types/schema'
+import { AttachmentMeta, EntryArtifact, JournalEntry } from '@/types/schema'
 import { Add, SubdirectoryArrowRight } from '@mui/icons-material'
-// import { JournalContext } from '@/contexts/JournalContext'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useCallback, useContext, useState } from 'react'
-import { makeJournalEntry } from '@/utils/journal'
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { makeEntryArtifact, makeJournalEntry } from '@/utils/journal'
 import { JournalContext } from '@/contexts/JournalContext'
-
-// interface AttachmentRowProps {
-// 	onRemove: () => void
-// 	index: number
-// }
-
-// const AttachmentRow = (props: AttachmentRowProps) => {
-// 	const { index, onRemove } = props
-// 	const { watch, register } = useFormContext<CreateJournalEntryForm>()
-
-// 	const artifact = watch(`artifacts.${index}`)
-
-// 	// Check if the artifact's file has an content type of image. If so, we create a URL for it
-// 	const imageSrc: string | null = useMemo(() => {
-// 		const attachment = artifact._attachments[artifact.filename]
-// 		if (attachment.content_type.startsWith('image')) {
-// 			const blob = new Blob([attachment.data], { type: attachment.content_type })
-// 			return URL.createObjectURL(blob)
-// 		}
-
-// 		return null
-// 	}, [artifact])
-
-// 	return (
-// 		<Stack direction="row" alignItems="flex-start" spacing={1}>
-// 			<Card sx={{ aspectRatio: 4 / 5, width: 128 }}>
-// 				{imageSrc ? (
-// 					<CardMedia component="img" sx={{ objectFit: 'cover' }} height={'100%'} image={imageSrc} />
-// 				) : (
-// 					<MuiAvatar>
-// 						<Folder />
-// 					</MuiAvatar>
-// 				)}
-// 			</Card>
-// 			<Stack gap={0.5} sx={{ flex: 1, justifyContent: 'space-between' }}>
-// 				<Stack direction="row" gap={1}>
-// 					<Typography variant="body1">{artifact.filename}</Typography>
-// 					<Typography variant="body2">{formatFileSize(artifact.filesize)}</Typography>
-// 				</Stack>
-// 				<TextField
-// 					label="Description"
-// 					placeholder="Enter a description for this attachment"
-// 					{...register(`artifacts.${index}.description`)}
-// 					fullWidth
-// 					multiline
-// 					rows={2}
-// 				/>
-// 			</Stack>
-// 			<IconButton onClick={() => onRemove()}>
-// 				<Delete />
-// 			</IconButton>
-// 		</Stack>
-// 	)
-// }
+import EntryArtifactsForm from './EntryArtifactsForm'
+import { useFilePrompt } from '@/hooks/useFilePrompt'
+import { getJournalEntryWithAttachments } from '@/database/queries'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -82,27 +31,86 @@ export default function JournalEntryForm() {
 
 	const journalContext = useContext(JournalContext)
 
+	const promptForFiles = useFilePrompt()
+
 	const childEntriesFieldArray = useFieldArray({
 		control,
 		name: 'children',
-		keyName: '_id',
 	})
 
-	const _date = useWatch({ control, name: 'date' })
+	const entriesArtifactsFieldArray = useFieldArray({
+		control,
+		name: 'artifacts',
+	})
+
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const children = useWatch({ control, name: 'children' })
+	const children = useWatch({ control, name: 'children' }) ?? []
+	const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
+	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
+	const journalEntryId = useWatch({ control, name: '_id' })
 
 	const handleAddChildEntry = useCallback(() => {
 		if (!journalContext.journal) {
 			return
 		}
-		const newEntry = makeJournalEntry({}, journalContext.journal._id)
+		const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
 		if (children) {
-			childEntriesFieldArray.append(newEntry)
+			childEntriesFieldArray.prepend(newEntry)
 		} else {
 			setValue('children', [newEntry])
 		}
 	}, [children])
+
+	const handleAddArtifact = async () => {
+		if (!journalContext.journal) {
+			return
+		}
+
+		const journalId = journalContext.journal._id
+
+		
+		const files = await promptForFiles("image/*", true)
+
+		if (!Array.isArray(files)) {
+			return
+		}
+
+		const newArtifacts: EntryArtifact[] = [];
+		const newAttachments: Record<string, AttachmentMeta> = {}
+
+		for (const file of files) {
+			const artifact = makeEntryArtifact({
+				contentType: file.type,
+				size: file.size,
+				originalFileName: file.name,
+				description: '',
+			}, journalId)
+			console.log('NEW artifact:', artifact)
+
+			newArtifacts.push(artifact)
+			newAttachments[artifact._id] = {
+				content_type: file.type,
+				// data: await fileToBase64(file),
+				data: file
+			}
+		}
+
+		if (artifacts) {
+			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
+		} else {
+			setValue('artifacts', newArtifacts)
+		}
+
+		setValue('_attachments', { ...attachments, ...newAttachments })
+	}
+
+	useEffect(() => {
+		getJournalEntryWithAttachments(journalEntryId)
+			.then((entry) => {
+				setValue('_attachments', { ...attachments, ...(entry._attachments ?? {}) })
+			})
+			.catch()
+	}, [journalEntryId])
 
 	return (
 		<>
@@ -198,9 +206,14 @@ export default function JournalEntryForm() {
 							})}
 						</Stack> */}
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={4}>
-							<Typography>Sub-Entries (0)</Typography>
+							<Typography>Sub-Entries ({children.length})</Typography>
 							<Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
 						</Stack>
+						{children.length === 0 && (
+							<Typography variant='body2' color='textSecondary'>
+								No sub-entries. <Link onClick={() => handleAddChildEntry()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
+							</Typography>
+						)}
 						<Stack mt={2} mx={-1} spacing={1}>
 							<ChildJournalEntryForm
 								fieldArray={childEntriesFieldArray}
@@ -208,17 +221,22 @@ export default function JournalEntryForm() {
 								onSelectionChange={setSelectedRows}
 							/>								
 						</Stack>
-						{/* <Stack>
-							{artifactsFieldArray.fields.map((field, index) => {
-								return (
-									<AttachmentRow
-										key={field.id}
-										onRemove={() => artifactsFieldArray.remove(index)}
-										index={index}
-									/>
-								)
-							})}
-						</Stack> */}
+						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
+							<Typography>Attachments ({artifacts.length})</Typography>
+							<Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
+						</Stack>
+						{artifacts.length === 0 && (
+							<Typography variant='body2' color='textSecondary'>
+								No attachments. <Link onClick={() => handleAddArtifact()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
+							</Typography>
+						)}
+						<Stack mt={2} mx={-1} spacing={1}>
+							<EntryArtifactsForm
+								fieldArray={entriesArtifactsFieldArray}
+								selection={selectedRows}
+								onSelectionChange={setSelectedRows}
+							/>								
+						</Stack>
 					</Grid>
 					<Grid size={4}>
 						<Stack>
