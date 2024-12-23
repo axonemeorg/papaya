@@ -19,7 +19,7 @@ export default function EntryArtifactsForm() {
     const { setValue, control } = useFormContext<JournalEntry>()
     const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
-	const entriesArtifactsFieldArray = useFieldArray({
+	const entryArtifactsFieldArray = useFieldArray({
 		control,
 		name: 'artifacts',
 	})
@@ -55,7 +55,7 @@ export default function EntryArtifactsForm() {
 		}
 
 		if (artifacts) {
-			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
+			newArtifacts.forEach((artifact) => entryArtifactsFieldArray.prepend(artifact))
 		} else {
 			setValue('artifacts', newArtifacts)
 		}
@@ -73,22 +73,22 @@ export default function EntryArtifactsForm() {
         }
     }
 
-    const handleRemoveChildEntries = (artifactIds: string[]) => {
-        const indices = artifactIds.map((artifactId) => entriesArtifactsFieldArray.fields.findIndex((entry) => entry._id === artifactId))
-        entriesArtifactsFieldArray.remove(indices)
+    const handleRemoveArtifacts = (artifactIds: string[]) => {
+        const indices = artifactIds.map((artifactId) => entryArtifactsFieldArray.fields.findIndex((entry) => entry._id === artifactId))
+        entryArtifactsFieldArray.remove(indices)
         setSelectedRows(selectedRows.filter((id) => !artifactIds.includes(id)))
     }
 
     const handleSelectAll = () => {    
-        setSelectedRows(entriesArtifactsFieldArray.fields.map((entry) => entry._id))
+        setSelectedRows(entryArtifactsFieldArray.fields.map((entry) => entry._id))
     }
 
     const handleDeselectAll = () => {
         setSelectedRows([])
     }
 
-    const handleDeleteSelectedChildren = () => {
-        handleRemoveChildEntries(selectedRows)
+    const handleDeleteSelectedArtifacts = () => {
+        handleRemoveArtifacts(selectedRows)
     }
 
 
@@ -98,7 +98,7 @@ export default function EntryArtifactsForm() {
     }
 
     const handleDeleteArtifact = (artifactId: EntryArtifact['_id'], index: number) => {
-        entriesArtifactsFieldArray.remove(index)
+        entryArtifactsFieldArray.remove(index)
         setSelectedRows(selectedRows.filter((id) => id !== artifactId))
         const newAttachments = { ...attachments }
         delete newAttachments[artifactId]
@@ -113,9 +113,9 @@ export default function EntryArtifactsForm() {
                 numSelected={selectedRows.length}
                 onSelectAll={handleSelectAll}
                 onDeselectAll={handleDeselectAll}
-                numTotalSelectable={entriesArtifactsFieldArray.fields.length}
+                numTotalSelectable={entryArtifactsFieldArray.fields.length}
                 actions={{
-                    onDelete: handleDeleteSelectedChildren
+                    onDelete: handleDeleteSelectedArtifacts
                 }}
             />
             <Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2} mx={-2} px={2} ref={selectionMenuAnchorRef}>
@@ -128,7 +128,7 @@ export default function EntryArtifactsForm() {
                 </Typography>
             )}
             <Stack mt={2} mx={-1} spacing={1}>
-                {entriesArtifactsFieldArray.fields.map((artifact, index) => {
+                {entryArtifactsFieldArray.fields.map((artifact, index) => {
                     const file = attachments[artifact._id]?.data
 
                     return (
