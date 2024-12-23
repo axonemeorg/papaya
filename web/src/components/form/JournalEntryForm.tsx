@@ -214,13 +214,13 @@ export default function JournalEntryForm() {
 								No sub-entries. <Link onClick={() => handleAddChildEntry()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
 							</Typography>
 						)}
-						<Stack mt={2} mx={-1} spacing={1}>
-							<ChildJournalEntryForm
-								fieldArray={childEntriesFieldArray}
-								selection={selectedRows}
-								onSelectionChange={setSelectedRows}
-							/>								
-						</Stack>
+					
+						<ChildJournalEntryForm
+							fieldArray={childEntriesFieldArray}
+							selection={selectedRows}
+							onSelectionChange={setSelectedRows}
+						/>								
+
 						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
 							<Typography>Attachments ({artifacts.length})</Typography>
 							<Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
