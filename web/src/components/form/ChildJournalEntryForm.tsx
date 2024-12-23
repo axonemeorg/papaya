@@ -26,11 +26,7 @@ export default function ChildJournalEntryForm() {
 			return
 		}
 		const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
-		// if (children) {
-			childEntriesFieldArray.prepend(newEntry)
-		// } else {
-			// setValue('children', [newEntry])
-		// }
+        childEntriesFieldArray.prepend(newEntry)
 	}, [children])
     
     const isFlagged = false
@@ -107,21 +103,12 @@ export default function ChildJournalEntryForm() {
                             </Stack>
                             <Grid container columns={12} spacing={1} sx={{ flex: '1', ml: 1 }}>
                                 <Grid size={6}>
-                                    {/* <AmountField
-                                        size='small'
-                                        {...register(`children.${index}.amount`)}
-                                        name={`children.${index}.amount`}
-                                    /> */}
                                     <Controller
                                         control={control}
                                         name={`children.${index}.amount`}
                                         render={({ field }) => (
                                             <AmountField
-                                                // variant='filled'
                                                 {...field}
-                                                // fullWidth
-                                                // sx={{ flex: 1 }}
-                                                // autoComplete="off"
                                                 size="small"
                                             />
                                         )}

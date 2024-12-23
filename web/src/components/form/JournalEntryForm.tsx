@@ -2,90 +2,28 @@
 
 import {
 	Box,
-	Button,
 	Grid2 as Grid,
-	Link,
 	Stack,
 	TextField,
-	Typography,
 } from '@mui/material'
-import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { AttachmentMeta, EntryArtifact, JournalEntry } from '@/types/schema'
-import { Add } from '@mui/icons-material'
+import { JournalEntry } from '@/types/schema'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useContext, useEffect } from 'react'
-import { makeEntryArtifact } from '@/utils/journal'
-import { JournalContext } from '@/contexts/JournalContext'
+import { useEffect } from 'react'
 import EntryArtifactsForm from './EntryArtifactsForm'
-import { useFilePrompt } from '@/hooks/useFilePrompt'
 import { getJournalEntryWithAttachments } from '@/database/queries'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
 
-	const journalContext = useContext(JournalContext)
-
-	const promptForFiles = useFilePrompt()
-
-	const entriesArtifactsFieldArray = useFieldArray({
-		control,
-		name: 'artifacts',
-	})
-
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
-
-	
-
-	const handleAddArtifact = async () => {
-		if (!journalContext.journal) {
-			return
-		}
-
-		const journalId = journalContext.journal._id
-
-		
-		const files = await promptForFiles("image/*", true)
-
-		if (!Array.isArray(files)) {
-			return
-		}
-
-		const newArtifacts: EntryArtifact[] = [];
-		const newAttachments: Record<string, AttachmentMeta> = {}
-
-		for (const file of files) {
-			const artifact = makeEntryArtifact({
-				contentType: file.type,
-				size: file.size,
-				originalFileName: file.name,
-				description: '',
-			}, journalId)
-			console.log('NEW artifact:', artifact)
-
-			newArtifacts.push(artifact)
-			newAttachments[artifact._id] = {
-				content_type: file.type,
-				// data: await fileToBase64(file),
-				data: file
-			}
-		}
-
-		if (artifacts) {
-			newArtifacts.forEach((artifact) => entriesArtifactsFieldArray.prepend(artifact))
-		} else {
-			setValue('artifacts', newArtifacts)
-		}
-
-		setValue('_attachments', { ...attachments, ...newAttachments })
-	}
 
 	useEffect(() => {
 		getJournalEntryWithAttachments(journalEntryId)
@@ -168,44 +106,9 @@ export default function JournalEntryForm() {
 									)}
 								/>
 							</Grid>
-						</Grid>
-						{/* <Stack>
-							{childrenFieldArray.fields.map((field, index) => {
-								return (
-									<JournalEntryChildRow
-										key={field.id}
-										index={index}
-										fieldArray={childrenFieldArray.fields}
-										remove={childrenFieldArray.remove}
-										onClickTagButton={(event) => {
-											setEntryTagPickerData({
-												anchorEl: event.currentTarget,
-												index,
-											})
-										}}
-										entryTags={getEntryTagsQuery.data}
-									/>
-								)
-							})}
-						</Stack> */}
-					
-						<ChildJournalEntryForm
-						/>								
-
-						<Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2}>
-							<Typography>Attachments ({artifacts.length})</Typography>
-							<Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
-						</Stack>
-						{artifacts.length === 0 && (
-							<Typography variant='body2' color='textSecondary'>
-								No attachments. <Link onClick={() => handleAddArtifact()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
-							</Typography>
-						)}
-						<Stack mt={2} mx={-1} spacing={1}>
-							<EntryArtifactsForm
-								fieldArray={entriesArtifactsFieldArray}
-							/>								
-						</Stack>
+						</Grid>					
+						<ChildJournalEntryForm />
+						<EntryArtifactsForm />
 					</Grid>
 					<Grid size={4}>
 						<Stack>
