@@ -1,4 +1,5 @@
 import { getDatabaseClient } from '@/database/client'
+import { generateGenericUniqueId } from '@/utils/id'
 import { Button, Stack, TextField } from '@mui/material'
 import { useState } from 'react'
 
@@ -12,7 +13,7 @@ export default function MigratePage() {
 		const records = jsonData.map((record: any) => {
 			return {
 				...record,
-				_id: crypto.randomUUID(),
+				_id: generateGenericUniqueId(),
 			}
 		})
 		db.bulkDocs(records)

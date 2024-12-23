@@ -1,5 +1,7 @@
-const generateGenericUniqueId = () => {
-	return crypto.randomUUID()
+import { nanoid } from 'nanoid'
+
+export const generateGenericUniqueId = () => {
+	return nanoid()
 }
 
 export const generateJournalEntryId = generateGenericUniqueId
