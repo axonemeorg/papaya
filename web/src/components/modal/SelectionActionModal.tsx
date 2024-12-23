@@ -2,6 +2,7 @@ import { Delete } from "@mui/icons-material"
 import {
     Button,
     Checkbox,
+    ClickAwayListener,
     Divider,
     Fade,
     IconButton,
@@ -11,6 +12,7 @@ import {
     Tooltip,
     Typography
 } from "@mui/material"
+import { useCallback, useEffect, useState } from "react"
 
 interface SelectionActionModalActions {
     onDelete: () => void
@@ -27,6 +29,8 @@ interface SelectionActionModalProps {
 }
 
 export default function SelectionActionModal(props: SelectionActionModalProps) {
+    const [numSelectedDisplayed, setNumSelectedDisplayed] = useState<number>(props.numSelected)
+
     const handleSelectAllChange = () => {
         if (props.numSelected === props.numTotalSelectable) {
             props.onDeselectAll()
@@ -35,60 +39,72 @@ export default function SelectionActionModal(props: SelectionActionModalProps) {
         }
     }
 
+    const handleClickAway = useCallback(() => {
+        //
+    }, [props.open])
+
+    useEffect(() => {
+        if (props.numSelected > 0) {
+            setNumSelectedDisplayed(props.numSelected)
+        }
+    }, [props.numSelected])
+
     return (
-        <Popper
-            open={props.open}
-            anchorEl={props.anchorEl}
-            style={{ zIndex: 10000 }}
-            transition
-            placement="top-start"
-        >
-            {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350}>
-                    <Paper>
-                        <Stack
-                            direction='row'
-                            alignItems={'center'}
-                            sx={{
-                                'button:not(.MuiIconButton-root):not(:first-child)': {
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0,
-                                },
-                                'button:not(.MuiIconButton-root):not(:last-child)': {
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                },
-                            }}
-                        >
-                            <Button
-                                onClick={() => handleSelectAllChange()}
-                                sx={{ gap: 1, px: 2 }}
-                                tabIndex={-1}
-                                disableFocusRipple
+        <ClickAwayListener onClickAway={handleClickAway}>
+            <Popper
+                open={props.open}
+                anchorEl={props.anchorEl}
+                style={{ zIndex: 10000 }}
+                transition
+                placement="top-start"
+            >
+                {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeout={350}>
+                        <Paper>
+                            <Stack
+                                direction='row'
+                                alignItems={'center'}
+                                sx={{
+                                    'button:not(.MuiIconButton-root):not(:first-child)': {
+                                        borderTopLeftRadius: 0,
+                                        borderBottomLeftRadius: 0,
+                                    },
+                                    'button:not(.MuiIconButton-root):not(:last-child)': {
+                                        borderTopRightRadius: 0,
+                                        borderBottomRightRadius: 0,
+                                    },
+                                }}
                             >
-                                <Checkbox
-                                    indeterminate={props.numSelected > 0 && props.numSelected < props.numTotalSelectable}
-                                    checked={props.numSelected > 0 && props.numSelected === props.numTotalSelectable}
-                                    disabled={props.numTotalSelectable <= 0}
-                                    sx={{ mx: -1 }}
-                                    disableTouchRipple
-                                />
-                                <Typography color='inherit'>{props.numSelected} selected</Typography>
-                            </Button>
-                            {props.actions?.onDelete && (
-                                <>
-                                    <Divider orientation="vertical" flexItem />
-                                    <Tooltip title='Delete'>
-                                        <IconButton onClick={() => props.actions?.onDelete()}>
-                                            <Delete />
-                                        </IconButton>
-                                    </Tooltip>
-                                </>
-                            )}                            
-                        </Stack>
-                    </Paper>
-                </Fade>
-            )}
-        </Popper>
+                                <Button
+                                    onClick={() => handleSelectAllChange()}
+                                    sx={{ gap: 1, px: 2, py: 0 }}
+                                    tabIndex={-1}
+                                    disableFocusRipple
+                                >
+                                    <Checkbox
+                                        indeterminate={numSelectedDisplayed > 0 && numSelectedDisplayed < props.numTotalSelectable}
+                                        checked={numSelectedDisplayed > 0 && numSelectedDisplayed === props.numTotalSelectable}
+                                        disabled={props.numTotalSelectable <= 0}
+                                        sx={{ mx: -1 }}
+                                        disableTouchRipple
+                                    />
+                                    <Typography color='inherit'>{numSelectedDisplayed} selected</Typography>
+                                </Button>
+                                {props.actions?.onDelete && (
+                                    <>
+                                        <Divider orientation="vertical" flexItem />
+                                        <Tooltip title='Delete'>
+                                            <IconButton onClick={() => props.actions?.onDelete()}>
+                                                <Delete />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </>
+                                )}                            
+                            </Stack>
+                        </Paper>
+                    </Fade>
+                )}
+            </Popper>
+        </ClickAwayListener>
     )
 }

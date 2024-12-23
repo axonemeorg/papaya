@@ -48,6 +48,12 @@ export default function ChildJournalEntryForm() {
         }
     }
 
+    const handleRemoveChildEntries = (entryIds: string[]) => {
+        const indices = entryIds.map((entryId) => childEntriesFieldArray.fields.findIndex((entry) => entry._id === entryId))
+        childEntriesFieldArray.remove(indices)
+        setSelectedRows(selectedRows.filter((id) => !entryIds.includes(id)))
+    }
+
     const handleSelectAll = () => {    
         setSelectedRows(childEntriesFieldArray.fields.map((entry) => entry._id))
     }
@@ -57,7 +63,7 @@ export default function ChildJournalEntryForm() {
     }
 
     const handleDeleteSelectedChildren = () => {
-        //
+        handleRemoveChildEntries(selectedRows)
     }
 
     return (
@@ -133,7 +139,7 @@ export default function ChildJournalEntryForm() {
                                     />
                                 </Grid>
                             </Grid>
-                            <IconButton onClick={() => childEntriesFieldArray.remove(index)}>
+                            <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
                                 <Delete />
                             </IconButton>
                         </Stack>
