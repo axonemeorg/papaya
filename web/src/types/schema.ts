@@ -65,7 +65,6 @@ export type AmountRecord = z.output<typeof AmountRecord>
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_ARTIFACT'),
-		// attachmentId: z.string(), // The ID of the _attachment record attached to the journal object
 		originalFileName: z.string(),
 		size: z.number(),
 		contentType: z.string(),
