@@ -75,7 +75,13 @@ export default function ManageCategories() {
 					onSaved={() => getCategoriesQuery.refetch()}
 				/>
 			)}
-			<Stack gap={3}>
+			<Stack mb={4} gap={0.5}>
+				<Typography variant='h4'>Categories</Typography>
+				{/* <Typography variant='body2'>
+					Manage categories to organize your journal entries.
+				</Typography> */}
+			</Stack>
+			<Stack gap={2}>
 				<Stack direction="row" justifyContent="space-between" alignItems="center">
 					<TextField
 						slotProps={{
@@ -90,7 +96,7 @@ export default function ManageCategories() {
 						Add Category
 					</Button>
 				</Stack>
-				<Paper sx={(theme) => ({ borderRadius: theme.spacing(2) })}>
+				<Paper sx={(theme) => ({ borderRadius: theme.spacing(1) })}>
 					<Stack p={2} direction="row" justifyContent="space-between" alignItems="center">
 						<Typography>
 							<>{categories.length} {p(categories.length, 'categor', 'y', 'ies')}</>
