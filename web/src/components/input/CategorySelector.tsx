@@ -21,6 +21,7 @@ import { JournalContext } from "@/contexts/JournalContext";
 import AvatarIcon from "../icon/AvatarIcon";
 import { createCategory } from "@/database/actions";
 import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
+import clsx from "clsx";
 
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
 
@@ -52,29 +53,34 @@ export default function CategorySelector(props: CategorySelectorProps) {
     }
 
     return (
-        <>
+        <Stack gap={0.5}>
             <Button
+                component='a'
+                className={clsx({ '--open': Boolean(anchorEl) })}
                 onClick={(event) => setAnchorEl(event.currentTarget)}
                 sx={(theme) => ({
                     mx: -1,
+                    mt: -2,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     width: '100%',
                     textAlign: 'left',
                     color: 'inherit',
-                    fontWeight: 600,
-                    '&:hover, &:focus': {
+                    '&:hover, &:focus, &:focus-within, &.--open': {
                         color: theme.palette.primary.main
                     },
+                    background: 'none',
                 })}
+                disableRipple
+                tabIndex={-1}
             >
-                <Typography component='span'>Category</Typography>
-                <IconButton sx={{ m: -1, color: 'inherit' }} disableRipple>
+                <Typography component='span' sx={{ fontWeight: 500 }}>Category</Typography>
+                <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
                     <Settings />
                 </IconButton>
             </Button>
-            <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5, mt: 0.5 }}>
+            <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5 }}>
                 {selectedCategories.map((category) => {
                     return (
                         <CategoryChip key={category._id} icon contrast category={category} />
@@ -158,6 +164,6 @@ export default function CategorySelector(props: CategorySelectorProps) {
                     </Paper>
                 </ClickAwayListener>
             </Popper>
-        </>
+        </Stack>
     )
 }

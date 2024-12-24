@@ -2,6 +2,7 @@
 
 import {
 	Box,
+	Divider,
 	Grid2 as Grid,
 	Stack,
 	TextField,
@@ -111,7 +112,7 @@ export default function JournalEntryForm() {
 						<EntryArtifactsForm />
 					</Grid>
 					<Grid size={4}>
-						<Stack>
+						<Stack gap={3} pt={1}>
 							<Controller
 								control={control}
 								name="categoryIds"
@@ -121,11 +122,26 @@ export default function JournalEntryForm() {
 									return (
 										<CategorySelector
 											{...field}
-											// ref={null}
-											// variant='filled'
 											value={categoryIds}
 											onChange={(_event, newValue) => {
-												// setManuallySetCategory(Boolean(newValue))
+												setValue(field.name, newValue ?? [], { shouldDirty: true })
+											}}
+										/>
+									)
+								}}
+							/>
+							<Divider flexItem />
+							<Controller
+								control={control}
+								name="categoryIds"
+								render={({ field }) => {
+									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
+
+									return (
+										<CategorySelector
+											{...field}
+											value={categoryIds}
+											onChange={(_event, newValue) => {
 												setValue(field.name, newValue ?? [], { shouldDirty: true })
 											}}
 										/>
