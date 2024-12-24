@@ -18,11 +18,13 @@ import ChildJournalEntryForm from './ChildJournalEntryForm'
 import { useEffect } from 'react'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { getJournalEntryWithAttachments } from '@/database/queries'
+import EntryTagSelector from '../input/EntryTagSelector'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
 
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
 
@@ -117,8 +119,6 @@ export default function JournalEntryForm() {
 								control={control}
 								name="categoryIds"
 								render={({ field }) => {
-									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
-
 									return (
 										<CategorySelector
 											{...field}
@@ -133,14 +133,12 @@ export default function JournalEntryForm() {
 							<Divider flexItem />
 							<Controller
 								control={control}
-								name="categoryIds"
+								name="tagIds"
 								render={({ field }) => {
-									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
-
 									return (
-										<CategorySelector
+										<EntryTagSelector
 											{...field}
-											value={categoryIds}
+											value={entryTagIds}
 											onChange={(_event, newValue) => {
 												setValue(field.name, newValue ?? [], { shouldDirty: true })
 											}}

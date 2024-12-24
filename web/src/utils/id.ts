@@ -6,5 +6,6 @@ export const generateGenericUniqueId = () => {
 
 export const generateJournalEntryId = generateGenericUniqueId
 export const generateCategoryId = generateGenericUniqueId
+export const generateEntryTagId = generateGenericUniqueId
 export const generateArtifactId = generateGenericUniqueId
 export const generateJournalId = generateGenericUniqueId

@@ -1,12 +1,14 @@
 import {
 	Category,
 	CreateCategory,
+	CreateEntryTag,
 	CreateJournalMeta,
+	EntryTag,
 	JournalEntry,
 	JournalMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
-import { generateCategoryId, generateJournalId } from '@/utils/id'
+import { generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
 
 const db = getDatabaseClient()
@@ -138,3 +140,18 @@ export const deleteJournal = async (journalId: string) => {
 	const record = await db.get(journalId)
 	await db.remove(record)
 }
+
+export const createEntryTag = async (formData: CreateEntryTag, journalId: string) => {
+	const tag: EntryTag = {
+		label:  formData.label,
+		description: formData.description,
+		type: 'ENTRY_TAG',
+		_id: generateEntryTagId(),
+		createdAt: new Date().toISOString(),
+		updatedAt: null,
+		journalId,
+	}
+
+	return db.put(tag)
+}
+
