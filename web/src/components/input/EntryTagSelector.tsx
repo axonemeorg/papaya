@@ -33,16 +33,14 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const { getEntryTagsQuery, journal } = useContext(JournalContext)
     const value = props.value ?? []
 
-    console.log('entryTagSelectorProps', props)
-
-    const selectedEntryTags: EntryTag[] = value
-        .map((tagId) => getEntryTagsQuery.data[tagId])
-        .filter(Boolean)
-
     const options: Record<string, EntryTag | ReservedTag> = {
         ...RESERVED_TAGS,
         ...getEntryTagsQuery.data
     }
+
+    const selectedEntryTags: (EntryTag | ReservedTag)[] = value
+        .map((tagId) => options[tagId])
+        .filter(Boolean)
 
     const handleClose = () => {
         setOpen(false)

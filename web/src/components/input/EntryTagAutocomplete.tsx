@@ -25,7 +25,7 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 			loading={isLoading || loading}
 			options={[...Object.keys(RESERVED_TAGS), ...Object.keys(data)]}
 			renderInput={(params) => <TextField {...params} label={'Tag'} />}
-			getOptionLabel={(option) => data[option]?.label}
+			getOptionLabel={(option) => options[option]?.label}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props
 				const entryTag: EntryTag | ReservedTag = options[option]
