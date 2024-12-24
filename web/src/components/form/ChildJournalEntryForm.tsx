@@ -1,7 +1,7 @@
-import { Button, Checkbox, Grid2 as Grid, IconButton, Link, Stack, Typography } from "@mui/material"
+import { Button, Checkbox, Grid2 as Grid, Grow, IconButton, Link, Stack, TextField, Typography } from "@mui/material"
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
-import { Add, Delete, Flag, FlagOutlined } from "@mui/icons-material"
+import { Add, Delete, EditNote, Flag, FlagOutlined } from "@mui/icons-material"
 import { useCallback, useContext, useRef, useState } from "react"
 import { JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
@@ -12,6 +12,7 @@ import { RESERVED_TAGS } from "@/constants/tags"
 
 export default function ChildJournalEntryForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
+    const [journalEntriesWithMemos, setJournalEntriesWithMemos] = useState<string[]>([])
     const selectionMenuAnchorRef = useRef<HTMLDivElement>(null);
     const journalContext = useContext(JournalContext)
     
@@ -88,11 +89,12 @@ export default function ChildJournalEntryForm() {
                     No sub-entries. <Link onClick={() => handleAddChildEntry()} sx={{ cursor: 'pointer' }}>Click to add one.</Link>
                 </Typography>
             )}
-            <Stack mt={2} mx={-1} spacing={1}>
+            <Stack mt={2} mx={-1} gap={2}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
                     const isFlagged = Boolean(entry.tagIds?.includes(RESERVED_TAGS.FLAGGED._id))
+                    const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     return (
-                        <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
+                        <Stack direction='row' alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
                             <Stack direction='row' spacing={-1}>
                                 <Checkbox
                                     checked={selectedRows.includes(entry._id)}
@@ -128,6 +130,51 @@ export default function ChildJournalEntryForm() {
                                             }
                                         }}
                                     />
+                                </Grid>
+                                <Grid size={12}>
+                                    {hasMemo ? (
+                                        <Grow in>
+                                            <div>
+                                                <Controller
+                                                    control={control}
+                                                    name={`children.${index}.memo`}
+                                                    render={({ field }) => (
+                                                        <TextField
+                                                            {...field}
+                                                            size="small"
+                                                            label='Memo'
+                                                            fullWidth
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                        </Grow>
+                                    ) : (
+                                        <Button
+                                            component='a'
+                                            onClick={() => setJournalEntriesWithMemos([...journalEntriesWithMemos, entry._id])}
+                                            sx={(theme) => ({
+                                                mx: -1,
+                                                my: -1,
+                                                display: 'flex',
+                                                justifyContent: 'flex-start',
+                                                gap: 1,
+                                                alignItems: 'center',
+                                                width: '100%',
+                                                textAlign: 'left',
+                                                color: theme.palette.text.secondary,
+                                                '&:hover, &:focus, &:focus-within, &.--open': {
+                                                    color: theme.palette.primary.main
+                                                },
+                                                background: 'none',
+                                            })}
+                                            disableRipple
+                                            tabIndex={-1}
+                                        >
+                                            <EditNote />
+                                            <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Add a memo</Typography>
+                                        </Button>
+                                    )}
                                 </Grid>
                             </Grid>
                             <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
