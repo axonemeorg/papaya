@@ -1,3 +1,4 @@
+import KeyboardShortcut from '@/components/text/KeyboardShortcut'
 import { Search } from '@mui/icons-material'
 import { Button, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 
@@ -17,8 +18,6 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 			<Button
 				variant="text"
 				sx={(theme) => ({
-					// border: '1px solid',
-					// borderColor: 'rgba(0, 0, 0, 0.23)',
 					color: theme.palette.text.secondary,
 					backgroundColor: theme.palette.action.hover,
 					borderRadius: 16,
@@ -29,9 +28,9 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 				startIcon={<Search color="inherit" />}
                 onClick={() => props.onOpen()}
             >
-				<Typography sx={{ userSelect: 'none' }}>
+				<Typography sx={{ userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5 }}>
 					{placeholderText}
-					{/* <Shortcut>Ctrl</Shortcut> */}
+					<KeyboardShortcut letter="/" />
 				</Typography>
 			</Button>
 		)

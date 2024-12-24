@@ -44,7 +44,7 @@ const fuseOptions = {
 	keys: ['memo', 'amount', 'label'], // Fields to search in
 	includeScore: true, // Include the score of how good each match is
 	threshold: 0.2, // Tolerance for fuzzy matching
-	minMatchCharLength: 2, // Minimum number of characters that must match
+	minMatchCharLength: 1, // Minimum number of characters that must match
 }
 
 const Bullet = () => {
