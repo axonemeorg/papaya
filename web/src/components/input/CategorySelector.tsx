@@ -1,8 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import CategoryAutocomplete, { CategoryAutocompleteProps } from "./CategoryAutocomplete";
 import { 
     AutocompleteCloseReason,
     Button,
+    ButtonBase,
     ClickAwayListener,
     Divider,
     IconButton,
@@ -26,7 +27,8 @@ import clsx from "clsx";
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
 
 export default function CategorySelector(props: CategorySelectorProps) {
-    const [anchorEl, setAnchorEl] = useState<any>(null);
+    const anchorRef = useRef<HTMLAnchorElement>(null);
+    const [open, setOpen] = useState<boolean>(false)
     const [searchValue, setSearchValue] = useState<string>('')
     const { getCategoriesQuery, journal } = useContext(JournalContext)
     const value = props.value ?? []
@@ -36,7 +38,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
         .filter(Boolean)
 
     const handleClose = () => {
-        setAnchorEl(null);
+        setOpen(false)
     }
 
     const createCategoryWithValue = async () => {
@@ -56,8 +58,9 @@ export default function CategorySelector(props: CategorySelectorProps) {
         <Stack gap={0.5}>
             <Button
                 component='a'
-                className={clsx({ '--open': Boolean(anchorEl) })}
-                onClick={(event) => setAnchorEl(event.currentTarget)}
+                className={clsx({ '--open': open })}
+                ref={anchorRef}
+                onClick={() => setOpen(true)}
                 sx={(theme) => ({
                     mx: -1,
                     mt: -2,
@@ -80,18 +83,27 @@ export default function CategorySelector(props: CategorySelectorProps) {
                     <Settings />
                 </IconButton>
             </Button>
-            <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5 }}>
-                {selectedCategories.map((category) => {
-                    return (
-                        <CategoryChip key={category._id} icon contrast category={category} />
-                    )
-                })}
-            </Stack>
+            {selectedCategories.length === 0 ? (
+                <Typography sx={{ mt: -1 }} variant='body2' color='textSecondary'>
+                    <span>No category — </span>
+                    <Link onClick={() => setOpen(true)} sx={{ cursor: 'pointer' }}>Add one</Link>
+                </Typography>
+            ) : (
+                <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5 }}>
+                    {selectedCategories.map((category) => {
+                        return (
+                            <ButtonBase disableRipple onClick={() => setOpen(true)} key={category._id}>
+                                <CategoryChip icon contrast category={category} />
+                            </ButtonBase>
+                        )
+                    })}
+                </Stack>
+            )}
             <Popper
-                open={Boolean(anchorEl)}
-                anchorEl={anchorEl}
+                open={open}
+                anchorEl={anchorRef.current}
                 sx={(theme) => ({ width: '300px', zIndex: theme.zIndex.modal})}
-                placement='bottom-end'
+                placement='bottom-start'
             >
                 <ClickAwayListener onClickAway={handleClose}>
                     <Paper>

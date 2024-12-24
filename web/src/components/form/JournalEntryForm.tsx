@@ -45,7 +45,7 @@ export default function JournalEntryForm() {
 				}}
 			/> */}
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
-				<Grid container columns={12} spacing={3} rowSpacing={2} mb={1} sx={{ px: 0 }}>
+				<Grid container columns={12} spacing={4} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>
 						{/* <Stack direction='row' sx={{ pt: 0, pb: 2 }}>
 							<Button variant='outlined' startIcon={<SubdirectoryArrowRight />} onClick={() => handleAddChildEntry()}>
@@ -53,7 +53,7 @@ export default function JournalEntryForm() {
 							</Button>
 						</Stack> */}
 					</Grid>
-					<Grid size={8}>
+					<Grid size={7}>
 						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
 							<Grid size={12}>
 								<TextField
@@ -111,7 +111,7 @@ export default function JournalEntryForm() {
 						<ChildJournalEntryForm />
 						<EntryArtifactsForm />
 					</Grid>
-					<Grid size={4}>
+					<Grid size={5}>
 						<Stack gap={3} pt={1}>
 							<Controller
 								control={control}

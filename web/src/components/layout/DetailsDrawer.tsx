@@ -17,7 +17,7 @@ export default function DetailsDrawer(props: DetailsDrawerProps) {
             PaperProps={{
                 sx: (theme) => ({
                     width: '100%',
-                    maxWidth: theme.breakpoints.values.md,
+                    maxWidth: theme.breakpoints.values.lg,
                 }),
             }}
         >
