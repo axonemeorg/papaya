@@ -11,6 +11,7 @@ import { Add, Search } from '@mui/icons-material'
 import {
 	Button,
 	Divider,
+	Link as MuiLink,
 	ListItem,
 	ListItemIcon,
 	MenuList,
@@ -96,38 +97,44 @@ export default function ManageCategories() {
 						</Typography>
 					</Stack>
 					<Divider />
-					<MenuList>
-						{Object.values(getCategoriesQuery.data).map((category) => {
-							return (
-								<ListItem
-									key={category._id}
-									secondaryAction={
-										<Stack direction='row' gap={1}>
-											<Button
-												color='primary'
-												onClick={() => handleSelectCategoryForEdit(category)}
-											>
-												Edit
-											</Button>
-											<Button
-												color='error'
-												onClick={() => handleDeleteCategory(category)}
-											>
-												Delete
-											</Button>
-										</Stack>
-									}
-								>
-									<ListItemIcon>
-										<AvatarIcon avatar={category?.avatar} />
-									</ListItemIcon>
-									<Link href={`/journal/a?cs=${category._id}`}>
-										<CategoryChip category={category} contrast />
-									</Link>
-								</ListItem>
-							)
-						})}
-					</MenuList>
+					{Object.values(getCategoriesQuery.data).length === 0 ? (
+						<Typography align="center" variant='body2' px={2} py={3}>
+							No categories. <MuiLink sx={{ pointer: 'cursor' }} onClick={() => setShowCreateCategoryModal(true)}>Create one</MuiLink>
+						</Typography>
+					) : (
+						<MenuList>
+							{Object.values(getCategoriesQuery.data).map((category) => {
+								return (
+									<ListItem
+										key={category._id}
+										secondaryAction={
+											<Stack direction='row' gap={1}>
+												<Button
+													color='primary'
+													onClick={() => handleSelectCategoryForEdit(category)}
+												>
+													Edit
+												</Button>
+												<Button
+													color='error'
+													onClick={() => handleDeleteCategory(category)}
+												>
+													Delete
+												</Button>
+											</Stack>
+										}
+									>
+										<ListItemIcon>
+											<AvatarIcon avatar={category?.avatar} />
+										</ListItemIcon>
+										<Link href={`/journal/a?cs=${category._id}`}>
+											<CategoryChip category={category} contrast />
+										</Link>
+									</ListItem>
+								)
+							})}
+						</MenuList>
+					)}
 				</Paper>
 			</Stack>
 		</>
