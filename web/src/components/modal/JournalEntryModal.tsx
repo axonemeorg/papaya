@@ -5,7 +5,7 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { JournalEntry } from '@/types/schema'
+import { Category, JournalEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
@@ -25,16 +25,9 @@ const JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY = 'JOURNAL_ENTRY'
 
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
-	const { journal, journalEntryForm } = useContext(JournalContext)
+	const { journal, journalEntryForm, getCategoriesQuery } = useContext(JournalContext)
 	const queryClient = useQueryClient()
 	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning()
-
-	useEffect(() => {
-		if (props.open) {
-			// Prevents the user from closing the browser tab with potentially unsaved changes
-			enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
-		}
-	}, [props.open])
 
 	const handleSaveFormWithCurrentValues = useCallback(async () => {
 		if (!journal) {
@@ -52,18 +45,12 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			})
 	}, [journal]);
 
+	const categoryIds = useWatch({ control: journalEntryForm.control, name: 'categoryIds' }) ?? []
+	const category: Category | undefined = categoryIds[0] ? getCategoriesQuery.data[categoryIds[0]] : undefined
 	const currentFormState = useWatch({ control: journalEntryForm.control })
 	const currentMemoValue = currentFormState.memo ?? ''
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
-
-	useEffect(() => {
-		if (!journalEntryForm.formState.isDirty) {
-			return
-		}
-		debouncedhandleSaveFormWithCurrentValues()
-		enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
-	}, [currentFormState])
 
 	const refreshJournalEntriesQuery = () => {
 		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'journalEntries' })
@@ -95,6 +82,21 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		})
 	}, [journal])
 
+	useEffect(() => {
+		if (props.open) {
+			// Prevents the user from closing the browser tab with potentially unsaved changes
+			enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
+		}
+	}, [props.open])
+
+	useEffect(() => {
+		if (!journalEntryForm.formState.isDirty) {
+			return
+		}
+		debouncedhandleSaveFormWithCurrentValues()
+		enableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
+	}, [currentFormState])
+
 	return (
 		<FormProvider {...journalEntryForm}>
 			<DetailsDrawer
@@ -112,7 +114,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			>
 				<DialogTitle>
 					<Stack direction='row' gap={1} alignItems='center'>
-						<AvatarIcon />
+						<AvatarIcon avatar={category?.avatar}/>
 						<Typography variant='inherit'>
 							{currentMemoValue.trim() || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
 						</Typography>
