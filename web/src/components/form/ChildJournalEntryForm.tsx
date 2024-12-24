@@ -2,12 +2,13 @@ import { Button, Checkbox, Grid2 as Grid, IconButton, Link, Stack, Typography } 
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
 import { Add, Delete, Flag, FlagOutlined } from "@mui/icons-material"
-import { ChangeEvent, useCallback, useContext, useRef, useState } from "react"
+import { useCallback, useContext, useRef, useState } from "react"
 import { JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import SelectionActionModal from "../modal/SelectionActionModal"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeJournalEntry } from "@/utils/journal"
+import { RESERVED_TAGS } from "@/constants/tags"
 
 export default function ChildJournalEntryForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
@@ -29,10 +30,12 @@ export default function ChildJournalEntryForm() {
         childEntriesFieldArray.prepend(newEntry)
 	}, [children])
     
-    const isFlagged = false
-    const handleToggleFlagged = (event: ChangeEvent<HTMLInputElement>) => {
-        const _flagged = event.target.checked
-        
+    const handleToggleFlagged = (index: number, isFlagged: boolean) => {
+        const entry = childEntriesFieldArray.fields[index]
+        const tagIds = isFlagged
+            ? [...entry.tagIds ?? [], RESERVED_TAGS.FLAGGED._id]
+            : entry.tagIds?.filter((tagId) => tagId !== RESERVED_TAGS.FLAGGED._id)
+        childEntriesFieldArray.update(index, { ...entry, tagIds })
     }
 
     const handleToggleSelected = (key: string) => {
@@ -87,6 +90,7 @@ export default function ChildJournalEntryForm() {
             )}
             <Stack mt={2} mx={-1} spacing={1}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
+                    const isFlagged = Boolean(entry.tagIds?.includes(RESERVED_TAGS.FLAGGED._id))
                     return (
                         <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
                             <Stack direction='row' spacing={-1}>
@@ -98,7 +102,7 @@ export default function ChildJournalEntryForm() {
                                     icon={<FlagOutlined />}
                                     checkedIcon={<Flag />}
                                     checked={isFlagged}
-                                    onChange={handleToggleFlagged}
+                                    onChange={() => handleToggleFlagged(index, !isFlagged)}
                                 />
                             </Stack>
                             <Grid container columns={12} spacing={1} sx={{ flex: '1', ml: 1 }}>
