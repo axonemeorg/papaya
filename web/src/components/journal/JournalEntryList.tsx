@@ -85,6 +85,7 @@ const TableBody = (props: TableBodyProps) => {
 interface JournalEntryListProps {
 	journalRecordGroups: Record<string, JournalEntry[]>
 	onClickListItem: (event: any, entry: JournalEntry) => void
+	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
 }
 
 const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean }) => {
@@ -181,7 +182,9 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												return (
 													<TableRow
 														key={entry._id}
-														onClick={(event) => props.onClickListItem(event, entry)}>
+														onClick={(event) => props.onClickListItem(event, entry)}
+														onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
+													>
 														<TableCell sx={{ width: '0%', borderBottom: 'none' }}>
 															<AvatarIcon avatar={category?.avatar} compact={isSmall} />
 														</TableCell>
