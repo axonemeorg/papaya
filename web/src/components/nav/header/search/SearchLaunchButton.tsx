@@ -1,11 +1,12 @@
 import { Search } from '@mui/icons-material'
 import { Button, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 
-interface SearchLaunchButtonProps {
-	placeholderText?: string
+export interface SearchLaunchButtonProps {
+    placeholderText?: string
+    onOpen: () => void
 }
 
-const SearchLaunchButton = (props: SearchLaunchButtonProps) => {
+export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 	const theme = useTheme()
 	const showSearchBar = !useMediaQuery(theme.breakpoints.down('md'))
 
@@ -25,7 +26,9 @@ const SearchLaunchButton = (props: SearchLaunchButtonProps) => {
 					px: 2,
 					pr: 8,
 				})}
-				startIcon={<Search color="inherit" />}>
+				startIcon={<Search color="inherit" />}
+                onClick={() => props.onOpen()}
+            >
 				<Typography sx={{ userSelect: 'none' }}>
 					{placeholderText}
 					{/* <Shortcut>Ctrl</Shortcut> */}
@@ -39,8 +42,4 @@ const SearchLaunchButton = (props: SearchLaunchButtonProps) => {
 			<Search />
 		</IconButton>
 	)
-}
-
-export default function SearchWidget() {
-	return <SearchLaunchButton placeholderText="Search" />
 }
