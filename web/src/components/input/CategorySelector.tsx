@@ -1,138 +1,33 @@
 import { useContext, useState } from "react";
 import CategoryAutocomplete, { CategoryAutocompleteProps } from "./CategoryAutocomplete";
-import { autocompleteClasses, AutocompleteCloseReason, Box, ButtonBase, ClickAwayListener, InputBase, Link, Popover, Popper, Stack, styled, TextField, Typography } from "@mui/material";
+import { 
+    AutocompleteCloseReason,
+    Button,
+    ClickAwayListener,
+    Divider,
+    IconButton,
+    InputBase,
+    Link,
+    ListItem,
+    Paper,
+    Popper,
+    Stack,
+    Typography
+} from "@mui/material";
 import { Close, Done, Settings } from "@mui/icons-material";
 import { Category } from "@/types/schema";
 import CategoryChip from "../icon/CategoryChip";
 import { JournalContext } from "@/contexts/JournalContext";
 import AvatarIcon from "../icon/AvatarIcon";
+import { createCategory } from "@/database/actions";
+import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
 
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
-
-interface PopperComponentProps {
-    anchorEl?: any;
-    disablePortal?: boolean;
-    open: boolean;
-}
-
-const StyledAutocompletePopper = styled('div')(({ theme }) => ({
-    [`& .${autocompleteClasses.paper}`]: {
-        boxShadow: 'none',
-        margin: 0,
-        color: 'inherit',
-        fontSize: 13,
-    },
-    [`& .${autocompleteClasses.listbox}`]: {
-        backgroundColor: '#fff',
-
-        padding: 0,
-        [`& .${autocompleteClasses.option}`]: {
-            minHeight: 'auto',
-            alignItems: 'flex-start',
-            padding: 8,
-            borderBottom: `1px solid  ${' #eaecef'}`,
-
-            '&[aria-selected="true"]': {
-                backgroundColor: 'transparent',
-            },
-            [`&.${autocompleteClasses.focused}, &.${autocompleteClasses.focused}[aria-selected="true"]`]:
-            {
-                backgroundColor: theme.palette.action.hover,
-            },
-            ...theme.applyStyles('dark', {
-                borderBottom: `1px solid  ${'#30363d'}`,
-            }),
-        },
-        ...theme.applyStyles('dark', {
-            backgroundColor: '#1c2128',
-        }),
-    },
-    [`&.${autocompleteClasses.popperDisablePortal}`]: {
-        position: 'relative',
-    },
-}));
-
-function PopperComponent(props: PopperComponentProps) {
-    const { disablePortal, anchorEl, open, ...other } = props;
-    return <StyledAutocompletePopper {...other} />;
-}
-
-
-const StyledPopper = styled(Popper)(({ theme }) => ({
-    border: `1px solid ${'#e1e4e8'}`,
-    boxShadow: `0 8px 24px ${'rgba(149, 157, 165, 0.2)'}`,
-    color: '#24292e',
-    backgroundColor: '#fff',
-    borderRadius: 6,
-    width: 300,
-    zIndex: theme.zIndex.modal,
-    fontSize: 13,
-    ...theme.applyStyles('dark', {
-        border: `1px solid ${'#30363d'}`,
-        boxShadow: `0 8px 24px ${'rgb(1, 4, 9)'}`,
-        color: '#c9d1d9',
-        backgroundColor: '#1c2128',
-    }),
-}));
-
-const StyledInput = styled(InputBase)(({ theme }) => ({
-    padding: 10,
-    width: '100%',
-    borderBottom: `1px solid ${'#30363d'}`,
-    '& input': {
-        borderRadius: 4,
-        backgroundColor: '#fff',
-        border: `1px solid ${'#30363d'}`,
-        padding: 8,
-        transition: theme.transitions.create(['border-color', 'box-shadow']),
-        fontSize: 14,
-        '&:focus': {
-            boxShadow: `0px 0px 0px 3px ${'rgba(3, 102, 214, 0.3)'}`,
-            borderColor: '#0366d6',
-            ...theme.applyStyles('dark', {
-                boxShadow: `0px 0px 0px 3px ${'rgb(12, 45, 107)'}`,
-                borderColor: '#388bfd',
-            }),
-        },
-        ...theme.applyStyles('dark', {
-            backgroundColor: '#0d1117',
-            border: `1px solid ${'#eaecef'}`,
-        }),
-    },
-    ...theme.applyStyles('dark', {
-        borderBottom: `1px solid ${'#eaecef'}`,
-    }),
-}));
-
-const Button = styled(ButtonBase)(({ theme }) => ({
-    fontSize: 13,
-    width: '100%',
-    textAlign: 'left',
-    paddingBottom: 8,
-    color: '#586069',
-    fontWeight: 600,
-    '&:hover,&:focus': {
-        color: '#0366d6',
-        ...theme.applyStyles('dark', {
-            color: '#58a6ff',
-        }),
-    },
-    '& span': {
-        width: '100%',
-    },
-    '& svg': {
-        width: 16,
-        height: 16,
-    },
-    ...theme.applyStyles('dark', {
-        color: '#8b949e',
-    }),
-}));
 
 export default function CategorySelector(props: CategorySelectorProps) {
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const [searchValue, setSearchValue] = useState<string>('')
-    const { getCategoriesQuery } = useContext(JournalContext)
+    const { getCategoriesQuery, journal } = useContext(JournalContext)
     const value = props.value ?? []
 
     const selectedCategories: Category[] = value
@@ -143,34 +38,57 @@ export default function CategorySelector(props: CategorySelectorProps) {
         setAnchorEl(null);
     }
 
-    const createCategoryWithValue = () => {
-        //
+    const createCategoryWithValue = async () => {
+        if (!journal) {
+            return
+        }
+        const journalId = journal._id
+        await createCategory({
+            label: searchValue,
+            description: '',
+            avatar: DEFAULT_AVATAR,
+        }, journalId)
+        getCategoriesQuery.refetch()
     }
 
     return (
         <>
-            <Button onClick={(event) => setAnchorEl(event.currentTarget)} sx={{ display: 'block', p: 1, m: -1 }}>
-                <Stack direction='row' justifyContent={'space-between'} alignItems={'baseline'}>
-                    <Typography component='span'>Category</Typography>
+            <Button
+                onClick={(event) => setAnchorEl(event.currentTarget)}
+                sx={(theme) => ({
+                    mx: -1,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    textAlign: 'left',
+                    color: 'inherit',
+                    fontWeight: 600,
+                    '&:hover, &:focus': {
+                        color: theme.palette.primary.main
+                    },
+                })}
+            >
+                <Typography component='span'>Category</Typography>
+                <IconButton sx={{ m: -1, color: 'inherit' }} disableRipple>
                     <Settings />
-                </Stack>
+                </IconButton>
             </Button>
-            <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap' }}>
+            <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5, mt: 0.5 }}>
                 {selectedCategories.map((category) => {
                     return (
                         <CategoryChip key={category._id} icon contrast category={category} />
                     )
                 })}
             </Stack>
-            <StyledPopper
+            <Popper
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
-                // onClose={() => setAnchorEl(null)}
-                sx={{ width: '100%' }}
-                placement='bottom-start'
+                sx={(theme) => ({ width: '300px', zIndex: theme.zIndex.modal})}
+                placement='bottom-end'
             >
                 <ClickAwayListener onClickAway={handleClose}>
-                    <div>
+                    <Paper>
                         <CategoryAutocomplete
                             {...props}
                             open
@@ -184,76 +102,62 @@ export default function CategorySelector(props: CategorySelectorProps) {
                             }}
                             disableCloseOnSelect
                             noOptionsText={
-                                <Link onClick={() => createCategoryWithValue()} sx={{ cursor: 'pointer' }}>Create new category &quot;{searchValue}&quot;</Link>
+                                <Link onClick={() => createCategoryWithValue()} sx={{ cursor: 'pointer' }}>
+                                    Create new category &quot;{searchValue}&quot;
+                                </Link>
                             }
                             renderTags={() => null}
                             renderInput={(params) => (
-                                <StyledInput
-                                    ref={params.InputProps.ref}
-                                    value={searchValue}
-                                    onChange={(event) => setSearchValue(event.target.value)}
-                                    inputProps={params.inputProps}
-                                    autoFocus
-                                    placeholder="Filter labels"
-                                />
+                                <>
+                                    <InputBase
+                                        sx={{ width: '100%', px: 2, py: 1 }}
+                                        ref={params.InputProps.ref}
+                                        value={searchValue}
+                                        onChange={(event) => setSearchValue(event.target.value)}
+                                        inputProps={params.inputProps}
+                                        autoFocus
+                                        placeholder="Filter labels"
+                                    />
+                                    <Divider />
+                                </>
                             )}
                             renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props
                                 const category = getCategoriesQuery.data[option]
 
                                 return (
-                                    <li key={key} {...optionProps}>
-                                        <Box
-                                            component={Done}
-                                            sx={{ width: 17, height: 17, mr: '5px', ml: '-2px' }}
-                                            style={{
+                                    <ListItem key={key} {...optionProps}>
+                                        <Done
+                                            sx={(theme) => ({
+                                                width: 17,
+                                                height: 17,
+                                                mr: theme.spacing(1),
                                                 visibility: selected ? 'visible' : 'hidden',
-                                            }}
+                                            })}
                                         />
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                width: 14,
-                                                height: 14,
-                                                flexShrink: 0,
-                                                borderRadius: '3px',
-                                                mr: 1,
-                                                mt: '2px',
-                                            }}
-                                        // style={{ backgroundColor: option.color }}
-                                        />
-                                        <Stack direction='row' gap={1}
-                                            sx={{
-                                                flexGrow: 1,
-                                                '& span': {
-                                                    // color: '#8b949e',
-                                                    // ...t.applyStyles('light', {
-                                                    //     color: '#586069',
-                                                    // }),
-                                                },
-                                            }}
-                                        >
+                                        <Stack direction='row' sx={{ flexGrow: 1, gap: 1 }}>
                                             <AvatarIcon avatar={category.avatar} />
                                             {category.label}
                                         </Stack>
-                                        <Box
-                                            component={Close}
-                                            sx={{ opacity: 0.6, width: 18, height: 18 }}
-                                            style={{
+                                        <Close
+                                            sx={{
+                                                opacity: 0.6,
+                                                width: 18,
+                                                height: 18,
                                                 visibility: selected ? 'visible' : 'hidden',
                                             }}
                                         />
-                                    </li>
+                                    </ListItem>
                                 );
                             }}
                             slots={{
-                                popper: PopperComponent,
-                                paper: (params) => <div {...params} />
+                                popper: (params: any) => <div {...params} />,
+                                paper: (params) => <div {...params} />,
                             }}
                         />
-                    </div>
+                    </Paper>
                 </ClickAwayListener>
-            </StyledPopper>
+            </Popper>
         </>
     )
 }
