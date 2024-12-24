@@ -23,12 +23,17 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 					borderRadius: 16,
 					py: 0.75,
 					px: 2,
-					pr: 8,
+					width: '100%',
+					maxWidth: theme.spacing(40),
+					justifyContent: 'flex-start',
+					'&:hover': {
+						backgroundColor: theme.palette.action.selected,
+					},
 				})}
 				startIcon={<Search color="inherit" />}
                 onClick={() => props.onOpen()}
             >
-				<Typography sx={{ userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+				<Typography sx={{ userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'space-between', flex: 1 }}>
 					{placeholderText}
 					<KeyboardShortcut letter="/" />
 				</Typography>
