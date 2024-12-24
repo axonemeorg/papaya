@@ -19,6 +19,7 @@ import { useEffect } from 'react'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { getJournalEntryWithAttachments } from '@/database/queries'
 import EntryTagSelector from '../input/EntryTagSelector'
+import EntryNoteForm from './EntryNoteForm'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -146,6 +147,8 @@ export default function JournalEntryForm() {
 									)
 								}}
 							/>
+							<Divider flexItem />
+							<EntryNoteForm />
 						</Stack>
 					</Grid>
 				{/* <AttachmentDropzone onFilesAdded={handleAddFiles}>

@@ -82,7 +82,7 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
                 disableRipple
                 tabIndex={-1}
             >
-                <Typography component='span' sx={{ fontWeight: 500 }}>Tags</Typography>
+                <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Tags</Typography>
                 <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
                     <Settings />
                 </IconButton>

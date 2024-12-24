@@ -78,7 +78,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                 disableRipple
                 tabIndex={-1}
             >
-                <Typography component='span' sx={{ fontWeight: 500 }}>Category</Typography>
+                <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Category</Typography>
                 <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
                     <Settings />
                 </IconButton>
