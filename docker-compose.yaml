@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  couchdb:
+  zisk-server:
     build:
-      context: ./database
+      context: ./server
       dockerfile: Dockerfile
       args:
         - AUTH_SECRET=${AUTH_SECRET}
