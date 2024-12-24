@@ -2,6 +2,7 @@
 
 import {
 	Box,
+	Divider,
 	Grid2 as Grid,
 	Stack,
 	TextField,
@@ -17,11 +18,13 @@ import ChildJournalEntryForm from './ChildJournalEntryForm'
 import { useEffect } from 'react'
 import EntryArtifactsForm from './EntryArtifactsForm'
 import { getJournalEntryWithAttachments } from '@/database/queries'
+import EntryTagSelector from '../input/EntryTagSelector'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
 
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
 
@@ -44,7 +47,7 @@ export default function JournalEntryForm() {
 				}}
 			/> */}
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
-				<Grid container columns={12} spacing={3} rowSpacing={2} mb={1} sx={{ px: 0 }}>
+				<Grid container columns={12} spacing={4} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>
 						{/* <Stack direction='row' sx={{ pt: 0, pb: 2 }}>
 							<Button variant='outlined' startIcon={<SubdirectoryArrowRight />} onClick={() => handleAddChildEntry()}>
@@ -52,7 +55,7 @@ export default function JournalEntryForm() {
 							</Button>
 						</Stack> */}
 					</Grid>
-					<Grid size={8}>
+					<Grid size={7}>
 						<Grid container columns={12} spacing={2} rowSpacing={2} mb={1}>
 							<Grid size={12}>
 								<TextField
@@ -110,22 +113,33 @@ export default function JournalEntryForm() {
 						<ChildJournalEntryForm />
 						<EntryArtifactsForm />
 					</Grid>
-					<Grid size={4}>
-						<Stack>
+					<Grid size={5}>
+						<Stack gap={3} pt={1}>
 							<Controller
 								control={control}
 								name="categoryIds"
 								render={({ field }) => {
-									// const categoryId: Category['_id'] | null = !categoryIds?.length ? null : categoryIds[0]
-
 									return (
 										<CategorySelector
 											{...field}
-											// ref={null}
-											// variant='filled'
 											value={categoryIds}
 											onChange={(_event, newValue) => {
-												// setManuallySetCategory(Boolean(newValue))
+												setValue(field.name, newValue ?? [], { shouldDirty: true })
+											}}
+										/>
+									)
+								}}
+							/>
+							<Divider flexItem />
+							<Controller
+								control={control}
+								name="tagIds"
+								render={({ field }) => {
+									return (
+										<EntryTagSelector
+											{...field}
+											value={entryTagIds}
+											onChange={(_event, newValue) => {
 												setValue(field.name, newValue ?? [], { shouldDirty: true })
 											}}
 										/>

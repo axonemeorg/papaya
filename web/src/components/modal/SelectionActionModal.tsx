@@ -1,4 +1,4 @@
-import { Delete } from "@mui/icons-material"
+import { Delete, MoreVert } from "@mui/icons-material"
 import {
     Button,
     Checkbox,
@@ -99,7 +99,11 @@ export default function SelectionActionModal(props: SelectionActionModalProps) {
                                             </IconButton>
                                         </Tooltip>
                                     </>
-                                )}                            
+                                )}
+                                <Divider orientation="vertical" flexItem />
+                                <IconButton disabled>
+                                    <MoreVert />
+                                </IconButton>
                             </Stack>
                         </Paper>
                     </Fade>

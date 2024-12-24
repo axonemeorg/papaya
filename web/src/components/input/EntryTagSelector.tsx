@@ -1,57 +1,57 @@
 import { useContext, useRef, useState } from "react";
-import CategoryAutocomplete, { CategoryAutocompleteProps } from "./CategoryAutocomplete";
 import { 
     AutocompleteCloseReason,
     Button,
     ButtonBase,
+    Chip,
     ClickAwayListener,
     Divider,
     IconButton,
     InputBase,
     Link,
     ListItem,
+    ListItemText,
     Paper,
     Popper,
     Stack,
     Typography
 } from "@mui/material";
 import { Close, Done, Settings } from "@mui/icons-material";
-import { Category } from "@/types/schema";
-import CategoryChip from "../icon/CategoryChip";
+import { EntryTag } from "@/types/schema";
 import { JournalContext } from "@/contexts/JournalContext";
-import AvatarIcon from "../icon/AvatarIcon";
-import { createCategory } from "@/database/actions";
-import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
+import { createEntryTag } from "@/database/actions";
 import clsx from "clsx";
+import EntryTagAutocomplete, { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
 
-type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
+type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
-export default function CategorySelector(props: CategorySelectorProps) {
+export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
     const [searchValue, setSearchValue] = useState<string>('')
-    const { getCategoriesQuery, journal } = useContext(JournalContext)
+    const { getEntryTagsQuery, journal } = useContext(JournalContext)
     const value = props.value ?? []
 
-    const selectedCategories: Category[] = value
-        .map((categoryId) => getCategoriesQuery.data[categoryId])
+    console.log('entryTagSelectorProps', props)
+
+    const selectedEntryTags: EntryTag[] = value
+        .map((tagId) => getEntryTagsQuery.data[tagId])
         .filter(Boolean)
 
     const handleClose = () => {
         setOpen(false)
     }
 
-    const createCategoryWithValue = async () => {
+    const createEntryTagWithValue = async () => {
         if (!journal) {
             return
         }
         const journalId = journal._id
-        await createCategory({
+        await createEntryTag({
             label: searchValue,
             description: '',
-            avatar: DEFAULT_AVATAR,
         }, journalId)
-        getCategoriesQuery.refetch()
+        getEntryTagsQuery.refetch()
     }
 
     return (
@@ -78,22 +78,22 @@ export default function CategorySelector(props: CategorySelectorProps) {
                 disableRipple
                 tabIndex={-1}
             >
-                <Typography component='span' sx={{ fontWeight: 500 }}>Category</Typography>
+                <Typography component='span' sx={{ fontWeight: 500 }}>Tags</Typography>
                 <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
                     <Settings />
                 </IconButton>
             </Button>
-            {selectedCategories.length === 0 ? (
+            {selectedEntryTags.length === 0 ? (
                 <Typography sx={{ mt: -1 }} variant='body2' color='textSecondary'>
-                    <span>No category — </span>
+                    <span>No tags — </span>
                     <Link onClick={() => setOpen(true)} sx={{ cursor: 'pointer' }}>Add one</Link>
                 </Typography>
             ) : (
                 <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5 }}>
-                    {selectedCategories.map((category) => {
+                    {selectedEntryTags.map((tag) => {
                         return (
-                            <ButtonBase disableRipple onClick={() => setOpen(true)} key={category._id}>
-                                <CategoryChip icon contrast category={category} />
+                            <ButtonBase disableRipple onClick={() => setOpen(true)} key={tag._id}>
+                                <Chip label={tag.label} />
                             </ButtonBase>
                         )
                     })}
@@ -107,7 +107,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
             >
                 <ClickAwayListener onClickAway={handleClose}>
                     <Paper>
-                        <CategoryAutocomplete
+                        <EntryTagAutocomplete
                             {...props}
                             open
                             onClose={(
@@ -122,11 +122,11 @@ export default function CategorySelector(props: CategorySelectorProps) {
                             noOptionsText={
                                 searchValue.length === 0 ? (
                                     <Typography variant='body2' color='textSecondary'>
-                                        No categories
+                                        No tags
                                     </Typography>
                                 ) : (
-                                    <Link onClick={() => createCategoryWithValue()} sx={{ cursor: 'pointer' }}>
-                                        Create new category &quot;{searchValue}&quot;
+                                    <Link onClick={() => createEntryTagWithValue()} sx={{ cursor: 'pointer' }}>
+                                        Create new tag &quot;{searchValue}&quot;
                                     </Link>
                                 )
                             }
@@ -140,14 +140,14 @@ export default function CategorySelector(props: CategorySelectorProps) {
                                         onChange={(event) => setSearchValue(event.target.value)}
                                         inputProps={params.inputProps}
                                         autoFocus
-                                        placeholder="Filter categories"
+                                        placeholder="Filter tags"
                                     />
                                     <Divider />
                                 </>
                             )}
                             renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props
-                                const category = getCategoriesQuery.data[option]
+                                const entryTag: EntryTag | undefined = getEntryTagsQuery.data[option]
 
                                 return (
                                     <ListItem key={key} {...optionProps}>
@@ -159,10 +159,10 @@ export default function CategorySelector(props: CategorySelectorProps) {
                                                 visibility: selected ? 'visible' : 'hidden',
                                             })}
                                         />
-                                        <Stack direction='row' sx={{ flexGrow: 1, gap: 1 }}>
-                                            <AvatarIcon avatar={category.avatar} />
-                                            {category.label}
-                                        </Stack>
+                                        <ListItemText
+                                            primary={entryTag?.label}
+                                            secondary={entryTag?.description}
+                                        />
                                         <Close
                                             sx={{
                                                 opacity: 0.6,

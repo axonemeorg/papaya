@@ -2,7 +2,7 @@
 
 import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import AppLogo from './AppLogo'
-import { Menu, Settings } from '@mui/icons-material'
+import { Menu, MenuOpen, Settings } from '@mui/icons-material'
 import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
 import ActiveJournal from './ActiveJournal'
 import SearchWidget from './SearchWidget'
@@ -20,6 +20,7 @@ export default function Header(props: HeaderProps) {
 	// Get toggle menu function from zustand store
 	const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded)
 	const openDrawer = useAppMenuStateStore((state) => state.openDrawer)
+	const isExpanded = useAppMenuStateStore((state) => state.isExpanded)
 
 	const handleClickMenuButton = () => {
 		// If the screen is small, open the drawer. Otherwise, toggle the menu
@@ -45,7 +46,7 @@ export default function Header(props: HeaderProps) {
 			}}>
 			<Stack direction="row" gap={1} alignItems={'center'}>
 				<IconButton onClick={() => handleClickMenuButton()} size="large">
-					<Menu />
+					{isExpanded ? <MenuOpen /> : <Menu />}
 				</IconButton>
 				{showLogo && <AppLogo />}
 				<Stack direction="row" alignItems="center" gap={1} ml={showLogo ? 2 : undefined}>
