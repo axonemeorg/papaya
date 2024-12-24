@@ -35,7 +35,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                         <Typography component='span'>Category</Typography>
                         <Settings />
                     </Stack>
-                    <Stack direction='row' alignItems='flex-start'>
+                    <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap' }}>
                         {selectedCategories.map((category) => {
                             return (
                                 <CategoryChip key={category._id} icon contrast category={category} />

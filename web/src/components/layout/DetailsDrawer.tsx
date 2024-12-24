@@ -10,7 +10,17 @@ interface DetailsDrawerProps extends PropsWithChildren {
 
 export default function DetailsDrawer(props: DetailsDrawerProps) {
     return (
-        <Drawer anchor="right" open={props.open} onClose={props.onClose}>
+        <Drawer
+            anchor="right"
+            open={props.open}
+            onClose={props.onClose}
+            PaperProps={{
+                sx: (theme) => ({
+                    width: '100%',
+                    maxWidth: theme.breakpoints.values.md,
+                }),
+            }}
+        >
             <Stack direction='row' alignItems='center' justifyContent='space-between' p={2}>
                 <Stack direction='row' alignItems='center'>
                     <IconButton onClick={props.onClose}>
