@@ -114,6 +114,22 @@ export const CreateEntryTag = z.object({
 
 export type CreateEntryTag = z.output<typeof CreateEntryTag>
 
+export const ReservedTagKey = z.enum([
+	'FLAGGED',
+	'NEEDS_REVIEW',
+	'WAS_REVIEWED',
+])
+
+export type ReservedTagKey = z.output<typeof ReservedTagKey>
+
+export const ReservedTag = CreateEntryTag.merge(z.object({
+	_id: ReservedTagKey,
+	type: z.literal('RESERVED_TAG'),
+	archived: z.boolean().optional(),
+}))
+
+export type ReservedTag = z.output<typeof ReservedTag>
+
 export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
 	z.object({
 		type: z.literal('ENTRY_TAG'),
@@ -153,20 +169,3 @@ export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 )
 
 export type JournalMeta = z.output<typeof JournalMeta>
-
-export const ReservedTagKey = z.enum([
-	'FLAGGED',
-	'NEEDS_REVIEW',
-	'WAS_REVIEWED',
-])
-
-export type ReservedTagKey = z.output<typeof ReservedTagKey>
-
-export const ReservedTag = z.object({
-	type: z.literal('RESERVED_TAG'),
-	value: ReservedTagKey,
-	label: z.string(),
-	archived: z.boolean().optional(),
-})
-
-export type ReservedTag = z.output<typeof ReservedTag>

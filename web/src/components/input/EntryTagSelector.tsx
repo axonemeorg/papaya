@@ -17,11 +17,12 @@ import {
     Typography
 } from "@mui/material";
 import { Close, Done, Settings } from "@mui/icons-material";
-import { EntryTag } from "@/types/schema";
+import { EntryTag, ReservedTag } from "@/types/schema";
 import { JournalContext } from "@/contexts/JournalContext";
 import { createEntryTag } from "@/database/actions";
 import clsx from "clsx";
 import EntryTagAutocomplete, { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
+import { RESERVED_TAGS } from "@/constants/tags";
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
@@ -37,6 +38,11 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const selectedEntryTags: EntryTag[] = value
         .map((tagId) => getEntryTagsQuery.data[tagId])
         .filter(Boolean)
+
+    const options: Record<string, EntryTag | ReservedTag> = {
+        ...RESERVED_TAGS,
+        ...getEntryTagsQuery.data
+    }
 
     const handleClose = () => {
         setOpen(false)
@@ -147,7 +153,7 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
                             )}
                             renderOption={(props, option, { selected }) => {
                                 const { key, ...optionProps } = props
-                                const entryTag: EntryTag | undefined = getEntryTagsQuery.data[option]
+                                const entryTag: EntryTag | ReservedTag | undefined = options[option]
 
                                 return (
                                     <ListItem key={key} {...optionProps}>
