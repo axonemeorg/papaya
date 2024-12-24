@@ -76,7 +76,7 @@ export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 
 export type EntryArtifact = z.output<typeof EntryArtifact>
 
-export const BaseJournalEntry = BelongsToJournal.merge(AmountRecord).merge(
+export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
 		memo: z.string(),
@@ -94,7 +94,7 @@ export const BaseJournalEntry = BelongsToJournal.merge(AmountRecord).merge(
 
 export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 
-export const JournalEntry = DocumentMetadata.merge(BaseJournalEntry).merge(
+export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
 	})
