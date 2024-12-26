@@ -42,7 +42,7 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 	}
 
 	return (
-		<IconButton>
+		<IconButton onClick={() => props.onOpen()}>
 			<Search />
 		</IconButton>
 	)

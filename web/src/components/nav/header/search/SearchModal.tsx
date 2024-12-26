@@ -14,6 +14,8 @@ import {
     MenuList,
     Stack,
     Typography,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 import { SearchLaunchButtonProps } from "./SearchLaunchButton";
 import { ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -60,6 +62,9 @@ export default function SearchModal(props: SearchModalProps) {
     const inputRef = useRef<HTMLInputElement>(null)
     const fuseRef = useRef<Fuse<any> | null>(null)
     const journalContext = useContext(JournalContext)
+    const theme = useTheme()
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
     const hasError = false
 
     const handleClear = () => {
@@ -214,10 +219,10 @@ export default function SearchModal(props: SearchModalProps) {
                 sx: {
                     position: 'absolute',
                     top: 16,
-                    right: 0,
-                    left: 0,
+                    right: fullScreen ? undefined : 0,
+                    left: fullScreen ? undefined : 0,
                     mt: 0.75,
-                    mx: 16,
+                    mx: fullScreen ? 0 : 16,
                     width: 'unset'
                 }
             }}
