@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import AccountSettings from './AccountSettings'
 import { useRouter } from 'next/router'
+import JournalSettings from './JournalSettings'
 
 const SETTINGS_TABS = {
 	'appearance': {
@@ -17,8 +18,8 @@ const SETTINGS_TABS = {
 	'account': {
 		label: 'Account',
 	},
-	'journals': {
-		label: 'Journals'
+	'journal': {
+		label: 'Journal'
 	}
 }
 
@@ -57,6 +58,9 @@ export default function ManageSettings() {
 			<Paper sx={(theme) => ({ p: 2, borderRadius: theme.spacing(1) })}>
 				{tab === 'account' && (
 					<AccountSettings />
+				)}
+				{tab === 'journal' && (
+					<JournalSettings />
 				)}
 			</Paper>
 		</>
