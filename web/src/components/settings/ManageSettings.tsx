@@ -10,8 +10,12 @@ import { useMemo } from 'react'
 import AccountSettings from './AccountSettings'
 import { useRouter } from 'next/router'
 import JournalSettings from './JournalSettings'
+import SyncingSettings from './SyncingSettings'
 
 const SETTINGS_TABS = {
+	'syncing': {
+		label: 'Syncing',
+	},
 	'appearance': {
 		label: 'Appearance & Behavior',
 	},
@@ -20,7 +24,7 @@ const SETTINGS_TABS = {
 	},
 	'journal': {
 		label: 'Journal'
-	}
+	},
 }
 
 const DEFAULT_TAB = Object.keys(SETTINGS_TABS)[0]
@@ -56,6 +60,9 @@ export default function ManageSettings() {
 			</Stack>
 
 			<Paper sx={(theme) => ({ p: 3, borderRadius: theme.spacing(1) })}>
+				{tab === 'syncing' && (
+					<SyncingSettings />
+				)}
 				{tab === 'account' && (
 					<AccountSettings />
 				)}

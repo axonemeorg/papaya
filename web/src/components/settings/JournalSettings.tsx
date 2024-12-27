@@ -48,29 +48,6 @@ export default function JournalSettings() {
                 </Stack>
             </section>
             <section>
-                <SettingsSectionHeader title='Syncing' />
-                <Box pt={2}>
-                    <ToggleButtonGroup exclusive orientation="vertical">
-                        <RadioToggleButton
-                            heading='Zisk Cloud'
-                            description='Sync your journal with Zisk Cloud to access it from anywhere'
-                            value='CLOUD'
-                        />
-                        <RadioToggleButton
-                            heading='Local'
-                            description='Keep your journal on this device only'
-                            value='LOCAL'
-                        />
-                        <RadioToggleButton
-                            heading='Custom Server'
-                            description='Sync your journal with an unmanaged custom server'
-                            value='CUSTOM'
-                        />
-                        
-                    </ToggleButtonGroup>
-                </Box>
-            </section>
-            <section>
                 <SettingsSectionHeader title='Import & Export' />
             </section>
             <section>
