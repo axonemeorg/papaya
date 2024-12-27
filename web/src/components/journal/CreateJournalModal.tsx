@@ -1,5 +1,5 @@
 import { JournalContext } from '@/contexts/JournalContext'
-import { CreateJournalMeta, JournalMeta } from '@/types/schema'
+import { CreateJournalMeta, JournalMeta, SyncingStrategy } from '@/types/schema'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
 import { useContext, useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -31,8 +31,15 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
 	})
 
 	const handleSubmit = async (formData: CreateJournalMeta) => {
+		const syncingStrategy: SyncingStrategy = {
+			type: 'SYNCING_STRATEGY',
+			strategy: 'LOCAL',
+		}
 		// Create a new journal
-		const newJournal = await createJournal(formData)
+		const newJournal = await createJournal({
+			...formData,
+			syncingStrategy,
+		})
 
 		// Refetch journals
 		journalContext.getJournalsQuery.refetch()

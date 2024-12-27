@@ -157,9 +157,47 @@ export const ZiskMeta = IdentifierMetadata.merge(
 
 export type ZiskMeta = z.output<typeof ZiskMeta>
 
+export const SyncingServer = DocumentMetadata.merge(z.object({
+	label: z.string(),
+	url: z.string(),
+}))
+
+export type SyncingServer = z.output<typeof SyncingServer>
+
+export const CloudSyncingStrategory = z.object({
+	type: z.literal('SYNCING_STRATEGY'),
+	strategy: z.literal('CLOUD'),
+})
+
+export type CloudSyncingStrategory = z.output<typeof CloudSyncingStrategory>
+
+export const LocalSyncingStrategory = z.object({
+	type: z.literal('SYNCING_STRATEGY'),
+	strategy: z.literal('LOCAL'),
+})
+
+export type LocalSyncingStrategory = z.output<typeof LocalSyncingStrategory>
+
+export const CustomServerSyncingStrategory = z.object({
+	type: z.literal('SYNCING_STRATEGY'),
+	strategy: z.literal('CUSTOM'),
+	syncingServerId: z.string(),
+})
+
+export type CustomServerSyncingStrategory = z.output<typeof CustomServerSyncingStrategory>
+
+export const SyncingStrategy = z.union([
+	CloudSyncingStrategory,
+	LocalSyncingStrategory,
+	CustomServerSyncingStrategory,
+])
+
+export type SyncingStrategy = z.output<typeof SyncingStrategy>
+
 export const CreateJournalMeta = z.object({
 	journalName: z.string().min(1, 'Journal name must be at least 1 character'),
 	avatar: Avatar,
+	syncingStrategy: SyncingStrategy.optional(),
 })
 
 export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
