@@ -13,7 +13,7 @@ export default function MigratePage() {
 		const records = jsonData.map((record: any) => {
 			return {
 				...record,
-				_id: generateGenericUniqueId(),
+				_id: record._id ?? generateGenericUniqueId(),
 			}
 		})
 		db.bulkDocs(records)

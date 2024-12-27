@@ -11,6 +11,8 @@ import {
 import { getDatabaseClient } from './client'
 import { generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
+import JSZip from 'jszip'
+import FileSaver from 'file-saver'
 
 const db = getDatabaseClient()
 
@@ -156,3 +158,36 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 	return db.put(tag)
 }
 
+export const exportJournal = async (journalId: string) => {
+	const journal: JournalMeta = await db.get(journalId)
+	const journalObjects = await getAllJournalObjects(journalId)
+
+	const zip = new JSZip()
+	zip.file('journal.json', JSON.stringify(journal))
+	zip.file('objects.json', JSON.stringify(journalObjects))
+
+	const content = await zip.generateAsync({ type: 'blob' })
+	FileSaver.saveAs(content, `${journal.journalName}.ZISK`);
+}
+
+export const importJournal = async (archive: File) => {
+	// Unzip archive file using JSZip
+	const zip = new JSZip();
+	const loadedZip = await zip.loadAsync(archive);
+	const journalFile = loadedZip.files['journal.json'];
+	const objectsFile = loadedZip.files['objects.json'];
+
+	const journal = JSON.parse(await journalFile.async("string"));
+	const journalObjects = JSON.parse(await objectsFile.async("string"));
+
+	const documents = [
+		journal,
+		...journalObjects
+	].map((doc: any) => {
+		delete doc._rev
+		return doc
+	})
+
+	const response = await db.bulkDocs(documents)
+	console.log('response', response)
+}

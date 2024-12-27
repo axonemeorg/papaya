@@ -6,6 +6,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form'
 import AvatarPicker, { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createJournal } from '@/database/actions'
+import ImportJournalForm from '../form/ImportJournalForm'
 
 interface CreateJournalModalProps {
 	open: boolean
@@ -59,6 +60,7 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
 							/>
 							<TextField {...createJournalForm.register('journalName')} fullWidth label="Journal name" />
 						</Stack>
+						<ImportJournalForm />
 					</DialogContent>
 					<DialogActions>
 						<Button onClick={props.onClose}>Cancel</Button>
