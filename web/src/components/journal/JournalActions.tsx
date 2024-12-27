@@ -1,4 +1,3 @@
-import { exportJournal } from "@/database/actions";
 import { ArrowDropDown } from "@mui/icons-material";
 import { Button, ButtonGroup, Menu, MenuItem } from "@mui/material";
 import { useRef, useState } from "react";
