@@ -1,6 +1,9 @@
 import {
+	Category,
+	ChildJournalEntry,
 	EntryArtifact,
 	ReservedTagKey,
+	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
 import { generateArtifactId, generateJournalEntryId } from './id'
@@ -108,4 +111,16 @@ export const journalEntryHasTags = (entry: JournalEntry): boolean => {
 export const journalEntryIsFlagged = (entry: JournalEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
+}
+
+export const documentIsJournalEntryOrChildJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
+	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.type)
+}
+
+export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {
+	return doc.type === 'CHILD_JOURNAL_ENTRY'
+}
+
+export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
+	return doc.type === 'CATEGORY'
 }
