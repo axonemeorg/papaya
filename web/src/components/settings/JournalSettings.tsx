@@ -1,10 +1,11 @@
-import { Alert, Avatar, Box, Button, Stack, Typography } from "@mui/material"
+import { Alert, Avatar, Box, Button, Stack, ToggleButtonGroup, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
 import { useContext } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import AvatarIcon from "../icon/AvatarIcon"
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal"
 import { Edit, SwapHoriz } from "@mui/icons-material"
+import RadioToggleButton from "../input/RadioToggleButton"
 
 
 export default function JournalSettings() {
@@ -27,21 +28,47 @@ export default function JournalSettings() {
                             <AvatarIcon avatar={journal.avatar} />
                         </Avatar>
                         <Stack gap={0.25}>
-                            <Typography variant="h6" mb={0}>
+                            <Typography variant="h6" mb={0} sx={{ lineHeight: '1' }}>
                                 {journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
                             </Typography>
                             <Stack direction='row' alignItems='center' mb={0} gap={0.5}>
-                                <Typography variant="body2">Your active journal</Typography>
-                                <Button startIcon={<SwapHoriz />} sx={{ my: -0.25, py: 0.25 }} size="small">Switch journals</Button>
+                                <Typography variant="body2" color='textSecondary' sx={{ lineHeight: '1' }}>Your active journal</Typography>
+                                <Button
+                                    startIcon={<SwapHoriz />}
+                                    sx={{ my: -0.25, py: 0.25 }}
+                                    size="small"
+                                    onClick={() => journalContext.openJournalManager()}
+                                >
+                                    Switch journals
+                                </Button>
                             </Stack>
                         </Stack>
                     </Stack>
                     <Button disabled variant='contained' startIcon={<Edit />}>Edit Journal</Button>
                 </Stack>
             </section>
-
             <section>
                 <SettingsSectionHeader title='Syncing' />
+                <Box pt={2}>
+                    <ToggleButtonGroup exclusive orientation="vertical">
+                        <RadioToggleButton
+                            heading='Zisk Cloud'
+                            description='Sync your journal with Zisk Cloud to access it from anywhere'
+                            value='CLOUD'
+                        />
+                        <RadioToggleButton
+                            heading='Local'
+                            description='Keep your journal on this device only'
+                            value='LOCAL'
+                        />
+                        <RadioToggleButton
+                            heading='Custom Server'
+                            description='Sync your journal with an unmanaged custom server'
+                            value='CUSTOM'
+                        />
+                        
+                    </ToggleButtonGroup>
+                </Box>
             </section>
             <section>
                 <SettingsSectionHeader title='Import & Export' />

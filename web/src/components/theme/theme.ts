@@ -93,6 +93,13 @@ const appTheme = createTheme({
 				
             }
         },
+		MuiToggleButton: {
+            styleOverrides: {
+                root: {
+                    'textTransform': 'none'
+                }
+            }
+        },
 	},
 })
 
