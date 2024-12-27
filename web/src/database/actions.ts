@@ -168,3 +168,25 @@ export const exportJournal = async (journalId: string) => {
 	const content = await zip.generateAsync({ type: 'blob' })
 	FileSaver.saveAs(content, 'journal.ZISK');
 }
+
+export const importJournal = async (archive: File) => {
+	// Unzip archive file using JSZip
+	const zip = new JSZip();
+	const loadedZip = await zip.loadAsync(archive);
+	const journalFile = loadedZip.files['journal.json'];
+	const objectsFile = loadedZip.files['objects.json'];
+
+	const journal = JSON.parse(await journalFile.async("string"));
+	const journalObjects = JSON.parse(await objectsFile.async("string"));
+
+	const documents = [
+		journal,
+		...journalObjects
+	].map((doc: any) => {
+		delete doc._rev
+		return doc
+	})
+
+	const response = await db.bulkDocs(documents)
+	console.log('response', response)
+}
