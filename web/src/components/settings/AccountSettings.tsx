@@ -2,7 +2,7 @@ import { Check, Info } from "@mui/icons-material";
 import { Alert, Button, Link, Stack, Typography } from "@mui/material";
 import SettingsSectionHeader from "./SettingsSectionHeader";
 
-const ZISK_CLOUD_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
+export const ZISK_CLOUD_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
 
 export default function AccountSettings() {
     return (
