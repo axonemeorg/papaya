@@ -35,17 +35,27 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 	}
 
 	useEffect(() => {
-		// Add event listener to open search when user presses '/' key
+		// Add event listener to open search when user presses 'c' key
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'c') {
-				handleCreateEntry()
-				event.stopPropagation()
-				event.preventDefault()
+			const activeElement = document.activeElement as HTMLElement;
+	
+			// Check if the focused element is an input, textarea, or contenteditable
+			const isEditable =
+				activeElement.tagName === 'INPUT' ||
+				activeElement.tagName === 'TEXTAREA' ||
+				activeElement.isContentEditable;
+	
+			if (!isEditable && event.key === 'c') {
+				handleCreateEntry();
+				event.stopPropagation();
+				event.preventDefault();
 			}
-		}
-		document.addEventListener('keydown', handleKeyDown)
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [])
+		};
+	
+		document.addEventListener('keydown', handleKeyDown);
+		return () => document.removeEventListener('keydown', handleKeyDown);
+	}, [handleCreateEntry]);
+	
 
 	const journalContext = useContext(JournalContext)
 	if (props.view === 'mobile') {
