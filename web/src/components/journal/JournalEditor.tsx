@@ -10,6 +10,7 @@ import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 import { getDatabaseClient } from '@/database/client'
+import { getAllDatesInMonth } from '@/utils/date'
 
 export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
 
@@ -50,6 +51,14 @@ export default function JournalEditor() {
 				[currentDayString]: [],
 			}
 		)
+		
+		// TODO temp solution. Populate with all dates in the month
+		const xs = getAllDatesInMonth(Object.keys(groups)[0])
+		xs.forEach((date) => {
+			if (!groups[date]) {
+				groups[date] = []
+			}
+		})
 
 		return groups
 	}, [journalEntryContext.getJournalEntriesQuery.data])

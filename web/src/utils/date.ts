@@ -17,3 +17,20 @@ export const formatJournalEntryDate = (date: string | undefined): string => {
 	const showYear = now.diff(day, 'month') > 11
 	return day.format(showYear ? 'ddd MMM D, YYYY' : 'ddd MMM D')
 }
+
+export const getAllDatesInMonth = (inputDate: string) => {
+    const [year, month] = inputDate.split('-').map(Number);
+
+    // Get the number of days in the month
+    const endDate = new Date(year, month, 0); // The last day of the previous month (0th day of next month)
+    const totalDays = endDate.getDate();
+
+    // Generate the dates in 'YYYY-MM-DD' format
+    const dates: string[] = [];
+    for (let day = 1; day <= totalDays; day++) {
+        const date = new Date(year, month - 1, day);
+        dates.push(date.toISOString().split('T')[0]);
+    }
+
+    return dates;
+}

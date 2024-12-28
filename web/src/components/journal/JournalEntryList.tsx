@@ -83,19 +83,21 @@ const TableBody = (props: TableBodyProps) => {
 	)
 }
 
-interface JournalEntryListProps {
-	journalRecordGroups: Record<string, JournalEntry[]>
-	onClickListItem: (event: any, entry: JournalEntry) => void
-	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
+interface JournalEntryDateProps {
+	day: dayjs.Dayjs
+	isToday: boolean
+	onClick?: () => void
 }
 
-const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean }) => {
+const JournalEntryDate = (props: JournalEntryDateProps) => {
+	const { day, isToday, onClick } = props
 	// const theme = useTheme();
 	// const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
 	return (
 		<Stack
 			component={Button}
+			onClick={onClick}
 			direction="row"
 			alignItems="center"
 			gap={1.5}
@@ -130,10 +132,16 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean
 	)
 }
 
+interface JournalEntryListProps {
+	journalRecordGroups: Record<string, JournalEntry[]>
+	onClickListItem: (event: any, entry: JournalEntry) => void
+	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
+}
+
 export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery } = useContext(JournalContext)
+	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
 
 	return (
 		<Grid
@@ -165,7 +173,11 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 					return (
 						<React.Fragment key={date}>
 							<Grid size={{ xs: 12, sm: 2 }} className="date-cell">
-								<JournalEntryDate day={day} isToday={isToday} />
+								<JournalEntryDate
+									day={day}
+									isToday={isToday}
+									onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+								/>
 							</Grid>
 							<Grid size={{ xs: 12, sm: 10 }}>
 								{entries.length > 0 && (
