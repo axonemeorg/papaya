@@ -47,7 +47,7 @@ export const Category = DocumentMetadata.merge(BelongsToJournal).merge(CreateCat
 	z.object({
 		type: z.literal('CATEGORY'),
 		createdAt: z.string(),
-		updatedAt: z.string().nullable(),
+		updatedAt: z.string().nullable().optional(),
 	})
 )
 

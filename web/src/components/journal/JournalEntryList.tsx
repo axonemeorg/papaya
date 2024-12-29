@@ -16,6 +16,7 @@ import {
 	TableRowProps,
 	TableCellProps,
 	TableBodyProps,
+	Grow,
 } from '@mui/material'
 import React, { useContext } from 'react'
 
@@ -25,10 +26,10 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import CategoryChip from '../icon/CategoryChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { Flag } from '@mui/icons-material'
+import { Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -82,18 +83,21 @@ const TableBody = (props: TableBodyProps) => {
 	)
 }
 
-interface JournalEntryListProps {
-	journalRecordGroups: Record<string, JournalEntry[]>
-	onClickListItem: (event: any, entry: JournalEntry) => void
+interface JournalEntryDateProps {
+	day: dayjs.Dayjs
+	isToday: boolean
+	onClick?: () => void
 }
 
-const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean }) => {
+const JournalEntryDate = (props: JournalEntryDateProps) => {
+	const { day, isToday, onClick } = props
 	// const theme = useTheme();
 	// const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
 	return (
 		<Stack
 			component={Button}
+			onClick={onClick}
 			direction="row"
 			alignItems="center"
 			gap={1.5}
@@ -128,10 +132,16 @@ const JournalEntryDate = ({ day, isToday }: { day: dayjs.Dayjs; isToday: boolean
 	)
 }
 
+interface JournalEntryListProps {
+	journalRecordGroups: Record<string, JournalEntry[]>
+	onClickListItem: (event: any, entry: JournalEntry) => void
+	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
+}
+
 export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery } = useContext(JournalContext)
+	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
 
 	return (
 		<Grid
@@ -163,7 +173,11 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 					return (
 						<React.Fragment key={date}>
 							<Grid size={{ xs: 12, sm: 2 }} className="date-cell">
-								<JournalEntryDate day={day} isToday={isToday} />
+								<JournalEntryDate
+									day={day}
+									isToday={isToday}
+									onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+								/>
 							</Grid>
 							<Grid size={{ xs: 12, sm: 10 }}>
 								{entries.length > 0 && (
@@ -177,19 +191,30 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 													: undefined
 												const netAmount = calculateNetAmount(entry)
 												const isNetPositive = netAmount > 0
+												const isFlagged = journalEntryIsFlagged(entry)
+												const hasTags = journalEntryHasTags(entry)
 
 												return (
 													<TableRow
 														key={entry._id}
-														onClick={(event) => props.onClickListItem(event, entry)}>
+														onClick={(event) => props.onClickListItem(event, entry)}
+														onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
+													>
 														<TableCell sx={{ width: '0%', borderBottom: 'none' }}>
 															<AvatarIcon avatar={category?.avatar} compact={isSmall} />
 														</TableCell>
-														<TableCell sx={{ width: '0%' }}>
-															<Flag sx={{ display: 'block' }} />
-														</TableCell>
 														<TableCell sx={{ width: '40%' }}>
 															<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
+														</TableCell>
+														<TableCell sx={{ width: '0%' }}>
+															<Stack direction='row'>
+																<Grow in={isFlagged}>
+																	<Flag sx={{ display: 'block' }} />
+																</Grow>
+																<Grow in={hasTags}>
+																	<LocalOffer sx={{ display: 'block' }} />
+																</Grow>
+															</Stack>
 														</TableCell>
 														<TableCell align="right" sx={{ width: '10%' }}>
 															<Typography

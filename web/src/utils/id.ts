@@ -1,11 +1,25 @@
 import { nanoid } from 'nanoid'
 
 export const generateGenericUniqueId = () => {
-	return nanoid()
+	return `U${nanoid()}`
 }
 
-export const generateJournalEntryId = generateGenericUniqueId
-export const generateCategoryId = generateGenericUniqueId
-export const generateEntryTagId = generateGenericUniqueId
-export const generateArtifactId = generateGenericUniqueId
-export const generateJournalId = generateGenericUniqueId
+export const generateJournalEntryId = () => {
+	return `U${nanoid()}`
+}
+
+export const generateCategoryId = () => {
+	return `U${nanoid()}`
+}
+
+export const generateEntryTagId = () => {
+	return `U${nanoid()}`
+}
+
+export const generateArtifactId = () => {
+	return `U${nanoid()}`
+}
+
+export const generateJournalId = () => {
+	return `U${nanoid()}`
+}
