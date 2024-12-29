@@ -149,39 +149,21 @@ export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEnt
 
 export type EntryTag = z.output<typeof EntryTag>
 
-export const ZiskMeta = IdentifierMetadata.merge(
-	z.object({
-		activeJournalId: z.string().nullable(),
-	})
-)
-
-export type ZiskMeta = z.output<typeof ZiskMeta>
-
-export const SyncingServer = DocumentMetadata.merge(z.object({
-	label: z.string(),
-	url: z.string(),
-}))
-
-export type SyncingServer = z.output<typeof SyncingServer>
-
 export const CloudSyncingStrategory = z.object({
-	type: z.literal('SYNCING_STRATEGY'),
 	strategy: z.literal('CLOUD'),
 })
 
 export type CloudSyncingStrategory = z.output<typeof CloudSyncingStrategory>
 
 export const LocalSyncingStrategory = z.object({
-	type: z.literal('SYNCING_STRATEGY'),
 	strategy: z.literal('LOCAL'),
 })
 
 export type LocalSyncingStrategory = z.output<typeof LocalSyncingStrategory>
 
 export const CustomServerSyncingStrategory = z.object({
-	type: z.literal('SYNCING_STRATEGY'),
 	strategy: z.literal('CUSTOM'),
-	syncingServerId: z.string(),
+	serverUrl: z.string(),
 })
 
 export type CustomServerSyncingStrategory = z.output<typeof CustomServerSyncingStrategory>
@@ -194,10 +176,31 @@ export const SyncingStrategy = z.union([
 
 export type SyncingStrategy = z.output<typeof SyncingStrategy>
 
+export const ZiskSettings = z.object({
+	appearance: z.object({
+		// theme: z.union([z.literal('LIGHT'), z.literal('DARK'), z.literal('SYSTEM')]),
+		// animations: z.union([z.literal('NORMAL'), z.literal('FAST'), z.literal('OFF')]),
+		menuExpanded: z.boolean(),
+	}),
+	syncingStrategy: SyncingStrategy,
+})
+
+export type ZiskSettings = z.output<typeof ZiskSettings>
+
+export const ZiskMeta = IdentifierMetadata.merge(
+	z.object({
+		type: z.literal('ZISK_META'),
+		activeJournalId: z.string().nullable(),
+		settings: ZiskSettings,
+		createdAt: z.string(),
+	})
+)
+
+export type ZiskMeta = z.output<typeof ZiskMeta>
+
 export const CreateJournalMeta = z.object({
 	journalName: z.string().min(1, 'Journal name must be at least 1 character'),
 	avatar: Avatar,
-	syncingStrategy: SyncingStrategy.optional(),
 })
 
 export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
