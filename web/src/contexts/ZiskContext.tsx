@@ -1,6 +1,12 @@
-import { ZiskMeta } from "@/types/schema";
+import { ZiskMeta, ZiskSettings } from "@/types/schema";
 import { createContext } from "react";
 
-export type ZiskContext = ZiskMeta | null;
+export interface ZiskContext {
+    data: ZiskMeta | null;
+    updateSettings: (settings: ZiskSettings) => Promise<void>;
+}
 
-export const ZiskContext = createContext<ZiskContext>(null)
+export const ZiskContext = createContext<ZiskContext>({
+    data: null,
+    updateSettings: () => Promise.resolve(),
+})

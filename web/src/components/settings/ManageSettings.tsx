@@ -7,7 +7,6 @@ import {
 } from '@mui/material'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import AccountSettings from './AccountSettings'
 import { useRouter } from 'next/router'
 import JournalSettings from './JournalSettings'
 import SyncingSettings from './SyncingSettings'
@@ -62,9 +61,6 @@ export default function ManageSettings() {
 			<Paper sx={(theme) => ({ p: 3, borderRadius: theme.spacing(1) })}>
 				{tab === 'syncing' && (
 					<SyncingSettings />
-				)}
-				{tab === 'account' && (
-					<AccountSettings />
 				)}
 				{tab === 'journal' && (
 					<JournalSettings />

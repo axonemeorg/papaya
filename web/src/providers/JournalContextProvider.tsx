@@ -128,7 +128,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	}, [activeJournal])
 
 	useEffect(() => {
-		if (!ziskContext || !getJournalsQuery.data) {
+		if (!ziskContext.data || !getJournalsQuery.data) {
 			return
 		} else if (!getJournalsQuery.isFetched) {
 			return
@@ -137,7 +137,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		if (numJournals === 0) {
 			promptCreateJournal()
 		} else {
-			const activeJournalId = ziskContext.activeJournalId
+			const activeJournalId = ziskContext.data.activeJournalId
 			const journal = activeJournalId ? getJournalsQuery.data[activeJournalId] : null
 			if (!journal) {
 				promptSelectJournal()
@@ -145,7 +145,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 				setActiveJournal(journal)
 			}
 		}
-	}, [ziskContext, getJournalsQuery.data, getJournalsQuery.isFetched])
+	}, [ziskContext.data, getJournalsQuery.data, getJournalsQuery.isFetched])
 
 	const journalEntryForm = useForm<JournalEntry>({
 		defaultValues: {},

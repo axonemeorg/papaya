@@ -1,11 +1,10 @@
-import { Alert, Avatar, Box, Button, Stack, ToggleButtonGroup, Typography } from "@mui/material"
+import { Alert, Avatar, Button, Stack, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
 import { useContext } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import AvatarIcon from "../icon/AvatarIcon"
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal"
 import { Edit, SwapHoriz } from "@mui/icons-material"
-import RadioToggleButton from "../input/RadioToggleButton"
 
 
 export default function JournalSettings() {

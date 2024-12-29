@@ -151,6 +151,10 @@ export type EntryTag = z.output<typeof EntryTag>
 
 export const CloudSyncingStrategory = z.object({
 	strategy: z.literal('CLOUD'),
+	user: z.object({
+		username: z.string(),
+		avatar: Avatar,
+	})
 })
 
 export type CloudSyncingStrategory = z.output<typeof CloudSyncingStrategory>
@@ -161,10 +165,10 @@ export const LocalSyncingStrategory = z.object({
 
 export type LocalSyncingStrategory = z.output<typeof LocalSyncingStrategory>
 
-export const CustomServerSyncingStrategory = z.object({
+export const CustomServerSyncingStrategory = CloudSyncingStrategory.merge(z.object({
 	strategy: z.literal('CUSTOM'),
 	serverUrl: z.string(),
-})
+}))
 
 export type CustomServerSyncingStrategory = z.output<typeof CustomServerSyncingStrategory>
 

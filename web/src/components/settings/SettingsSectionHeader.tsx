@@ -8,7 +8,7 @@ interface SettingsSectionHeaderProps {
 export default function SettingsSectionHeader({ title }: SettingsSectionHeaderProps) {
     return (
         <Stack gap={1} mb={2}>
-            <Typography variant='h6'>
+            <Typography variant='h5'>
                 {title}
             </Typography>
             <Divider />
