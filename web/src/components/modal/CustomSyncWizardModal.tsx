@@ -1,6 +1,7 @@
 import { LoadingButton } from "@mui/lab";
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, Link, TextField } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, Link, TextField, ToggleButtonGroup } from "@mui/material";
 import { useMemo, useState } from "react";
+import RadioToggleButton from "../input/RadioToggleButton";
 
 function isAbsoluteUrl(url: string): boolean {
     try {
@@ -17,10 +18,15 @@ function isAbsoluteUrl(url: string): boolean {
 
 export default function CustomSyncWizardModal(props: DialogProps) {
     const [step, setStep] = useState<number>(0)
-    const [serverUrl, setServerUrl] = useState<string>('')
-    const [approvedUrl, setApprovedUrl] = useState<string>('')
+    const [serverUrl, setServerUrl] = useState<string>("http://localhost:5984")
+    const [urlIsApproved, setUrlIsApproved] = useState<boolean>(false)
+    const [databaseIsApproved, setDatabaseIsApproved] = useState<boolean>(false)
     const [serverCheckError, setServerCheckError] = useState<string | null>(null)
     const [serverCheckLoading, setServerCheckLoading] = useState<boolean>(false)
+    const [databaseCheckError, setDatabaseCheckError] = useState<string | null>(null)
+    // const [databaseCheckLoading, setDatabaseCheckLoading] = useState<boolean>(false)
+    // const [setupMode, setSetupMode] = useState<'auto' | 'manual'>('auto')
+    const [databaseName, setDatabaseName] = useState<string>('')
 
     const handleCheckUrl = async () => {
         if (!isAbsoluteUrl(serverUrl)) {
@@ -40,7 +46,7 @@ export default function CustomSyncWizardModal(props: DialogProps) {
             if (!response.ok) {
                 setServerCheckError(`Health check failed with status: ${response.status}`)
             } else {
-                setApprovedUrl(serverUrl)
+                setUrlIsApproved(true)
             }
         } catch (error: any) {
             console.error('Health check failed with error:', error);
@@ -50,9 +56,25 @@ export default function CustomSyncWizardModal(props: DialogProps) {
         }
     }
 
+    const handleCheckDatabase = async () => {
+        if (!databaseName) {
+            setDatabaseCheckError('Please enter a database name')
+            return
+        }
+
+    }
+
+
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
         setServerUrl(e.target.value)
+        setUrlIsApproved(false)
         setServerCheckError(null)
+    }
+
+    const handleChangeDatabaseName = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDatabaseName(e.target.value)
+        setDatabaseIsApproved(false)
+        setDatabaseCheckError(null)
     }
 
     const handleNext = () => {
@@ -63,13 +85,9 @@ export default function CustomSyncWizardModal(props: DialogProps) {
         setStep(step - 1)
     }
 
-    const serverIsApproved = useMemo(() => {
-        return !serverCheckError && Boolean(serverUrl) && serverUrl === approvedUrl
-    }, [serverUrl, approvedUrl])
-
     const disableNext = useMemo(() => {
-        return step === 0 && (!serverIsApproved)
-    }, [step, serverUrl, serverCheckError, approvedUrl, serverIsApproved])
+        return step === 0 && (!urlIsApproved)
+    }, [step, serverUrl, serverCheckError, urlIsApproved])
 
     return (
         <Dialog {...props}>
@@ -88,10 +106,57 @@ export default function CustomSyncWizardModal(props: DialogProps) {
                         autoComplete="off"
                         value={serverUrl}
                         onChange={handleChangeUrl}
-                        color={serverIsApproved ? 'success' : (serverCheckError ? 'error' : undefined)}
-                        helperText={serverCheckError ?? undefined}
+                        color={urlIsApproved ? 'success' : (serverCheckError ? 'error' : undefined)}
+                        helperText={serverCheckError ?? (urlIsApproved ? 'Server OK!' : undefined)}
                     />
                     <LoadingButton loading={serverCheckLoading} onClick={handleCheckUrl}>Check Status</LoadingButton>
+                </DialogContent>
+            )}
+            {step === 1 && (
+                <DialogContent>
+                    <DialogContentText>Setup your database.</DialogContentText>
+                    <TextField
+                        label="Database Name"
+                        value={databaseName}
+                        onChange={handleChangeDatabaseName}
+                        fullWidth
+                        variant="filled"
+                        autoComplete="off"
+                        error={Boolean(databaseCheckError)}
+                        helperText={databaseCheckError ?? (databaseIsApproved ? 'Database OK!' : undefined)}
+                    />
+                    <Button onClick={handleCheckDatabase}>Check Database</Button>
+
+                    {/* <ToggleButtonGroup
+                        value={setupMode}
+                        exclusive
+                        orientation="vertical"
+                        onChange={(_e, value) => setSetupMode(value)}
+                    >
+                        <RadioToggleButton
+                            value="auto"
+                            heading="Auto"
+                            description="We'll try to set up your server automatically."
+                        />
+                        <RadioToggleButton
+                            value="manual"
+                            heading="Manual"
+                            description="You'll need to set up your database and admin credentials manually."
+                        />
+                    </ToggleButtonGroup> */}
+                    <TextField
+                        label="Username"
+                        fullWidth
+                        variant="filled"
+                        autoComplete="off"
+                    />
+                    <TextField
+                        label="Password"
+                        fullWidth
+                        variant="filled"
+                        autoComplete="off"
+                        type="password"
+                    />
                 </DialogContent>
             )}
             <DialogActions>
