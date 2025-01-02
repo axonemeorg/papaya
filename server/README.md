@@ -42,6 +42,9 @@ nano .env
 
 You should change the following credentials:
 ```
+# Port that your server will run on
+ZISK_SERVER_PORT=6006
+
 # Used by the API. Choose a random value
 ZISK_APP_SERCRET=secret
 

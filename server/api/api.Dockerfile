@@ -1,21 +1,19 @@
-FROM php:8.3-fpm
+FROM node:18-alpine
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    && docker-php-ext-install zip pdo_mysql
+# Set the working directory
+WORKDIR /usr/src/app
 
-# Set working directory
-WORKDIR /var/www/project
+# Copy package.json and package-lock.json for dependency installation
+COPY api/package*.json ./
 
-# Copy project files
+# Install only production dependencies
+RUN npm install --only=production
+
+# Copy the rest of the application
 COPY api/ .
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --optimize-autoloader
-
-# Expose FPM port
+# Expose the port
 EXPOSE 9000
+
+# Start the application
+CMD ["node", "src/server.js"]
