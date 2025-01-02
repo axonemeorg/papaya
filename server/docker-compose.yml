@@ -1,1 +1,44 @@
-# TODO
+version: '3.8'
+
+services:
+  database:
+    build:
+      context: .
+      dockerfile: database/database.Dockerfile
+    container_name: couchdb
+    ports:
+      - "5984:5984"
+    env_file:
+      - .env
+    environment:
+      - COUCHDB_USER=${ZISK_COUCHDB_ADMIN_USER}
+      - COUCHDB_PASSWORD=${ZISK_COUCHDB_ADMIN_PASS}
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+
+  api:
+    build:
+      context: .
+      dockerfile: api/api.Dockerfile
+    container_name: symfony
+    working_dir: /var/www/project
+    volumes:
+      - ./api:/var/www/project
+    environment:
+      - APP_ENV=prod
+
+  proxy:
+    build:
+      context: .
+      dockerfile: proxy/proxy.Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./api/public:/var/www/project/public
+    depends_on:
+      - database
+      - api
+
+volumes:
+  couchdb_data:

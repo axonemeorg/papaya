@@ -16,7 +16,7 @@ If you want to remotely sync your Zisk journals without running an instance of Z
 Zisk Server runs using Docker Compose and maintains the following services:
 
  - **CouchDB**: used for storing your data. Users and authentication are managed using CouchDB. Couch-per-user is disabled, and databases are managed by the API container.
- - **Symfony API**: used to manage creating users and databases within CouchDB.
+ - **Nginx**: used to proxy connections to CouchDB. It also hosts a Symfony API for creating users and databases within CouchDB. Externally, requests made to /database/* get proxied to the CouchDB container (minus the /database prefix), and requests made to /api/* get proxied to the Symfony API (minus the /api predix).
 
 ## Setup Pre-requisites
 1. You need Docker and `docker-compose`.
@@ -48,10 +48,6 @@ ZISK_APP_SERCRET=secret
 # Used to show a display name for your server
 ZISK_SERVER_NAME=...
 
-# Used for cryptographically signing your auth tokens
-ZISK_AUTH_SECRET=secret
-ZISK_AUTH_HMAC_KID=zisk_auth
-
 # The admin username for the CouchDB instance. If you run an external CouchDB instance, you can ignore this
 ZISK_COUCHDB_ADMIN_USER=...
 
@@ -59,7 +55,7 @@ ZISK_COUCHDB_ADMIN_USER=...
 ZISK_COUCHDB_ADMIN_USER=...
 
 # Used to change your server port
-ZISK_SERVER_PORT=6000
+ZISK_SERVER_PORT=80
 ```
 
 Now, run the Docker Compose services.
@@ -68,7 +64,7 @@ Now, run the Docker Compose services.
 docker-compose up -d
 ```
 
-Your server will be available on `http://localhost:6000` (unless you changed your port in the previous step),.
+Your server will be available on `http://localhost` (`http://localhost:XXXX` if you changed your port in the previous step).
 
 ## Accessing Your Server
 Once your server is running, go to app.tryzisk.com and add your server to the app:
