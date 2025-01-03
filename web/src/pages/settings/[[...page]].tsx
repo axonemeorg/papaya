@@ -4,7 +4,7 @@ import { getLayout } from '@/layouts/main'
 
 export default function SettingsPage() {
     return (
-        <Container maxWidth="xl" disableGutters sx={{ pt: 1, pl: 1, pr: 3 }}>
+        <Container maxWidth="md" disableGutters sx={{ pt: 1, pl: 1, pr: 3, mx: 2 }}>
             <ManageSettings />
         </Container>
     )

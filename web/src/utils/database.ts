@@ -8,8 +8,11 @@ export const makeDefaultZiskSettings = (): ZiskSettings => {
 			// animations: 'NORMAL',
 			menuExpanded: true,
 		},
+		server: {
+			serverType: 'NONE',
+		},
 		syncingStrategy: {
-			strategy: 'LOCAL',
+			strategyType: 'LOCAL',
 		},
 	}
 }

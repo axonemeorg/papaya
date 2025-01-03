@@ -13,13 +13,10 @@ import SyncingSettings from './SyncingSettings'
 
 const SETTINGS_TABS = {
 	'syncing': {
-		label: 'Syncing',
+		label: 'Syncing & Account',
 	},
 	'appearance': {
 		label: 'Appearance & Behavior',
-	},
-	'account': {
-		label: 'Account',
 	},
 	'journal': {
 		label: 'Journal'
@@ -58,13 +55,15 @@ export default function ManageSettings() {
 				</Tabs>
 			</Stack>
 
-			<Paper sx={(theme) => ({ p: 3, borderRadius: theme.spacing(1) })}>
-				{tab === 'syncing' && (
-					<SyncingSettings />
-				)}
-				{tab === 'journal' && (
-					<JournalSettings />
-				)}
+			<Paper sx={(theme) => ({ p: 3, borderRadius: theme.spacing(1), mb: 5 })}>
+				<>
+					{tab === 'syncing' && (
+						<SyncingSettings />
+					)}
+					{tab === 'journal' && (
+						<JournalSettings />
+					)}
+				</>
 			</Paper>
 		</>
 	)

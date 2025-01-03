@@ -149,33 +149,61 @@ export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEnt
 
 export type EntryTag = z.output<typeof EntryTag>
 
-export const CloudSyncingStrategory = z.object({
-	strategy: z.literal('CLOUD'),
+export const CloudZiskServer = z.object({
+	serverType: z.literal('ZISK_CLOUD'),
 	user: z.object({
 		username: z.string(),
 		avatar: Avatar,
 	})
 })
 
-export type CloudSyncingStrategory = z.output<typeof CloudSyncingStrategory>
+export type CloudZiskServer = z.output<typeof CloudZiskServer>
+
+export const NoneZiskServer = z.object({
+	serverType: z.literal('NONE')
+})
+
+export type NoneZiskServer = z.output<typeof NoneZiskServer>
+
+export const CustomZiskServer = CloudZiskServer.merge(z.object({
+	serverType: z.literal('CUSTOM'),
+	serverUrl: z.string(),
+}))
+
+export type CustomZiskServer = z.output<typeof CustomZiskServer>
+
+export const ZiskServer = z.union([
+	CustomZiskServer,
+	NoneZiskServer,
+	CloudZiskServer,
+])
+
+export type ZiskServer = z.output<typeof ZiskServer>
+
+export const CouchDbSyncingStrategory = z.object({
+	strategyType: z.literal('COUCH_DB'),
+	couchDbUrl: z.string(),
+})
+
+export type CouchDbSyncingStrategory = z.output<typeof CouchDbSyncingStrategory>
 
 export const LocalSyncingStrategory = z.object({
-	strategy: z.literal('LOCAL'),
+	strategyType: z.literal('LOCAL'),
 })
 
 export type LocalSyncingStrategory = z.output<typeof LocalSyncingStrategory>
 
-export const CustomServerSyncingStrategory = CloudSyncingStrategory.merge(z.object({
-	strategy: z.literal('CUSTOM'),
+export const ServerSyncingStrategory = z.object({
+	strategyType: z.literal('CUSTOM_SERVER_OR_ZISK_CLOUD'),
 	serverUrl: z.string(),
-}))
+})
 
-export type CustomServerSyncingStrategory = z.output<typeof CustomServerSyncingStrategory>
+export type ServerSyncingStrategory = z.output<typeof ServerSyncingStrategory>
 
 export const SyncingStrategy = z.union([
-	CloudSyncingStrategory,
 	LocalSyncingStrategory,
-	CustomServerSyncingStrategory,
+	ServerSyncingStrategory,
+	CouchDbSyncingStrategory,
 ])
 
 export type SyncingStrategy = z.output<typeof SyncingStrategy>
@@ -186,6 +214,7 @@ export const ZiskSettings = z.object({
 		// animations: z.union([z.literal('NORMAL'), z.literal('FAST'), z.literal('OFF')]),
 		menuExpanded: z.boolean(),
 	}),
+	server: ZiskServer,
 	syncingStrategy: SyncingStrategy,
 })
 
