@@ -17,10 +17,11 @@ services:
       context: .
       dockerfile: api/api.Dockerfile
     container_name: node
+    env_file:
+      - .env
     environment:
+      - SERVER_NAME=${ZISK_SERVER_NAME}
       - PORT=9000
-    volumes:
-      - ./api:/usr/src/app
 
   proxy:
     build:

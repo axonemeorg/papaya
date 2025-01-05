@@ -4,10 +4,10 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json for dependency installation
-COPY api/package*.json ./
+COPY api/package.json .
 
 # Install only production dependencies
-RUN npm install --only=production
+RUN npm install
 
 # Copy the rest of the application
 COPY api/ .
