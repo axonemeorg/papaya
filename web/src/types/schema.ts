@@ -168,6 +168,7 @@ export type NoneZiskServer = z.output<typeof NoneZiskServer>
 export const CustomZiskServer = CloudZiskServer.merge(z.object({
 	serverType: z.literal('CUSTOM'),
 	serverUrl: z.string(),
+	serverNickname: z.string().optional(),
 }))
 
 export type CustomZiskServer = z.output<typeof CustomZiskServer>

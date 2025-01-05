@@ -5,6 +5,7 @@ import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
 import CustomSyncWizardModal from "../modal/CustomSyncWizardModal"
 import { Add, Cloud } from "@mui/icons-material"
+import AddServerForm from "../form/AddServerForm"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
@@ -71,28 +72,7 @@ export default function SyncingSettings() {
                         </Stack>
                     </Stack>
                     <Typography mb={1}>Add a Server</Typography>
-                    <form onSubmit={() => {}}>
-                        <Grid container columns={12} alignItems={'center'} gap={1}>
-                            <Grid size='grow'>
-                                <TextField
-                                    fullWidth
-                                    label='Server URL'
-                                    name='add-server-url'
-                                    size='small'
-                                    variant='filled'
-                                />
-                            </Grid>
-                            <Grid size='auto'>
-                                <Button
-                                    type='submit'
-                                    startIcon={<Add />}
-                                    variant='contained'
-                                >
-                                    Connect
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </form>
+                    <AddServerForm />
                 </section>
                 <section>
                     <SettingsSectionHeader title='Syncing Strategy' />
