@@ -10,6 +10,7 @@ import NotificationsProvider from '@/providers/NotificationsProvider'
 import '@/styles/main.scss'
 import JournalContextProvider from '@/providers/JournalContextProvider'
 import ZiskContextProvider from '@/providers/ZiskContextProvider'
+import RemoteContextProvider from '@/providers/RemoteContextProvider'
 
 const queryClient = new QueryClient()
 
@@ -32,9 +33,11 @@ function MyApp(props: any) {
 					<NotificationsProvider>
 						<QueryClientProvider client={queryClient}>
 							<ZiskContextProvider>
-								<JournalContextProvider>
-									{getLayout(<Component {...rest} />)}
-								</JournalContextProvider>
+								<RemoteContextProvider>
+									<JournalContextProvider>
+										{getLayout(<Component {...rest} />)}
+									</JournalContextProvider>
+								</RemoteContextProvider>
 							</ZiskContextProvider>
 						</QueryClientProvider>
 					</NotificationsProvider>

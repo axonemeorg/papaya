@@ -9,18 +9,21 @@ import {
 	CircularProgress,
 	Divider,
 	Grow,
+	IconButton,
 	LinearProgress,
 	Popover,
+	Stack,
 	SvgIconOwnProps,
 	Typography,
 } from '@mui/material'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 type IconColor = SvgIconOwnProps['color']
 
-export default function SyncStatus() {
+export default function SyncHeaderWidget() {
 	const [verbose, setVerbose] = useState<boolean>(false)
-	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+	const [modalOpen, setModalOpen] = useState<boolean>(false)
+	const buttonAnchorRef = useRef<HTMLDivElement>(null);
 
 	const remoteContext = useContext(RemoteContext)
 	const { syncStatus } = remoteContext
@@ -71,6 +74,7 @@ export default function SyncStatus() {
 					syncStatusDescription: 'Failed to save changes to the remote database',
 				}
 			case SyncStatusEnum.IDLE:
+			default:
 				return {
 					syncStatusTitle: 'Idle',
 					syncStatusDescription: 'No changes to sync',
@@ -138,27 +142,21 @@ export default function SyncStatus() {
 		remoteContext.sync()
 	}
 
-	const handleClickButton = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleOpen = () => {
 		setVerbose(true)
-		setAnchorEl(event.currentTarget)
+		setModalOpen(true)
 	}
 
-	const showingModal = Boolean(anchorEl)
-
-	const isLoading = useMemo(() => {
-		return syncStatus === SyncStatusEnum.SAVING || syncStatus === SyncStatusEnum.CONNECTING_TO_REMOTE
-	}, [syncStatus])
-
-	const canSync = useMemo(() => {
-		return remoteContext.authenticationStatus === 'authenticated'
-	}, [remoteContext.authenticationStatus])
+	const isLoading = [SyncStatusEnum.SAVING, SyncStatusEnum.CONNECTING_TO_REMOTE].includes(syncStatus)
+	const showButton = !isIdle
+	const showCaption = verbose || modalOpen
 
 	return (
 		<>
 			<Popover
-				anchorEl={anchorEl}
-				open={showingModal}
-				onClose={() => setAnchorEl(null)}
+				anchorEl={buttonAnchorRef.current}
+				open={modalOpen}
+				onClose={() => setModalOpen(false)}
 				anchorOrigin={{
 					vertical: 'bottom',
 					horizontal: 'left',
@@ -172,7 +170,7 @@ export default function SyncStatus() {
 					title={syncStatusTitle}
 					subheader={syncStatusDescription}
 				/>
-				{canSync && (
+				{remoteContext.syncSupported && (
 					<>
 						{isLoading ? (
 							<LinearProgress variant="indeterminate" />
@@ -185,37 +183,33 @@ export default function SyncStatus() {
 					</>
 				)}
 			</Popover>
-			<Grow in={!isIdle}>
-				<Button
-					variant="text"
-					onClick={handleClickButton}
-					sx={(theme) => ({
-						color: theme.palette.text.secondary,
-						borderRadius: 16,
-						py: 1,
-						px: 1,
-						gap: 1,
-						justifyContent: 'flex-start',
-						minWidth: 0,
-						'& .MuiButton-icon': {
-							margin: verbose ? undefined : 0,
-						},
-					})}>
-					<ButtonIcon
-						fontSize="small"
-						color={verbose ? syncIconVerboseColor : 'inherit'}
-						sx={{ transition: 'all 0.3s' }}
-					/>
-					{(verbose || showingModal) && (
-						<Grow in>
-							<Typography variant="caption" sx={{ mr: 1, userSelect: 'none' }}>
-								{syncStatusTitle}
-								{/* <Shortcut>Ctrl</Shortcut> */}
-							</Typography>
-						</Grow>
-					)}
-				</Button>
-			</Grow>
+			<Stack direction="row" alignItems="center" gap={0} ref={buttonAnchorRef}>
+				<Grow in={showButton}>
+					<IconButton
+						onClick={handleOpen}
+						sx={(theme) => ({
+							color: theme.palette.text.secondary,
+						})}
+					>
+						<ButtonIcon
+							fontSize="small"
+							color={verbose ? syncIconVerboseColor : 'inherit'}
+							sx={{ transition: 'all 0.3s' }}
+						/>
+					</IconButton>
+				</Grow>
+				<Grow in={showCaption}>
+					<Typography
+						component='a'
+						onClick={handleOpen}
+						variant="caption"
+						sx={{ mr: 1, userSelect: 'none', cursor: 'pointer' }}
+					>
+						{syncStatusTitle}
+						{/* <Shortcut>Ctrl</Shortcut> */}
+					</Typography>
+				</Grow>
+			</Stack>
 		</>
 	)
 }

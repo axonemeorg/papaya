@@ -1,9 +1,8 @@
-import { Alert, AlertTitle, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Paper, Radio, Select, Stack, TextField, Typography } from "@mui/material"
+import { Alert, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Radio, Select, Stack, TextField, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
 import React, { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
-import CustomSyncWizardModal from "../modal/CustomSyncWizardModal"
 import { Add, Cloud } from "@mui/icons-material"
 import AddServerForm from "../form/AddServerForm"
 
@@ -30,10 +29,6 @@ export default function SyncingSettings() {
 
     return (
         <>
-            <CustomSyncWizardModal
-                open={showCustomSyncWizardModal}
-                onClose={() => setShowCustomSyncWizardModal(false)}
-            />
             <Stack spacing={4}>
                 <section>
                     <SettingsSectionHeader title='Your Server' />

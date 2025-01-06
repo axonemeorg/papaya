@@ -7,6 +7,7 @@ import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
 import ActiveJournal from './ActiveJournal'
 import SearchWidget from './search/SearchWidget'
 import UserWidget from './UserWidget'
+import SyncHeaderWidget from './SyncHeaderWidget'
 
 interface HeaderProps {
 	view: 'desktop' | 'mobile'
@@ -50,7 +51,7 @@ export default function Header(props: HeaderProps) {
 				{showLogo && <AppLogo />}
 				<Stack direction="row" alignItems="center" gap={1} ml={showLogo ? 2 : undefined}>
 					<ActiveJournal />
-					{/* <SyncStatus /> */}
+					<SyncHeaderWidget />
 				</Stack>
 			</Stack>
 			<Stack direction="row" gap={1} alignItems={'center'}>

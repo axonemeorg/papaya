@@ -10,12 +10,13 @@ export enum SyncStatusEnum {
 	SAVED_TO_THIS_DEVICE = 'SAVED_TO_THIS_DEVICE',
 	FAILED_TO_SAVE = 'FAILED_TO_SAVE',
 	IDLE = 'IDLE',
+	INITIALIZING = 'INITIALIZING',
 }
 
 export interface RemoteContext {
 	syncError: string | null
 	syncStatus: SyncStatusEnum
-	authenticationStatus: 'loading' | 'authenticated' | 'unauthenticated'
+	syncSupported: boolean
 	sync: () => Promise<void>
 }
 
