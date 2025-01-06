@@ -181,30 +181,30 @@ export const ZiskServer = z.union([
 
 export type ZiskServer = z.output<typeof ZiskServer>
 
-export const CouchDbSyncingStrategory = z.object({
+export const CouchDbSyncingStrategy = z.object({
 	strategyType: z.literal('COUCH_DB'),
 	couchDbUrl: z.string(),
 })
 
-export type CouchDbSyncingStrategory = z.output<typeof CouchDbSyncingStrategory>
+export type CouchDbSyncingStrategy = z.output<typeof CouchDbSyncingStrategy>
 
-export const LocalSyncingStrategory = z.object({
+export const LocalSyncingStrategy = z.object({
 	strategyType: z.literal('LOCAL'),
 })
 
-export type LocalSyncingStrategory = z.output<typeof LocalSyncingStrategory>
+export type LocalSyncingStrategy = z.output<typeof LocalSyncingStrategy>
 
-export const ServerSyncingStrategory = z.object({
+export const ServerSyncingStrategy = z.object({
 	strategyType: z.literal('CUSTOM_SERVER_OR_ZISK_CLOUD'),
 	serverUrl: z.string(),
 })
 
-export type ServerSyncingStrategory = z.output<typeof ServerSyncingStrategory>
+export type ServerSyncingStrategy = z.output<typeof ServerSyncingStrategy>
 
 export const SyncingStrategy = z.union([
-	LocalSyncingStrategory,
-	ServerSyncingStrategory,
-	CouchDbSyncingStrategory,
+	LocalSyncingStrategy,
+	ServerSyncingStrategy,
+	CouchDbSyncingStrategy,
 ])
 
 export type SyncingStrategy = z.output<typeof SyncingStrategy>
