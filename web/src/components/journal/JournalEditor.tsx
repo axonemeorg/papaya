@@ -53,12 +53,12 @@ export default function JournalEditor() {
 		)
 		
 		// TODO temp solution. Populate with all dates in the month
-		const xs = getAllDatesInMonth(Object.keys(groups)[0])
-		xs.forEach((date) => {
-			if (!groups[date]) {
-				groups[date] = []
-			}
-		})
+		// const xs = getAllDatesInMonth(Object.keys(groups)[0])
+		// xs.forEach((date) => {
+		// 	if (!groups[date]) {
+		// 		groups[date] = []
+		// 	}
+		// })
 
 		return groups
 	}, [journalEntryContext.getJournalEntriesQuery.data])
