@@ -3,7 +3,7 @@ import SettingsSectionHeader from "./SettingsSectionHeader"
 import React, { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
-import { Add, Cloud } from "@mui/icons-material"
+import { Add, Cloud, LeakAdd } from "@mui/icons-material"
 import AddServerForm from "../form/AddServerForm"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
@@ -11,21 +11,13 @@ const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/
 
 export default function SyncingSettings() {
     const ziskContext = useContext(ZiskContext)
-    const [showCustomSyncWizardModal, setShowCustomSyncWizardModal] = useState<boolean>(false)
+    const [showJoinServerModal, setShowJoinServerModal] = useState<boolean>(false)
     if (!ziskContext.data) {
         return React.Fragment;
     }
     
     const ziskServer = ziskContext.data.settings.server
     const syncStrategy: SyncingStrategy = ziskContext.data.settings.syncingStrategy
-
-    const handleSwitchToLocal = () => {
-
-    }
-
-    const handleSwitchToCustomServer = () => {
-        setShowCustomSyncWizardModal(true)
-    }
 
     return (
         <>
@@ -36,38 +28,9 @@ export default function SyncingSettings() {
                         Zisk Server is an optional web server for syncing and analyzing your Zisk journal. Data replication is automatically implemented using CouchDB, but you can host your own instance of CouchDB. You may also choose not to connect to a server, and your data will only persist on your device.
                     </Typography>
                     {ziskServer.serverType === 'NONE' && (
-                        <Alert severity="info" sx={{ mb: 2 }}>You are not currently using a Zisk Server</Alert>
+                        <Alert severity="info" sx={{ mb: 2 }}>You are not connected to a Zisk Server.</Alert>
                     )}
-                    <Stack gap={3} mb={4}>
-                        <Stack direction='row' alignItems={'flex-start'} gap={1}>
-                            <Radio
-                                checked={ziskServer.serverType === 'ZISK_CLOUD'}
-                                disableRipple
-                                disableFocusRipple
-                                disableTouchRipple
-                                sx={{ my: -1.5 }}
-                            />
-                            <Stack sx={{ flex: 1, alignItems: 'flex-start' }}>
-                                <Stack direction='row' gap={1} alignItems={'center'}>
-                                    <Typography sx={{ lineHeight: 1, mb: 0.5 }}>Zisk Cloud</Typography>
-                                    <Cloud />
-                                </Stack>
-                                <Typography variant='body2' color='textSecondary' mb={2}>
-                                    Zisk Cloud is a managed server.
-                                </Typography>
-                                {ziskServer.serverType === 'ZISK_CLOUD' ? (
-                                    // <Paper variant='outlined' sx={{ p: 1 }}>
-                                    //     <Typography variant='caption'>Server URL</Typography>
-                                    // </Paper>
-                                    <Alert sx={{ mt: 1 }} severity="success">You are using Zisk Cloud</Alert>
-                                ) : (
-                                    <Button variant='contained'>Sign In to Zisk Cloud</Button>
-                                )}
-                            </Stack>
-                        </Stack>
-                    </Stack>
-                    <Typography mb={1}>Add a Server</Typography>
-                    <AddServerForm />
+                    <Button startIcon={<LeakAdd />}>Connect to a Server</Button>
                 </section>
                 <section>
                     <SettingsSectionHeader title='Syncing Strategy' />
