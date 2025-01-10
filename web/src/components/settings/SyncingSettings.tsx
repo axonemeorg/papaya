@@ -1,10 +1,11 @@
 import { Alert, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Radio, Select, Stack, TextField, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
 import { Add, Cloud, LeakAdd } from "@mui/icons-material"
 import AddServerForm from "../form/AddServerForm"
+import JoinServerModal from "../modal/JoinServerModal"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 // const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
@@ -12,6 +13,7 @@ const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 export default function SyncingSettings() {
     const ziskContext = useContext(ZiskContext)
     const [showJoinServerModal, setShowJoinServerModal] = useState<boolean>(false)
+
     if (!ziskContext.data) {
         return (
             <></>
@@ -23,6 +25,10 @@ export default function SyncingSettings() {
 
     return (
         <>
+            <JoinServerModal
+                open={showJoinServerModal}
+                onClose={() => setShowJoinServerModal(false)}
+            />
             <Stack spacing={4}>
                 <section>
                     <SettingsSectionHeader title='Your Server' />
@@ -32,7 +38,7 @@ export default function SyncingSettings() {
                     {ziskServer.serverType === 'NONE' && (
                         <Alert severity="info" sx={{ mb: 2 }}>You are not connected to a Zisk Server.</Alert>
                     )}
-                    <Button startIcon={<LeakAdd />}>Connect to a Server</Button>
+                    <Button variant='contained' startIcon={<LeakAdd />}  onClick={() => setShowJoinServerModal(true)}>Connect to a Server</Button>
                 </section>
                 <section>
                     <SettingsSectionHeader title='Syncing Strategy' />
