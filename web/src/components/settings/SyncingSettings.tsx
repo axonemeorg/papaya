@@ -1,31 +1,33 @@
 import { Alert, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Radio, Select, Stack, TextField, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
-import React, { useContext, useState } from "react"
+import React, { useContext } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
 import { Add, Cloud } from "@mui/icons-material"
 import AddServerForm from "../form/AddServerForm"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
-const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
+// const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
 
 export default function SyncingSettings() {
     const ziskContext = useContext(ZiskContext)
-    const [showCustomSyncWizardModal, setShowCustomSyncWizardModal] = useState<boolean>(false)
+    // const [showCustomSyncWizardModal, setShowCustomSyncWizardModal] = useState<boolean>(false)
     if (!ziskContext.data) {
-        return React.Fragment;
+        return (
+            <></>
+        )
     }
     
     const ziskServer = ziskContext.data.settings.server
     const syncStrategy: SyncingStrategy = ziskContext.data.settings.syncingStrategy
 
-    const handleSwitchToLocal = () => {
+    // const handleSwitchToLocal = () => {
 
-    }
+    // }
 
-    const handleSwitchToCustomServer = () => {
-        setShowCustomSyncWizardModal(true)
-    }
+    // const handleSwitchToCustomServer = () => {
+    //     setShowCustomSyncWizardModal(true)
+    // }
 
     return (
         <>
@@ -72,7 +74,7 @@ export default function SyncingSettings() {
                 <section>
                     <SettingsSectionHeader title='Syncing Strategy' />
                     <Typography variant="body2" color='textSecondary' mb={2}>
-                        Zisk uses <Link href={POUCH_DB_DOCS_URL}>PouchDB</Link> to store your journals. If you're connected to a Zisk Server, it can be used to sync your journals. You can also sync your journals using your own CouchDB server, or just store them on this device only.
+                        Zisk uses <Link href={POUCH_DB_DOCS_URL}>PouchDB</Link> to store your journals. If you are connected to a Zisk Server, it can be used to sync your journals. You can also sync your journals using your own CouchDB server, or just store them on this device only.
                     </Typography>
                     <Stack gap={3}>
                         <Stack direction='row' alignItems={'flex-start'} gap={1}>
@@ -86,7 +88,7 @@ export default function SyncingSettings() {
                             <Stack sx={{ flex: 1, alignItems: 'flex-start' }}>
                                 <Typography sx={{ lineHeight: 1, mb: 0.5 }}>Zisk Server</Typography>
                                 <Typography variant='body2' color='textSecondary' mb={2}>
-                                    Your journals will be synced with the Zisk Server you've selected above.
+                                    Your journals will be synced with the Zisk Server you have selected above.
                                 </Typography>
 
                                 <Grid container columns={12} alignItems={'center'} gap={1}>

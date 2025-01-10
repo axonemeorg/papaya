@@ -3,16 +3,12 @@ import { LoadingButton } from "@mui/lab";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid2 as Grid, Stack, TextField } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 
-interface AddServerFormProps {
-    //
-}
-
-export default function AddServerForm(props: AddServerFormProps) {
+export default function AddServerForm() {
     const [showLoginDialog, setShowLoginDialog] = useState<boolean>(false);
     const [loginServerUrl, setLoginServerUrl] = useState<string | null>(null);
     const [versionData, setVersionData] = useState<Record<string, string | null | undefined> | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [_loading, setLoading] = useState<boolean>(false);
+    const [_error, setError] = useState<string | null>(null);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         setLoading(true);

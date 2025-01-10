@@ -59,7 +59,7 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
                     return
                 }
                 // TODO still need a way to determine what the user's database will be called
-                const databaseUrl = server.serverUrl + '/database'
+                const _databaseUrl = server.serverUrl + '/database'
                 remoteDb.current = new PouchDB(syncingStrategy.serverUrl)
             }
         }
