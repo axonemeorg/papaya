@@ -8,10 +8,13 @@ import {
     Button,
     Stack,
     TextField,
-    Collapse
+    Collapse,
+    FormControlLabel,
+    Checkbox,
+    Paper
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import ServerWidget, { ServerData } from "../settings/widget/ServerWidget";
+import ServerWidget, { ServerData } from "../widget/ServerWidget";
 import RadioToggleButton from "../input/RadioToggleButton";
 import { LoadingButton } from "@mui/lab";
 import { LeakAdd, LeakRemove } from "@mui/icons-material";
@@ -19,6 +22,7 @@ import { getServerApiUrl, getServerDatabaseUrl, isValidUrl } from "@/utils/serve
 import { NotificationsContext } from "@/contexts/NotificationsContext";
 import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
 import { ZiskContext } from "@/contexts/ZiskContext";
+import { ZiskSettings } from "@/types/schema";
 
 interface JoinServerModalProps {
     open: boolean
@@ -37,6 +41,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [serverNickname, setServerNickname] = useState<string>('')
+    const [willUpdateSyncStrategy, setWillUpdateSyncStrategy] = useState<boolean>(true)
 
     const { snackbar } = useContext(NotificationsContext)
     const ziskContext = useContext(ZiskContext)
@@ -106,7 +111,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
 
         if (response?.ok) {
             // Update user's settings to reflect new server, then close the modal
-            await ziskContext.updateSettings({
+            const updateSettings: Partial<ZiskSettings> = {
                 server: {
                     serverType: 'CUSTOM',
                     serverUrl: serverUrl,
@@ -116,8 +121,15 @@ export default function JoinServerModal(props: JoinServerModalProps) {
                         avatar: DEFAULT_AVATAR, // TODO
                         username,
                     }
+                },
+            }
+            if (willUpdateSyncStrategy) {
+                updateSettings.syncingStrategy = {
+                    strategyType: 'CUSTOM_SERVER_OR_ZISK_CLOUD',
+                    serverUrl,
                 }
-            })
+            }
+            await ziskContext.updateSettings(updateSettings)
             props.onClose()
         } else {
             snackbar({
@@ -176,23 +188,25 @@ export default function JoinServerModal(props: JoinServerModalProps) {
                         </LoadingButton>
                     </Collapse>
                     <Collapse in={serverHealthCheckOk}>
-                        <ServerWidget
-                            serverName={serverData?.serverName}
-                            serverNickname={serverNickname}
-                            serverUrl={serverUrl}
-                            userName={username}
-                            status={serverData?.status}
-                            version={serverData?.version}
-                            actions={
-                                <Button
-                                    onClick={() => setServerHealthCheckOk(false)}
-                                    color='error'
-                                    startIcon={<LeakRemove />}
-                                >
-                                    Disconnect
-                                </Button>
-                            }
-                        />
+                        <Paper variant='outlined' sx={(theme) => ({ background: 'none', borderRadius: theme.shape.borderRadius, alignSelf: 'flex-start' })}>
+                            <ServerWidget
+                                serverName={serverData?.serverName}
+                                serverNickname={serverNickname}
+                                serverUrl={serverUrl}
+                                userName={username}
+                                status={serverData?.status}
+                                version={serverData?.version}
+                                actions={
+                                    <Button
+                                        onClick={() => setServerHealthCheckOk(false)}
+                                        color='error'
+                                        startIcon={<LeakRemove />}
+                                    >
+                                        Disconnect
+                                    </Button>
+                                }
+                            />
+                        </Paper>
                     </Collapse>
                     <TextField
                         label='Username'
@@ -215,6 +229,15 @@ export default function JoinServerModal(props: JoinServerModalProps) {
                         onChange={(event) => setServerNickname(event.target.value)}
                         fullWidth
                         placeholder={serverData?.serverName || undefined}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={willUpdateSyncStrategy}
+                                onChange={() => setWillUpdateSyncStrategy(!willUpdateSyncStrategy)}
+                            />
+                        }
+                        label="Set my syncing strategy to this server"
                     />
                 </Stack>
             </DialogContent>

@@ -1,11 +1,11 @@
-import { Alert, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Radio, Select, Stack, TextField, Typography } from "@mui/material"
+import { Alert, Button, FormControl, FormHelperText, Grid2 as Grid, InputLabel, Link, Paper, Radio, Select, Stack, TextField, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
 import React, { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
 import { Add, LeakAdd, LeakRemove } from "@mui/icons-material"
 import JoinServerModal from "../modal/JoinServerModal"
-import ServerWidget from "./widget/ServerWidget"
+import ServerWidget from "../widget/ServerWidget"
 import { NotificationsContext } from "@/contexts/NotificationsContext"
 import { getServerDatabaseUrl } from "@/utils/server"
 
@@ -92,21 +92,23 @@ export default function SyncingSettings() {
                     {ziskServer.serverType === 'CUSTOM' && (
                         <Stack gap={2}>
                             <Alert severity="success">You are connected to a Zisk Server.</Alert>
-                            <ServerWidget
-                                serverUrl={ziskServer.serverUrl}
-                                serverName={ziskServer.serverName}
-                                serverNickname={ziskServer.serverNickname}
-                                userName={ziskServer.user.username}
-                                actions={
-                                    <Button
-                                        onClick={() => handleDisconnectFromServer()}
-                                        // color='error'
-                                        startIcon={<LeakRemove />}
-                                    >
-                                        Sign Out
-                                    </Button>
-                                }
-                            />
+                            <Paper variant='outlined' sx={(theme) => ({ background: 'none', borderRadius: theme.shape.borderRadius, alignSelf: 'flex-start' })}>
+                                <ServerWidget
+                                    serverUrl={ziskServer.serverUrl}
+                                    serverName={ziskServer.serverName}
+                                    serverNickname={ziskServer.serverNickname}
+                                    userName={ziskServer.user.username}
+                                    actions={
+                                        <Button
+                                            onClick={() => handleDisconnectFromServer()}
+                                            // color='error'
+                                            startIcon={<LeakRemove />}
+                                        >
+                                            Sign Out
+                                        </Button>
+                                    }
+                                />
+                            </Paper>
                         </Stack>
                     )}
                 </section>

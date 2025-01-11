@@ -1,6 +1,6 @@
 import { PLACEHOLDER_UNNAMED_ZISK_SERVER } from "@/constants/server";
 import { prettyPrintServerUrl } from "@/utils/server";
-import { Grow, Paper, Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
+import { Grow, Box, Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
 export interface ServerData {
@@ -20,7 +20,7 @@ export default function ServerWidget(props: ServerWidgetProps) {
     const printedServerName: string = props.serverNickname || (props.serverName || PLACEHOLDER_UNNAMED_ZISK_SERVER)
 
     return (
-        <Paper variant='outlined' sx={(theme) => ({ background: 'none', py: 2, px: 2.5, borderRadius: theme.shape.borderRadius, alignSelf: 'flex-start' })}>
+        <Box sx={{ py: 2, px: 2.5 }}>
             <Stack direction='row' gap={1} sx={{ flexWrap: 'nowrap', alignItems: 'center' }}>
                 <Typography variant='h5' sx={{ lineHeight: 1 }}>
                     {printedServerName}
@@ -57,6 +57,6 @@ export default function ServerWidget(props: ServerWidgetProps) {
                     {props.actions}
                 </Stack>
             )}
-        </Paper>
+        </Box>
     )
 }
