@@ -26,3 +26,11 @@ export const makeDefaultZiskMeta = (): ZiskMeta => {
 		createdAt: new Date().toISOString(),
 	}
 }
+
+export const dbNameToUsername = (prefixedHexName: string) => {
+	return Buffer.from(prefixedHexName.replace('userdb-', ''), 'hex').toString('utf8');
+}
+
+export const usernameToDbName = (name: string) => {
+	return 'userdb-' + Buffer.from(name).toString('hex');
+}

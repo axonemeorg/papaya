@@ -32,7 +32,7 @@ interface JoinServerModalProps {
 
 
 export default function JoinServerModal(props: JoinServerModalProps) {
-    const [serverUrl, setServerUrl] = useState<string>('https://zisk.ax0ne.me')
+    const [serverUrl, setServerUrl] = useState<string>('http://localhost:6006/')
     const [serverHealthCheckOk, setServerHealthCheckOk] = useState<boolean>(false)
     const [serverHealthCheckError, setServerHealthCheckError] = useState<boolean>(false)
     const [serverData, setServerData] = useState<ServerData | null>(null)

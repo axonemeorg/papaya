@@ -13,8 +13,16 @@ export enum SyncStatusEnum {
 	INITIALIZING = 'INITIALIZING',
 }
 
+export enum SyncErrorEnum {
+	MISSING_USER_CONTEXT = 'MISSING_USER_CONTEXT',
+	MISSING_DATABASE = 'MISSING_DATABASE',
+	UNAUTHENTICATED = 'UNAUTHENTICATED',
+	MISSING_SERVER_URL_IN_CONFIG = 'MISSING_SERVER_URL_IN_CONFIG',
+	ZISK_CLOUD_DISABLED = 'ZISK_CLOUD_DISABLED',
+}
+
 export interface RemoteContext {
-	syncError: string | null
+	syncError: SyncErrorEnum | null
 	syncStatus: SyncStatusEnum
 	syncSupported: boolean
 	sync: () => Promise<void>
