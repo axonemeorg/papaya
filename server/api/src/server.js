@@ -18,7 +18,7 @@ app.use(cors({
 }));
 
 const PORT = process.env.PORT || 9000;
-const SERVER_NAME = process.env.SERVER_NAME || 'Unnamed Zisk Server';
+const SERVER_NAME = process.env.SERVER_NAME || '';
 
 // Health check endpoint
 app.get('/', (req, res) => {

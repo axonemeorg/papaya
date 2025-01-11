@@ -3,16 +3,20 @@ import SettingsSectionHeader from "./SettingsSectionHeader"
 import React, { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
-import { Add, Cloud, LeakAdd } from "@mui/icons-material"
-import AddServerForm from "../form/AddServerForm"
+import { Add, LeakAdd, LeakRemove } from "@mui/icons-material"
 import JoinServerModal from "../modal/JoinServerModal"
+import ServerWidget from "./widget/ServerWidget"
+import { NotificationsContext } from "@/contexts/NotificationsContext"
+import { getServerDatabaseUrl } from "@/utils/server"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 // const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
 
 export default function SyncingSettings() {
-    const ziskContext = useContext(ZiskContext)
     const [showJoinServerModal, setShowJoinServerModal] = useState<boolean>(false)
+
+    const ziskContext = useContext(ZiskContext)
+    const { snackbar } = useContext(NotificationsContext)
 
     if (!ziskContext.data) {
         return (
@@ -22,6 +26,43 @@ export default function SyncingSettings() {
     
     const ziskServer = ziskContext.data.settings.server
     const syncStrategy: SyncingStrategy = ziskContext.data.settings.syncingStrategy
+
+    const handleDisconnectFromServer = async () => {
+        const confirmDisconnect = window.confirm(
+            'Are you sure you want to disconnect? You will no longer be able to sync with your server until you sign back in.'
+        )
+
+        if (!confirmDisconnect) {
+            return
+        }
+
+        if (ziskServer.serverType === 'CUSTOM') {
+            const databaseUrl = getServerDatabaseUrl(ziskServer.serverUrl)
+            let response
+
+            try {
+                response = await fetch(`${databaseUrl}/_session`, {
+                    method: 'DELETE',
+                    credentials: 'include', // Ensure cookies are sent with the request
+                });
+            } catch {
+                //
+            }
+            if (response?.ok) {
+                // Successfully signed out. Remove server from settings
+                ziskContext.updateSettings({
+                    server: {
+                        serverType: 'NONE',
+                    }
+                })
+            } else {
+                snackbar({ message: 'Failed to sign out.'})
+            }
+        } else {
+            throw new Error('Disconnecting from Zisk Cloud is not implemented')
+        }
+        
+    }
 
     return (
         <>
@@ -36,9 +77,38 @@ export default function SyncingSettings() {
                         Zisk Server is an optional web server for syncing and analyzing your Zisk journal. Data replication is automatically implemented using CouchDB, but you can host your own instance of CouchDB. You may also choose not to connect to a server, and your data will only persist on your device.
                     </Typography>
                     {ziskServer.serverType === 'NONE' && (
-                        <Alert severity="info" sx={{ mb: 2 }}>You are not connected to a Zisk Server.</Alert>
+                        <Stack gap={2}>
+                            <Alert severity="info">You are not connected to a Zisk Server.</Alert>
+                            <Button
+                                variant='contained'
+                                startIcon={<LeakAdd />}
+                                onClick={() => setShowJoinServerModal(true)}
+                                sx={{ alignSelf: 'flex-start' }}
+                            >
+                                Connect to a Server
+                            </Button>
+                        </Stack>
                     )}
-                    <Button variant='contained' startIcon={<LeakAdd />}  onClick={() => setShowJoinServerModal(true)}>Connect to a Server</Button>
+                    {ziskServer.serverType === 'CUSTOM' && (
+                        <Stack gap={2}>
+                            <Alert severity="success">You are connected to a Zisk Server.</Alert>
+                            <ServerWidget
+                                serverUrl={ziskServer.serverUrl}
+                                serverName={ziskServer.serverName}
+                                serverNickname={ziskServer.serverNickname}
+                                userName={ziskServer.user.username}
+                                actions={
+                                    <Button
+                                        onClick={() => handleDisconnectFromServer()}
+                                        // color='error'
+                                        startIcon={<LeakRemove />}
+                                    >
+                                        Sign Out
+                                    </Button>
+                                }
+                            />
+                        </Stack>
+                    )}
                 </section>
                 <section>
                     <SettingsSectionHeader title='Syncing Strategy' />

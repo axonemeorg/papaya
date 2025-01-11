@@ -189,15 +189,17 @@ export const importJournal = async (archive: File) => {
 		return doc
 	})
 
-	const response = await db.bulkDocs(documents)
-	console.log('response', response)
+	await db.bulkDocs(documents)
 }
 
-export const updateSettings = (settings: ZiskSettings) => {
+export const updateSettings = async (settings: Partial<ZiskSettings>) => {
 	return getOrCreateZiskMeta().then((meta) => {
 		return db.put({
 			...meta,
-			settings,
+			settings: {
+				...meta.settings,
+				...settings,
+			},
 		})
 	})
 }

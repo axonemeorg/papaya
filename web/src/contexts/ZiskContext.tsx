@@ -3,7 +3,7 @@ import { createContext } from "react";
 
 export interface ZiskContext {
     data: ZiskMeta | null;
-    updateSettings: (settings: ZiskSettings) => Promise<void>;
+    updateSettings: (settings: Partial<ZiskSettings>) => Promise<void>;
 }
 
 export const ZiskContext = createContext<ZiskContext>({

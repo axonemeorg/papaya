@@ -4,58 +4,196 @@ import {
     DialogContent,
     DialogActions,
     DialogContentText,
-    DialogProps, 
     ToggleButtonGroup,
-    ToggleButton,
     Button,
     Stack,
-    TextField
+    TextField,
+    Collapse
 } from "@mui/material";
-import { useState } from "react";
-import ServerWidget from "../settings/widget/ServerWidget";
+import { useContext, useEffect, useState } from "react";
+import ServerWidget, { ServerData } from "../settings/widget/ServerWidget";
+import RadioToggleButton from "../input/RadioToggleButton";
+import { LoadingButton } from "@mui/lab";
+import { LeakAdd, LeakRemove } from "@mui/icons-material";
+import { getServerApiUrl, getServerDatabaseUrl, isValidUrl } from "@/utils/server";
+import { NotificationsContext } from "@/contexts/NotificationsContext";
+import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
+import { ZiskContext } from "@/contexts/ZiskContext";
 
-interface JoinServerModalProps extends DialogProps {}
+interface JoinServerModalProps {
+    open: boolean
+    onClose: () => void
+}
+
+
 
 export default function JoinServerModal(props: JoinServerModalProps) {
     const [serverUrl, setServerUrl] = useState<string>('https://zisk.ax0ne.me')
+    const [serverHealthCheckOk, setServerHealthCheckOk] = useState<boolean>(false)
+    const [serverHealthCheckError, setServerHealthCheckError] = useState<boolean>(false)
+    const [serverData, setServerData] = useState<ServerData | null>(null)
+    const [loadingHealthCheck, setLoadingHealthCheck] = useState<boolean>(false)
+    const [loadingSignIn, setLoadingSignIn] = useState<boolean>(false)
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [serverNickname, setServerNickname] = useState<string>('')
 
-    const serverName = 'myserver'
+    const { snackbar } = useContext(NotificationsContext)
+    const ziskContext = useContext(ZiskContext)
+
+    const checkServerHealth = async () => {
+        const versionUrl =  getServerApiUrl(serverUrl)
+        let response
+
+        try {
+            response = await fetch(versionUrl);
+        } catch {
+            //
+        }
+
+        if (response?.ok) {
+            const data = await response.json();
+            setServerData(data)
+            setServerHealthCheckOk(true)
+        } else {
+            console.error('Failed to fetch version data');
+            setServerHealthCheckOk(false)
+            setServerHealthCheckError(true)
+        }
+    }
+
+    const handleCheckServerHealth = async () => {
+        setLoadingHealthCheck(true)
+        setServerHealthCheckError(false)
+
+        checkServerHealth().finally(() => {
+            setLoadingHealthCheck(false)
+        })
+    }
+
+    const handleSignIn = async () => {
+        await checkServerHealth()
+
+        if (!serverHealthCheckOk) {
+            return
+        }
+
+        const couchDbLoginUrl = [
+            getServerDatabaseUrl(serverUrl),
+            '_session'
+        ].join('/')
+
+        const credentials = {
+            name: username,
+            password,
+        }
+
+        // Send username and password as form parameters
+        let response
+        
+        try {
+            response = await fetch(couchDbLoginUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(credentials),
+                credentials: 'include',
+            });
+        } catch {
+            // Catch handled in following control flow
+        }
+
+        if (response?.ok) {
+            // Update user's settings to reflect new server, then close the modal
+            await ziskContext.updateSettings({
+                server: {
+                    serverType: 'CUSTOM',
+                    serverUrl: serverUrl,
+                    serverName: serverData?.serverName,
+                    serverNickname,
+                    user: {
+                        avatar: DEFAULT_AVATAR, // TODO
+                        username,
+                    }
+                }
+            })
+            props.onClose()
+        } else {
+            snackbar({
+                message: 'Failed to log in. Check your credentials and try again.'
+            })
+        }
+        setLoadingSignIn(false)
+    }
+
+    const disableSignIn = !username || !password || !serverUrl || !serverHealthCheckOk || !serverUrl
+
+    useEffect(() => {
+        setServerHealthCheckError(false)
+    }, [serverUrl])
 
     return (
         <Dialog {...props} fullWidth maxWidth={'sm'}>
             <DialogTitle>Join Server</DialogTitle>
             <DialogContent>
-                <ToggleButtonGroup>
-                    <ToggleButton disabled>
-                        Zisk Cloud
-                    </ToggleButton>
-                    <ToggleButton>
-                        Zisk Server
-                    </ToggleButton>
-                </ToggleButtonGroup>
                 <DialogContentText>
                     Text.
                 </DialogContentText>
+                <ToggleButtonGroup>
+                    <RadioToggleButton
+                        heading="Zisk Cloud"
+                        description="Zisk Cloud."
+                        value={'CLOUD'}
+                    />
+                    <RadioToggleButton
+                        heading="Zisk Server"
+                        description="A custom server."
+                        value={'SERVER'}
+                    />
+
+                </ToggleButtonGroup>
                 <Stack mt={2} gap={1}>
                     <TextField
                         value={serverUrl}
                         onChange={(event) => setServerUrl(event.target.value)}
                         label='Server URL'
                         placeholder='your.server.com'
+                        disabled={serverHealthCheckOk || loadingHealthCheck}
                         fullWidth
                         required
+                        error={serverHealthCheckError}
+                        helperText={serverHealthCheckError ? 'Failed to connect to server.' : undefined}
                     />
-                    <ServerWidget
-                        serverName={serverName}
-                        serverNickname={serverNickname}
-                        serverUrl={serverUrl}
-                        userName={username}
-                        status="alright"
-                        version="1.1.1.1"
-                    />
+                    <Collapse in={!serverHealthCheckOk}>
+                        <LoadingButton
+                            variant='contained'
+                            onClick={() => handleCheckServerHealth()}
+                            loading={loadingHealthCheck}
+                            disabled={serverHealthCheckOk || !isValidUrl(serverUrl)}
+                        >
+                            Check Server
+                        </LoadingButton>
+                    </Collapse>
+                    <Collapse in={serverHealthCheckOk}>
+                        <ServerWidget
+                            serverName={serverData?.serverName}
+                            serverNickname={serverNickname}
+                            serverUrl={serverUrl}
+                            userName={username}
+                            status={serverData?.status}
+                            version={serverData?.version}
+                            actions={
+                                <Button
+                                    onClick={() => setServerHealthCheckOk(false)}
+                                    color='error'
+                                    startIcon={<LeakRemove />}
+                                >
+                                    Disconnect
+                                </Button>
+                            }
+                        />
+                    </Collapse>
                     <TextField
                         label='Username'
                         value={username}
@@ -76,12 +214,21 @@ export default function JoinServerModal(props: JoinServerModalProps) {
                         value={serverNickname}
                         onChange={(event) => setServerNickname(event.target.value)}
                         fullWidth
-                        placeholder={serverName}
+                        placeholder={serverData?.serverName || undefined}
                     />
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => props.onClose?.()}>Close</Button>
+                <LoadingButton
+                    variant='contained'
+                    startIcon={<LeakAdd />}
+                    onClick={() => handleSignIn()}
+                    disabled={disableSignIn}
+                    loading={loadingSignIn}
+                >
+                    Join Server
+                </LoadingButton>
+                <Button onClick={() => props.onClose()}>Close</Button>
             </DialogActions>
         </Dialog>
     )

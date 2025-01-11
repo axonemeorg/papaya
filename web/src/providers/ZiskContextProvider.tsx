@@ -15,14 +15,17 @@ export default function ZiskContextProvider(props: PropsWithChildren) {
         enabled: true,
     })
 
-    const updateZiskSettings = async (settings: ZiskSettings): Promise<void> => {
+    const updateZiskSettings = async (settings: Partial<ZiskSettings>): Promise<void> => {
         setZiskMeta((prev) => {
             if (!prev) {
                 return null
             }
             return {
                 ...prev,
-                settings,
+                settings: {
+                    ...prev.settings,
+                    ...settings,
+                }
             }
         })
         await updateSettings(settings)
