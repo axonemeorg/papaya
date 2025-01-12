@@ -9,6 +9,7 @@ import ServerWidget from "../widget/ServerWidget"
 import { NotificationsContext } from "@/contexts/NotificationsContext"
 import { getServerDatabaseUrl } from "@/utils/server"
 import SyncWidget from "../widget/SyncWidget"
+import SwitchSyncStrategyModal from "../modal/SwitchSyncStrategyModal"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 // const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
@@ -71,6 +72,11 @@ export default function SyncingSettings() {
 
     return (
         <>
+            <SwitchSyncStrategyModal
+                open={showChangeSyncStrategyModal}
+                onClose={() => setShowChangeSyncStrategyModal(false)}
+                currentStrategy={syncStrategy.strategyType}
+            />
             <JoinServerModal
                 open={showJoinServerModal}
                 onClose={() => setShowJoinServerModal(false)}
