@@ -1,7 +1,8 @@
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, ToggleButtonGroup } from "@mui/material";
 import RadioToggleButton from "../input/RadioToggleButton";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ServerWidget from "../widget/ServerWidget";
+import { Shuffle } from "@mui/icons-material";
 
 type SyncStrategyType = 'LOCAL' | 'CUSTOM_SERVER_OR_ZISK_CLOUD' | 'COUCH_DB'
 
@@ -14,11 +15,23 @@ interface SwitchSyncStrategyModalProps {
 export default function SwitchSyncStrategyModal(props: SwitchSyncStrategyModalProps) {
     const [strategy, setStrategy] = useState<SyncStrategyType>(props.currentStrategy)
 
+    const disableSwitchButton = useMemo(() => {
+        if (props.currentStrategy === strategy) {
+            return true
+        }
+
+        return false
+    }, [props.currentStrategy, strategy])
+
+    const handleSwitch = () => {
+        //
+    }
+
     return (
         <Dialog open={props.open} onClose={() => props.onClose()} fullWidth maxWidth='sm'>
             <DialogTitle>Switch Sync Strategy</DialogTitle>
             <DialogContent>
-                <Stack>
+                <Stack gap={1}>
                     <ToggleButtonGroup
                         orientation="vertical"
                         exclusive
@@ -45,7 +58,7 @@ export default function SwitchSyncStrategyModal(props: SwitchSyncStrategyModalPr
                         />
                     </ToggleButtonGroup>
                     {strategy === 'LOCAL' && props.currentStrategy === 'CUSTOM_SERVER_OR_ZISK_CLOUD' && (
-                        <Alert severity="info">You'll remain signed into your Zisk Server.</Alert>
+                        <Alert severity="info">You will remain signed into your Zisk Server.</Alert>
                     )}
                     {strategy === 'CUSTOM_SERVER_OR_ZISK_CLOUD' && (
                         <ServerWidget
@@ -55,6 +68,14 @@ export default function SwitchSyncStrategyModal(props: SwitchSyncStrategyModalPr
                 </Stack>
             </DialogContent>
             <DialogActions>
+                <Button
+                    variant='contained'
+                    onClick={() => handleSwitch()}
+                    disabled={disableSwitchButton}
+                    startIcon={<Shuffle />}
+                >
+                    Switch
+                </Button>
                 <Button onClick={() => props.onClose()}>Close</Button>
             </DialogActions>
         </Dialog>
