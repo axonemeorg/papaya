@@ -13,6 +13,8 @@ import { useContext, useMemo } from 'react'
 import SyncIcon from '../icon/SyncIcon'
 import { getSyncStatusTitles } from '@/utils/string'
 
+const ENABLE_SYNC_DEBUGGING = process.env.NEXT_PUBLIC_SYNC_DEBUGGING === 'true'
+
 export default function SyncWidget() {
 	const remoteContext = useContext(RemoteContext)
 	const { syncStatus } = remoteContext
@@ -35,6 +37,11 @@ export default function SyncWidget() {
                 title={syncStatusTitle}
                 subheader={syncStatusDescription}
             />
+            {(ENABLE_SYNC_DEBUGGING && remoteContext.syncError) && (
+                <pre>
+                    {remoteContext.syncError}
+                </pre>
+            )}
             {remoteContext.syncSupported && (
                 <>
                     {isLoading ? (

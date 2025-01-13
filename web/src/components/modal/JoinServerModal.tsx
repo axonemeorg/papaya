@@ -126,7 +126,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
             if (willUpdateSyncStrategy) {
                 updateSettings.syncingStrategy = {
                     strategyType: 'CUSTOM_SERVER_OR_ZISK_CLOUD',
-                    serverUrl,
+                    // serverUrl,
                 }
             }
             await ziskContext.updateSettings(updateSettings)

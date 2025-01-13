@@ -75,7 +75,6 @@ export default function SyncingSettings() {
             <SwitchSyncStrategyModal
                 open={showChangeSyncStrategyModal}
                 onClose={() => setShowChangeSyncStrategyModal(false)}
-                currentStrategy={syncStrategy.strategyType}
             />
             <JoinServerModal
                 open={showJoinServerModal}

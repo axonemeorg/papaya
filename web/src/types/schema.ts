@@ -197,7 +197,7 @@ export type LocalSyncingStrategy = z.output<typeof LocalSyncingStrategy>
 
 export const ServerSyncingStrategy = z.object({
 	strategyType: z.literal('CUSTOM_SERVER_OR_ZISK_CLOUD'),
-	serverUrl: z.string(),
+	// serverUrl: z.string(),
 })
 
 export type ServerSyncingStrategy = z.output<typeof ServerSyncingStrategy>
