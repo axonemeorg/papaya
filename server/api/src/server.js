@@ -4,7 +4,7 @@ const cors = require('cors'); // Import cors
 const app = express();
 
 // Allow requests from specific origins
-const allowedOrigins = ['http://localhost:9475', 'app.tryzisk.com', 'http://192.168.68.68:9475'];
+const allowedOrigins = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
 
 app.use(cors({
 	origin: (origin, callback) => {
