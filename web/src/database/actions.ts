@@ -9,7 +9,7 @@ import {
 	ZiskDocument,
 	ZiskSettings,
 } from '@/types/schema'
-import { getDatabaseClient } from './client'
+import { getDatabaseClient, initializeDatabaseClient } from './client'
 import { generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
 import { getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
@@ -202,4 +202,13 @@ export const updateSettings = async (settings: Partial<ZiskSettings>) => {
 			},
 		})
 	})
+}
+
+export const __purgeAllLocalDatabases = async () => {
+	const db = getDatabaseClient()
+	if (!db) {
+		return
+	}
+	await db.destroy()
+	initializeDatabaseClient()
 }

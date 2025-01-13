@@ -7,9 +7,14 @@ PouchDB.plugin(PouchDBFind)
 
 let db: PouchDB.Database | null = null
 
+export const initializeDatabaseClient = () => {
+	db = new PouchDB(POUCH_DB_NAME)
+	return  db
+}
+
 export const getDatabaseClient = () => {
 	if (!db) {
-		db = new PouchDB(POUCH_DB_NAME)
+		return initializeDatabaseClient()
 	}
 	return db
 }
