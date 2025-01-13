@@ -1,3 +1,5 @@
+import { SyncStatusEnum } from "@/contexts/RemoteContext"
+
 export const getPriceString = (price: number): string => {
 	const isNetPositive = price > 0
 	return isNetPositive ? `+$${Number(price).toFixed(2)}` : `$${Number(-price).toFixed(2)}`
@@ -39,3 +41,56 @@ export const formatFileSize = (bytes: number): string => {
 export const pluralize = (quantity: number, word: string, singularSuffix = '', pluralSuffix = 's') => {
 	return `${word}${quantity === 1 ? singularSuffix : pluralSuffix}`;
 };
+
+export const getSyncStatusTitles = (syncStatus: SyncStatusEnum) => {
+	switch (syncStatus) {
+		case SyncStatusEnum.CONNECTING_TO_REMOTE:
+			return {
+				syncStatusTitle: 'Connecting to remote...',
+				syncStatusDescription: 'Waiting to establish connection with remote database',
+			}
+		case SyncStatusEnum.FAILED_TO_CONNECT:
+			return {
+				syncStatusTitle: 'Failed to connect',
+				syncStatusDescription: 'Failed to establish connection with remote database',
+			}
+		case SyncStatusEnum.SAVING:
+			return {
+				syncStatusTitle: 'Syncing...',
+				syncStatusDescription: 'Pulling and pushing changes to remote database',
+			}
+		case SyncStatusEnum.SAVED_TO_REMOTE:
+			return {
+				syncStatusTitle: 'Saved to remote',
+				syncStatusDescription: 'Your changes have been saved to the remote database',
+			}
+		case SyncStatusEnum.WORKING_OFFLINE:
+			return {
+				syncStatusTitle: 'Working offline',
+				syncStatusDescription:
+					'Your device is currently offline. Changes will be synced when you are back online',
+			}
+		case SyncStatusEnum.SAVED_TO_THIS_DEVICE:
+			return {
+				syncStatusTitle: 'Saved to this device',
+				syncStatusDescription:
+					'Your changes have been saved locally, but need to be synced to the remote database',
+			}
+		case SyncStatusEnum.WORKING_LOCALLY:
+			return {
+				syncStatusTitle: 'Working locally',
+				syncStatusDescription: 'All changes will be maintained locally',
+			}
+		case SyncStatusEnum.FAILED_TO_SAVE:
+			return {
+				syncStatusTitle: 'Failed to save',
+				syncStatusDescription: 'Failed to save changes to the remote database',
+			}
+		case SyncStatusEnum.IDLE:
+		default:
+			return {
+				syncStatusTitle: 'Idle',
+				syncStatusDescription: 'No changes to sync',
+			}
+	}
+}

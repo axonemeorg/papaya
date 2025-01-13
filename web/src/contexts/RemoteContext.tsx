@@ -10,12 +10,21 @@ export enum SyncStatusEnum {
 	SAVED_TO_THIS_DEVICE = 'SAVED_TO_THIS_DEVICE',
 	FAILED_TO_SAVE = 'FAILED_TO_SAVE',
 	IDLE = 'IDLE',
+	INITIALIZING = 'INITIALIZING',
+}
+
+export enum SyncErrorEnum {
+	MISSING_USER_CONTEXT = 'MISSING_USER_CONTEXT',
+	MISSING_DATABASE = 'MISSING_DATABASE',
+	UNAUTHENTICATED = 'UNAUTHENTICATED',
+	MISSING_SERVER_URL_IN_CONFIG = 'MISSING_SERVER_URL_IN_CONFIG',
+	ZISK_CLOUD_DISABLED = 'ZISK_CLOUD_DISABLED',
 }
 
 export interface RemoteContext {
-	syncError: string | null
+	syncError: SyncErrorEnum | null
 	syncStatus: SyncStatusEnum
-	authenticationStatus: 'loading' | 'authenticated' | 'unauthenticated'
+	syncSupported: boolean
 	sync: () => Promise<void>
 }
 
