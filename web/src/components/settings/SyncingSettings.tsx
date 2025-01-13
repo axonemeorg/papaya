@@ -10,6 +10,7 @@ import { NotificationsContext } from "@/contexts/NotificationsContext"
 import { getServerDatabaseUrl } from "@/utils/server"
 import SyncWidget from "../widget/SyncWidget"
 import SwitchSyncStrategyModal from "../modal/SwitchSyncStrategyModal"
+import { __purgeAllLocalDatabases } from "@/database/actions"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 // const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
@@ -68,6 +69,14 @@ export default function SyncingSettings() {
             throw new Error('Disconnecting from Zisk Cloud is not implemented')
         }
         
+    }
+
+    const handleDeleteAllLocalData = async () => {
+        const confirmed = window.confirm('ALL local data will be permanently removed. Any data saved to a remote database will be kept.')
+        if (confirmed) {
+            // Erase all pouchdb Data
+            await __purgeAllLocalDatabases()
+        }
     }
 
     return (
@@ -159,6 +168,16 @@ export default function SyncingSettings() {
                             Change Syncing Strategy
                         </Button>
                     </Stack>
+                </section>
+                <section>
+                    <SettingsSectionHeader title='Danger Zone' />
+                    <Button
+                        color='error'
+                        variant='outlined'
+                        onClick={() => handleDeleteAllLocalData()}
+                    >
+                        Delete All Local Data
+                    </Button>
                 </section>
             </Stack>
         </>
