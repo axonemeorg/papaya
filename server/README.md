@@ -7,16 +7,17 @@
 Zisk Server is a web server for managing the syncing of a Zisk journal. Data replication is implemented by CouchDB.
 
 ## Why Zisk Server?
-By default, the Zisk app only stores your data locally on-device. Zisk Server is a self-managed server that makes it easier to maintain your own private instance of CouchDB.
+By default, the Zisk app only stores your data locally on-device using PouchDB - a JavaScript implementation of CouchDB. Zisk Server is a set self-managed services that makes it easier to maintain your own private instance of CouchDB.
 
 ### Remote Syncing Without Zisk Server
 If you want to remotely sync your Zisk journals without running an instance of Zisk Server, you can add add the URL of your own CouchDB instance to Zisk. To learn more, check out the docs for the Zisk app.
 
-## Services
+## Service Architecture
 Zisk Server runs using Docker Compose and maintains the following services:
 
- - **CouchDB**: used for storing your data. Users and authentication are managed using CouchDB. Couch-per-user is disabled, and databases are managed by the API container.
- - **Nginx**: used to proxy connections to CouchDB. It also hosts a Symfony API for creating users and databases within CouchDB. Externally, requests made to /database/* get proxied to the CouchDB container (minus the /database prefix), and requests made to /api/* get proxied to the Symfony API (minus the /api predix).
+ - **CouchDB**: used for storing your data. Users, Zisk Journals, and authentication are all managed using CouchDB.
+ - **Node**: a Node.js server, used for communicating with the serrver.
+ - **Nginx**: used to proxy connections to CouchDB and Node. Externally, requests made to /database/* get proxied to the CouchDB container (minus the /database prefix), and requests made to /api/* get proxied to the Node container.
 
 ## Setup Pre-requisites
 1. You need Docker and `docker-compose`.
