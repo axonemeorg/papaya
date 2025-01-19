@@ -1,15 +1,5 @@
+import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard";
 import { useEffect } from "react"
-
-export enum KeyboardActionName {
-    CREATE_JOURNAL_ENTRY = 'CREATE_JOURNAL_ENTRY',  
-    OPEN_SEARCH_MODAL = 'OPEN_SEARCH_MODAL',
-}
-
-export const KEYBOARD_ACTIONS: Record<KeyboardActionName, string[]> = {
-    CREATE_JOURNAL_ENTRY: ['c'],
-    OPEN_SEARCH_MODAL: ['/'],
-}
-
 
 export default function useKeyboardActions(name: KeyboardActionName, action: () => void): void {
     useEffect(() => {
@@ -33,6 +23,8 @@ export default function useKeyboardActions(name: KeyboardActionName, action: () 
 
             if (activated) {
 				action()
+                event.stopPropagation();
+				event.preventDefault();
 			}
 		};
 	

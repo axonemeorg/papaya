@@ -1,18 +1,17 @@
 import { alpha, Chip } from "@mui/material"
+import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard"
 
 interface KeyboardShortcutProps {
-    ctrl?: boolean
-    alt?: boolean
-    shift?: boolean
-    letter: string
+    name: KeyboardActionName
 }
 
 export default function KeyboardShortcut(props: KeyboardShortcutProps) {
-    const keystroke = [
-        props.ctrl ? 'Ctrl' : '',
-        props.alt ? 'Alt' : '',
-        props.shift ? 'Shift' : '',
-        props.letter,
+    const keystroke = KEYBOARD_ACTIONS[props.name]
+    const keystrokeLabel = [
+        keystroke.ctrl ? 'Ctrl' : '',
+        keystroke.alt ? 'Alt' : '',
+        keystroke.shift ? 'Shift' : '',
+        keystroke.symbol,
     ].filter(Boolean).join('+')
 
     return (
@@ -33,7 +32,7 @@ export default function KeyboardShortcut(props: KeyboardShortcutProps) {
                     p: '0 !important',
                 }
             })}
-            label={keystroke}
+            label={keystrokeLabel}
         />
     )
 }
