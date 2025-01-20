@@ -19,7 +19,7 @@ export default function useKeyboardActions(name: KeyboardActionName, action: () 
             }
             
             const keystroke = KEYBOARD_ACTIONS[name]
-			if (keystroke.ctrlCnd) {
+			if (keystroke.ctrlCmd) {
 				if (macOs && !event.metaKey) {
 					return
 				} else if (!event.ctrlKey) {

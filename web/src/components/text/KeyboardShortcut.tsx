@@ -8,8 +8,8 @@ interface KeyboardShortcutProps {
 export default function KeyboardShortcut(props: KeyboardShortcutProps) {
     const keystroke = KEYBOARD_ACTIONS[props.name]
     const keystrokeLabel = [
-        keystroke.ctrl ? 'Ctrl' : '',
-        keystroke.alt ? 'Alt' : '',
+        keystroke.ctrlCmd ? 'Ctrl' : '',
+        keystroke.altOpt ? 'Alt' : '',
         keystroke.shift ? 'Shift' : '',
         keystroke.symbol,
     ].filter(Boolean).join('+')
