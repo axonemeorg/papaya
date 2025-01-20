@@ -4,8 +4,8 @@ export enum KeyboardActionName {
 }
 
 export interface Keystroke {
-    ctrl?: boolean
-    alt?: boolean
+    ctrlCnd?: boolean
+    altOpt?: boolean
     shift?: boolean
     symbol: string
 }
