@@ -1,4 +1,5 @@
 import KeyboardShortcut from '@/components/text/KeyboardShortcut'
+import { KeyboardActionName } from '@/constants/keyboard'
 import { Search } from '@mui/icons-material'
 import { Button, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 
@@ -35,7 +36,7 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
             >
 				<Typography sx={{ userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'space-between', flex: 1 }}>
 					{placeholderText}
-					<KeyboardShortcut letter="/" />
+					<KeyboardShortcut name={KeyboardActionName.OPEN_SEARCH_MODAL} />
 				</Typography>
 			</Button>
 		)

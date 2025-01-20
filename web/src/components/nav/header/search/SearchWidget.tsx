@@ -1,32 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import SearchModal from './SearchModal'
 import SearchLaunchButton from './SearchLaunchButton'
+import useKeyboardActions from '@/hooks/useKeyboardActions'
+import { KeyboardActionName } from '@/constants/keyboard'
 
 export default function SearchWidget() {
 	const [showSearchModal, setShowSearchModal] = useState<boolean>(false)
 
-	useEffect(() => {
-		// Add event listener to open search when user presses '/' key
-		const handleKeyDown = (event: KeyboardEvent) => {
-			const activeElement = document.activeElement as HTMLElement;
-	
-			// Check if the focused element is an input, textarea, or contenteditable
-			const isEditable =
-				activeElement.tagName === 'INPUT' ||
-				activeElement.tagName === 'TEXTAREA' ||
-				activeElement.isContentEditable;
-	
-			if (!isEditable && event.key === '/') {
-				setShowSearchModal(true);
-				event.stopPropagation();
-				event.preventDefault();
-			}
-		};
-	
-		document.addEventListener('keydown', handleKeyDown);
-		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [setShowSearchModal]); // Added dependency
-	
+	useKeyboardActions(KeyboardActionName.OPEN_SEARCH_MODAL, () => {
+		setShowSearchModal(true);
+	})
 
 	return (
 		<>
