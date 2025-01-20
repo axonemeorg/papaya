@@ -20,6 +20,8 @@ import { useRouter } from 'next/router'
 import React, { ReactNode, useContext, useEffect } from 'react'
 import AppLogo from '../header/AppLogo'
 import { JournalContext } from '@/contexts/JournalContext'
+import useKeyboardActions from '@/hooks/useKeyboardActions'
+import { KeyboardActionName } from '@/constants/keyboard'
 
 interface AppMenuProps {
 	view: 'desktop' | 'mobile'
@@ -34,28 +36,9 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 		journalContext.createJournalEntry()
 	}
 
-	useEffect(() => {
-		// Add event listener to open search when user presses 'c' key
-		const handleKeyDown = (event: KeyboardEvent) => {
-			const activeElement = document.activeElement as HTMLElement;
-	
-			// Check if the focused element is an input, textarea, or contenteditable
-			const isEditable =
-				activeElement.tagName === 'INPUT' ||
-				activeElement.tagName === 'TEXTAREA' ||
-				activeElement.isContentEditable;
-	
-			if (!isEditable && event.key === 'c') {
-				handleCreateEntry();
-				event.stopPropagation();
-				event.preventDefault();
-			}
-		};
-	
-		document.addEventListener('keydown', handleKeyDown);
-		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [handleCreateEntry]);
-	
+	useKeyboardActions(KeyboardActionName.CREATE_JOURNAL_ENTRY, () => {
+		handleCreateEntry();
+	})
 
 	const journalContext = useContext(JournalContext)
 	if (props.view === 'mobile') {

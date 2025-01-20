@@ -16,7 +16,7 @@ export default function useKeyboardActions(name: KeyboardActionName, action: () 
                 return
             }
             
-            const keystrokes = KEYBOARD_ACTIONS[name]
+            const _keystrokes = KEYBOARD_ACTIONS[name]
 
             // TODO check if keystroke is activated
             const activated = false

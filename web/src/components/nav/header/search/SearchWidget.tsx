@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import SearchModal from './SearchModal'
 import SearchLaunchButton from './SearchLaunchButton'
 import useKeyboardActions from '@/hooks/useKeyboardActions'
