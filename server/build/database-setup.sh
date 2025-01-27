@@ -4,7 +4,6 @@ set -e
 
 CONFIG_MARKER="/opt/couchdb/etc/local.d/setup_completed"
 
-# Run setup only if the marker file does not exist
 if [[ ! -f "$CONFIG_MARKER" ]]; then
   echo "Running initial setup for CouchDB."
 
@@ -28,8 +27,8 @@ EOF
 
   echo "CouchDB configured with JWT secret."
 
-  # Create a marker file to indicate setup is complete
+  # Create marker file to indicate setup is complete
   touch "$CONFIG_MARKER"
 else
-  echo "Setup has already been completed. Skipping initial configuration."
+  echo "Setup already completed. Skipping."
 fi
