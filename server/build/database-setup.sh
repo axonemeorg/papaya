@@ -8,8 +8,8 @@ if [[ ! -f "$CONFIG_MARKER" ]]; then
   echo "Running initial setup for CouchDB."
 
   # Ensure required environment variables are present
-  if [[ -z "$AUTH_ACCESS_TOKEN_SECRET" || -z "$AUTH_ACCESS_TOKEN_HMAC_KID" ]]; then
-    echo "Environment variables AUTH_ACCESS_TOKEN_SECRET and AUTH_ACCESS_TOKEN_HMAC_KID must be set."
+  if [[ -z "$AUTH_ACCESS_TOKEN_SECRET" || -z "$AUTH_ACCESS_TOKEN_HMAC_KID" || -z "$ZISK_COUCHDB_ADMIN_USER" || -z "$ZISK_COUCHDB_ADMIN_PASS" ]]; then
+    echo "Environment variables AUTH_ACCESS_TOKEN_SECRET, AUTH_ACCESS_TOKEN_HMAC_KID, ZISK_COUCHDB_ADMIN_USER, and ZISK_COUCHDB_ADMIN_PASS must be set."
     exit 1
   fi
 
@@ -23,9 +23,12 @@ if [[ ! -f "$CONFIG_MARKER" ]]; then
 
 [jwt_keys]
 hmac:$AUTH_ACCESS_TOKEN_HMAC_KID = $ENCODED_SECRET
+
+[admins]
+$ZISK_COUCHDB_ADMIN_USER = $ZISK_COUCHDB_ADMIN_PASS
 EOF
 
-  echo "CouchDB configured with JWT secret."
+  echo "CouchDB configured with JWT secret and admin credentials."
 
   # Create marker file to indicate setup is complete
   touch "$CONFIG_MARKER"
