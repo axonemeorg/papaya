@@ -52,19 +52,14 @@ export default function SyncingSettings() {
             } catch {
                 //
             }
-            if (response?.ok) {
-                // Successfully signed out. Remove server from settings
-                ziskContext.updateSettings({
-                    server: {
-                        serverType: 'NONE',
-                    },
-                    syncingStrategy: {
-                        strategyType: 'LOCAL',
-                    }
-                })
-            } else {
-                snackbar({ message: 'Failed to sign out.'})
-            }
+            ziskContext.updateSettings({
+                server: {
+                    serverType: 'NONE',
+                },
+                syncingStrategy: {
+                    strategyType: 'LOCAL',
+                }
+            })
         } else {
             throw new Error('Disconnecting from Zisk Cloud is not implemented')
         }
