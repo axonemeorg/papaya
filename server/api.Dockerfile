@@ -1,19 +1,23 @@
-FROM node:23-alpine
+# Use the official Node.js image as the base image
+FROM node:18
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json for dependency installation
-COPY api/package.json .
+# Copy package.json, package-lock.json, and tsconfig.json to the container
+COPY package*.json tsconfig.json ./
 
-# Install only production dependencies
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application
-COPY api/ .
+# Copy the entire source code to the container
+COPY . .
 
-# Expose the port
+# Build the TypeScript code
+RUN npm run build
+
+# Expose the port the app runs on
 EXPOSE 9000
 
-# Start the application
-CMD ["node", "src/server.js"]
+# Command to run the app (run the compiled JavaScript output)
+CMD ["node", "dist/server.js"]
