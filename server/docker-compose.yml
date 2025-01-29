@@ -25,6 +25,8 @@ services:
     environment:
       - SERVER_NAME=${ZISK_SERVER_NAME}
       - PORT=9000
+    ports:
+      - 9000:9000
 
   proxy:
     build:
