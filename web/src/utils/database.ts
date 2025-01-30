@@ -34,3 +34,54 @@ export const dbNameToUsername = (prefixedHexName: string) => {
 export const usernameToDbName = (name: string) => {
 	return 'userdb-' + Buffer.from(name).toString('hex');
 }
+
+export const getUrlPartsFromCouchDbConnectionString = (couchDbConnectionString: string) => {
+    try {
+        const parsedUrl = new URL(couchDbConnectionString);
+
+        const protocol = parsedUrl.protocol // includes ':' at the end
+        const user = parsedUrl.username || null
+    	const password = parsedUrl.password || null
+        const hostname = parsedUrl.hostname
+        const port = parsedUrl.port || null
+        const database = parsedUrl.pathname.replace(/^\//, '') || null
+        
+		return {
+			url: `${protocol}//${hostname}:${port}/${database}`,
+			user,
+			password,
+		}
+
+    } catch (_error: any) {
+        throw new Error("Invalid CouchDB connection string");
+    }
+}
+
+export const getBasicAuthHeader = (username: string, password: string) => {
+
+	const hash = `${username}:${password}`
+	return `Basic ${btoa(hash)}`
+}
+
+export const testCouchDbConnection = async (couchDbConnectionString: string): Promise<boolean> => {
+	const { url, user, password } = getUrlPartsFromCouchDbConnectionString(couchDbConnectionString)
+
+	if (!user || !password || !url) {
+		return false
+	}
+
+	let response;
+	try {
+		response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				'Authorization': getBasicAuthHeader(user, password),
+				'Content-Type': 'application/json'
+			}
+		})
+	} catch {
+		return false
+	}
+
+	return Boolean(response?.ok)
+}
