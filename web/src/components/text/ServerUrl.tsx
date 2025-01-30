@@ -14,7 +14,10 @@ export const ServerUrl = (props: { serverUrl: string }) => {
                 input: {
                     endAdornment: (
                         <IconButton size="small" onClick={() => {
-                            navigator.clipboard.writeText(props.serverUrl)
+                            if (typeof window === 'undefined') {
+                                return
+                            }
+                            window?.navigator?.clipboard.writeText(props.serverUrl)
                         }}>
                             <FileCopy />
                         </IconButton>

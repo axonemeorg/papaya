@@ -32,7 +32,10 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 
 	const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.preventDefault() // Prevent the default anchor tag behavior
-		navigator.clipboard
+		if (typeof window === 'undefined') {
+			return
+		}
+		window?.navigator?.clipboard
 			.writeText(entryNumberString)
 			.then(() => {
 				snackbar({ message: 'Copied to clipboard.' })
