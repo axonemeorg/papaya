@@ -7,6 +7,7 @@ import { ZiskContext } from "@/contexts/ZiskContext";
 import { ZiskSettings } from "@/types/schema";
 import { LoadingButton } from "@mui/lab";
 import { isValidUrl } from "@/utils/server";
+import { testCouchDbConnection } from "@/utils/database";
 
 type SyncStrategyType = 'LOCAL' | 'CUSTOM_SERVER_OR_ZISK_CLOUD' | 'COUCH_DB'
 
@@ -33,18 +34,13 @@ export default function SwitchSyncStrategyModal(props: SwitchSyncStrategyModalPr
         if (strategy === 'COUCH_DB') {
             // Test the CouchDB connection before switching
             setLoading(true)
-            let response
-            try {
-                response = await fetch(couchDbUrl)
-            } catch {
-                //
-            }
             
-            if (!response?.ok) {
+            if (!(await testCouchDbConnection(couchDbUrl))) {
                 setLoading(false)
                 setCouchDbError(true)
                 return
             }
+
             await ziskContext.updateSettings({
                 syncingStrategy: {
                     strategyType: 'COUCH_DB',
