@@ -25,16 +25,14 @@ export default function EntryTasksForm() {
         const newTask = makeEntryTask({}, journalId)
 
 		if (tasks) {
-			entryTasksFieldArray.prepend(newTask)
+			entryTasksFieldArray.append(newTask)
 		} else {
 			setValue('tasks', [newTask])
 		}
 	}
 
-    const handleDeleteTask = (taskId: string, index: number) => {
-        // const indices = artifactIds.map((artifactId) => entryTasksFieldArray.fields.findIndex((entry) => entry._id === artifactId))
-        // entryTasksFieldArray.remove(indices)
-        // setSelectedRows(selectedRows.filter((id) => !artifactIds.includes(id)))
+    const handleDeleteTask = (index: number) => {
+        entryTasksFieldArray.remove(index)
     }
 
     const handleToggleCompleted = (taskId: string) => {
@@ -56,7 +54,7 @@ export default function EntryTasksForm() {
                 {entryTasksFieldArray.fields.map((task, index) => {
 
                     return (
-                        <Stack direction='row' spacing={0} alignItems={'flex-start'} sx={{ width: '100%' }} key={task._id}>
+                        <Stack direction='row' spacing={0} alignItems={'center'} sx={{ width: '100%' }} key={task._id}>
                             <Checkbox
                                 checked={Boolean(task.completedAt)}
                                 onChange={() => handleToggleCompleted(task._id)}
@@ -68,22 +66,35 @@ export default function EntryTasksForm() {
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
-                                        onChange={(event) => {
-                                            console.log('event.target.value:', event.target.value)
-                                            console.log('field.value:', field.value)
-                                            if (!event.target.value && !field.value) {
-                                                alert('delete me')
+                                        variant='standard'
+                                        size='small'
+                                        autoFocus
+
+                                        // onChange={(event) => {
+                                        //     console.log('event.target.value:', event.target.value)
+                                        //     console.log('field.value:', field.value)
+                                        //     if (!event.target.value && !field.value) {
+                                        //         alert('delete me')
+                                        //     }
+                                        //     field.onChange(event)
+                                        // }}
+
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault()
+                                                handleAddTask()
+                                            } else if (event.key === 'Backspace' && !field.value) {
+                                                event.preventDefault()
+                                                handleDeleteTask(index)
                                             }
-                                            field.onChange(event)
                                         }}
-                                        label='Description'
                                         fullWidth
                                     />
                                 )}
                             />
                             <Stack direction={'row'} spacing={-1} alignItems={'center'}>
                                 <Tooltip title='Delete'>
-                                    <IconButton onClick={() => handleDeleteTask(task._id, index)}>
+                                    <IconButton onClick={() => handleDeleteTask(index)}>
                                         <Delete />
                                     </IconButton>
                                 </Tooltip>
