@@ -1,8 +1,8 @@
-import { Button, Checkbox, Grid2 as Grid, IconButton, Link, Stack, TextField, Tooltip, Typography } from "@mui/material"
-import { Add, Delete } from "@mui/icons-material"
+import { Button, Checkbox, IconButton, InputBase, Link, Stack, Tooltip, Typography } from "@mui/material"
+import { Add, CheckCircle, Delete, RadioButtonUnchecked } from "@mui/icons-material"
 import { JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
-import { useContext } from "react"
+import { useContext, useMemo } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeEntryTask } from "@/utils/journal"
 
@@ -15,6 +15,9 @@ export default function EntryTasksForm() {
 		control,
 		name: 'tasks',
 	})
+
+    const activeTasks = useMemo(() => tasks?.filter(task => !task.completedAt), [tasks])
+    const completedTasks = useMemo(() => tasks?.filter(task => task.completedAt), [tasks])
 
     const handleAddTask = async () => {
 		if (!journalContext.journal) {
@@ -35,10 +38,6 @@ export default function EntryTasksForm() {
         entryTasksFieldArray.remove(index)
     }
 
-    const handleToggleCompleted = (taskId: string) => {
-        //
-    }
-
     return (
         <>
             <Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2} mx={-2} px={2}>
@@ -50,35 +49,42 @@ export default function EntryTasksForm() {
                     No tasks. <Link onClick={() => handleAddTask()}>Click to add one.</Link>
                 </Typography>
             )}
-            <Stack mt={2} mx={-1} spacing={1}>
+            <Stack mt={2} mx={-1} gap={0}>
                 {entryTasksFieldArray.fields.map((task, index) => {
 
                     return (
                         <Stack direction='row' spacing={0} alignItems={'center'} sx={{ width: '100%' }} key={task._id}>
-                            <Checkbox
-                                checked={Boolean(task.completedAt)}
-                                onChange={() => handleToggleCompleted(task._id)}
+                            <Controller
+                                control={control}
+                                name={`tasks.${index}.completedAt`}
+                                render={({ field }) => {
+                                    return (
+                                        <Checkbox
+                                            checked={Boolean(field.value)}
+                                            onChange={(event) => {
+                                                setValue(`tasks.${index}.completedAt`, !event.target.checked ? null : new Date().toISOString())
+                                            }}
+                                            icon={<RadioButtonUnchecked />}
+                                            checkedIcon={<CheckCircle />}
+                                        />
+                                    )
+                                }}
                             />
                             <Controller
-                                key={task._id}
                                 control={control}
                                 name={`tasks.${index}.description`}
                                 render={({ field }) => (
-                                    <TextField
+                                    <InputBase
                                         {...field}
-                                        variant='standard'
+                                        // variant='standard'
                                         size='small'
                                         autoFocus
-
-                                        // onChange={(event) => {
-                                        //     console.log('event.target.value:', event.target.value)
-                                        //     console.log('field.value:', field.value)
-                                        //     if (!event.target.value && !field.value) {
-                                        //         alert('delete me')
-                                        //     }
-                                        //     field.onChange(event)
-                                        // }}
-
+                                        fullWidth
+                                        slotProps={{
+                                            input: {
+                                                sx: { padding: 0 }
+                                            }
+                                        }}
                                         onKeyDown={(event) => {
                                             if (event.key === 'Enter') {
                                                 event.preventDefault()
@@ -88,7 +94,6 @@ export default function EntryTasksForm() {
                                                 handleDeleteTask(index)
                                             }
                                         }}
-                                        fullWidth
                                     />
                                 )}
                             />
