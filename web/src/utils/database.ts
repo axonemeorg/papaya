@@ -46,8 +46,9 @@ export const getUrlPartsFromCouchDbConnectionString = (couchDbConnectionString: 
         const port = parsedUrl.port || null
         const database = parsedUrl.pathname.replace(/^\//, '') || null
         
+		const portString = `:${port}`
 		return {
-			url: `${protocol}//${hostname}:${port}/${database}`,
+			url: `${protocol}//${hostname}${port ? portString : ''}/${database}`,
 			user,
 			password,
 		}
@@ -65,8 +66,10 @@ export const getBasicAuthHeader = (username: string, password: string) => {
 
 export const testCouchDbConnection = async (couchDbConnectionString: string): Promise<boolean> => {
 	const { url, user, password } = getUrlPartsFromCouchDbConnectionString(couchDbConnectionString)
+	console.log({ url, user, password })
 
 	if (!user || !password || !url) {
+		console.log('invalid input')
 		return false
 	}
 

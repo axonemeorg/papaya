@@ -6,7 +6,6 @@ import { ZiskContext } from "@/contexts/ZiskContext"
 import { LeakAdd, LeakRemove, Shuffle } from "@mui/icons-material"
 import JoinServerModal from "../modal/JoinServerModal"
 import ServerWidget from "../widget/ServerWidget"
-import { NotificationsContext } from "@/contexts/NotificationsContext"
 import { getServerDatabaseUrl } from "@/utils/server"
 import SyncWidget from "../widget/SyncWidget"
 import SwitchSyncStrategyModal from "../modal/SwitchSyncStrategyModal"
@@ -20,7 +19,7 @@ export default function SyncingSettings() {
     const [showChangeSyncStrategyModal, setShowChangeSyncStrategyModal] = useState<boolean>(false)
 
     const ziskContext = useContext(ZiskContext)
-    const { snackbar } = useContext(NotificationsContext)
+    // const { snackbar } = useContext(NotificationsContext)
 
     if (!ziskContext.data) {
         return (
@@ -42,29 +41,23 @@ export default function SyncingSettings() {
 
         if (ziskServer.serverType === 'CUSTOM') {
             const databaseUrl = getServerDatabaseUrl(ziskServer.serverUrl)
-            let response
 
             try {
-                response = await fetch(`${databaseUrl}/_session`, {
+                await fetch(`${databaseUrl}/_session`, {
                     method: 'DELETE',
                     credentials: 'include', // Ensure cookies are sent with the request
                 });
             } catch {
                 //
             }
-            if (response?.ok) {
-                // Successfully signed out. Remove server from settings
-                ziskContext.updateSettings({
-                    server: {
-                        serverType: 'NONE',
-                    },
-                    syncingStrategy: {
-                        strategyType: 'LOCAL',
-                    }
-                })
-            } else {
-                snackbar({ message: 'Failed to sign out.'})
-            }
+            ziskContext.updateSettings({
+                server: {
+                    serverType: 'NONE',
+                },
+                syncingStrategy: {
+                    strategyType: 'LOCAL',
+                }
+            })
         } else {
             throw new Error('Disconnecting from Zisk Cloud is not implemented')
         }
