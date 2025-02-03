@@ -1,5 +1,10 @@
 const dotenv = require('dotenv');
 const dotenvExpand = require('dotenv-expand');
+const { execSync } = require("child_process");
+
+function getCommitHash() {
+  return execSync("git rev-parse HEAD").toString().trim();
+}
 
 const env = dotenv.config({ path: '../.env' });
 dotenvExpand.expand(env);
@@ -18,7 +23,10 @@ const nextConfig = {
   },
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],
-  }
+  },
+  env: {
+    NEXT_PUBLIC_COMMIT_HASH: getCommitHash(),
+  },
 };
 
 module.exports = nextConfig;
