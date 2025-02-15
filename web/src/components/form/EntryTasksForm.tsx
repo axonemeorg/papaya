@@ -50,11 +50,11 @@ export default function EntryTasksForm() {
                                 <Controller
                                     control={control}
                                     name={`tasks.${index}.completedAt`}
-                                    render={({ field }) => (
+                                    render={({ field: { value, onChange } }) => (
                                         <Checkbox
-                                            checked={Boolean(field.value)}
+                                            checked={Boolean(value)}
                                             onChange={(event) => {
-                                                field.onChange(!event.target.checked ? null : new Date().toISOString())
+                                                onChange(event.target.checked ? new Date().toISOString() : null)
                                             }}
                                             icon={<RadioButtonUnchecked />}
                                             checkedIcon={<CheckCircle />}
@@ -64,13 +64,17 @@ export default function EntryTasksForm() {
                                 <Controller
                                     control={control}
                                     name={`tasks.${index}.description`}
-                                    render={({ field }) => (
+                                    render={({ field: { value, onChange, ...rest } }) => (
                                         <InputBase
-                                            {...field}
+                                            value={value}
+                                            onChange={onChange}
+                                            {...rest}
                                             placeholder='Task...'
                                             size='small'
                                             fullWidth
-                                            sx={{ textDecoration: task.completedAt ? 'line-through' : 'none' }}
+                                            sx={{ 
+                                                textDecoration: tasks?.[index]?.completedAt ? 'line-through' : 'none'
+                                            }}
                                         />
                                     )}
                                 />
