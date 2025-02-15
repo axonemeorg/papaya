@@ -76,6 +76,16 @@ export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 
 export type EntryArtifact = z.output<typeof EntryArtifact>
 
+export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
+	z.object({
+		type: z.literal('ENTRY_TASK'),
+		description: z.string(),
+		completedAt: z.string().nullable(),
+	})
+)
+
+export type EntryTask = z.output<typeof EntryTask>
+
 export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
 	z.object({
 		type: z.literal('JOURNAL_ENTRY'),
@@ -84,6 +94,7 @@ export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(A
 		categoryIds: z.array(z.string()).optional(),
 		date: z.string().optional(),
 		notes: z.string().optional(),
+		tasks: z.array(EntryTask).optional(),
 		artifacts: z.array(EntryArtifact).optional(),
 		paymentMethodId: z.string().nullable().optional(),
 		relatedEntryIds: z.array(z.string()).optional(),

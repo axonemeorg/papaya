@@ -20,6 +20,10 @@ export const generateArtifactId = () => {
 	return `U${nanoid()}`
 }
 
+export const generateTaskId = () => {
+	return `U${nanoid()}`
+}
+
 export const generateJournalId = () => {
 	return `U${nanoid()}`
 }

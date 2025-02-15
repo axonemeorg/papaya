@@ -17,7 +17,7 @@ export default function EntryArtifactsForm() {
 	const promptForFiles = useFilePrompt()
     
     const { setValue, control } = useFormContext<JournalEntry>()
-    const artifacts = useWatch({ control, name: 'artifacts' }) ?? []
+    const artifacts = useWatch({ control, name: 'artifacts' })
     const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const entryArtifactsFieldArray = useFieldArray({
 		control,
@@ -119,10 +119,10 @@ export default function EntryArtifactsForm() {
                 }}
             />
             <Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2} mx={-2} px={2} ref={selectionMenuAnchorRef}>
-                <Typography>Attachments ({artifacts.length})</Typography>
+                <Typography>Attachments ({artifacts?.length ?? 0})</Typography>
                 <Button onClick={() => handleAddArtifact()} startIcon={<Add />}>Add Attachment</Button>
             </Stack>
-            {artifacts.length === 0 && (
+            {!artifacts?.length && (
                 <Typography variant='body2' color='textSecondary'>
                     No attachments. <Link onClick={() => handleAddArtifact()}>Click to add one.</Link>
                 </Typography>

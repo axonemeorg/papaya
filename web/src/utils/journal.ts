@@ -2,11 +2,12 @@ import {
 	Category,
 	ChildJournalEntry,
 	EntryArtifact,
+	EntryTask,
 	ReservedTagKey,
 	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
-import { generateArtifactId, generateJournalEntryId } from './id'
+import { generateJournalEntryId, generateTaskId } from './id'
 import dayjs from 'dayjs'
 import { RESERVED_TAGS } from '@/constants/tags'
 
@@ -88,10 +89,7 @@ export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: s
 	const now = new Date().toISOString()
 
 	const entryArtifact: EntryArtifact = {
-		_id: formData._id ?? generateArtifactId(),
-		_attachments: {
-			...formData._attachments,
-		},
+		_id: formData._id ?? generateTaskId(),
 		type: 'ENTRY_ARTIFACT',
 		originalFileName: formData.originalFileName ?? '',
     	contentType: formData.contentType ?? '',
@@ -101,6 +99,20 @@ export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: s
 	}
 
 	return entryArtifact
+}
+
+export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): EntryTask => {
+	// const now = new Date().toISOString()
+
+	const newTask: EntryTask = {
+		_id: formData._id ?? generateTaskId(),
+		type: 'ENTRY_TASK',
+		description: formData.description ?? '',
+		completedAt: formData.completedAt ?? null,
+		journalId,
+	}
+
+	return newTask
 }
 
 export const journalEntryHasTags = (entry: JournalEntry): boolean => {
