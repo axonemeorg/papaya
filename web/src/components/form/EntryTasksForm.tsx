@@ -1,5 +1,5 @@
 import { Button, Checkbox, IconButton, InputBase, Link, Stack, Tooltip, Typography } from "@mui/material"
-import { Add, CheckCircle, Delete, RadioButtonUnchecked } from "@mui/icons-material"
+import { Add, AddTask, CheckCircle, Delete, RadioButtonUnchecked } from "@mui/icons-material"
 import { EntryTask, JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { useContext } from "react"
@@ -32,18 +32,39 @@ export default function EntryTasksForm() {
 	}
 
     return (
-        <>
-            <Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={2} mx={-2} px={2}>
-                <Typography>Tasks ({tasks?.length ?? 0})</Typography>
-                <Button onClick={() => handleAddTask()} startIcon={<Add />}>Add Task</Button>
-            </Stack>
-            {!tasks?.length && (
-                <Typography variant='body2' color='textSecondary'>
-                    No tasks. <Link onClick={() => handleAddTask()}>Click to add one.</Link>
+        <Stack gap={0.5}>
+            <Button
+                component='a'
+                onClick={() => handleAddTask()}
+                sx={(theme) => ({
+                    mx: -1,
+                    mt: -2,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    textAlign: 'left',
+                    color: 'inherit',
+                    '&:hover, &:focus, &:focus-within, &.--open': {
+                        color: theme.palette.primary.main
+                    },
+                    background: 'none',
+                })}
+                disableRipple
+                tabIndex={-1}
+            >
+                <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Tags</Typography>
+                <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
+                    <AddTask />
+                </IconButton>
+            </Button>
+            {entryTasksFieldArray.fields.length === 0 ? (
+                <Typography sx={{ mt: -1 }} variant='body2' color='textSecondary'>
+                    <span>No tags — </span>
+                    <Link onClick={() => handleAddTask()}>Add one</Link>
                 </Typography>
-            )}
-            {entryTasksFieldArray.fields.length > 0 && (
-                <Stack mt={0} mx={-1} gap={0}>
+            ) : (
+                <Stack mt={0} ml={-1} mr={1} gap={0}>
                     {entryTasksFieldArray.fields.map((task, index) => {{
                         return (
                             <Stack direction='row' spacing={0} alignItems={'center'} sx={{ width: '100%' }} key={task._id}>
@@ -78,16 +99,17 @@ export default function EntryTasksForm() {
                                         />
                                     )}
                                 />
-                                <Tooltip title='Delete'>
+                                {/* <Tooltip title='Delete'>
                                     <IconButton onClick={() => entryTasksFieldArray.remove(index)}>
                                         <Delete />
                                     </IconButton>
-                                </Tooltip>
+                                </Tooltip> */}
                             </Stack>
                         )
                     }})}
                 </Stack>
             )}
-        </>
+                
+        </Stack>
     )
 }
