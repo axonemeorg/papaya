@@ -113,7 +113,6 @@ export default function JournalEntryForm() {
 							</Grid>
 						</Grid>					
 						<ChildJournalEntryForm />
-						<EntryTasksForm />
 						<EntryArtifactsForm />
 					</Grid>
 					<Grid size={5}>
@@ -149,6 +148,8 @@ export default function JournalEntryForm() {
 									)
 								}}
 							/>
+							<Divider flexItem />
+							<EntryTasksForm />
 							<Divider flexItem />
 							<EntryNoteForm />
 						</Stack>
