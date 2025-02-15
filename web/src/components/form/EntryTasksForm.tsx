@@ -1,35 +1,74 @@
-import { Button, Checkbox, IconButton, InputBase, Link, Stack, Tooltip, Typography } from "@mui/material"
-import { Add, AddTask, CheckCircle, Delete, RadioButtonUnchecked } from "@mui/icons-material"
+import { Button, Checkbox, IconButton, InputBase, Link, Stack, Typography } from "@mui/material"
+import { AddTask, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material"
 import { EntryTask, JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
-import { useContext } from "react"
+import { useContext, useRef } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeEntryTask } from "@/utils/journal"
 
 export default function EntryTasksForm() {
     const journalContext = useContext(JournalContext)
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
     const { setValue, control } = useFormContext<JournalEntry>()
     const tasks: EntryTask[] | undefined = useWatch({ control, name: 'tasks' })
-	const entryTasksFieldArray = useFieldArray({
-		control,
-		name: 'tasks',
-	})
+    const entryTasksFieldArray = useFieldArray({
+        control,
+        name: 'tasks',
+    })
 
-    const handleAddTask = async () => {
-		if (!journalContext.journal) {
-			return
-		}
+    const handleAddTask = async (focusInput = true) => {
+        if (!journalContext.journal) {
+            return
+        }
         
         const journalId = journalContext.journal._id
         const newTask = makeEntryTask({}, journalId)
+        const newIndex = tasks ? tasks.length : 0
 
-		if (tasks) {
-			entryTasksFieldArray.append(newTask)
-		} else {
-			setValue('tasks', [newTask])
-		}
-	}
+        if (tasks) {
+            entryTasksFieldArray.append(newTask)
+        } else {
+            setValue('tasks', [newTask])
+        }
+
+        // Focus the new input after a short delay to ensure the element is rendered
+        if (focusInput) {
+            setTimeout(() => {
+                inputRefs.current[newIndex]?.focus()
+            }, 0)
+        }
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        const input = event.currentTarget
+        const isLastRow = index === (tasks?.length ?? 0) - 1
+        
+        if (input.value === '') {
+            if (event.key === 'Backspace' || (event.key === 'Delete' && !isLastRow)) {
+                event.preventDefault()
+                entryTasksFieldArray.remove(index)
+                
+                // Focus the previous input if it exists
+                setTimeout(() => {
+                    if (index > 0) {
+                        inputRefs.current[index - 1]?.focus()
+                    }
+                }, 0)
+            }
+        }
+        
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            const currentIndex = index
+            handleAddTask(false)
+            
+            // Focus the new input after it's created
+            setTimeout(() => {
+                inputRefs.current[currentIndex + 1]?.focus()
+            }, 0)
+        }
+    }
 
     return (
         <Stack gap={0.5}>
@@ -64,52 +103,46 @@ export default function EntryTasksForm() {
                     <Link onClick={() => handleAddTask()}>Add one</Link>
                 </Typography>
             ) : (
-                <Stack mt={0} ml={-1} mr={1} gap={0}>
-                    {entryTasksFieldArray.fields.map((task, index) => {{
-                        return (
-                            <Stack direction='row' spacing={0} alignItems={'center'} sx={{ width: '100%' }} key={task._id}>
-                                <Controller
-                                    control={control}
-                                    name={`tasks.${index}.completedAt`}
-                                    render={({ field: { value, onChange } }) => (
-                                        <Checkbox
-                                            checked={Boolean(value)}
-                                            onChange={(event) => {
-                                                onChange(event.target.checked ? new Date().toISOString() : null)
-                                            }}
-                                            icon={<RadioButtonUnchecked />}
-                                            checkedIcon={<CheckCircle />}
-                                        />
-                                    )}
-                                />
-                                <Controller
-                                    control={control}
-                                    name={`tasks.${index}.description`}
-                                    render={({ field: { value, onChange, ...rest } }) => (
-                                        <InputBase
-                                            value={value}
-                                            onChange={onChange}
-                                            {...rest}
-                                            placeholder='Task...'
-                                            size='small'
-                                            fullWidth
-                                            sx={{ 
-                                                textDecoration: tasks?.[index]?.completedAt ? 'line-through' : 'none'
-                                            }}
-                                        />
-                                    )}
-                                />
-                                {/* <Tooltip title='Delete'>
-                                    <IconButton onClick={() => entryTasksFieldArray.remove(index)}>
-                                        <Delete />
-                                    </IconButton>
-                                </Tooltip> */}
-                            </Stack>
-                        )
-                    }})}
+                <Stack mt={0} ml={-1} mr={2} gap={0} mb={-1}>
+                    {entryTasksFieldArray.fields.map((task, index) => (
+                        <Stack direction='row' spacing={0} alignItems={'center'} sx={{ width: '100%' }} key={task._id}>
+                            <Controller
+                                control={control}
+                                name={`tasks.${index}.completedAt`}
+                                render={({ field: { value, onChange } }) => (
+                                    <Checkbox
+                                        checked={Boolean(value)}
+                                        onChange={(event) => {
+                                            onChange(event.target.checked ? new Date().toISOString() : null)
+                                        }}
+                                        icon={<RadioButtonUnchecked />}
+                                        checkedIcon={<CheckCircle />}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                control={control}
+                                name={`tasks.${index}.description`}
+                                render={({ field: { value, onChange, ...rest } }) => (
+                                    <InputBase
+                                        value={value}
+                                        onChange={onChange}
+                                        inputRef={el => inputRefs.current[index] = el}
+                                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
+                                        {...rest}
+                                        placeholder='Task...'
+                                        size='small'
+                                        fullWidth
+                                        sx={{ 
+                                            textDecoration: tasks?.[index]?.completedAt ? 'line-through' : 'none'
+                                        }}
+                                    />
+                                )}
+                            />
+                        </Stack>
+                    ))}
                 </Stack>
             )}
-                
         </Stack>
     )
 }
