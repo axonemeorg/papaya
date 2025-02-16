@@ -1,35 +1,28 @@
 import { useContext, useRef, useState } from "react";
 import { 
-    AutocompleteCloseReason,
     Button,
     ButtonBase,
     Chip,
-    ClickAwayListener,
-    Divider,
     IconButton,
-    InputBase,
     Link,
-    ListItem,
-    ListItemText,
-    Paper,
-    Popper,
     Stack,
     Typography
 } from "@mui/material";
-import { Close, Done, Settings } from "@mui/icons-material";
+import { Settings } from "@mui/icons-material";
 import { EntryTag, ReservedTag } from "@/types/schema";
 import { JournalContext } from "@/contexts/JournalContext";
 import { createEntryTag } from "@/database/actions";
 import clsx from "clsx";
-import EntryTagAutocomplete, { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
+import { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
 import { RESERVED_TAGS } from "@/constants/tags";
+import { EntryTagPicker } from "../pickers/EntryTagPicker";
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
 export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
-    const [searchValue, setSearchValue] = useState<string>('')
+    
     const { getEntryTagsQuery, journal } = useContext(JournalContext)
     const value = props.value ?? []
 
@@ -46,13 +39,13 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
         setOpen(false)
     }
 
-    const createEntryTagWithValue = async () => {
+    const handleCreateEntryTagWithValue = async (value: string) => {
         if (!journal) {
             return
         }
         const journalId = journal._id
         await createEntryTag({
-            label: searchValue,
+            label: value,
             description: '',
         }, journalId)
         getEntryTagsQuery.refetch()
@@ -103,89 +96,13 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
                     })}
                 </Stack>
             )}
-            <Popper
+            <EntryTagPicker
+                {...props}
                 open={open}
                 anchorEl={anchorRef.current}
-                sx={(theme) => ({ width: '300px', zIndex: theme.zIndex.modal})}
-                placement='bottom-start'
-            >
-                <ClickAwayListener onClickAway={handleClose}>
-                    <Paper>
-                        <EntryTagAutocomplete
-                            {...props}
-                            open
-                            onClose={(
-                                _event,
-                                reason: AutocompleteCloseReason,
-                            ) => {
-                                if (reason === 'escape') {
-                                    handleClose();
-                                }
-                            }}
-                            disableCloseOnSelect
-                            noOptionsText={
-                                searchValue.length === 0 ? (
-                                    <Typography variant='body2' color='textSecondary'>
-                                        No tags
-                                    </Typography>
-                                ) : (
-                                    <Link onClick={() => createEntryTagWithValue()}>
-                                        Create new tag &quot;{searchValue}&quot;
-                                    </Link>
-                                )
-                            }
-                            renderTags={() => null}
-                            renderInput={(params) => (
-                                <>
-                                    <InputBase
-                                        sx={{ width: '100%', px: 2, py: 1 }}
-                                        ref={params.InputProps.ref}
-                                        value={searchValue}
-                                        onChange={(event) => setSearchValue(event.target.value)}
-                                        inputProps={params.inputProps}
-                                        autoFocus
-                                        placeholder="Filter tags"
-                                    />
-                                    <Divider />
-                                </>
-                            )}
-                            renderOption={(props, option, { selected }) => {
-                                const { key, ...optionProps } = props
-                                const entryTag: EntryTag | ReservedTag | undefined = options[option]
-
-                                return (
-                                    <ListItem key={key} {...optionProps}>
-                                        <Done
-                                            sx={(theme) => ({
-                                                width: 17,
-                                                height: 17,
-                                                mr: theme.spacing(1),
-                                                visibility: selected ? 'visible' : 'hidden',
-                                            })}
-                                        />
-                                        <ListItemText
-                                            primary={entryTag?.label}
-                                            secondary={entryTag?.description}
-                                        />
-                                        <Close
-                                            sx={{
-                                                opacity: 0.6,
-                                                width: 18,
-                                                height: 18,
-                                                visibility: selected ? 'visible' : 'hidden',
-                                            }}
-                                        />
-                                    </ListItem>
-                                );
-                            }}
-                            slots={{
-                                popper: (params: any) => <div {...params} />,
-                                paper: (params) => <div {...params} />,
-                            }}
-                        />
-                    </Paper>
-                </ClickAwayListener>
-            </Popper>
+                onCreateEntryTagWithValue={handleCreateEntryTagWithValue}
+                onClose={() => handleClose()}
+            />
         </Stack>
     )
 }
