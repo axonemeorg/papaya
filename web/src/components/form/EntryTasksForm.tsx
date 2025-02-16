@@ -92,14 +92,14 @@ export default function EntryTasksForm() {
                 disableRipple
                 tabIndex={-1}
             >
-                <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Tags</Typography>
+                <Typography component='span' variant='body2' sx={{ fontWeight: 500 }}>Tasks</Typography>
                 <IconButton sx={{ m: -1, color: 'inherit' }} disableTouchRipple>
                     <AddTask />
                 </IconButton>
             </Button>
             {entryTasksFieldArray.fields.length === 0 ? (
                 <Typography sx={{ mt: -1 }} variant='body2' color='textSecondary'>
-                    <span>No tags — </span>
+                    <span>No tasks — </span>
                     <Link onClick={() => handleAddTask()}>Add one</Link>
                 </Typography>
             ) : (

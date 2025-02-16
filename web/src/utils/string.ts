@@ -1,8 +1,17 @@
 import { SyncStatusEnum } from "@/contexts/RemoteContext"
 
+const formatCurrencyAmount = (amount: number): string => {
+	return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export const getPriceString = (price: number): string => {
-	const isNetPositive = price > 0
-	return isNetPositive ? `+$${Number(price).toFixed(2)}` : `$${Number(-price).toFixed(2)}`
+	if (price === 0) {
+		return '$0.00'
+	} else if (price > 0) {
+		return `+$${formatCurrencyAmount(price)}`
+	} else {
+		return `$${formatCurrencyAmount(-price)}`
+	}
 }
 
 export const formatFileSize = (bytes: number): string => {

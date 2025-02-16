@@ -13,6 +13,7 @@ import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount } from '@/utils/journal'
+import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
 	entry: JournalEntry
@@ -60,8 +61,9 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const { entry, anchorEl } = props
 	const { getCategoriesQuery, editJournalEntry } = useContext(JournalContext)
 
+	const getPriceStyle = useGetPriceStyle()
+
 	const netAmount = calculateNetAmount(entry)
-	const isNetPositive = netAmount > 0
 	const categoryId: string | undefined = entry?.categoryIds?.[0]
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
@@ -121,10 +123,10 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 									<Stack sx={{ textAlign: 'center' }} alignItems="center">
 										<Typography
 											variant="h3"
-											sx={(theme) => ({
-												color: isNetPositive ? theme.palette.success.main : undefined,
+											sx={{
+												...getPriceStyle(netAmount),
 												mb: 0.5,
-											})}>
+											}}>
 											{getPriceString(netAmount)}
 										</Typography>
 										<Stack direction="row" gap={1}>

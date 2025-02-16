@@ -30,6 +30,7 @@ import { Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
+import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -142,6 +143,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
+	const getPriceStyle = useGetPriceStyle()
 
 	return (
 		<Grid
@@ -190,7 +192,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 													? getCategoriesQuery.data[categoryId]
 													: undefined
 												const netAmount = calculateNetAmount(entry)
-												const isNetPositive = netAmount > 0
 												const isFlagged = journalEntryIsFlagged(entry)
 												const hasTags = journalEntryHasTags(entry)
 
@@ -217,12 +218,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 															</Stack>
 														</TableCell>
 														<TableCell align="right" sx={{ width: '10%' }}>
-															<Typography
-																sx={(theme) => ({
-																	color: isNetPositive
-																		? theme.palette.success.main
-																		: undefined,
-																})}>
+															<Typography sx={{ ...getPriceStyle(netAmount) }}>
 																{getPriceString(netAmount)}
 															</Typography>
 														</TableCell>
