@@ -1,22 +1,24 @@
 import { Button, Checkbox, Grid2 as Grid, Grow, IconButton, Link, Stack, TextField, Typography } from "@mui/material"
 import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
-import { Add, Delete, EditNote, Flag, FlagOutlined } from "@mui/icons-material"
+import { Add, DeleteOutline, EditNote, LocalOffer, LocalOfferOutlined } from "@mui/icons-material"
 import { useCallback, useContext, useRef, useState } from "react"
 import { JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import SelectionActionModal from "../modal/SelectionActionModal"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeJournalEntry } from "@/utils/journal"
-import { RESERVED_TAGS } from "@/constants/tags"
+import { EntryTagPicker } from "../pickers/EntryTagPicker"
 
 export default function ChildJournalEntryForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const [journalEntriesWithMemos, setJournalEntriesWithMemos] = useState<string[]>([])
     const selectionMenuAnchorRef = useRef<HTMLDivElement>(null);
     const journalContext = useContext(JournalContext)
+    const [childEntryTaggingIndex, setChildEntryTaggingIndex] = useState<number>(-1)
+    const [childEntryTaggingAnchorEl, setChildEntryTaggingAnchorEl] = useState<HTMLElement | null>(null)
     
-    const { control } = useFormContext<JournalEntry>()
+    const { control, setValue } = useFormContext<JournalEntry>()
     const children = useWatch({ control, name: 'children' }) ?? []
     const childEntriesFieldArray = useFieldArray({
         control,
@@ -31,13 +33,13 @@ export default function ChildJournalEntryForm() {
         childEntriesFieldArray.prepend(newEntry)
 	}, [children])
     
-    const handleToggleFlagged = (index: number, isFlagged: boolean) => {
-        const entry = childEntriesFieldArray.fields[index]
-        const tagIds = isFlagged
-            ? [...entry.tagIds ?? [], RESERVED_TAGS.FLAGGED._id]
-            : entry.tagIds?.filter((tagId) => tagId !== RESERVED_TAGS.FLAGGED._id)
-        childEntriesFieldArray.update(index, { ...entry, tagIds })
-    }
+    // const handleToggleFlagged = (index: number, isFlagged: boolean) => {
+    //     const entry = childEntriesFieldArray.fields[index]
+    //     const tagIds = isFlagged
+    //         ? [...entry.tagIds ?? [], RESERVED_TAGS.FLAGGED._id]
+    //         : entry.tagIds?.filter((tagId) => tagId !== RESERVED_TAGS.FLAGGED._id)
+    //     childEntriesFieldArray.update(index, { ...entry, tagIds })
+    // }
 
     const handleToggleSelected = (key: string) => {
         const isSelected = selectedRows.includes(key)
@@ -50,6 +52,9 @@ export default function ChildJournalEntryForm() {
 
     const handleRemoveChildEntries = (entryIds: string[]) => {
         const indices = entryIds.map((entryId) => childEntriesFieldArray.fields.findIndex((entry) => entry._id === entryId))
+        if (indices.includes(childEntryTaggingIndex)) {
+            setChildEntryTaggingAnchorEl(null)
+        }
         childEntriesFieldArray.remove(indices)
         setSelectedRows(selectedRows.filter((id) => !entryIds.includes(id)))
     }
@@ -80,6 +85,22 @@ export default function ChildJournalEntryForm() {
                 }}
             />
 
+            <EntryTagPicker
+                open={Boolean(childEntryTaggingAnchorEl)}
+                anchorEl={childEntryTaggingAnchorEl}
+                onClose={() => setChildEntryTaggingAnchorEl(null)}
+                value={(childEntryTaggingIndex >= 0 && children[childEntryTaggingIndex])
+                    ? children[childEntryTaggingIndex].tagIds
+                    : undefined
+                }
+                onChange={(_event, newValue) => {
+                    if (childEntryTaggingIndex < 0) {
+                        return
+                    }
+                    setValue(`children.${childEntryTaggingIndex}.tagIds`, newValue ?? [], { shouldDirty: true })
+                }}
+            />
+
             <Stack direction='row' alignItems={'center'} justifyContent={'space-between'} mt={4} mx={-2} px={2} ref={selectionMenuAnchorRef}>
                 <Typography>Sub-Entries ({children.length})</Typography>
                 <Button onClick={() => handleAddChildEntry()} startIcon={<Add />}>Add Row</Button>
@@ -91,24 +112,16 @@ export default function ChildJournalEntryForm() {
             )}
             <Stack mt={2} mx={-1} gap={2}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
-                    const isFlagged = Boolean(entry.tagIds?.includes(RESERVED_TAGS.FLAGGED._id))
+                    const isTagged = Boolean(entry.tagIds?.length)
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     return (
                         <Stack direction='row' alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
-                            <Stack direction='row' spacing={-1}>
-                                <Checkbox
-                                    checked={selectedRows.includes(entry._id)}
-                                    onChange={() => handleToggleSelected(entry._id)}
-                                />
-                                <Checkbox
-                                    icon={<FlagOutlined />}
-                                    checkedIcon={<Flag />}
-                                    checked={isFlagged}
-                                    onChange={() => handleToggleFlagged(index, !isFlagged)}
-                                />
-                            </Stack>
-                            <Grid container columns={12} spacing={1} sx={{ flex: '1', ml: 1 }}>
-                                <Grid size={6}>
+                            <Checkbox
+                                checked={selectedRows.includes(entry._id)}
+                                onChange={() => handleToggleSelected(entry._id)}
+                            />
+                            <Grid container columns={12} spacing={1} sx={{ flex: '1' }}>
+                                <Grid size={4}>
                                     <Controller
                                         control={control}
                                         name={`children.${index}.amount`}
@@ -120,7 +133,7 @@ export default function ChildJournalEntryForm() {
                                         )}
                                     />
                                 </Grid>
-                                <Grid size={6}>
+                                <Grid size={'grow'}>
                                     <CategoryAutocomplete
                                         size='small'
                                         value={entry.categoryIds}
@@ -130,6 +143,21 @@ export default function ChildJournalEntryForm() {
                                             }
                                         }}
                                     />
+                                </Grid>
+                                <Grid size='auto'>
+                                    <Stack direction='row' spacing={-1} ml={-1}>
+                                        <IconButton
+                                            onClick={(event) => {
+                                                setChildEntryTaggingIndex(index)
+                                                setChildEntryTaggingAnchorEl(event.currentTarget)
+                                            }}
+                                        >
+                                            {isTagged ? <LocalOffer /> : <LocalOfferOutlined />}
+                                        </IconButton>
+                                        <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
+                                            <DeleteOutline />
+                                        </IconButton>
+                                    </Stack>
                                 </Grid>
                                 <Grid size={12}>
                                     {hasMemo ? (
@@ -177,9 +205,6 @@ export default function ChildJournalEntryForm() {
                                     )}
                                 </Grid>
                             </Grid>
-                            <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
-                                <Delete />
-                            </IconButton>
                         </Stack>
                     )
                 })}
