@@ -10,25 +10,39 @@ import {
     Typography
 } from "@mui/material";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import EntryTagAutocomplete, { EntryTagAutocompleteProps } from "../input/EntryTagAutocomplete";
+
+import { JournalContext } from "@/contexts/JournalContext";
+import { createEntryTag } from "@/database/actions";
 
 interface EntryTagPickerProps extends Omit<EntryTagAutocompleteProps, 'renderInput'> {
 	anchorEl: HTMLElement | null
 	open: boolean
 	onClose: () => void
-	onCreateEntryTagWithValue: (value: string) => Promise<void>
 }
 
 export const EntryTagPicker = (props: EntryTagPickerProps) => {
 	const [searchValue, setSearchValue] = useState<string>('')
 
+	const { getEntryTagsQuery, journal } = useContext(JournalContext)
+
+	const handleCreateEntryTagWithValue = async (value: string) => {
+        if (!journal) {
+            return
+        }
+        const journalId = journal._id
+        await createEntryTag({
+            label: value,
+            description: '',
+        }, journalId)
+        getEntryTagsQuery.refetch()
+    }
+
 	const {
 		anchorEl,
 		open,
 		onClose,
-		onCreateEntryTagWithValue,
-		// options,
 		...rest
 	} = props
 
@@ -59,7 +73,7 @@ export const EntryTagPicker = (props: EntryTagPickerProps) => {
 									No tags
 								</Typography>
 							) : (
-								<Link onClick={() => onCreateEntryTagWithValue(searchValue)}>
+								<Link onClick={() => handleCreateEntryTagWithValue(searchValue)}>
 									Create new tag &quot;{searchValue}&quot;
 								</Link>
 							)

@@ -11,7 +11,6 @@ import {
 import { Settings } from "@mui/icons-material";
 import { EntryTag, ReservedTag } from "@/types/schema";
 import { JournalContext } from "@/contexts/JournalContext";
-import { createEntryTag } from "@/database/actions";
 import clsx from "clsx";
 import { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
 import { RESERVED_TAGS } from "@/constants/tags";
@@ -23,7 +22,7 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
     
-    const { getEntryTagsQuery, journal } = useContext(JournalContext)
+    const { getEntryTagsQuery } = useContext(JournalContext)
     const value = props.value ?? []
 
     const options: Record<string, EntryTag | ReservedTag> = {
@@ -37,18 +36,6 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
 
     const handleClose = () => {
         setOpen(false)
-    }
-
-    const handleCreateEntryTagWithValue = async (value: string) => {
-        if (!journal) {
-            return
-        }
-        const journalId = journal._id
-        await createEntryTag({
-            label: value,
-            description: '',
-        }, journalId)
-        getEntryTagsQuery.refetch()
     }
 
     return (
@@ -100,7 +87,6 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
                 {...props}
                 open={open}
                 anchorEl={anchorRef.current}
-                onCreateEntryTagWithValue={handleCreateEntryTagWithValue}
                 onClose={() => handleClose()}
             />
         </Stack>
