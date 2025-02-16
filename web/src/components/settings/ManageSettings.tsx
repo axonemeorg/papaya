@@ -10,6 +10,7 @@ import { useMemo } from 'react'
 import { useRouter } from 'next/router'
 import JournalSettings from './JournalSettings'
 import SyncingSettings from './SyncingSettings'
+import AppearanceBehaviorSettings from './AppearanceBehaviorSettings'
 
 const SETTINGS_TABS = {
 	'syncing': {
@@ -59,6 +60,9 @@ export default function ManageSettings() {
 				<>
 					{tab === 'syncing' && (
 						<SyncingSettings />
+					)}
+					{tab === 'appearance' && (
+						<AppearanceBehaviorSettings />
 					)}
 					{tab === 'journal' && (
 						<JournalSettings />
