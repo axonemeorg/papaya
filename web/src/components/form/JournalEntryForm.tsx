@@ -40,14 +40,6 @@ export default function JournalEntryForm() {
 
 	return (
 		<>
-			{/* <EntryTagPicker
-				anchorEl={entryTagPickerData.anchorEl}
-				onClose={() => setEntryTagPickerData((prev) => ({ ...prev, anchorEl: null }))}
-				value={entryTagPickerSelectedTags}
-				onChange={(tagIds: EntryTag['_id'][]) => {
-					setValue(`children.${entryTagPickerData.index}.tagIds`, tagIds)
-				}}
-			/> */}
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
 				<Grid container columns={12} spacing={4} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>

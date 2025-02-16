@@ -56,6 +56,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const hasTags = journalEntryHasTags(currentFormState as JournalEntry)
 	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
 	const childIsFlagged = children.some(journalEntryIsFlagged)
+	const childHasTags = children.some(journalEntryHasTags)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
@@ -133,7 +134,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 									</Tooltip>
 								</Grow>
 							)}
-							{hasTags && (
+							{(hasTags || childHasTags) && (
 								<Grow key="TAGS" in>
 									<Tooltip title='Tags applied'>
 										<LocalOffer fontSize='small' sx={{ cursor: 'pointer' }} />
