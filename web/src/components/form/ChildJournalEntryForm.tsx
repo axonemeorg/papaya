@@ -18,28 +18,20 @@ export default function ChildJournalEntryForm() {
     const [childEntryTaggingIndex, setChildEntryTaggingIndex] = useState<number>(-1)
     const [childEntryTaggingAnchorEl, setChildEntryTaggingAnchorEl] = useState<HTMLElement | null>(null)
     
-    const { control, setValue } = useFormContext<JournalEntry>()
+    const { control, setValue, watch } = useFormContext<JournalEntry>()
     const children = useWatch({ control, name: 'children' }) ?? []
     const childEntriesFieldArray = useFieldArray({
         control,
         name: 'children',
     })
 
-	const handleAddChildEntry = useCallback(() => {
-		if (!journalContext.journal) {
-			return
-		}
-		const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
+    const handleAddChildEntry = useCallback(() => {
+        if (!journalContext.journal) {
+            return
+        }
+        const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
         childEntriesFieldArray.prepend(newEntry)
-	}, [children])
-    
-    // const handleToggleFlagged = (index: number, isFlagged: boolean) => {
-    //     const entry = childEntriesFieldArray.fields[index]
-    //     const tagIds = isFlagged
-    //         ? [...entry.tagIds ?? [], RESERVED_TAGS.FLAGGED._id]
-    //         : entry.tagIds?.filter((tagId) => tagId !== RESERVED_TAGS.FLAGGED._id)
-    //     childEntriesFieldArray.update(index, { ...entry, tagIds })
-    // }
+    }, [children])
 
     const handleToggleSelected = (key: string) => {
         const isSelected = selectedRows.includes(key)
@@ -88,7 +80,10 @@ export default function ChildJournalEntryForm() {
             <EntryTagPicker
                 open={Boolean(childEntryTaggingAnchorEl)}
                 anchorEl={childEntryTaggingAnchorEl}
-                onClose={() => setChildEntryTaggingAnchorEl(null)}
+                onClose={() => {
+                    setChildEntryTaggingAnchorEl(null)
+                    setChildEntryTaggingIndex(-1)
+                }}
                 value={(childEntryTaggingIndex >= 0 && children[childEntryTaggingIndex])
                     ? children[childEntryTaggingIndex].tagIds
                     : undefined
@@ -112,8 +107,10 @@ export default function ChildJournalEntryForm() {
             )}
             <Stack mt={2} mx={-1} gap={2}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
-                    const isTagged = Boolean(entry.tagIds?.length)
+                    const childTags = watch(`children.${index}.tagIds`) ?? []
+                    const isTagged = childTags.length > 0
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
+                    
                     return (
                         <Stack direction='row' alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
                             <Checkbox
