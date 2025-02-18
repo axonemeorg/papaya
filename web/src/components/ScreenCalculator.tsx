@@ -2,10 +2,35 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Button, Grow, Paper, TextareaAutosize } from "@mui/material";
+import { Box, Button, ButtonProps, Grid2 as Grid, Grow, IconButton, Paper, Stack, TextareaAutosize } from "@mui/material";
+import { green } from "@mui/material/colors";
 
 interface ScreenCalculatorProps {
     open: boolean
+}
+
+const CalculatorButton = (props: ButtonProps) => {
+    const { children, sx, ...rest } = props;
+
+    return (
+        <Button
+            sx={{
+                ...sx,
+                borderRadius: '50%',
+                aspectRatio: 1,
+                padding: 1,
+                width: '22px',
+                height: '22px',
+                boxSizing: 'content-box',
+                minWidth: 'unset',
+            }}
+            size='large'
+            variant='contained'
+            {...rest}
+        >
+            {children}
+        </Button>
+    )
 }
 
 export function ScreenCalculator(props: ScreenCalculatorProps) {
@@ -21,13 +46,19 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
         return () => setMounted(false);
     }, []);
 
+    useEffect(() => {
+        if (props.open) {
+            croak()
+        }
+    }, [props.open])
+
     const croak = () => {
         audioRef.current?.play()
     }
 
     const handleMouseDown = (e: React.MouseEvent) => {
         // Allow TextField clicks to focus properly
-        if (e.target instanceof HTMLElement && e.target.tagName === 'TEXTAREA') {
+        if (e.target instanceof HTMLElement && ['BUTTON', 'TEXTAREA'].includes(e.target.tagName)) {
             return;
         }
 
@@ -75,7 +106,7 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
 
     return createPortal(
         (
-            <Grow in={props.open}>
+            <Grow in={props.open} timeout={100}>
                 <Box
                     ref={containerRef}
                     className="cursor-move"
@@ -167,8 +198,37 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                                 // variant='filled'
                                 
                             />
-
-                    {/* <Frog /> */}
+                            <Stack direction='row'>
+                                <Grid columns={3} spacing={1} container justifyContent='center' sx={{ width: 'auto' }}>
+                                    <Grid size={1}>
+                                        <CalculatorButton color="forestGreen">7</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">8</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">9</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1}>
+                                        <CalculatorButton color="forestGreen">4</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">5</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">6</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1}>
+                                        <CalculatorButton color="forestGreen">1</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">2</CalculatorButton>
+                                    </Grid>
+                                    <Grid size={1} >
+                                        <CalculatorButton color="forestGreen">3</CalculatorButton>
+                                    </Grid>
+                                </Grid>
+                            </Stack>
                     </Paper>
                 </Box>
             </Grow>
