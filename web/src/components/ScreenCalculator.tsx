@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Paper, TextField } from "@mui/material";
+import { Box, Button, Grow, Paper, TextareaAutosize } from "@mui/material";
 
 interface ScreenCalculatorProps {
     open: boolean
@@ -14,22 +14,27 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const containerRef = useRef<HTMLDivElement | null>(null);
     const [mounted, setMounted] = useState(false);
+    const audioRef = useRef(typeof Audio !== "undefined" ? new Audio('/sound/frog2.mp3') : undefined)
 
     useEffect(() => {
         setMounted(true);
         return () => setMounted(false);
     }, []);
 
+    const croak = () => {
+        audioRef.current?.play()
+    }
+
     const handleMouseDown = (e: React.MouseEvent) => {
         // Allow TextField clicks to focus properly
-        if (e.target instanceof HTMLElement && e.target.tagName === 'INPUT') {
-            return; 
-        } 
-    
+        if (e.target instanceof HTMLElement && e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+
         if (!containerRef.current) {
             return;
         }
-    
+
         setIsDragging(true);
         const rect = containerRef.current.getBoundingClientRect();
         setDragOffset({
@@ -49,6 +54,7 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
 
     const handleMouseUp = () => {
         setIsDragging(false);
+        croak()
     };
 
     useEffect(() => {
@@ -63,38 +69,110 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
         };
     }, [isDragging]);
 
-    const calculator = (
-        <Paper
-            ref={containerRef}
-            className="cursor-move"
-            sx={{
-                position: 'fixed',
-                zIndex: 99999,
-                left: position.x,
-                top: position.y,
-                padding: 2,
-                userSelect: 'none',
-                display: props.open ? 'block' : 'none',
-            }}
-            onMouseDown={(e) => {
-                e.stopPropagation()
-                
-                handleMouseDown(e)
-            }}
-            onClick={(e) => {
-                e.preventDefault()
-            }}
-            elevation={3}
-        >
-            <div className="p-4">
-                <div className="mb-4">Calculator</div>
-                <TextField className="pointer-events-auto" />
-                <Button onClick={() => alert('hello')}>Test</Button>
-            </div>
-        </Paper>
-    );
+    if (!mounted) {
+        return null;
+    }
 
-    if (!mounted) return null;
-    
-    return createPortal(calculator, document.body);
+    return createPortal(
+        (
+            <Grow in={props.open}>
+                <Box
+                    ref={containerRef}
+                    className="cursor-move"
+                    sx={{
+                        position: 'fixed',
+                        zIndex: 99999,
+                        left: position.x,
+                        top: position.y,
+                        padding: 2,
+                        userSelect: 'none',
+                        filter: 'drop-shadow(0 5px 10px rgba(13, 13, 14, 0.05))',
+
+                        // Left leg
+                        "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            bottom: "-15px",
+                            left: "-40px",
+                            width: "100px",
+                            height: "100px",
+                            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g transform="translate(0, -10)" fill="%234CC24F" ><ellipse transform="translate(46.538193, 57.026578) rotate(-27.000000) translate(-46.538193, -57.026578)" cx="46.5381931" cy="57.0265777" rx="26.5" ry="50.5"></ellipse><rect x="13" y="89" width="56" height="15" rx="9"></rect></g></svg>')`,
+                            backgroundSize: "contain",
+                            backgroundRepeat: "no-repeat",
+                        },
+
+                        // Right leg
+                        "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            bottom: "-15px",
+                            right: "-40px",
+                            width: "100px",
+                            height: "100px",
+                            scale: '-1 1',
+                            backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g transform="translate(0, -10)" fill="%234CC24F"><ellipse transform="translate(46.538193, 57.026578) rotate(-27.000000) translate(-46.538193, -57.026578)" cx="46.5381931" cy="57.0265777" rx="26.5" ry="50.5"></ellipse><rect x="13" y="89" width="56" height="15" rx="9"></rect></g></svg>')`,
+                            backgroundSize: "contain",
+                            backgroundRepeat: "no-repeat",
+                            zIndex: -1,
+                        },
+                    }}
+                    onMouseDown={(e) => {
+                        e.stopPropagation()
+
+                        handleMouseDown(e)
+                    }}
+                    onClick={(e) => {
+                        e.preventDefault()
+                    }}
+                >
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            backgroundColor: 'rgb(105, 218, 107)',
+                            position: 'relative',
+                            borderRadius: '8px',
+                            padding: '32px 16px',
+                            // zIndex: 1000000,
+
+                            "&::before": {
+                                content: '""',
+                                position: "absolute",
+                                top: "-22px",
+                                left: "0px",
+                                width: "48px",
+                                height: "48px",
+                                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g><circle id="Oval-29" fill="%2369DA6B" cx="24" cy="24" r="24"></circle><circle id="Oval-37" stroke="%23FFFFFF" stroke-width="5" fill="%23000000" cx="24" cy="24" r="12"></circle></g></svg>')`,
+                                backgroundSize: "contain",
+                                backgroundRepeat: "no-repeat",
+                            },
+                            "&::after": {
+                                content: '""',
+                                position: "absolute",
+                                top: "-22px",
+                                right: "0px",
+                                width: "48px",
+                                height: "48px",
+                                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g><circle id="Oval-29" fill="%2369DA6B" cx="24" cy="24" r="24"></circle><circle id="Oval-37" stroke="%23FFFFFF" stroke-width="5" fill="%23000000" cx="24" cy="24" r="12"></circle></g></svg>')`,
+                                backgroundSize: "contain",
+                                backgroundRepeat: "no-repeat",
+                            },
+
+                        }}
+                    >
+                            <TextareaAutosize
+                                style={{
+                                    background: 'none'
+                                }}
+                                // label='Math'
+                                // variant='filled'
+                                
+                            />
+
+                    {/* <Frog /> */}
+                    </Paper>
+                </Box>
+            </Grow>
+        ),
+        document.body
+    );
 }

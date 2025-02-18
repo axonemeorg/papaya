@@ -46,7 +46,7 @@ interface Operator {
 
 type ExpressionType = Operator | Constant | Variable
 
-export class ExpressionContext {
+class ExpressionContext {
     private context: Record<string, Expression>
 
     constructor(context: Record<string, Expression> = {}) {
@@ -73,7 +73,7 @@ export class ExpressionContext {
     }
 }
 
-export class Expression<T extends ExpressionType = ExpressionType> {
+class Expression<T extends ExpressionType = ExpressionType> {
     private value: T
     private context?: ExpressionContext
 
@@ -82,9 +82,88 @@ export class Expression<T extends ExpressionType = ExpressionType> {
     }
 
     public static fromTokens(tokens: string[]): Expression<ExpressionType> {
-        for (let token in tokens) {
-            // TODO
+        const operatorStack = new Stack<string>();
+        const outputStack = new Stack<Expression>();
+        
+        // Define operator precedence
+        const precedence: Record<string, number> = {
+            [Operation.EXP]: 4,
+            [Operation.MUL]: 3,
+            [Operation.DIV]: 3,
+            [Operation.ADD]: 2,
+            [Operation.SUB]: 2,
+            '(': 1,
+        };
+
+        for (const token of tokens) {
+            if (token === '(') {
+                operatorStack.push(token);
+            }
+            else if (token === ')') {
+                // Process operators until we find the matching parenthesis
+                while (!operatorStack.empty() && operatorStack.peek() !== '(') {
+                    const operator = operatorStack.pop()!;
+                    const b = outputStack.pop()!;
+                    const a = outputStack.pop()!;
+                    outputStack.push(new Expression<Operator>({
+                        operation: operator as Operation,
+                        operands: [a, b]
+                    }));
+                }
+                // Remove the opening parenthesis
+                operatorStack.pop();
+            }
+            else if (Object.values(Operation).includes(token as Operation)) {
+                // Process operators with higher or equal precedence
+                while (!operatorStack.empty() && 
+                       operatorStack.peek() !== '(' && 
+                       precedence[operatorStack.peek()! as Operation] >= precedence[token as Operation]) {
+                    const operator = operatorStack.pop()!;
+                    const b = outputStack.pop()!;
+                    const a = outputStack.pop()!;
+                    outputStack.push(new Expression<Operator>({
+                        operation: operator as Operation,
+                        operands: [a, b]
+                    }));
+                }
+                operatorStack.push(token);
+            }
+            else if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
+                // Variable
+                outputStack.push(new Expression<Variable>({
+                    key: token
+                }));
+            }
+            else if (/^-?\d*\.?\d+$/.test(token)) {
+                // Number constant
+                outputStack.push(new Expression<Constant>({
+                    num: parseFloat(token)
+                }));
+            }
+            else {
+                throw new Error(`Invalid token: ${token}`);
+            }
         }
+
+        // Process remaining operators
+        while (!operatorStack.empty()) {
+            const operator = operatorStack.pop()!;
+            if (operator === '(') {
+                throw new Error('Mismatched parentheses');
+            }
+            const b = outputStack.pop()!;
+            const a = outputStack.pop()!;
+            outputStack.push(new Expression<Operator>({
+                operation: operator as Operation,
+                operands: [a, b]
+            }));
+        }
+
+        if (outputStack.empty()) {
+            throw new Error('Empty expression');
+        }
+
+        return outputStack.pop()!;
     }
 
     public withContext(context: ExpressionContext) {
@@ -132,3 +211,6 @@ export class Expression<T extends ExpressionType = ExpressionType> {
         return undefined
     }
 }
+
+const expr = Expression.fromTokens(["9", "*", "2", "+", "(", "13", "/", "17", ")"]);
+console.log(expr.evaluate()); // Will output: 18 + (13/17) ≈ 18.76
