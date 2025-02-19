@@ -14,6 +14,7 @@ import { generateCategoryId, generateEntryTagId, generateJournalId } from '@/uti
 import { getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
+import dayjs from 'dayjs'
 
 const db = getDatabaseClient()
 
@@ -168,7 +169,13 @@ export const exportJournal = async (journalId: string) => {
 	zip.file('objects.json', JSON.stringify(journalObjects))
 
 	const content = await zip.generateAsync({ type: 'blob' })
-	FileSaver.saveAs(content, `${journal.journalName}.ZISK`);
+	const fileName = [
+		journal.journalName,
+		'_',
+		dayjs().format('YYYY-MM-DD_HH-mm-ss'),
+		'.ZISK'
+	].join('')
+	FileSaver.saveAs(content, fileName);
 }
 
 export const importJournal = async (archive: File) => {
