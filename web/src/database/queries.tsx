@@ -13,6 +13,8 @@ import { makeDefaultZiskMeta } from '@/utils/database'
 
 const db = getDatabaseClient()
 
+const ARBITRARY_MAX_FIND_LIMIT = 10000 as const;
+
 export const getCategories = async (journalId: string): Promise<Record<Category['_id'], Category>> => {
 	const result = await db.find({
 		selector: {
@@ -21,6 +23,7 @@ export const getCategories = async (journalId: string): Promise<Record<Category[
 				{ journalId },
 			],
 		},
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
 	return Object.fromEntries((result.docs as Category[]).map((category) => [category._id, category]))
@@ -51,8 +54,12 @@ export const getJournalEntries = async (
 	}
 
 	const result = await db.find({
-		selector
+		selector,
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
+
+
+	console.log('raw result:', result)
 
 	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
 }
@@ -65,6 +72,7 @@ export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['
 				{ journalId },
 			],
 		},
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
 	return Object.fromEntries((result.docs as EntryTag[]).map((tag) => [tag._id, tag]))
@@ -91,6 +99,7 @@ export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalM
 		selector: {
 			type: 'JOURNAL',
 		},
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
 	return Object.fromEntries((result.docs as unknown as JournalMeta[]).map((journal) => [journal._id, journal]))
@@ -104,6 +113,7 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 				{ journalId },
 			],
 		},
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
 	return Object.fromEntries((result.docs as EntryArtifact[]).map((artifact) => [artifact._id, artifact]))
