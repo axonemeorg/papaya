@@ -124,7 +124,8 @@ const JournalYearMonthPage = () => {
 				date={date}
 				onNextPage={() => handleNextPage()}
 				onPrevPage={() => handlePrevPage()}
-				setDate={(date) => handleDateChange(date)}>
+				setDate={(date) => handleDateChange(date)}
+			>
 				<JournalEditor />
 			</JournalEntryContextProvider>
 		</Paper>

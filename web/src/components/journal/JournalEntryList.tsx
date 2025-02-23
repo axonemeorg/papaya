@@ -18,7 +18,7 @@ import {
 	TableBodyProps,
 	Grow,
 } from '@mui/material'
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 
 import { Category, JournalEntry } from '@/types/schema'
 import dayjs from 'dayjs'
@@ -31,6 +31,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
+import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 
 const TableRow = (props: TableRowProps) => {
 	const { sx, ...rest } = props
@@ -143,7 +144,22 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
+	const journalEntryContext = useContext(JournalEntryContext)
 	const getPriceStyle = useGetPriceStyle()
+
+
+	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
+
+	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
+
+	if (journalEntryContext.view === 'month') {
+		if (dayjs(journalEntryContext.date).isSame(currentDayString, 'month')) {
+			displayedJournalDates.add(currentDayString)
+		} else {
+			displayedJournalDates.add(dayjs(journalEntryContext.date).startOf('month').format('YYYY-MM-DD'))
+		}
+	}
+
 
 	return (
 		<Grid
@@ -164,13 +180,15 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 					},
 				},
 			}}>
-			{Object.entries(props.journalRecordGroups)
+			{Array.from(displayedJournalDates)
 				.sort(([dateA, _a], [dateB, _b]) => {
 					return new Date(dateA).getTime() - new Date(dateB).getTime()
 				})
-				.map(([date, entries]) => {
+				.map((date: string) => {
+					const entries = props.journalRecordGroups[date] ?? []
 					const day = dayjs(date)
 					const isToday = day.isSame(dayjs(), 'day')
+					const showQuckEditor = isToday || !entries.length
 
 					return (
 						<React.Fragment key={date}>
@@ -243,7 +261,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										</TableBody>
 									</Table>
 								)}
-								{isToday && <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />}
+								{showQuckEditor && <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />}
 							</Grid>
 						</React.Fragment>
 					)
