@@ -1,19 +1,16 @@
 'use client'
 
 import { Avatar, AvatarVariant } from '@/types/schema'
+import { createImageAvatar } from '@/utils/image'
 import { AddPhotoAlternate, RemoveCircle } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from '@mui/material'
 import { useMemo, useRef, useState } from 'react'
 
-const AWS_CLOUDFRONT_IMAGES_URL = process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_IMAGES_URL
-
 interface ImageAvatarPicker {
 	value: Avatar
 	onChange: (avatar: Avatar | null) => void
 }
-
-type AvatarImageUploadResponse = any // TODO
 
 interface ImageAvatarProps extends AvatarProps {
 	avatar: Avatar
@@ -21,23 +18,14 @@ interface ImageAvatarProps extends AvatarProps {
 
 export const ImageAvatar = (props: ImageAvatarProps) => {
 	const { avatar, ...rest } = props
-	const imageSrc = ['https:/', AWS_CLOUDFRONT_IMAGES_URL, avatar.content].join('/')
 
-	return <MuiAvatar variant="rounded" src={imageSrc} {...rest} />
+	return <MuiAvatar variant="rounded" src={avatar.content} {...rest} />
 }
 
 export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 	const [uploading, setUploading] = useState<boolean>(false)
 	const [uploadError, setUploadError] = useState<string | null>(null)
 	const fileInputRef = useRef<HTMLInputElement>(null)
-
-	const handleImageUploadSuccess = (data: AvatarImageUploadResponse) => {
-		props.onChange({
-			content: data.record.s3Key,
-			variant: AvatarVariant.Enum.IMAGE,
-			primaryColor: data.color ?? '',
-		})
-	}
 
 	const hasImageIcon = useMemo(() => {
 		return [
@@ -62,17 +50,8 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 			setUploadError(null)
 
 			try {
-				const formData = new FormData()
-				formData.append('file', file)
-
-				// Send the file to your API endpoint
-				const response = await fetch('/api/images/upload', {
-					method: 'POST',
-					body: formData,
-				})
-
-				const data: AvatarImageUploadResponse = await response.json()
-				handleImageUploadSuccess(data)
+				const imageAvatar = await createImageAvatar(file)
+				props.onChange(imageAvatar)
 			} catch (err) {
 				setUploadError((err as Error).message)
 			} finally {
@@ -95,14 +74,6 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 					<>
 						<ImageAvatar
 							avatar={props.value}
-							sx={
-								uploading
-									? {
-											filter: 'blur(2px)',
-											opacity: 0.5,
-										}
-									: undefined
-							}
 						/>
 						<Button variant="text" onClick={() => handleRemoveImage()} startIcon={<RemoveCircle />}>
 							Remove
