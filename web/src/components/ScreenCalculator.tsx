@@ -3,7 +3,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Box, Button, ButtonProps, Grid2 as Grid, Grow, IconButton, Paper, Stack, TextareaAutosize } from "@mui/material";
-import { green } from "@mui/material/colors";
 
 interface ScreenCalculatorProps {
     open: boolean
@@ -19,12 +18,11 @@ const CalculatorButton = (props: ButtonProps) => {
                 borderRadius: '50%',
                 aspectRatio: 1,
                 padding: 1,
-                width: '22px',
-                height: '22px',
+                width: '14px',
+                height: '14px',
                 boxSizing: 'content-box',
                 minWidth: 'unset',
             }}
-            size='large'
             variant='contained'
             {...rest}
         >
@@ -123,8 +121,9 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                         "&::before": {
                             content: '""',
                             position: "absolute",
+                            transform: 'scale(0.75)',
                             bottom: "-15px",
-                            left: "-40px",
+                            left: "-30px",
                             width: "100px",
                             height: "100px",
                             backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g transform="translate(0, -10)" fill="%234CC24F" ><ellipse transform="translate(46.538193, 57.026578) rotate(-27.000000) translate(-46.538193, -57.026578)" cx="46.5381931" cy="57.0265777" rx="26.5" ry="50.5"></ellipse><rect x="13" y="89" width="56" height="15" rx="9"></rect></g></svg>')`,
@@ -136,8 +135,9 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                         "&::after": {
                             content: '""',
                             position: "absolute",
+                            transform: 'scale(0.75)',
                             bottom: "-15px",
-                            right: "-40px",
+                            right: "-30px",
                             width: "100px",
                             height: "100px",
                             scale: '-1 1',
@@ -162,14 +162,15 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                             backgroundColor: 'rgb(105, 218, 107)',
                             position: 'relative',
                             borderRadius: '8px',
-                            padding: '32px 16px',
+                            padding: '24px 16px 16px',
                             // zIndex: 1000000,
 
                             "&::before": {
                                 content: '""',
                                 position: "absolute",
-                                top: "-22px",
-                                left: "0px",
+                                transform: 'scale(0.75)',
+                                top: "-20px",
+                                left: "-6px",
                                 width: "48px",
                                 height: "48px",
                                 backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g><circle id="Oval-29" fill="%2369DA6B" cx="24" cy="24" r="24"></circle><circle id="Oval-37" stroke="%23FFFFFF" stroke-width="5" fill="%23000000" cx="24" cy="24" r="12"></circle></g></svg>')`,
@@ -179,8 +180,9 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                             "&::after": {
                                 content: '""',
                                 position: "absolute",
-                                top: "-22px",
-                                right: "0px",
+                                transform: 'scale(0.75)',
+                                top: "-20px",
+                                right: "-6px",
                                 width: "48px",
                                 height: "48px",
                                 backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><g><circle id="Oval-29" fill="%2369DA6B" cx="24" cy="24" r="24"></circle><circle id="Oval-37" stroke="%23FFFFFF" stroke-width="5" fill="%23000000" cx="24" cy="24" r="12"></circle></g></svg>')`,
@@ -199,35 +201,32 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                                 
                             />
                             <Stack direction='row'>
-                                <Grid columns={3} spacing={1} container justifyContent='center' sx={{ width: 'auto' }}>
-                                    <Grid size={1}>
+                                <Stack gap={0.5} direction='column'>
+                                    <Stack direction='row' gap={0.5}>
                                         <CalculatorButton color="forestGreen">7</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">8</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">9</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1}>
+                                        <CalculatorButton color="primary">&times;</CalculatorButton>
+                                    </Stack>                                    
+                                    <Stack direction='row' gap={0.5}>
                                         <CalculatorButton color="forestGreen">4</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">5</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">6</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1}>
+                                        <CalculatorButton color="primary">&ndash;</CalculatorButton>
+                                    </Stack>
+                                    <Stack direction='row' gap={0.5}>
                                         <CalculatorButton color="forestGreen">1</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">2</CalculatorButton>
-                                    </Grid>
-                                    <Grid size={1} >
                                         <CalculatorButton color="forestGreen">3</CalculatorButton>
-                                    </Grid>
-                                </Grid>
+                                        <CalculatorButton color="primary">+</CalculatorButton>
+                                    </Stack>
+                                    <Stack direction='row' gap={0.5}>
+                                        <CalculatorButton color="forestGreen">&plusmn;</CalculatorButton>
+                                        <CalculatorButton color="forestGreen">0</CalculatorButton>
+                                        <CalculatorButton color="forestGreen">.</CalculatorButton>
+                                        <CalculatorButton color="primary">=</CalculatorButton>
+                                    </Stack>
+                                </Stack>
                             </Stack>
                     </Paper>
                 </Box>
