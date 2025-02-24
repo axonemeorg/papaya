@@ -7,19 +7,28 @@ export async function createImageAvatar(file: File): Promise<Avatar> {
     
     // Resize image to 64x64
     const resizedBase64 = resizeImage(image, 64, 64);
-    
-    // Resize image for color extraction
-    const colorPaletteBase64 = resizeImage(image, 512, 512);
-    
-    // Extract color palette
-    const palette = await Vibrant.from(colorPaletteBase64).getPalette();
-    const paletteColor = palette.Vibrant?.hex ?? ''
 
     return {
         content: resizedBase64, // `data:image/png;base64,${resizedBase64}`,
         variant: 'IMAGE',
-        primaryColor: paletteColor,
+        primaryColor: '',
     };
+}
+
+export async function getPaletteColors(file: File): Promise<string[]> {
+    const image = await loadImage(file);
+    const colorPaletteBase64 = resizeImage(image, 512, 512);
+    
+    // Extract color palette
+    const palette = await Vibrant.from(colorPaletteBase64).getPalette();
+    return [
+        palette.Vibrant?.hex ?? '',
+        palette.DarkMuted?.hex ?? '',
+        palette.DarkVibrant?.hex ?? '',
+        palette.LightMuted?.hex ?? '',
+        palette.LightVibrant?.hex ?? '',
+        palette.Muted?.hex ?? '',
+    ].filter(Boolean)
 }
 
 async function loadImage(file: File): Promise<HTMLImageElement> {

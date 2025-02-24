@@ -1,11 +1,12 @@
 'use client'
 
 import { Avatar, AvatarVariant } from '@/types/schema'
-import { createImageAvatar } from '@/utils/image'
+import { createImageAvatar, getPaletteColors } from '@/utils/image'
 import { AddPhotoAlternate, RemoveCircle } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from '@mui/material'
 import { useMemo, useRef, useState } from 'react'
+import ColorPicker from './ColorPicker'
 
 interface ImageAvatarPicker {
 	value: Avatar
@@ -25,7 +26,10 @@ export const ImageAvatar = (props: ImageAvatarProps) => {
 export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 	const [uploading, setUploading] = useState<boolean>(false)
 	const [uploadError, setUploadError] = useState<string | null>(null)
+	const [paletteColors, setPaletteColors] = useState<string[]>([])
 	const fileInputRef = useRef<HTMLInputElement>(null)
+
+	console.log(paletteColors)
 
 	const hasImageIcon = useMemo(() => {
 		return [
@@ -51,7 +55,9 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 
 			try {
 				const imageAvatar = await createImageAvatar(file)
-				props.onChange(imageAvatar)
+				const paletteColors = await getPaletteColors(file)
+				setPaletteColors(paletteColors)
+				props.onChange({ ...imageAvatar, primaryColor: paletteColors[0] })
 			} catch (err) {
 				setUploadError((err as Error).message)
 			} finally {
@@ -74,6 +80,12 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 					<>
 						<ImageAvatar
 							avatar={props.value}
+						/>
+						<ColorPicker
+							color={props.value.primaryColor}
+							onChange={(color) => props.onChange({ ...props.value, primaryColor: color })}
+							swatches={paletteColors.map((color: string) => ({ color, name: '' }))}
+							disabled={!paletteColors.length}
 						/>
 						<Button variant="text" onClick={() => handleRemoveImage()} startIcon={<RemoveCircle />}>
 							Remove
