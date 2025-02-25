@@ -1,6 +1,5 @@
 import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Divider } from '@mui/material'
-import dayjs from 'dayjs'
 import JournalHeader from './JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -28,8 +27,6 @@ export default function JournalEditor() {
 	const journalContext = useContext(JournalContext)
 	const journalEntryContext = useContext(JournalEntryContext)
 
-	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
-
 	const journalGroups = useMemo(() => {
 		const entries = journalEntryContext.getJournalEntriesQuery.data
 		const groups: Record<JournalEntry['_id'], JournalEntry[]> = Object.values(entries).reduce(
@@ -45,19 +42,8 @@ export default function JournalEditor() {
 				}
 
 				return acc
-			},
-			{
-				[currentDayString]: [],
-			}
+			}, {}
 		)
-		
-		// TODO temp solution. Populate with all dates in the month
-		// const xs = getAllDatesInMonth(Object.keys(groups)[0])
-		// xs.forEach((date) => {
-		// 	if (!groups[date]) {
-		// 		groups[date] = []
-		// 	}
-		// })
 
 		return groups
 	}, [journalEntryContext.getJournalEntriesQuery.data])
