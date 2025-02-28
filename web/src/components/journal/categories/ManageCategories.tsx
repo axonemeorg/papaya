@@ -1,5 +1,5 @@
 import AvatarIcon from '@/components/icon/AvatarIcon'
-import CategoryChip from '@/components/icon/CategoryChip'
+import AvatarChip from '@/components/icon/AvatarChip'
 import CreateCategoryModal from '@/components/modal/CreateCategoryModal'
 import EditCategoryModal from '@/components/modal/EditCategoryModal'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -135,7 +135,7 @@ export default function ManageCategories() {
 											<AvatarIcon avatar={category?.avatar} />
 										</ListItemIcon>
 										<Link href={generateCategoryLink(category)}>
-											<CategoryChip category={category} contrast />
+											<AvatarChip avatar={category.avatar} label={category.label} contrast />
 										</Link>
 									</ListItem>
 								)

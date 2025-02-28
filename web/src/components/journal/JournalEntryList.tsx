@@ -24,7 +24,7 @@ import { Category, JournalEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
-import CategoryChip from '../icon/CategoryChip'
+import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -242,7 +242,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 														</TableCell>
 														<TableCell>
 															{category ? (
-																<CategoryChip category={category} />
+																<AvatarChip avatar={category.avatar} label={category.label} />
 															) : (
 																<Chip
 																	sx={(theme) => ({

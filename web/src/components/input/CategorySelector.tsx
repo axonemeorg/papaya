@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { Close, Done, Settings } from "@mui/icons-material";
 import { Category } from "@/types/schema";
-import CategoryChip from "../icon/CategoryChip";
+import AvatarChip from "../icon/AvatarChip";
 import { JournalContext } from "@/contexts/JournalContext";
 import AvatarIcon from "../icon/AvatarIcon";
 import { createCategory } from "@/database/actions";
@@ -93,7 +93,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
                     {selectedCategories.map((category) => {
                         return (
                             <ButtonBase disableRipple onClick={() => setOpen(true)} key={category._id}>
-                                <CategoryChip icon contrast category={category} />
+                                <AvatarChip icon contrast avatar={category.avatar} label={category.label} />
                             </ButtonBase>
                         )
                     })}

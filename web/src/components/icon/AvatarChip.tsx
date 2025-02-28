@@ -1,15 +1,16 @@
-import { Category } from '@/types/schema'
+import { Avatar } from '@/types/schema'
 import { alpha, Chip, Icon, useTheme } from '@mui/material'
 import AvatarIcon from './AvatarIcon'
 
-interface CategoryChipProps {
-	category?: Category
+interface AvatarChipProps {
+	avatar?: Avatar
+	label?: string
 	contrast?: boolean
 	icon?: boolean
 }
 
-export default function CategoryChip(props: CategoryChipProps) {
-	const categoryColor = props.category?.avatar.primaryColor
+export default function AvatarChip(props: AvatarChipProps) {
+	const categoryColor = props.avatar?.primaryColor
 	const theme = useTheme()
 
 	let background = undefined;
@@ -33,10 +34,10 @@ export default function CategoryChip(props: CategoryChipProps) {
 				background,
 				fontWeight: 500,
 			}}
-			label={props.category?.label}
-			icon={props.icon && props.category ? (
+			label={props.label}
+			icon={props.icon && props.avatar ? (
 				<Icon>
-					<AvatarIcon avatar={props.category.avatar} sx={{ color: `${color} !important` }} />
+					<AvatarIcon avatar={props.avatar} sx={{ color: `${color} !important` }} />
 				</Icon>
 			) : undefined}
 		/>

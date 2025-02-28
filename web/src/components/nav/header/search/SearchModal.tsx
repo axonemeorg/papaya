@@ -27,7 +27,7 @@ import { flattenJournalObjects } from "@/utils/search";
 import { Category, ChildJournalEntry, JournalEntry, ZiskDocument } from "@/types/schema";
 import { calculateNetAmount, documentIsCategory, documentIsChildJournalEntry, documentIsJournalEntryOrChildJournalEntry } from "@/utils/journal";
 import { getPriceString } from "@/utils/string";
-import CategoryChip from "@/components/icon/CategoryChip";
+import AvatarChip from "@/components/icon/AvatarChip";
 import AvatarIcon from "@/components/icon/AvatarIcon";
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from "@/constants/journal";
 import { formatJournalEntryDate } from "@/utils/date";
@@ -116,7 +116,7 @@ export default function SearchModal(props: SearchModalProps) {
 
         // Category
         else if (documentIsCategory(result.item)) {
-            primaryTextFirstPart = <CategoryChip category={result.item} icon contrast />
+            primaryTextFirstPart = <AvatarChip avatar={result.item.avatar} label={result.item.label} icon contrast />
             link = generateCategoryLink(result.item)
         }
     
