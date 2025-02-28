@@ -165,6 +165,31 @@ export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEnt
 
 export type EntryTag = z.output<typeof EntryTag>
 
+export const RecurringCadence = z.object({
+	// TODO
+})
+
+export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
+	z.object({
+		type: z.literal('ENTRY_RECURRENCE'),
+		/**
+		 * Encodes the cadence of the recurrence, e.g. every four weeks,
+		 * every month, etc. If this value is undefined, then the it
+		 * will inherit the cadence of the last recurrence.
+		 */
+		cadence: z.object({
+
+		}).optional(),
+		/**
+		 * The journal entry ID of the previous recurrence. If this is the
+		 * first recurrence, this value is null.
+		 */
+		lastRecurrence: z.string().nullable()
+	})
+)
+
+export type EntryRecurrence = z.output<typeof EntryRecurrence>;
+
 export const CreateAccount = z.object({
 	label: z.string(),
 	description: z.string(),
