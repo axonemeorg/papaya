@@ -6,6 +6,9 @@ import {
 	Grid2 as Grid,
 	Stack,
 	TextField,
+	ToggleButton,
+	ToggleButtonGroup,
+	Tooltip,
 } from '@mui/material'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
@@ -22,6 +25,7 @@ import EntryTagSelector from '../input/EntryTagSelector'
 import EntryNoteForm from './EntryNoteForm'
 import EntryTasksForm from './EntryTasksForm'
 import AccountAutocomplete from '../input/AccountAutocomplete'
+import { Book, Info, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -43,6 +47,22 @@ export default function JournalEntryForm() {
 	return (
 		<>
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
+				<ToggleButtonGroup value={'JOURNAL_ENTRY'} size='small'>
+					<ToggleButton value='JOURNAL_ENTRY'>
+						<Stack direction='row' gap={0.5} alignItems='center'>
+							<Book sx={{ mr: 0 }} />
+							<span>Ledger</span>
+							<Tooltip title="Journal entry"><InfoOutlined fontSize='small' /></Tooltip>
+						</Stack>
+					</ToggleButton>
+					<ToggleButton value='ACCOUNT_TRANSFER_ENTRY'>
+						<Stack direction='row' gap={0.5} alignItems='center'>
+							<TransferWithinAStation sx={{ mr: 0 }} />
+							<span>Transfer</span>
+							<Tooltip title="Transfer between accounts"><InfoOutlined fontSize='small' /></Tooltip>
+						</Stack>
+					</ToggleButton>
+				</ToggleButtonGroup>
 				<Grid container columns={12} spacing={4} rowSpacing={2} mb={1} sx={{ px: 0 }}>
 					<Grid size={12}>
 						{/* <Stack direction='row' sx={{ pt: 0, pb: 2 }}>
