@@ -117,6 +117,7 @@ export default function JournalEntryForm() {
 												onChange={(_event, newValue) => {
 													setValue(field.name, newValue ?? undefined, { shouldDirty: true })
 												}}
+												renderInput={(params) => <TextField {...params} label={'Account'} variant='filled' />}
 											/>
 										)
 									}}
