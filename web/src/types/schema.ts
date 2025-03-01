@@ -7,7 +7,7 @@ export const IdentifierMetadata = z.object({
 export type IdentifierMetadata = z.output<typeof IdentifierMetadata>
 
 export const BelongsToJournal = z.object({
-    journalId: z.string(),
+	journalId: z.string(),
 })
 
 export const AttachmentMeta = z.object({
@@ -167,33 +167,44 @@ export type EntryTag = z.output<typeof EntryTag>
 
 const MonthlyCadence = z.object({
 	frequency: z.literal('MONTHLY'),
-	on: z.union(
-		// 
+	on: z.union([
 		z.object({
+			// Monthly on Last Thursday, First Monday, Second Monday, etc.
 			week: z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST']),
 		}),
-
 		z.object({
+			// Monthly on the 12th day
 			day: z.number().min(1).max(31),
-		})
-	)
-})
+		}),
+	]),
+});
+
+const DailyCadence = z.object({
+	frequency: z.literal('DAILY'),
+});
 
 const YearlyCadence = z.object({
-	frequency: z.literal('YEARLY')
-})
+	frequency: z.literal('YEARLY'),
+});
+
+const WeeklyCadence = z.object({
+	frequency: z.literal('WEEKLY'),
+	days: z.array(
+		z.enum(['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'])
+	),
+});
+
 
 export const RecurringCadence = z.object({
-	periodMultiple: z.number(),
-}).merge(
-	z.union(
+	period: z.number(), // Every _ days/months/weeks
+}).and(
+	z.union([
 		MonthlyCadence,
 		WeeklyCadence,
 		DailyCadence,
 		YearlyCadence,
-	)
-)
-
+	])
+);
 export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_RECURRENCE'),
@@ -202,9 +213,7 @@ export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 		 * every month, etc. If this value is undefined, then the it
 		 * will inherit the cadence of the last recurrence.
 		 */
-		cadence: z.object({
-
-		}).optional(),
+		cadence: RecurringCadence.optional(),
 		/**
 		 * The journal entry ID of the previous recurrence. If this is the
 		 * first recurrence, this value is null.
