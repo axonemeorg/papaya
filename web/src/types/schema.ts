@@ -165,9 +165,34 @@ export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEnt
 
 export type EntryTag = z.output<typeof EntryTag>
 
-export const RecurringCadence = z.object({
-	// TODO
+const MonthlyCadence = z.object({
+	frequency: z.literal('MONTHLY'),
+	on: z.union(
+		// 
+		z.object({
+			week: z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST']),
+		}),
+
+		z.object({
+			day: z.number().min(1).max(31),
+		})
+	)
 })
+
+const YearlyCadence = z.object({
+	frequency: z.literal('YEARLY')
+})
+
+export const RecurringCadence = z.object({
+	periodMultiple: z.number(),
+}).merge(
+	z.union(
+		MonthlyCadence,
+		WeeklyCadence,
+		DailyCadence,
+		YearlyCadence,
+	)
+)
 
 export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
