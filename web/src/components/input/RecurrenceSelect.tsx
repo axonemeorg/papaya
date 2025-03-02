@@ -3,18 +3,8 @@ import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, YearlyCa
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material"
 import { Button, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent, SelectProps, Stack, TextField, ToggleButton, Typography } from "@mui/material"
 import { ChangeEvent, useEffect, useMemo, useState } from "react"
-import { date } from "zod"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
-
-
-const INITIAL_RECURRING_CADENCE: RecurringCadence = {
-    frequency: "MONTHLY",
-    period: 1,
-    on: {
-        day: 1,
-    }
-}
 
 interface CustomRecurrenceModalProps extends Omit<DialogProps, 'onSubmit' | 'onClose'> {
     onSubmit: (cadence: RecurringCadence) => void
@@ -23,8 +13,7 @@ interface CustomRecurrenceModalProps extends Omit<DialogProps, 'onSubmit' | 'onC
 
 function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     const { onSubmit, ...rest } = props
-    // const [recurrence, setRecurrence] = useState<RecurringCadence>(INITIAL_RECURRING_CADENCE)
-    const [period, setPeriod] = useState<string | number>('')
+    const [period, setPeriod] = useState<string | number>(1)
     const [frequency, setFrequency] = useState<CadenceFrequency>('MONTHLY')
     const [selectedWeekDays, setSelectedWeekDays] = useState<Set<DayOfWeek>>(new Set<DayOfWeek>())
     const [monthlyCadenceOptions, setMonthlyCadenceOptions] = useState<MonthlyCadence[]>([])
@@ -33,44 +22,10 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     const [dateString, setDateString] = useState<string>('2025-01-01')
 
     const handleChangeFrequency = (event: SelectChangeEvent<CadenceFrequency>) => {
-        // setRecurrence((prev: RecurringCadence): RecurringCadence => {
-        //     switch (event.target.value as CadenceFrequency) {
-        //         case 'YEARLY':
-        //             return {
-        //                 frequency: 'YEARLY',
-        //                 period: prev.period,
-        //             }
-        //         case 'DAILY':
-        //             return {
-        //                 frequency: 'DAILY',
-        //                 period: prev.period,
-        //             }
-        //         case 'MONTHLY':
-        //         default:
-        //             return {
-        //                 frequency: 'MONTHLY',
-        //                 period: prev.period,
-        //                 on: {
-        //                     week: "FIRST",
-        //                 },
-        //             }
-        //         case 'WEEKLY': {
-        //             return {
-        //                 frequency: 'WEEKLY',
-        //                 period: prev.period,
-        //                 days: [],
-        //             }
-        //         } 
-        //     }
-        // })
         setFrequency(event.target.value as CadenceFrequency)
     }
 
     const handleChangePeriod = (event: ChangeEvent<HTMLInputElement>) => {
-        // const period = [undefined, ''].includes(event.target.value)
-        //     ? undefined as unknown as number
-        //     : Number(event.target.value)
-        // setRecurrence((prev) => ({ ...prev, period }))
         setPeriod(event.target.value)
     }
 
@@ -87,7 +42,31 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     }
 
     const handleSubmit = () => {
-        //
+        switch (frequency) {
+            case 'YEARLY':
+                return {
+                    frequency: 'YEARLY',
+                    period,
+                }
+            case 'DAILY':
+                return {
+                    frequency: 'DAILY',
+                    period,
+                }
+            case 'MONTHLY':
+            default:
+                return {
+                    ...monthlyCadenceOptions[selectedMonthlyCadenceOption],
+                    period,
+                }
+            case 'WEEKLY': {
+                return {
+                    frequency: 'WEEKLY',
+                    period,
+                    days: Array.from(selectedWeekDays),
+                }
+            } 
+        }
     }
 
     useEffect(() => {
@@ -118,6 +97,11 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             autoComplete="new-password"
                             type='number'
                             variant='filled'
+                            onBlur={() => {
+                                if (!period || Number(period) <= 0) {
+                                    setPeriod(1)
+                                }
+                            }}
                             slotProps={{
                                 htmlInput: {
                                     sx: {
