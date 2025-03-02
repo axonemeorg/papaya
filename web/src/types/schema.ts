@@ -165,46 +165,67 @@ export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEnt
 
 export type EntryTag = z.output<typeof EntryTag>
 
-const MonthlyCadence = z.object({
-	frequency: z.literal('MONTHLY'),
-	on: z.union([
-		z.object({
-			// Monthly on Last Thursday, First Monday, Second Monday, etc.
-			week: z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST']),
-		}),
-		z.object({
-			// Monthly on the 12th day
-			day: z.number().min(1).max(31),
-		}),
-	]),
+// CadenceFrequency enum using Zod
+export const CadenceFrequency = z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']);
+export type CadenceFrequency = z.infer<typeof CadenceFrequency>;
+
+// Week number enum using Zod
+export const WeekNumber = z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST']);
+export type WeekNumber = z.infer<typeof WeekNumber>;
+
+// Days of week enum using Zod
+export const DayOfWeek = z.enum(['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']);
+export type DayOfWeek = z.infer<typeof DayOfWeek>;
+
+export const MonthlyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.MONTHLY),
+  on: z.union([
+    z.object({
+      // Monthly on Last Thursday, First Monday, Second Monday, etc.
+      week: WeekNumber,
+    }),
+    z.object({
+      // Monthly on the 12th day
+      day: z.number().min(1).max(31),
+    }),
+  ]),
 });
 
-const DailyCadence = z.object({
-	frequency: z.literal('DAILY'),
+export type MonthlyCadence = z.output<typeof MonthlyCadence>
+
+export const DailyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.DAILY),
 });
 
-const YearlyCadence = z.object({
-	frequency: z.literal('YEARLY'),
+export type DailyCadence = z.output<typeof DailyCadence>
+
+export const YearlyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.YEARLY),
 });
 
-const WeeklyCadence = z.object({
-	frequency: z.literal('WEEKLY'),
-	days: z.array(
-		z.enum(['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'])
-	),
+export type YearlyCadence = z.output<typeof YearlyCadence>
+
+export const WeeklyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.WEEKLY),
+  days: z.array(DayOfWeek),
 });
+
+export type WeeklyCadence = z.output<typeof WeeklyCadence>
 
 
 export const RecurringCadence = z.object({
-	period: z.number(), // Every _ days/months/weeks
+  period: z.number(), // Every _ days/months/weeks
 }).and(
-	z.union([
-		MonthlyCadence,
-		WeeklyCadence,
-		DailyCadence,
-		YearlyCadence,
-	])
+  z.union([
+    MonthlyCadence,
+    WeeklyCadence,
+    DailyCadence,
+    YearlyCadence,
+  ])
 );
+
+export type RecurringCadence = z.output<typeof RecurringCadence>
+
 export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
 		type: z.literal('ENTRY_RECURRENCE'),

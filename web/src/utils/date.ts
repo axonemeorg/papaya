@@ -48,11 +48,12 @@ export const getAllDatesInMonth = (inputDate: string) => {
  * @example getWeekOfMonth('2024-01-29') // Output: 5 (the last week)
  */
 export const getWeekOfMonth = (date: string) => {
-    const day = dayjs(date);
-    const firstDayOfMonth = day.startOf('month');
-    const dayOfMonth = day.date();
-    const weekOfMonth = Math.ceil((dayOfMonth + firstDayOfMonth.day()) / 7);
-    
-    return weekOfMonth;
+    let day = dayjs(date)
+    let weekNumber = 0
+    for (let pivot = dayjs(date); pivot.month() === day.month(); pivot = pivot.subtract(7, 'days')) {
+        weekNumber ++;
+    }
+
+    return weekNumber;
 }
 
