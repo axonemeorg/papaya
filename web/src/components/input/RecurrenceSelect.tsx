@@ -1,12 +1,14 @@
 import { getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate } from "@/utils/recurrence"
-import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, YearlyCadence } from "@/types/schema"
+import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from "@/types/schema"
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material"
-import { Button, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent, SelectProps, Stack, TextField, ToggleButton, Typography } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent, SelectProps, Stack, TextField, Typography } from "@mui/material"
 import { ChangeEvent, useEffect, useMemo, useState } from "react"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
 
-interface CustomRecurrenceModalProps extends Omit<DialogProps, 'onSubmit' | 'onClose'> {
+interface CustomRecurrenceModalProps {
+    open: boolean
+    date: string
     onSubmit: (cadence: RecurringCadence) => void
     onClose: () => void
 }
@@ -18,8 +20,6 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     const [selectedWeekDays, setSelectedWeekDays] = useState<Set<DayOfWeek>>(new Set<DayOfWeek>())
     const [monthlyCadenceOptions, setMonthlyCadenceOptions] = useState<MonthlyCadence[]>([])
     const [selectedMonthlyCadenceOption, setSelectedMonthlyCadenceOption] = useState<number>(0)
-
-    const [dateString, setDateString] = useState<string>('2025-01-01')
 
     const handleChangeFrequency = (event: SelectChangeEvent<CadenceFrequency>) => {
         setFrequency(event.target.value as CadenceFrequency)
@@ -42,50 +42,49 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     }
 
     const handleSubmit = () => {
+        let response: RecurringCadence
         switch (frequency) {
             case 'YEARLY':
-                return {
+                response = {
                     frequency: 'YEARLY',
-                    period,
+                    period: Number(period),
                 }
+                break
             case 'DAILY':
-                return {
+                response = {
                     frequency: 'DAILY',
-                    period,
+                    period: Number(period),
                 }
-            case 'MONTHLY':
-            default:
-                return {
-                    ...monthlyCadenceOptions[selectedMonthlyCadenceOption],
-                    period,
-                }
+                break
             case 'WEEKLY': {
-                return {
+                response = {
                     frequency: 'WEEKLY',
-                    period,
+                    period: Number(period),
                     days: Array.from(selectedWeekDays),
                 }
-            } 
+                break
+            }
+            case 'MONTHLY':
+            default:
+                response = {
+                    ...monthlyCadenceOptions[selectedMonthlyCadenceOption],
+                    period: Number(period),
+                }
+                break
         }
+        onSubmit(response)
     }
 
     useEffect(() => {
         setSelectedMonthlyCadenceOption(0)
-        setMonthlyCadenceOptions(getMonthlyRecurrencesFromDate(dateString))
-        setSelectedWeekDays(new Set<DayOfWeek>([dayjs(dateString).format('ddd').toUpperCase() as DayOfWeek]))
-    }, [dateString])
+        setMonthlyCadenceOptions(getMonthlyRecurrencesFromDate(props.date))
+        setSelectedWeekDays(new Set<DayOfWeek>([dayjs(props.date).format('ddd').toUpperCase() as DayOfWeek]))
+    }, [props.date])
 
     return (
         <Dialog {...rest} maxWidth='xs' fullWidth>
             <DialogTitle>Custom recurrence</DialogTitle>
             <DialogContent>
-                <TextField
-                    color='error'
-                    label={'Debug Date'}
-                    value={dateString}
-                    onChange={(event) => setDateString(event.target.value)}
-                    sx={{ mt: 1 }}
-                />
                 <Stack spacing={1}>
                     <Stack direction='row' spacing={0.5} alignItems={'center'}>
                         <Typography sx={{ pr: 1 }}>Repeats every</Typography>
@@ -107,8 +106,8 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                                     sx: {
                                         width: '3ch',
                                         textAlign: 'center',
-                                        '&::-webkit-inner-spin-button,::-webkit-outer-spin-button': { 
-                                           '-webkit-appearance': 'none', 
+                                        '&::-webkit-inner-spin-button,::-webkit-outer-spin-button': {
+                                            '-webkit-appearance': 'none',
                                             margin: 0,
                                         }
                                     }
@@ -149,7 +148,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             onChange={(event) => setSelectedMonthlyCadenceOption(Number(event.target.value))}
                         >
                             {monthlyCadenceOptions.map((option: MonthlyCadence, index: number) => {
-                                const label = getMonthlyCadenceLabel(option, dateString);
+                                const label = getMonthlyCadenceLabel(option, props.date);
 
                                 return (
                                     <MenuItem value={index} key={label}>
@@ -168,34 +167,67 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => props.onClose()}>Cancek</Button>
+                <Button onClick={() => props.onClose()}>Cancel</Button>
                 <Button variant='contained' color='primary' onClick={() => handleSubmit()}>Done</Button>
             </DialogActions>
         </Dialog>
     )
 }
 
-type RecurrenceSelectProps = Partial<Omit<SelectProps, 'children'>>
+interface RecurrenceSelectProps extends Partial<Omit<SelectProps<RecurringCadence | undefined>, 'children'>> {
+    date: string
+}
 
 export default function RecurrenceSelect(props: RecurrenceSelectProps) {
     const [showCustomRecurrenceDialog, setShowCustomRecurrenceDialog] = useState<boolean>(true)
 
-    const selectOptions: any[] = useMemo(() => {
-        return []
-    }, [])
+    const selectOptions: (RecurringCadence | string)[] = useMemo(() => {
+        const options = []
+        if (props.value) {
+            options.push(props.value)
+        }
+        return options
+    }, [props.date, props.value])
 
-    return (
+    const handleChange = (event: SelectChangeEvent<RecurringCadence | string>) => {
+        const { value } = event.target
+        if (value === 'CUSTOM') {
+            setShowCustomRecurrenceDialog(true)
+            event.preventDefault()
+            return
+        }
+        if (props.onChange) {
+            props.onChange(event)
+        }
+    }
+
+    const handleSubmitCustomRecurrenceForm = (value: RecurringCadence) => {
+        console.log('handleSubmitCustomRecurrenceForm value:', value)
+        handleChange({ target: { value, name: props.name } } as SelectChangeEvent<RecurringCadence>);
+        setShowCustomRecurrenceDialog(false)
+    }
+
+    return ( 
         <>
             <CustomRecurrenceModal
                 open={showCustomRecurrenceDialog}
+                date={props.date}
                 onClose={() => setShowCustomRecurrenceDialog(false)}
-                onSubmit={() => {}}
+                onSubmit={handleSubmitCustomRecurrenceForm}
             />
             <Select
                 {...props}
+                onChange={handleChange}
             >
-                <MenuItem>Does not recur</MenuItem>
-                <MenuItem>Custom...</MenuItem>
+                <MenuItem value='NON_RECURRING'>Does not recur</MenuItem>
+                {selectOptions.map((option) => {
+                    return (
+                        <MenuItem key={JSON.stringify(option)}>
+                            
+                        </MenuItem>
+                    )
+                })}
+                <MenuItem value='CUSTOM'>Custom...</MenuItem>
             </Select>
         </>
     )

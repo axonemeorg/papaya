@@ -4,6 +4,7 @@ import {
 	Box,
 	Divider,
 	Grid2 as Grid,
+	SelectChangeEvent,
 	Stack,
 	TextField,
 } from '@mui/material'
@@ -11,7 +12,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { JournalEntry } from '@/types/schema'
+import { JournalEntry, RecurringCadence } from '@/types/schema'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
@@ -27,6 +28,7 @@ import RecurrenceSelect from '../input/RecurrenceSelect'
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
 
+	const date: string = useWatch({ control, name: 'date' }) ?? dayjs().format('YYYY-MM-DD')
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
 	const accountId = useWatch({ control, name: 'accountId' })
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
@@ -87,10 +89,26 @@ export default function JournalEntryForm() {
 										</LocalizationProvider>
 									)}
 								/>
-								<RecurrenceSelect
-									variant='filled'
-									label='Recurrence'
+								
+								<Controller
+									control={control}
+									name="recurs"
+									render={({ field }) => (
+										<RecurrenceSelect
+											variant='filled'
+											label='Recurrence'
+											date={date}
+											{...field}
+											value={field.value?.cadence ?? ''}
+											onChange={(event: SelectChangeEvent<RecurringCadence | string | undefined>) => {
+												const value: RecurringCadence | string | undefined = event.target.value;
+												console.log('got value:', value)
+												setValue(`recurs.cadence`, value || undefined, { shouldDirty: true })
+											}}
+										/>
+									)}
 								/>
+													
 							</Stack>
 							<Grid container columns={12} columnSpacing={2}>
 								<Grid size={8}>

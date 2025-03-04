@@ -90,81 +90,6 @@ export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
 
 export type EntryTask = z.output<typeof EntryTask>
 
-export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
-	z.object({
-		type: z.literal('JOURNAL_ENTRY'),
-		memo: z.string(),
-		tagIds: z.array(z.string()).optional(),
-		categoryIds: z.array(z.string()).optional(),
-		accountId: z.string().optional(),
-		date: z.string().optional(),
-		notes: z.string().optional(),
-		tasks: z.array(EntryTask).optional(),
-		artifacts: z.array(EntryArtifact).optional(),
-		paymentMethodId: z.string().nullable().optional(),
-		relatedEntryIds: z.array(z.string()).optional(),
-		createdAt: z.string(),
-		updatedAt: z.string().nullable().optional(),
-	})
-)
-
-export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
-
-export const JournalEntry = BaseJournalEntry.merge(
-	z.object({
-		children: z.array(BaseJournalEntry).optional(),
-	})
-)
-
-export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
-	parentEntry: JournalEntry,
-	type: z.literal('CHILD_JOURNAL_ENTRY'),
-}))
-
-export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
-
-export type JournalEntry = z.output<typeof JournalEntry>
-
-export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
-	memo: z.string().optional(),
-	categoryIds: z.array(z.string()).optional(),
-}))
-
-export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
-
-export const CreateEntryTag = z.object({
-	label: z.string(),
-	description: z.string(),
-})
-
-export type CreateEntryTag = z.output<typeof CreateEntryTag>
-
-export const ReservedTagKey = z.enum([
-	'FLAGGED',
-	'NEEDS_REVIEW',
-	'WAS_REVIEWED',
-])
-
-export type ReservedTagKey = z.output<typeof ReservedTagKey>
-
-export const ReservedTag = CreateEntryTag.merge(z.object({
-	_id: ReservedTagKey,
-	type: z.literal('RESERVED_TAG'),
-	archived: z.boolean().optional(),
-}))
-
-export type ReservedTag = z.output<typeof ReservedTag>
-
-export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
-	z.object({
-		type: z.literal('ENTRY_TAG'),
-		createdAt: z.string(),
-		updatedAt: z.string().nullable(),
-	})
-)
-
-export type EntryTag = z.output<typeof EntryTag>
-
 // CadenceFrequency enum using Zod
 export const CadenceFrequency = z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']);
 export type CadenceFrequency = z.infer<typeof CadenceFrequency>;
@@ -244,6 +169,82 @@ export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 )
 
 export type EntryRecurrence = z.output<typeof EntryRecurrence>;
+
+export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
+	z.object({
+		type: z.literal('JOURNAL_ENTRY'),
+		memo: z.string(),
+		tagIds: z.array(z.string()).optional(),
+		categoryIds: z.array(z.string()).optional(),
+		accountId: z.string().optional(),
+		date: z.string().optional(),
+		notes: z.string().optional(),
+		tasks: z.array(EntryTask).optional(),
+		artifacts: z.array(EntryArtifact).optional(),
+		recurs: EntryRecurrence.optional(),
+		paymentMethodId: z.string().nullable().optional(),
+		relatedEntryIds: z.array(z.string()).optional(),
+		createdAt: z.string(),
+		updatedAt: z.string().nullable().optional(),
+	})
+)
+
+export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
+
+export const JournalEntry = BaseJournalEntry.merge(
+	z.object({
+		children: z.array(BaseJournalEntry).optional(),
+	})
+)
+
+export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
+	parentEntry: JournalEntry,
+	type: z.literal('CHILD_JOURNAL_ENTRY'),
+}))
+
+export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
+
+export type JournalEntry = z.output<typeof JournalEntry>
+
+export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
+	memo: z.string().optional(),
+	categoryIds: z.array(z.string()).optional(),
+}))
+
+export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
+
+export const CreateEntryTag = z.object({
+	label: z.string(),
+	description: z.string(),
+})
+
+export type CreateEntryTag = z.output<typeof CreateEntryTag>
+
+export const ReservedTagKey = z.enum([
+	'FLAGGED',
+	'NEEDS_REVIEW',
+	'WAS_REVIEWED',
+])
+
+export type ReservedTagKey = z.output<typeof ReservedTagKey>
+
+export const ReservedTag = CreateEntryTag.merge(z.object({
+	_id: ReservedTagKey,
+	type: z.literal('RESERVED_TAG'),
+	archived: z.boolean().optional(),
+}))
+
+export type ReservedTag = z.output<typeof ReservedTag>
+
+export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
+	z.object({
+		type: z.literal('ENTRY_TAG'),
+		createdAt: z.string(),
+		updatedAt: z.string().nullable(),
+	})
+)
+
+export type EntryTag = z.output<typeof EntryTag>
 
 export const CreateAccount = z.object({
 	label: z.string(),
