@@ -148,7 +148,10 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             onChange={(event) => setSelectedMonthlyCadenceOption(Number(event.target.value))}
                         >
                             {monthlyCadenceOptions.map((option: MonthlyCadence, index: number) => {
-                                const label = getMonthlyCadenceLabel(option, props.date);
+                                const label = [
+                                    'monthly on',
+                                    getMonthlyCadenceLabel(option, props.date)
+                                ].join(' ')
 
                                 return (
                                     <MenuItem value={index} key={label}>
@@ -219,7 +222,7 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
                 {...props}
                 onChange={handleChange}
             >
-                <MenuItem value='NON_RECURRING'>Does not recur</MenuItem>
+                <MenuItem value='NON_RECURRING'></MenuItem>
                 {selectOptions.map((option) => {
                     return (
                         <MenuItem key={JSON.stringify(option)}>
