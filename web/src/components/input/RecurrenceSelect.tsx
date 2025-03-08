@@ -15,8 +15,8 @@ interface CustomRecurrenceModalProps {
 
 function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     const { onSubmit, ...rest } = props
-    const [period, setPeriod] = useState<string | number>(1)
-    const [frequency, setFrequency] = useState<CadenceFrequency>('MONTHLY')
+    const [interval, setInterval] = useState<string | number>(1)
+    const [frequency, setFrequency] = useState<CadenceFrequency>('M')
     const [selectedWeekDays, setSelectedWeekDays] = useState<Set<DayOfWeek>>(new Set<DayOfWeek>())
     const [monthlyCadenceOptions, setMonthlyCadenceOptions] = useState<MonthlyCadence[]>([])
     const [selectedMonthlyCadenceOption, setSelectedMonthlyCadenceOption] = useState<number>(0)
@@ -25,50 +25,50 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
         setFrequency(event.target.value as CadenceFrequency)
     }
 
-    const handleChangePeriod = (event: ChangeEvent<HTMLInputElement>) => {
-        setPeriod(event.target.value)
+    const handleChangeInterval = (event: ChangeEvent<HTMLInputElement>) => {
+        setInterval(event.target.value)
     }
 
-    const incrementPeriod = () => {
-        setPeriod((prev) => (Number(prev || 0) + 1))
+    const incrementInterval = () => {
+        setInterval((prev) => (Number(prev || 0) + 1))
     }
 
-    const decrementPeriod = () => {
-        if (Number(period) > 1) {
-            setPeriod((prev) => Number(prev) - 1)
+    const decrementInterval = () => {
+        if (Number(interval) > 1) {
+            setInterval((prev) => Number(prev) - 1)
         } else {
-            setPeriod(1)
+            setInterval(1)
         }
     }
 
     const handleSubmit = () => {
         let response: RecurringCadence
         switch (frequency) {
-            case 'YEARLY':
+            case 'Y':
                 response = {
-                    frequency: 'YEARLY',
-                    period: Number(period),
+                    frequency: 'Y',
+                    interval: Number(interval),
                 }
                 break
-            case 'DAILY':
+            case 'D':
                 response = {
-                    frequency: 'DAILY',
-                    period: Number(period),
+                    frequency: 'D',
+                    interval: Number(interval),
                 }
                 break
-            case 'WEEKLY': {
+            case 'W': {
                 response = {
-                    frequency: 'WEEKLY',
-                    period: Number(period),
+                    frequency: 'W',
+                    interval: Number(interval),
                     days: Array.from(selectedWeekDays),
                 }
                 break
             }
-            case 'MONTHLY':
+            case 'M':
             default:
                 response = {
                     ...monthlyCadenceOptions[selectedMonthlyCadenceOption],
-                    period: Number(period),
+                    interval: Number(interval),
                 }
                 break
         }
@@ -90,15 +90,15 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                         <Typography sx={{ pr: 1 }}>Repeats every</Typography>
                         <TextField
                             hiddenLabel
-                            value={period}
-                            onChange={handleChangePeriod}
+                            value={interval}
+                            onChange={handleChangeInterval}
                             size='small'
                             autoComplete="new-password"
                             type='number'
                             variant='filled'
                             onBlur={() => {
-                                if (!period || Number(period) <= 0) {
-                                    setPeriod(1)
+                                if (!interval || Number(interval) <= 0) {
+                                    setInterval(1)
                                 }
                             }}
                             slotProps={{
@@ -115,10 +115,10 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             }}
                         />
                         <Stack spacing={0}>
-                            <IconButton size="small" onClick={() => incrementPeriod()}>
+                            <IconButton size="small" onClick={() => incrementInterval()}>
                                 <ArrowUpward />
                             </IconButton>
-                            <IconButton size="small" onClick={() => decrementPeriod()}>
+                            <IconButton size="small" onClick={() => decrementInterval()}>
                                 <ArrowDownward />
                             </IconButton>
                         </Stack>
@@ -131,14 +131,14 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                         >
                             {CadenceFrequency.options.map((frequency: CadenceFrequency) => {
                                 return (
-                                    <MenuItem value={frequency} key={`${frequency}-${period}`}>
-                                        {getFrequencyLabel(frequency, Number(period || 0))}
+                                    <MenuItem value={frequency} key={`${frequency}-${interval}`}>
+                                        {getFrequencyLabel(frequency, Number(interval || 0))}
                                     </MenuItem>
                                 )
                             })}
                         </Select>
                     </Stack>
-                    {frequency === 'MONTHLY' && (
+                    {frequency === 'M' && (
                         <Select
                             hiddenLabel
                             fullWidth
@@ -161,7 +161,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             })}
                         </Select>
                     )}
-                    {frequency === 'WEEKLY' && (
+                    {frequency === 'W' && (
                         <DaysOfWeekPicker
                             value={selectedWeekDays}
                             onChange={setSelectedWeekDays}

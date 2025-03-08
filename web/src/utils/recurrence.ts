@@ -4,10 +4,10 @@ import dayjs from "dayjs";
 import { DAYS_OF_WEEK_NAMES } from "@/constants/date";
 
 const FREQUENCY_LABELS: Record<CadenceFrequency, { singular: string, plural: string, adverb: string }> = {
-    DAILY: { singular: 'day', plural: 'days', adverb: 'daily' },
-    WEEKLY: { singular: 'week', plural: 'weeks', adverb: 'weekly' },
-    MONTHLY: { singular: 'month', plural: 'months', adverb: 'monthly' },
-    YEARLY: { singular: 'year', plural: 'years', adverb: 'annually' },
+    D: { singular: 'day', plural: 'days', adverb: 'daily' },
+    W: { singular: 'week', plural: 'weeks', adverb: 'weekly' },
+    M: { singular: 'month', plural: 'months', adverb: 'monthly' },
+    Y: { singular: 'year', plural: 'years', adverb: 'annually' },
 };
 
 export const NON_RECURRING_LABEL = 'Does not recur'
@@ -24,7 +24,7 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
 
     const cadences: MonthlyCadence[] = [
         {
-            frequency: 'MONTHLY',
+            frequency: 'M',
             on: {
                 day: dayNumber
             }
@@ -33,7 +33,7 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
 
     if (weekNumber <= 3) {
         cadences.push({
-            frequency: 'MONTHLY',
+            frequency: 'M',
             on: {
                 week: WeekNumber.options[weekNumber - 1]
             }
@@ -41,13 +41,13 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
     } else {
         cadences.push(
             {
-                frequency: 'MONTHLY',
+                frequency: 'M',
                 on: {
                     week: 'FOURTH'
                 }
             },
             {
-                frequency: 'MONTHLY',
+                frequency: 'M',
                 on: {
                     week: 'LAST'
                 }
@@ -96,19 +96,19 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
 
 export const getRecurringCadenceString = (cadence: RecurringCadence, date: string): string => {
     const stringParts = []
-    if (cadence.period === 1) {
+    if (cadence.interval === 1) {
         stringParts.push(FREQUENCY_LABELS[cadence.frequency].adverb)
-    } else if (cadence.period > 1) {
+    } else if (cadence.interval > 1) {
         stringParts.push(
             'every',
-            String(cadence.period),
+            String(cadence.interval),
             FREQUENCY_LABELS[cadence.frequency].plural)
     } else {
         return NON_RECURRING_LABEL
     }
 
     switch (cadence.frequency) {
-        case CadenceFrequency.Enum.WEEKLY:
+        case CadenceFrequency.Enum.W:
             stringParts.push(
                 'on',
                 sortDaysOfWeek(cadence.days)
@@ -116,19 +116,19 @@ export const getRecurringCadenceString = (cadence: RecurringCadence, date: strin
                     .join(', ')
             )
             break
-        case CadenceFrequency.Enum.MONTHLY:
+        case CadenceFrequency.Enum.M:
             stringParts.push(
                 'on',
                 getMonthlyCadenceLabel(cadence, date)
             )
             break
-        case CadenceFrequency.Enum.YEARLY:
+        case CadenceFrequency.Enum.Y:
             stringParts.push(
                 'on',
                 dayjs(date).format('MMMM D')
             )
             break
-        case CadenceFrequency.Enum.DAILY:
+        case CadenceFrequency.Enum.D:
         default:
             break
     }

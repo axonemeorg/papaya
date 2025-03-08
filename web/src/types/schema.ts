@@ -91,7 +91,12 @@ export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
 export type EntryTask = z.output<typeof EntryTask>
 
 // CadenceFrequency enum using Zod
-export const CadenceFrequency = z.enum(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']);
+export const CadenceFrequency = z.enum([
+	'D', // Daily
+	'W', // Weekly
+	'M', // Monthly
+	'Y', // Yearly
+]);
 export type CadenceFrequency = z.infer<typeof CadenceFrequency>;
 
 // Week number enum using Zod
@@ -99,11 +104,19 @@ export const WeekNumber = z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST'])
 export type WeekNumber = z.infer<typeof WeekNumber>;
 
 // Days of week enum using Zod
-export const DayOfWeek = z.enum(['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']);
+export const DayOfWeek = z.enum([
+	'SU',
+	'MO',
+	'TU',
+	'WE',
+	'TH',
+	'FR',
+	'SA',
+]);
 export type DayOfWeek = z.infer<typeof DayOfWeek>;
 
 export const MonthlyCadence = z.object({
-  frequency: z.literal(CadenceFrequency.enum.MONTHLY),
+  frequency: z.literal(CadenceFrequency.enum.M),
   on: z.union([
     z.object({
       // Monthly on Last Thursday, First Monday, Second Monday, etc.
@@ -119,19 +132,19 @@ export const MonthlyCadence = z.object({
 export type MonthlyCadence = z.output<typeof MonthlyCadence>
 
 export const DailyCadence = z.object({
-  frequency: z.literal(CadenceFrequency.enum.DAILY),
+  frequency: z.literal(CadenceFrequency.enum.D),
 });
 
 export type DailyCadence = z.output<typeof DailyCadence>
 
 export const YearlyCadence = z.object({
-  frequency: z.literal(CadenceFrequency.enum.YEARLY),
+  frequency: z.literal(CadenceFrequency.enum.Y),
 });
 
 export type YearlyCadence = z.output<typeof YearlyCadence>
 
 export const WeeklyCadence = z.object({
-  frequency: z.literal(CadenceFrequency.enum.WEEKLY),
+  frequency: z.literal(CadenceFrequency.enum.W),
   days: z.array(DayOfWeek),
 });
 
@@ -139,7 +152,7 @@ export type WeeklyCadence = z.output<typeof WeeklyCadence>
 
 
 export const RecurringCadence = z.object({
-  period: z.number(), // Every _ days/months/weeks
+  interval: z.number(), // Every _ days/months/weeks
 }).and(
   z.union([
     MonthlyCadence,
