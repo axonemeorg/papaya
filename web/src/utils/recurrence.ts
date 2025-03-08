@@ -194,3 +194,37 @@ export const deserializeRecurrenceCadence = (cadence: string): RecurringCadence 
     }
     return parsed
 }
+
+export const updateRecurrenceCadenceForNewDate = (cadence: RecurringCadence | undefined, date: string): RecurringCadence | undefined => {
+    let newValue: RecurringCadence | undefined = undefined
+    if (!cadence || !date) {
+        return
+    }
+    if (cadence.frequency === 'W') {
+        const dateWeekday = dayOfWeekFromDate(date)
+        if (cadence.days.includes(dateWeekday)) {
+            // New date's day of week is already included; no change needed
+            return;
+        } else if (cadence.days.length > 1) {
+            // Custom recurrence includes more than one day; don't change
+            return
+        } else {
+            // Replace the day of week
+            newValue = { ...cadence, days: [dateWeekday] }
+        }
+    } else if (cadence.frequency === 'M') {
+        if ('day' in cadence.on) {
+            newValue = {
+                ...cadence,
+                on: { day: dayjs(date).date() }
+            }
+        } else {
+            const weekNumber = getWeekOfMonth(date)
+            newValue = {
+                ...cadence,
+                on: { week: WeekNumber.options[weekNumber - 1] }
+            }
+        }
+    }
+    return newValue
+}
