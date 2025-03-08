@@ -1,4 +1,4 @@
-import { dayOfWeekFromDate, deserializeRecurrenceCadence, generateDeafultRecurringCadences, getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate, getRecurringCadenceString, serializeRecurrenceCadence } from "@/utils/recurrence"
+import { dayOfWeekFromDate, deserializeRecurrenceCadence, generateDeafultRecurringCadences, getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate, getRecurringCadenceString, serializeRecurrenceCadence, updateRecurrenceCadenceForNewDate } from "@/utils/recurrence"
 import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, WeekNumber } from "@/types/schema"
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material"
 import {
@@ -20,7 +20,6 @@ import { ChangeEvent, useEffect, useState } from "react"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
 import { sentenceCase } from "@/utils/string"
-import { getWeekOfMonth } from "@/utils/date"
 
 enum RecurrenceDefaultOption {
     NON_RECURRING = 'NON_RECURRING',
@@ -209,7 +208,7 @@ interface RecurrenceSelectProps {
     onChange: (cadence: RecurringCadence | undefined) => void
 }
 
-const getSelectOptions = (date: string, selectedCadence: RecurringCadence | undefined) => {
+const getSelectOptions = (date: string, additional: (RecurringCadence | undefined)[]) => {
     const today = dayjs().format('YYYY-MM-DD')
     const options: string[] = [
         RecurrenceDefaultOption.NON_RECURRING,
@@ -217,12 +216,14 @@ const getSelectOptions = (date: string, selectedCadence: RecurringCadence | unde
     generateDeafultRecurringCadences(date ?? today).forEach((cadence) => {
         options.push(serializeRecurrenceCadence(cadence));
     })
-    if (selectedCadence) {
-        const serialized = serializeRecurrenceCadence(selectedCadence)
-        if (!options.includes(serialized)) {
-            options.push(serialized)
+    additional.forEach((cadence) => {
+        if (cadence) {
+            const serialized = serializeRecurrenceCadence(cadence)
+            if (!options.includes(serialized)) {
+                options.push(serialized)
+            }
         }
-    }
+    })
     options.push(
         RecurrenceDefaultOption.CUSTOM,
     );
@@ -231,6 +232,7 @@ const getSelectOptions = (date: string, selectedCadence: RecurringCadence | unde
 
 export default function RecurrenceSelect(props: RecurrenceSelectProps) {
     const [showCustomRecurrenceDialog, setShowCustomRecurrenceDialog] = useState<boolean>(false)
+    const [customCadence, setCustomCadence] = useState<RecurringCadence | undefined>(undefined)
 
     const handleChange = (event: SelectChangeEvent<string>) => {
         event.preventDefault()
@@ -246,53 +248,23 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
     }
 
     const handleSubmitCustomRecurrenceForm = (value: RecurringCadence) => {
-        // setCustomCadence(value)
+        setCustomCadence(value)
         props.onChange(value)
         setShowCustomRecurrenceDialog(false)
     }
-
 
     /**
      * When the date changes, select the recurrence that best approximates the
      * previous one.
      */
     useEffect(() => {
-        let newValue: RecurringCadence | undefined = undefined
-        if (!props.value || !props.date) {
-            return
-        }
-        if (props.value.frequency === 'W') {
-            const dateWeekday = dayOfWeekFromDate(props.date)
-            if (props.value.days.includes(dateWeekday)) {
-                // New date's day of week is already included; no change needed
-                return;
-            } else if (props.value.days.length > 1) {
-                // Custom recurrence includes more than one day; don't change
-                return
-            } else {
-                // Replace the day of week
-                newValue = { ...props.value, days: [dateWeekday] }
-            }
-        } else if (props.value.frequency === 'M') {
-            if ('day' in props.value.on) {
-                newValue = {
-                    ...props.value,
-                    on: { day: dayjs(props.date).date() }
-                }
-            } else {
-                const weekNumber = getWeekOfMonth(props.date)
-                newValue = {
-                    ...props.value,
-                    on: { week: WeekNumber.options[weekNumber - 1] }
-                }
-            }
-        }
+        let newValue = updateRecurrenceCadenceForNewDate(props.value, props.date)
         if (newValue) {
             props.onChange(newValue)
         }
     }, [props.date])
 
-    const selectOptions: string[] = getSelectOptions(props.date, props.value)
+    const selectOptions: string[] = getSelectOptions(props.date, [props.value, customCadence])
 
     return ( 
         <>
