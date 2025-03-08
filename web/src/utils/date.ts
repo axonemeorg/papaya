@@ -56,4 +56,3 @@ export const getWeekOfMonth = (date: string) => {
 
     return weekNumber;
 }
-

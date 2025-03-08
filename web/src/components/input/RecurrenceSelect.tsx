@@ -1,10 +1,34 @@
-import { getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate } from "@/utils/recurrence"
+import { dayOfWeekFromDate, deserializeRecurrenceCadence, generateDeafultRecurringCadences, getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate, getRecurringCadenceString, serializeRecurrenceCadence } from "@/utils/recurrence"
 import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from "@/types/schema"
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material"
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent, SelectProps, Stack, TextField, Typography } from "@mui/material"
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material"
 import { ChangeEvent, useEffect, useMemo, useState } from "react"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
+
+enum RecurrenceDefaultOption {
+    NON_RECURRING = 'NON_RECURRING',
+    CUSTOM = 'CUSTOM'
+}
+
+const RECURRENCE_DEFAULT_OPTION_LABELS: Record<RecurrenceDefaultOption, string> = {
+    [RecurrenceDefaultOption.CUSTOM]: 'Custom...',
+    [RecurrenceDefaultOption.NON_RECURRING]: 'Does not recur'
+}
 
 interface CustomRecurrenceModalProps {
     open: boolean
@@ -78,7 +102,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     useEffect(() => {
         setSelectedMonthlyCadenceOption(0)
         setMonthlyCadenceOptions(getMonthlyRecurrencesFromDate(props.date))
-        setSelectedWeekDays(new Set<DayOfWeek>([dayjs(props.date).format('ddd').toUpperCase() as DayOfWeek]))
+        setSelectedWeekDays(new Set<DayOfWeek>([dayOfWeekFromDate(props.date)]))
     }, [props.date])
 
     return (
@@ -177,38 +201,66 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
     )
 }
 
-interface RecurrenceSelectProps extends Partial<Omit<SelectProps<RecurringCadence | undefined>, 'children'>> {
+interface RecurrenceSelectProps {
     date: string
+    value: RecurringCadence | undefined
+    onChange: (cadence: RecurringCadence | undefined) => void
 }
 
 export default function RecurrenceSelect(props: RecurrenceSelectProps) {
     const [showCustomRecurrenceDialog, setShowCustomRecurrenceDialog] = useState<boolean>(true)
+    const [customCadence, setCustomCadence] = useState<RecurringCadence | undefined>(undefined)
 
-    const selectOptions: (RecurringCadence | string)[] = useMemo(() => {
-        const options = []
-        if (props.value) {
-            options.push(props.value)
+    const selectOptions: string[] = useMemo(() => {
+        const today = dayjs().format('YYYY-MM-DD')
+        const options: string[] = [
+            RecurrenceDefaultOption.NON_RECURRING,
+            
+        ]
+        generateDeafultRecurringCadences(props.date ?? today).forEach((cadence) => {
+            options.push(serializeRecurrenceCadence(cadence));
+        })
+        if (customCadence) {
+            options.push(serializeRecurrenceCadence(customCadence))
         }
+        options.push(
+            RecurrenceDefaultOption.CUSTOM,
+        );
         return options
-    }, [props.date, props.value])
+    }, [props.date, props.value, customCadence])
 
-    const handleChange = (event: SelectChangeEvent<RecurringCadence | string>) => {
+    const handleChange = (event: SelectChangeEvent<string>) => {
+        event.preventDefault()
         const { value } = event.target
-        if (value === 'CUSTOM') {
+        if (value === RecurrenceDefaultOption.CUSTOM) {
             setShowCustomRecurrenceDialog(true)
-            event.preventDefault()
+            return
+        } else if (value === RecurrenceDefaultOption.NON_RECURRING) {
+            props.onChange(undefined)
             return
         }
-        if (props.onChange) {
-            props.onChange(event)
-        }
+        props.onChange(deserializeRecurrenceCadence(value))
     }
 
     const handleSubmitCustomRecurrenceForm = (value: RecurringCadence) => {
-        console.log('handleSubmitCustomRecurrenceForm value:', value)
-        handleChange({ target: { value, name: props.name } } as SelectChangeEvent<RecurringCadence>);
+        setCustomCadence(value)
+        props.onChange(value)
         setShowCustomRecurrenceDialog(false)
     }
+
+    /**
+     * Ensures that if the component receives a cadence that is not among the list
+     * of defaults, then it will be represented by the custom cadence.
+     */
+    useEffect(() => {
+        if (!props.value) {
+            return
+        }
+        const serialized = serializeRecurrenceCadence(props.value)
+        if (!selectOptions.includes(serialized)) {
+            setCustomCadence(props.value)
+        }
+    }, [props.value, selectOptions])
 
     return ( 
         <>
@@ -218,20 +270,33 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
                 onClose={() => setShowCustomRecurrenceDialog(false)}
                 onSubmit={handleSubmitCustomRecurrenceForm}
             />
-            <Select
-                {...props}
-                onChange={handleChange}
-            >
-                <MenuItem value='NON_RECURRING'></MenuItem>
-                {selectOptions.map((option) => {
-                    return (
-                        <MenuItem key={JSON.stringify(option)}>
-                            
-                        </MenuItem>
-                    )
-                })}
-                <MenuItem value='CUSTOM'>Custom...</MenuItem>
-            </Select>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <Select
+                    fullWidth
+                    variant='filled'
+                    displayEmpty
+                    {...props}
+                    onChange={handleChange}
+                    value={props.value ? serializeRecurrenceCadence(props.value) : RecurrenceDefaultOption.NON_RECURRING}
+                >
+                    {selectOptions.map((option: string | RecurrenceDefaultOption) => {
+                        let label: string = ''
+                        if (option in RECURRENCE_DEFAULT_OPTION_LABELS) {
+                            label = RECURRENCE_DEFAULT_OPTION_LABELS[option as RecurrenceDefaultOption]
+                        } else {
+                            let cadence: RecurringCadence | undefined = deserializeRecurrenceCadence(option)
+                            if (cadence) {
+                                label = getRecurringCadenceString(cadence, props.date) ?? ''
+                            }
+                        }
+                        return (
+                            <MenuItem key={option} value={option}>
+                                {label}
+                            </MenuItem>
+                        )
+                    })}
+                </Select>
+            </FormControl>
         </>
     )
 }

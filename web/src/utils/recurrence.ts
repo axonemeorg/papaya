@@ -10,7 +10,35 @@ const FREQUENCY_LABELS: Record<CadenceFrequency, { singular: string, plural: str
     Y: { singular: 'year', plural: 'years', adverb: 'annually' },
 };
 
-export const NON_RECURRING_LABEL = 'Does not recur'
+export const generateDeafultRecurringCadences = (date: string): RecurringCadence[] => {
+    const weekNumber = getWeekOfMonth(date)
+    return [
+        {
+            frequency: 'D',
+            interval: 1,
+        },
+        {
+            frequency: 'W',
+            interval: 1,
+            days: [dayOfWeekFromDate(date)]
+        },
+        {
+            frequency: 'M',
+            interval: 1,
+            on: {
+                week: WeekNumber.options[weekNumber - 1]
+            }
+        },
+        {
+            frequency: 'Y',
+            interval: 1,
+        }
+    ]
+}
+
+export const dayOfWeekFromDate = (date: string): DayOfWeek => {
+    return dayjs(date).format('ddd').substring(0, 2).toUpperCase() as DayOfWeek
+}
 
 export const getFrequencyLabel = (frequency: CadenceFrequency, quantity: number ) => {
     const { singular, plural } = FREQUENCY_LABELS[frequency]
@@ -65,6 +93,15 @@ export const sortDaysOfWeek = (days: DayOfWeek[]): DayOfWeek[] => {
     ) as DayOfWeek[];
 };
 
+/**
+ * Returns true if the given array exactly contains all five weekdays,
+ * namely MO, TU, WE, TH, FR
+ */
+export const isSetOfWeekdays = (days: DayOfWeek[]): boolean => {
+    const weekdays = new Set<DayOfWeek>(['MO', 'TU', 'WE', 'TH', 'FR']);
+    return days.length === weekdays.size && new Set(days).size === weekdays.size && days.every(day => weekdays.has(day));
+};
+
 export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): string => {
     let labelParts = []
     if ('day' in cadence.on) {
@@ -94,7 +131,7 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
     return labelParts.join(' ')
 }
 
-export const getRecurringCadenceString = (cadence: RecurringCadence, date: string): string => {
+export const getRecurringCadenceString = (cadence: RecurringCadence, date: string): string | undefined => {
     const stringParts = []
     if (cadence.interval === 1) {
         stringParts.push(FREQUENCY_LABELS[cadence.frequency].adverb)
@@ -104,16 +141,18 @@ export const getRecurringCadenceString = (cadence: RecurringCadence, date: strin
             String(cadence.interval),
             FREQUENCY_LABELS[cadence.frequency].plural)
     } else {
-        return NON_RECURRING_LABEL
+        return undefined
     }
 
     switch (cadence.frequency) {
         case CadenceFrequency.Enum.W:
             stringParts.push(
                 'on',
-                sortDaysOfWeek(cadence.days)
-                    .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
-                    .join(', ')
+                isSetOfWeekdays(cadence.days)
+                    ? 'weekdays'
+                    : sortDaysOfWeek(cadence.days)
+                        .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
+                        .join(', ')
             )
             break
         case CadenceFrequency.Enum.M:
@@ -134,4 +173,24 @@ export const getRecurringCadenceString = (cadence: RecurringCadence, date: strin
     }
 
     return stringParts.join(' ');
+}
+
+/**
+ * @TODO optimization target
+ */
+export const serializeRecurrenceCadence = (cadence: RecurringCadence): string => {
+    return JSON.stringify(cadence)
+}
+
+export const deserializeRecurrenceCadence = (cadence: string): RecurringCadence | undefined => {
+    if (!cadence) {
+        return undefined
+    }
+    let parsed: RecurringCadence
+    try {
+        parsed = JSON.parse(cadence) as RecurringCadence
+    } catch (_error: any) {
+        return undefined
+    }
+    return parsed
 }

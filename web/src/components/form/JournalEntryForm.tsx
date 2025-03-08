@@ -4,7 +4,6 @@ import {
 	Box,
 	Divider,
 	Grid2 as Grid,
-	SelectChangeEvent,
 	Stack,
 	TextField,
 } from '@mui/material'
@@ -95,15 +94,11 @@ export default function JournalEntryForm() {
 									name="recurs"
 									render={({ field }) => (
 										<RecurrenceSelect
-											variant='filled'
-											label='Recurrence'
 											date={date}
-											{...field}
-											value={field.value?.cadence ?? ''}
-											onChange={(event: SelectChangeEvent<RecurringCadence | string | undefined>) => {
-												const value: RecurringCadence | string | undefined = event.target.value;
-												console.log('got value:', value)
-												setValue(`recurs.cadence`, value || undefined, { shouldDirty: true })
+											// {...field}
+											value={field.value?.cadence as RecurringCadence | undefined}
+											onChange={(value: RecurringCadence | undefined) => {
+												setValue(`recurs.cadence`, value ?? undefined, { shouldDirty: true })
 											}}
 										/>
 									)}
