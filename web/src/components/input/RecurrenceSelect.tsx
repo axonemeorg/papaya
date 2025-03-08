@@ -1,5 +1,5 @@
 import { dayOfWeekFromDate, deserializeRecurrenceCadence, generateDeafultRecurringCadences, getFrequencyLabel, getMonthlyCadenceLabel, getMonthlyRecurrencesFromDate, getRecurringCadenceString, serializeRecurrenceCadence, updateRecurrenceCadenceForNewDate } from "@/utils/recurrence"
-import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, WeekNumber } from "@/types/schema"
+import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from "@/types/schema"
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material"
 import {
     Button,
@@ -34,6 +34,7 @@ const RECURRENCE_DEFAULT_OPTION_LABELS: Record<RecurrenceDefaultOption, string> 
 interface CustomRecurrenceModalProps {
     open: boolean
     date: string
+    initialValue: RecurringCadence | undefined
     onSubmit: (cadence: RecurringCadence) => void
     onClose: () => void
 }
@@ -105,6 +106,17 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
         setMonthlyCadenceOptions(getMonthlyRecurrencesFromDate(props.date))
         setSelectedWeekDays(new Set<DayOfWeek>([dayOfWeekFromDate(props.date)]))
     }, [props.date])
+
+    useEffect(() => {
+        if (!props.open || !props.initialValue) {
+            return
+        }
+        setInterval(props.initialValue.interval)
+        setFrequency(props.initialValue.frequency)
+        if (props.initialValue.frequency === 'W') {
+            setSelectedWeekDays(new Set<DayOfWeek>(props.initialValue.days))
+        }
+    }, [props.initialValue, props.open])
 
     return (
         <Dialog {...rest} maxWidth='xs' fullWidth>
@@ -271,6 +283,7 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
             <CustomRecurrenceModal
                 open={showCustomRecurrenceDialog}
                 date={props.date}
+                initialValue={props.value}
                 onClose={() => setShowCustomRecurrenceDialog(false)}
                 onSubmit={handleSubmitCustomRecurrenceForm}
             />
