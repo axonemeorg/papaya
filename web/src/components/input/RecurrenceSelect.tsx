@@ -19,6 +19,7 @@ import {
 import { ChangeEvent, useEffect, useMemo, useState } from "react"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
+import { sentenceCase } from "@/utils/string"
 
 enum RecurrenceDefaultOption {
     NON_RECURRING = 'NON_RECURRING',
@@ -273,6 +274,7 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
             <FormControl sx={{ m: 1, minWidth: 120 }}>
                 <Select
                     fullWidth
+                    hiddenLabel
                     variant='filled'
                     displayEmpty
                     {...props}
@@ -291,7 +293,7 @@ export default function RecurrenceSelect(props: RecurrenceSelectProps) {
                         }
                         return (
                             <MenuItem key={option} value={option}>
-                                {label}
+                                {sentenceCase(label)}
                             </MenuItem>
                         )
                     })}
