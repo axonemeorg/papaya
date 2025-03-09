@@ -25,13 +25,13 @@ import EntryTagSelector from '../input/EntryTagSelector'
 import EntryNoteForm from './EntryNoteForm'
 import EntryTasksForm from './EntryTasksForm'
 import AccountAutocomplete from '../input/AccountAutocomplete'
-import { Book, Info, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
+import { Book, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
 
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
-	const accountId = useWatch({ control, name: 'accountId' })
+	const sourceAccountId = useWatch({ control, name: 'sourceAccountId' })
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
@@ -128,12 +128,12 @@ export default function JournalEntryForm() {
 							<Grid size={4}>
 								<Controller
 									control={control}
-									name="accountId"
+									name="sourceAccountId"
 									render={({ field }) => {
 										return (
 											<AccountAutocomplete
 												{...field}
-												value={accountId}
+												value={sourceAccountId}
 												onChange={(_event, newValue) => {
 													setValue(field.name, newValue ?? undefined, { shouldDirty: true })
 												}}
