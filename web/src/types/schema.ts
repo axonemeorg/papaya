@@ -183,9 +183,9 @@ export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 
 export type EntryRecurrence = z.output<typeof EntryRecurrence>;
 
-const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
+export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
 
-const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
+export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
 
 export const CommonEntryAttributes = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
 	z.object({
@@ -231,6 +231,10 @@ export const JournalEntry = BaseJournalEntry.merge(
 )
 
 export type JournalEntry = z.output<typeof JournalEntry>
+
+export const JournalOrTransferEntry = z.union([JournalEntry, TransferEntry])
+
+export type JournalOrTransferEntry = z.output<typeof JournalOrTransferEntry>
 
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,

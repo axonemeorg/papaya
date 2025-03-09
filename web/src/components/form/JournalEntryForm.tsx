@@ -2,6 +2,7 @@
 
 import {
 	Box,
+	Collapse,
 	Divider,
 	Grid2 as Grid,
 	Stack,
@@ -14,7 +15,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { JournalEntry, RecurringCadence } from '@/types/schema'
+import { JOURNAL_ENTRY, JournalEntry, JournalOrTransferEntry, RecurringCadence, TRANSFER_ENTRY } from '@/types/schema'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
@@ -29,7 +30,7 @@ import { Book, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
 import RecurrenceSelect from '../input/RecurrenceSelect'
 
 export default function JournalEntryForm() {
-	const { setValue, control, register } = useFormContext<JournalEntry>()
+	const { setValue, control, register } = useFormContext<JournalOrTransferEntry>()
 
 	const date: string = useWatch({ control, name: 'date' }) ?? dayjs().format('YYYY-MM-DD')
 	const categoryIds = useWatch({ control, name: 'categoryIds' })
@@ -37,6 +38,18 @@ export default function JournalEntryForm() {
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
+	const entryType = useWatch({ control, name: 'type' })
+	const childEntries = useWatch({ control, name: 'children' })
+
+	const handleChangeEntryType = (newType: JournalOrTransferEntry['type']) => {
+		if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
+			const confirmedRemoveChildren = confirm('Making this entry a Transfer will remove any child entries. Are you sure?')
+			if (!confirmedRemoveChildren) {
+				return
+			}
+		}
+		setValue('type', newType)
+	}
 
 	useEffect(() => {
 		getJournalEntryWithAttachments(journalEntryId)
@@ -49,15 +62,15 @@ export default function JournalEntryForm() {
 	return (
 		<>
 			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
-				<ToggleButtonGroup value={'JOURNAL_ENTRY'} size='small'>
-					<ToggleButton value='JOURNAL_ENTRY'>
+				<ToggleButtonGroup exclusive value={entryType} size='small' onChange={(_event, value) => handleChangeEntryType(value)}>
+					<ToggleButton value={JOURNAL_ENTRY.value}>
 						<Stack direction='row' gap={0.5} alignItems='center'>
 							<Book sx={{ mr: 0 }} />
 							<span>Ledger</span>
 							<Tooltip title="Journal entry"><InfoOutlined fontSize='small' /></Tooltip>
 						</Stack>
 					</ToggleButton>
-					<ToggleButton value='ACCOUNT_TRANSFER_ENTRY'>
+					<ToggleButton value={TRANSFER_ENTRY.value}>
 						<Stack direction='row' gap={0.5} alignItems='center'>
 							<TransferWithinAStation sx={{ mr: 0 }} />
 							<span>Transfer</span>
@@ -160,8 +173,10 @@ export default function JournalEntryForm() {
 									/>
 								</Grid>
 							</Grid>
-						</Stack>					
-						<ChildJournalEntryForm />
+						</Stack>
+						<Collapse in={entryType === 'JOURNAL_ENTRY'}>
+							<ChildJournalEntryForm />
+						</Collapse>
 						<EntryArtifactsForm />
 					</Grid>
 					<Grid size={5}>
