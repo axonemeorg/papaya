@@ -17,6 +17,7 @@ import {
 	TableCellProps,
 	TableBodyProps,
 	Grow,
+	Checkbox,
 } from '@mui/material'
 import React, { useContext, useMemo } from 'react'
 
@@ -220,7 +221,9 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 														onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
 													>
 														<TableCell sx={{ width: '0%', borderBottom: 'none' }}>
-															<AvatarIcon avatar={category?.avatar} compact={isSmall} />
+															<Checkbox
+																icon={<AvatarIcon avatar={category?.avatar} />}
+															/>
 														</TableCell>
 														<TableCell sx={{ width: '40%' }}>
 															<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
