@@ -15,7 +15,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { JOURNAL_ENTRY, JournalEntry, JournalOrTransferEntry, RecurringCadence, TRANSFER_ENTRY } from '@/types/schema'
+import { JOURNAL_ENTRY, JournalOrTransferEntry, RecurringCadence, TRANSFER_ENTRY } from '@/types/schema'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
@@ -113,7 +113,6 @@ export default function JournalEntryForm() {
 												label="Date"
 												slotProps={{
 													textField: {
-														// fullWidth: true,
 														variant: 'filled'
 													},
 												}}
@@ -128,7 +127,6 @@ export default function JournalEntryForm() {
 									render={({ field }) => (
 										<RecurrenceSelect
 											date={date}
-											// {...field}
 											value={field.value?.cadence as RecurringCadence | undefined}
 											onChange={(value: RecurringCadence | undefined) => {
 												setValue(`recurs.cadence`, value ?? undefined, { shouldDirty: true })
@@ -218,9 +216,6 @@ export default function JournalEntryForm() {
 							<EntryNoteForm />
 						</Stack>
 					</Grid>
-				{/* <AttachmentDropzone onFilesAdded={handleAddFiles}>
-					<AttachmentButton />
-				</AttachmentDropzone> */}
 				</Grid>
 			</Box>
 		</>
