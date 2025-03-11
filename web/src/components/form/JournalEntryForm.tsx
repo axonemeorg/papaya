@@ -8,8 +8,6 @@ import {
 	TextField,
 } from '@mui/material'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { JournalEntry, RecurringCadence } from '@/types/schema'
 import AmountField from '../input/AmountField'
@@ -23,6 +21,7 @@ import EntryNoteForm from './EntryNoteForm'
 import EntryTasksForm from './EntryTasksForm'
 import AccountAutocomplete from '../input/AccountAutocomplete'
 import RecurrenceSelect from '../input/RecurrenceSelect'
+import DateField from '../input/DateField'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -69,23 +68,17 @@ export default function JournalEntryForm() {
 									control={control}
 									name="date"
 									render={({ field }) => (
-										<LocalizationProvider dateAdapter={AdapterDayjs}>
-											<DatePicker
-												{...field}
-												value={dayjs(field.value)}
-												onChange={(value) => {
-													setValue(field.name, value?.format('YYYY-MM-DD') ?? '', { shouldDirty: true })
-												}}
-												format="ddd, MMM D"
-												label="Date"
-												slotProps={{
-													textField: {
-														// fullWidth: true,
-														variant: 'filled'
-													},
-												}}
-											/>
-										</LocalizationProvider>
+										<DateField
+											value={dayjs(field.value)}
+											onChange={(value) => {
+												if (!value) {
+													return
+												}
+												setValue(field.name, value.format('YYYY-MM-DD') ?? '', { shouldDirty: true })
+											}}
+											label='Date'
+											variant='filled'
+										/>
 									)}
 								/>
 								
