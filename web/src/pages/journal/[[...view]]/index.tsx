@@ -113,23 +113,16 @@ const JournalYearMonthPage = () => {
 	}
 
 	return (
-		<Paper
-			sx={(theme) => ({
-				flex: 1,
-				borderTopLeftRadius: theme.spacing(2),
-
-			})}>
-			<JournalEntryContextProvider
-				view={view}
-				date={date}
-				onNextPage={() => handleNextPage()}
-				onPrevPage={() => handlePrevPage()}
-				setDate={(date) => handleDateChange(date)}
-			>
-				<JournalEditor />
-			</JournalEntryContextProvider>
-		</Paper>
-
+	
+		<JournalEntryContextProvider
+			view={view}
+			date={date}
+			onNextPage={() => handleNextPage()}
+			onPrevPage={() => handlePrevPage()}
+			setDate={(date) => handleDateChange(date)}
+		>
+			<JournalEditor />
+		</JournalEntryContextProvider>
 	)
 }
 

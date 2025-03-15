@@ -34,3 +34,7 @@ export const getAllDatesInMonth = (inputDate: string) => {
 
     return dates;
 }
+
+export const sortDatesChronologically = (...dates: string[]) => {
+    return dates.sort((a, b) => dayjs(a).isBefore(b) ? -1 : 1);
+}

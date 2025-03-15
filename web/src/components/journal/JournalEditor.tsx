@@ -1,5 +1,5 @@
 import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider } from '@mui/material'
+import { Box, Divider, Paper } from '@mui/material'
 import JournalHeader from './JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -8,7 +8,6 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { getDatabaseClient } from '@/database/client'
 
 export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
 
@@ -109,27 +108,31 @@ export default function JournalEditor() {
 	}, []);
 
 	return (
-		<>
-			<Box
-				sx={{
-					px: { sm: 0 },
-				}}>
-				{selectedEntry.entry && (
-					<JournalEntryCard
-						entry={selectedEntry.entry}
-						anchorEl={selectedEntry.anchorEl}
-						onClose={() => handleDeselectListItem()}
-						onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+		<Paper
+			sx={(theme) => ({
+				flex: 1,
+				borderTopLeftRadius: theme.spacing(2),
+			})}>
+				<Box
+					sx={{
+						px: { sm: 0 },
+					}}>
+					{selectedEntry.entry && (
+						<JournalEntryCard
+							entry={selectedEntry.entry}
+							anchorEl={selectedEntry.anchorEl}
+							onClose={() => handleDeselectListItem()}
+							onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+						/>
+					)}
+					<JournalHeader reverseActionOrder />
+					<Divider />
+					<JournalEntryList
+						journalRecordGroups={journalGroups}
+						onClickListItem={handleClickListItem}
+						onDoubleClickListItem={handleDoubleClickListItem}
 					/>
-				)}
-				<JournalHeader reverseActionOrder />
-				<Divider />
-				<JournalEntryList
-					journalRecordGroups={journalGroups}
-					onClickListItem={handleClickListItem}
-					onDoubleClickListItem={handleDoubleClickListItem}
-				/>
-			</Box>
-		</>
+				</Box>
+		</Paper>
 	)
 }

@@ -33,6 +33,7 @@ import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 import clsx from 'clsx'
+import { sortDatesChronologically } from '@/utils/date'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -211,10 +212,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 	return (
 		<Table size="small">
-			{Array.from(displayedJournalDates)
-				.sort(([dateA, _a], [dateB, _b]) => {
-					return new Date(dateA).getTime() - new Date(dateB).getTime()
-				})
+			{sortDatesChronologically(...displayedJournalDates)
 				.map((date: string) => {
 					const entries = props.journalRecordGroups[date] ?? []
 					const day = dayjs(date)
