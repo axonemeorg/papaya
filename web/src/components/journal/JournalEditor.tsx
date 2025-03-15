@@ -1,5 +1,5 @@
 import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider, Paper } from '@mui/material'
+import { Box, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -108,31 +108,36 @@ export default function JournalEditor() {
 	}, []);
 
 	return (
-		<Paper
-			sx={(theme) => ({
-				flex: 1,
-				borderTopLeftRadius: theme.spacing(2),
-			})}>
-				<Box
-					sx={{
-						px: { sm: 0 },
-					}}>
-					{selectedEntry.entry && (
-						<JournalEntryCard
-							entry={selectedEntry.entry}
-							anchorEl={selectedEntry.anchorEl}
-							onClose={() => handleDeselectListItem()}
-							onDelete={() => handleDeleteEntry(selectedEntry.entry)}
-						/>
-					)}
-					<JournalHeader reverseActionOrder />
-					<Divider />
+		<>
+			{selectedEntry.entry && (
+				<JournalEntryCard
+					entry={selectedEntry.entry}
+					anchorEl={selectedEntry.anchorEl}
+					onClose={() => handleDeselectListItem()}
+					onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+				/>
+			)}
+			<Stack
+				component={Paper}
+				sx={(theme) => ({
+					px: { sm: 0 },
+					borderTopLeftRadius: theme.spacing(2),
+					overflow: 'hidden',
+					flex: 1,
+				})}>
+				
+				<JournalHeader reverseActionOrder />
+				<Divider />
+				<Box sx={{
+					overflowY: 'scroll',
+				}}>
 					<JournalEntryList
 						journalRecordGroups={journalGroups}
 						onClickListItem={handleClickListItem}
 						onDoubleClickListItem={handleDoubleClickListItem}
 					/>
 				</Box>
-		</Paper>
+			</Stack>
+		</>
 	)
 }

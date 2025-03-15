@@ -211,7 +211,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	}
 
 	return (
-		<Table size="small">
+		<Table size="small" sx={{ overflowY: 'scroll' }}>
 			{sortDatesChronologically(...displayedJournalDates)
 				.map((date: string) => {
 					const entries = props.journalRecordGroups[date] ?? []

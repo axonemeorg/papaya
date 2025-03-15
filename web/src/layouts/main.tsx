@@ -12,9 +12,9 @@ const MainLayout = (props: PropsWithChildren) => {
 	const view = usingMobileMenu ? 'mobile' : 'desktop'
 
 	return (
-		<Stack component="main" sx={{ minHeight: '100dvh' }}>
+		<Stack component="main" sx={{ minHeight: '100dvh', maxHeight: '100dvh' }}>
 			<Header view={view} />
-			<Stack direction="row" sx={{ flex: 1, gap: 0 }}>
+			<Stack direction="row" sx={{ flex: 1, gap: 0, overflow: 'hidden' }}>
 				<AppMenu view={view} />
 				<Stack
 					sx={() => ({
