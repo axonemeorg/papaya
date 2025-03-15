@@ -52,7 +52,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 	return (
 		<FormProvider {...createQuickJournalEntryForm}>
 			<form onSubmit={createQuickJournalEntryForm.handleSubmit(handleCreateQuickJournalEntry)}>
-				<Box px={2} py={1}>
+				<Box pr={2} py={0}>
 					{isActive ? (
 						<Stack direction="row">
 							<QuickJournalEntryForm />

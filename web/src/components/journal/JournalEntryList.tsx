@@ -33,54 +33,99 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import clsx from 'clsx'
 
-const TableRow = (props: TableRowProps) => {
-	const { sx, ...rest } = props
-	return (
-		<MuiTableRow
-			hover
-			// component={TableRowButton}
-			sx={{
-				borderTopLeftRadius: '64px',
-				borderBottomLeftRadius: '64px',
-				overflow: 'hidden',
-				'& > *:first-of-type': {
-					borderTopLeftRadius: '64px',
-					borderBottomLeftRadius: '64px',
-				},
-				userSelect: 'none',
-				cursor: 'pointer',
-				...sx,
-			}}
-			{...rest}
-		/>
-	)
+interface JournalTableRowProps extends TableRowProps {
+	dateRow?: boolean
+	buttonRow?: boolean
+	border?: boolean
 }
 
-const TableCell = (props: TableCellProps) => {
-	const { sx, ...rest } = props
+const TableRow = ({ sx, dateRow, buttonRow, border, ...rest }: JournalTableRowProps) => {
+	return (
+	  <MuiTableRow
+		hover={!dateRow && !buttonRow}
+		sx={{
+			'& td': {
+		  		...(dateRow || buttonRow ? {
+					cursor: 'default',
+				} : {}),
+				...(dateRow ? {
+					verticalAlign: 'top',
+					width: '0%',
+				} : {}),
+				...(!border ? {
+					border: 0,
+				} : {})
+			},
+		  userSelect: 'none',
+		  cursor: 'pointer',
+		  ...sx,
+		}}
+		{...rest}
+	  />
+	);
+  };
+
+interface JournalTableCellProps extends Omit<TableCellProps, 'colSpan'> {
+	selectCheckbox?: boolean
+	colSpan?: string | number
+}
+
+const TableCell = (props: JournalTableCellProps) => {
+	const { sx, className, colSpan, selectCheckbox, ...rest } = props
+
 	return (
 		<MuiTableCell
 			{...rest}
+			colSpan={colSpan as number}
+			className={clsx(
+				className,
+				{
+					'--selectCheckbox': selectCheckbox,
+				}
+			)}
 			sx={{
 				alignItems: 'center',
 				px: 1,
+				'&.--selectCheckbox': {
+					borderTopLeftRadius: '64px',
+					borderBottomLeftRadius: '64px',
+					overflow: 'hidden',
+					position: 'relative',
+
+					'&::after': {
+						position: 'absolute',
+						inset: 0,
+						borderBottomWidth: '1px',
+						borderBottomStyle: 'solid',
+						borderImage: `linear-gradient(
+							to right,
+							rgba(0,0,0,0),
+							red
+						) 1 100%
+						`,
+					},
+				},
 				...sx,
 			}}
 		/>
 	)
 }
 
-const TableBody = (props: TableBodyProps) => {
+type JournalTableBodyProps = TableBodyProps
+
+const TableBody = (props: JournalTableBodyProps) => {
 	const { sx, ...rest } = props
+
 	return (
 		<MuiTableBody
 			{...rest}
 			sx={{
 				...sx,
-				'& > tr:last-of-type td': {
-					borderBottom: 'none',
-				},
+				// '& > tr:last-of-type td': {
+				// 	borderBottom: 'none',
+				// },
 			}}
 		/>
 	)
@@ -161,114 +206,112 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 		}
 	}
 
-
 	return (
-		<Grid
-			container
-			columns={12}
-			sx={{
-				'--Grid-borderWidth': '1px',
-				borderColor: 'divider',
-				'& > div': {
-					borderBottom: 'var(--Grid-borderWidth) solid',
-					borderColor: 'divider',
+		<Table size="small">
+			<TableBody>
+				{Array.from(displayedJournalDates)
+					.sort(([dateA, _a], [dateB, _b]) => {
+						return new Date(dateA).getTime() - new Date(dateB).getTime()
+					})
+					.map((date: string) => {
+						const entries = props.journalRecordGroups[date] ?? []
+						const day = dayjs(date)
+						const isToday = day.isSame(dayjs(), 'day')
+						const showQuckEditor = isToday || !entries.length
 
-					'&.date-cell': {
-						borderWidth: {
-							xs: '0',
-							sm: '1px',
-						},
-					},
-				},
-			}}>
-			{Array.from(displayedJournalDates)
-				.sort(([dateA, _a], [dateB, _b]) => {
-					return new Date(dateA).getTime() - new Date(dateB).getTime()
-				})
-				.map((date: string) => {
-					const entries = props.journalRecordGroups[date] ?? []
-					const day = dayjs(date)
-					const isToday = day.isSame(dayjs(), 'day')
-					const showQuckEditor = isToday || !entries.length
+						return (
+							<React.Fragment key={date}>
+								<TableRow dateRow border>
+									<TableCell rowSpan={entries.length + (showQuckEditor ? 2 : 1)}>
+										<JournalEntryDate
+											day={day}
+											isToday={isToday}
+											onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+										/>
+									</TableCell>
+								</TableRow>
+								
+								{entries.map((entry, index) => {
+									const { categoryIds } = entry
+									const categoryId: string | undefined = categoryIds?.[0]
+									const category: Category | undefined = categoryId
+										? getCategoriesQuery.data[categoryId]
+										: undefined
+									const netAmount = calculateNetAmount(entry)
+									const isFlagged = journalEntryIsFlagged(entry)
+									const hasTags = journalEntryHasTags(entry)
 
-					return (
-						<React.Fragment key={date}>
-							<Grid size={{ xs: 12, sm: 2 }} className="date-cell">
-								<JournalEntryDate
-									day={day}
-									isToday={isToday}
-									onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
-								/>
-							</Grid>
-							<Grid size={{ xs: 12, sm: 10 }}>
-								{entries.length > 0 && (
-									<Table size="small">
-										<TableBody>
-											{entries.map((entry) => {
-												const { categoryIds } = entry
-												const categoryId: string | undefined = categoryIds?.[0]
-												const category: Category | undefined = categoryId
-													? getCategoriesQuery.data[categoryId]
-													: undefined
-												const netAmount = calculateNetAmount(entry)
-												const isFlagged = journalEntryIsFlagged(entry)
-												const hasTags = journalEntryHasTags(entry)
-
-												return (
-													<TableRow
-														key={entry._id}
-														onClick={(event) => props.onClickListItem(event, entry)}
-														onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-													>
-														<TableCell sx={{ width: '0%', borderBottom: 'none' }}>
-															<Checkbox
-																icon={<AvatarIcon avatar={category?.avatar} />}
-															/>
-														</TableCell>
-														<TableCell sx={{ width: '40%' }}>
-															<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
-														</TableCell>
-														<TableCell sx={{ width: '0%' }}>
-															<Stack direction='row'>
-																<Grow in={isFlagged}>
-																	<Flag sx={{ display: 'block' }} />
-																</Grow>
-																<Grow in={hasTags}>
-																	<LocalOffer sx={{ display: 'block' }} />
-																</Grow>
-															</Stack>
-														</TableCell>
-														<TableCell align="right" sx={{ width: '10%' }}>
-															<Typography sx={{ ...getPriceStyle(netAmount) }}>
-																{getPriceString(netAmount)}
-															</Typography>
-														</TableCell>
-														<TableCell>
-															{category ? (
-																<AvatarChip avatar={category.avatar} label={category.label} />
-															) : (
-																<Chip
-																	sx={(theme) => ({
-																		backgroundColor: alpha(
-																			theme.palette.grey[400],
-																			0.125
-																		),
-																	})}
-																	label="Uncategorized"
-																/>
-															)}
-														</TableCell>
-													</TableRow>
-												)
-											})}
-										</TableBody>
-									</Table>
+									return (
+										<TableRow
+											border={index === entries.length - 1 && !showQuckEditor}
+											key={entry._id}
+											onClick={(event) => props.onClickListItem(event, entry)}
+											onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
+										>
+											{/* {index === 0 && (
+												<TableCell rowSpan={entries.length} dateCell>
+													<JournalEntryDate
+														day={day}
+														isToday={isToday}
+														onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+													/>
+												</TableCell>
+											)} */}
+											<TableCell sx={{ width: '0%' }} selectCheckbox>
+												<Checkbox
+													sx={{ m: -1 }}
+													icon={<AvatarIcon avatar={category?.avatar} />}
+												/>
+											</TableCell>
+											<TableCell sx={{ width: '40%' }}>
+												<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
+											</TableCell>
+											<TableCell sx={{ width: '0%' }}>
+												<Stack direction='row'>
+													<Grow in={isFlagged}>
+														<Flag sx={{ display: 'block' }} />
+													</Grow>
+													<Grow in={hasTags}>
+														<LocalOffer sx={{ display: 'block' }} />
+													</Grow>
+												</Stack>
+											</TableCell>
+											<TableCell align="right" sx={{ width: '10%' }}>
+												<Typography sx={{ ...getPriceStyle(netAmount) }}>
+													{getPriceString(netAmount)}
+												</Typography>
+											</TableCell>
+											<TableCell>
+												{category ? (
+													<AvatarChip avatar={category.avatar} label={category.label} />
+												) : (
+													<Chip
+														sx={(theme) => ({
+															backgroundColor: alpha(
+																theme.palette.grey[400],
+																0.125
+															),
+														})}
+														label="Uncategorized"
+													/>
+												)}
+											</TableCell>
+										</TableRow>
+									)
+								})}
+											
+								{showQuckEditor && (
+									<TableRow border buttonRow>
+										<TableCell colSpan="100%">
+											<QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />
+										</TableCell>
+									</TableRow>
 								)}
-								{showQuckEditor && <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />}
-							</Grid>
-						</React.Fragment>
-					)
-				})}
-		</Grid>
+							</React.Fragment>
+						)
+					})
+				}
+			</TableBody>
+		</Table>
 	)
 }

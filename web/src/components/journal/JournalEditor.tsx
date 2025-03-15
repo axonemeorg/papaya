@@ -102,10 +102,10 @@ export default function JournalEditor() {
 
 	// show all docs
 	useEffect(() => {
-		const db = getDatabaseClient()
-	    db.allDocs({ include_docs: true }).then((result) => {
-	        console.log('all docs', result);
-	    })
+		// const db = getDatabaseClient()
+	    // db.allDocs({ include_docs: true }).then((result) => {
+	    //     console.log('all docs', result);
+	    // })
 	}, []);
 
 	return (
