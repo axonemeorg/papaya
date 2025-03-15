@@ -116,7 +116,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 				component="header"
 				direction="row"
 				justifyContent="space-between"
-				sx={{ flex: 1, py: 1, px: 2 }}
+				sx={{ flex: 0, py: 1, px: 2 }}
 				alignItems="center"
 				flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
 				gap={1}>

@@ -129,7 +129,8 @@ export default function JournalEditor() {
 				<JournalHeader reverseActionOrder />
 				<Divider />
 				<Box sx={{
-					overflowY: 'scroll',
+					flex: 1,
+					overflowY: 'auto',
 				}}>
 					<JournalEntryList
 						journalRecordGroups={journalGroups}
