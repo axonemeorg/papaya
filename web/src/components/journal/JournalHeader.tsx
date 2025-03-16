@@ -1,27 +1,49 @@
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { ArrowBack, ArrowDropDown, ArrowForward, CalendarToday, EventRepeat, FilterList } from '@mui/icons-material'
-import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+	ArrowBack,
+	ArrowDropDown,
+	ArrowForward,
+	CalendarToday,
+	CheckBox,
+	CheckBoxOutlineBlank,
+	IndeterminateCheckBox
+} from '@mui/icons-material'
+import { Button, IconButton, Menu, MenuItem, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import JournalFilters from './JournalFilters'
 
 interface JournalHeaderProps {
-	numRows?: number
-	numSelectedRows?: number
-	toggleSelectAllRows?: () => void
+	numRows: number
+	numSelectedRows: number
+	onSelectAll: (action: SelectAllAction) => void
+}
+
+export enum SelectAllAction {
+	TOGGLE = 'TOGGLE',
+	ALL = 'ALL',
+	NONE = 'NONE',
+	DEBIT = 'DEBIT',
+	CREDIT = 'CREDIT',
+}
+
+const selectAllMenuOptionLabels: Omit<Record<SelectAllAction, string>, 'TOGGLE'> = {
+	[SelectAllAction.ALL]: 'All',
+	[SelectAllAction.NONE]: 'None',
+	[SelectAllAction.CREDIT]: 'Credits',
+	[SelectAllAction.DEBIT]: 'Debits',
 }
 
 export default function JournalHeader(props: JournalHeaderProps) {
-	const [datePickerAnchorEl, setDatePickerAnchorEl] = useState<HTMLButtonElement | null>(null)
-	const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
+	const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
+	const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+	const [showSelectAllMenu, setShowSelectAllMenu] = useState<boolean>(false)
+	const selectAllMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+	// const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
 
 	const journalEntryContext = useContext(JournalEntryContext)
-
-	const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
-		journalEntryContext.setDate(value.format('YYYY-MM-DD'))
-	}
 
 	const theme = useTheme()
 	const hideTodayButton = journalEntryContext.view === 'all'
@@ -98,13 +120,35 @@ export default function JournalHeader(props: JournalHeaderProps) {
 		return now.format('dddd, MMMM D')
 	}, [])
 
+	const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
+		journalEntryContext.setDate(value.format('YYYY-MM-DD'))
+	}
+
 	const jumpToToday = useCallback(() => {
 		journalEntryContext.setDate(now.format('YYYY-MM-DD'))
 	}, [journalEntryContext.view])
 
+	const handleSelectAll = (key: SelectAllAction) => {
+		setShowSelectAllMenu(false)
+		props.onSelectAll(key)
+	}
+
 	return (
 		<>
-			<Popover open={Boolean(datePickerAnchorEl)} onClose={() => setDatePickerAnchorEl(null)} anchorEl={datePickerAnchorEl}>
+			<Menu
+				open={showSelectAllMenu}
+				anchorEl={selectAllMenuButtonRef.current}
+				onClose={() => setShowSelectAllMenu(false)}
+			>
+				{Object.entries(selectAllMenuOptionLabels).map(([key, label]) => {
+					return (
+						<MenuItem key={key} onClick={() => handleSelectAll(key as SelectAllAction)} aria-label={`Select ${label}`}>
+							{label}
+						</MenuItem>
+					)
+				})}
+			</Menu>
+			<Popover open={showDatePicker} onClose={() => setShowDatePicker(false)} anchorEl={datePickerButtonRef.current}>
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DateCalendar
 						views={calendarAvailableViews}
@@ -125,21 +169,55 @@ export default function JournalHeader(props: JournalHeaderProps) {
 				<Stack
 					direction="row"
 					alignItems="center"
+					justifyContent='space-between'
+					sx={{ width: '100%' }}
 					gap={2}
 				>
-					<JournalFilters
+					{/* <JournalFilters
 						anchorEl={journalFiltersAnchorEl}
 						onClose={() => setJournalFiltersAnchorEl(null)}
 						filterConfig={{
 							maxTransactionAmount: 1000,
 							minTransactionAmount: 0
 						}}
-					/>
+					/> */}
+					<Stack direction="row" alignItems="center" gap={1}>
+						<Stack direction='row'>
+							<Button
+								sx={{ minWidth: 'unset', pr: 0.5 }}
+								color='inherit'
+								onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
+								ref={selectAllMenuButtonRef}
+							>
+								{props.numRows === props.numSelectedRows ? (
+									<CheckBox color='primary' />
+								) : <>
+									{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
+										<IndeterminateCheckBox color='inherit' />	
+									) : (
+										<CheckBoxOutlineBlank color='inherit' />
+									)}
+								</>}
+							</Button>
+							<Button
+								color='inherit'
+								onClick={() => setShowSelectAllMenu(true)}
+								sx={{
+									minWidth: 'unset',
+									px: 0,
+									ml: -0.5
+								}}
+							>
+								<ArrowDropDown />
+							</Button>
+						</Stack>
+					</Stack>
 					<Stack direction="row" alignItems="center" gap={1}>
 						<Button
 							color="inherit"
 							endIcon={<ArrowDropDown />}
-							onClick={(e) => setDatePickerAnchorEl(e.currentTarget)}>
+							ref={datePickerButtonRef}
+							onClick={() => setShowDatePicker((showing) => !showing)}>
 							<Typography
 								variant={headingSize}
 								sx={{ fontWeight: 500 }}>

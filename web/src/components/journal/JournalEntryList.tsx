@@ -3,7 +3,6 @@ import {
 	Avatar,
 	Button,
 	Chip,
-	ListItemText,
 	Stack,
 	Table,
 	TableBody as MuiTableBody,
@@ -26,7 +25,7 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { CheckBoxOutlineBlank, Flag, LocalOffer } from '@mui/icons-material'
+import { Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
@@ -222,8 +221,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 		}
 	}
 
-	console.log(props.selectedRows)
-
 	return (
 		<Table size="small" sx={{ overflowY: 'scroll' }}>
 			{sortDatesChronologically(...displayedJournalDates)
@@ -245,7 +242,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 								</TableCell>
 							</TableRow>
 							
-							{entries.map((entry, index) => {
+							{entries.map((entry) => {
 								const { categoryIds } = entry
 								const categoryId: string | undefined = categoryIds?.[0]
 								const category: Category | undefined = categoryId
