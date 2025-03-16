@@ -54,7 +54,7 @@ export default function Header(props: HeaderProps) {
 					<SyncHeaderWidget />
 				</Stack>
 			</Stack>
-			<Stack direction="row" gap={1} alignItems={'center'}>
+			<Stack direction="row" gap={1} alignItems={'center'} sx={{ flex: 1, justifyContent: 'flex-end' }}>
 				<SearchWidget />
 				<IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
 					<Settings />

@@ -18,15 +18,16 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
 		return (
 			<Button
 				variant="text"
+				disableFocusRipple
 				sx={(theme) => ({
 					color: theme.palette.text.secondary,
 					backgroundColor: theme.palette.action.hover,
 					borderRadius: 16,
-					py: 0.75,
+					py: 1,
 					px: 2,
 					width: '100%',
-					maxWidth: theme.spacing(40),
 					justifyContent: 'flex-start',
+					cursor: 'text',
 					'&:hover': {
 						backgroundColor: theme.palette.action.selected,
 					},

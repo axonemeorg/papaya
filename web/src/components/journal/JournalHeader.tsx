@@ -1,5 +1,5 @@
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { ArrowBack, ArrowDropDown, ArrowForward, EventRepeat, FilterList } from '@mui/icons-material'
+import { ArrowBack, ArrowDropDown, ArrowForward, CalendarToday, EventRepeat, FilterList } from '@mui/icons-material'
 import { Button, IconButton, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -7,12 +7,11 @@ import dayjs from 'dayjs'
 import { PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react'
 import JournalFilters from './JournalFilters'
 
-type JournalHeaderProps = PropsWithChildren<{
-	reverseActionOrder?: boolean
+interface JournalHeaderProps {
 	numRows?: number
 	numSelectedRows?: number
 	toggleSelectAllRows?: () => void
-}>
+}
 
 export default function JournalHeader(props: JournalHeaderProps) {
 	const [datePickerAnchorEl, setDatePickerAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -121,25 +120,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
 				justifyContent="space-between"
 				sx={{ flex: 0, py: 1, px: 2 }}
 				alignItems="center"
-				flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
-				gap={1}>
-				<Stack direction="row" alignItems="center" gap={2}>
-					{props.children}
-				</Stack>
+				gap={1}
+			>
 				<Stack
 					direction="row"
 					alignItems="center"
 					gap={2}
-					flexDirection={props.reverseActionOrder ? 'row-reverse' : 'row'}
 				>
-					<Button
-						startIcon={<FilterList />}
-						color='inherit'
-						variant='outlined'
-						onClick={(event) => setJournalFiltersAnchorEl(event.currentTarget)}
-					>
-						Filters
-					</Button>
 					<JournalFilters
 						anchorEl={journalFiltersAnchorEl}
 						onClose={() => setJournalFiltersAnchorEl(null)}
@@ -148,13 +135,6 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							minTransactionAmount: 0
 						}}
 					/>
-					{!hideTodayButton && (
-						<Tooltip title={formattedCurrentDay}>
-							<IconButton color="inherit" onClick={() => jumpToToday()}>
-								<EventRepeat />
-							</IconButton>
-						</Tooltip>
-					)}
 					<Stack direction="row" alignItems="center" gap={1}>
 						<Button
 							color="inherit"
@@ -162,23 +142,30 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							onClick={(e) => setDatePickerAnchorEl(e.currentTarget)}>
 							<Typography
 								variant={headingSize}
-								sx={{ fontWeight: 500, minWidth: '9ch', textAlign: 'left' }}>
+								sx={{ fontWeight: 500 }}>
 								{formattedDateString}
 							</Typography>
 						</Button>
 						{!hideNextPrevButtons && (
 							<Stack direction="row">
 								<Tooltip title={prevButtonTooltip}>
-									<IconButton size="small" onClick={() => journalEntryContext.onPrevPage()}>
+									<IconButton onClick={() => journalEntryContext.onPrevPage()}>
 										<ArrowBack />
 									</IconButton>
 								</Tooltip>
 								<Tooltip title={nextButtonTooltip}>
-									<IconButton size="small" onClick={() => journalEntryContext.onNextPage()}>
+									<IconButton onClick={() => journalEntryContext.onNextPage()}>
 										<ArrowForward />
 									</IconButton>
 								</Tooltip>
 							</Stack>
+						)}
+						{!hideTodayButton && (
+							<Tooltip title={formattedCurrentDay}>
+								<IconButton color="inherit" onClick={() => jumpToToday()}>
+									<CalendarToday />
+								</IconButton>
+							</Tooltip>
 						)}
 					</Stack>
 				</Stack>
