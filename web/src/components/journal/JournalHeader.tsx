@@ -8,7 +8,7 @@ import {
 	CheckBoxOutlineBlank,
 	IndeterminateCheckBox
 } from '@mui/icons-material'
-import { Button, IconButton, Menu, MenuItem, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Button, IconButton, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
@@ -158,95 +158,100 @@ export default function JournalHeader(props: JournalHeaderProps) {
 					/>
 				</LocalizationProvider>
 			</Popover>
-			<Stack
-				component="header"
-				direction="row"
-				justifyContent="space-between"
-				sx={{ flex: 0, py: 1, px: 2 }}
-				alignItems="center"
-				gap={1}
-			>
+			<Stack component='header'>
 				<Stack
 					direction="row"
+					justifyContent="space-between"
+					sx={{ flex: 0, py: 1, px: 2, pb: 0 }}
 					alignItems="center"
-					justifyContent='space-between'
-					sx={{ width: '100%' }}
-					gap={2}
+					gap={1}
 				>
-					{/* <JournalFilters
-						anchorEl={journalFiltersAnchorEl}
-						onClose={() => setJournalFiltersAnchorEl(null)}
-						filterConfig={{
-							maxTransactionAmount: 1000,
-							minTransactionAmount: 0
-						}}
-					/> */}
-					<Stack direction="row" alignItems="center" gap={1}>
-						<Stack direction='row'>
+					<Stack
+						direction="row"
+						alignItems="center"
+						justifyContent='space-between'
+						sx={{ width: '100%' }}
+						gap={2}
+					>
+						{/* <JournalFilters
+							anchorEl={journalFiltersAnchorEl}
+							onClose={() => setJournalFiltersAnchorEl(null)}
+							filterConfig={{
+								maxTransactionAmount: 1000,
+								minTransactionAmount: 0
+							}}
+						/> */}
+						<Stack direction="row" alignItems="center" gap={1}>
+							<Stack direction='row'>
+								<Button
+									sx={{ minWidth: 'unset', pr: 0.5, ml: -1 }}
+									color='inherit'
+									onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
+									ref={selectAllMenuButtonRef}
+								>
+									{props.numRows === props.numSelectedRows ? (
+										<CheckBox color='primary' />
+									) : <>
+										{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
+											<IndeterminateCheckBox color='inherit' />	
+										) : (
+											<CheckBoxOutlineBlank color='inherit' />
+										)}
+									</>}
+								</Button>
+								<Button
+									color='inherit'
+									onClick={() => setShowSelectAllMenu(true)}
+									sx={{
+										minWidth: 'unset',
+										px: 0,
+										ml: -0.5
+									}}
+								>
+									<ArrowDropDown />
+								</Button>
+							</Stack>
+						</Stack>
+						<Stack direction="row" alignItems="center" gap={1}>
 							<Button
-								sx={{ minWidth: 'unset', pr: 0.5 }}
-								color='inherit'
-								onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
-								ref={selectAllMenuButtonRef}
-							>
-								{props.numRows === props.numSelectedRows ? (
-									<CheckBox color='primary' />
-								) : <>
-									{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
-										<IndeterminateCheckBox color='inherit' />	
-									) : (
-										<CheckBoxOutlineBlank color='inherit' />
-									)}
-								</>}
+								color="inherit"
+								endIcon={<ArrowDropDown />}
+								ref={datePickerButtonRef}
+								onClick={() => setShowDatePicker((showing) => !showing)}>
+								<Typography
+									variant={headingSize}
+									sx={{ fontWeight: 500 }}>
+									{formattedDateString}
+								</Typography>
 							</Button>
-							<Button
-								color='inherit'
-								onClick={() => setShowSelectAllMenu(true)}
-								sx={{
-									minWidth: 'unset',
-									px: 0,
-									ml: -0.5
-								}}
-							>
-								<ArrowDropDown />
-							</Button>
+							{!hideNextPrevButtons && (
+								<Stack direction="row">
+									<Tooltip title={prevButtonTooltip}>
+										<IconButton onClick={() => journalEntryContext.onPrevPage()}>
+											<ArrowBack />
+										</IconButton>
+									</Tooltip>
+									<Tooltip title={nextButtonTooltip}>
+										<IconButton onClick={() => journalEntryContext.onNextPage()}>
+											<ArrowForward />
+										</IconButton>
+									</Tooltip>
+								</Stack>
+							)}
+							{!hideTodayButton && (
+								<Tooltip title={formattedCurrentDay}>
+									<IconButton color="inherit" onClick={() => jumpToToday()}>
+										<CalendarToday />
+									</IconButton>
+								</Tooltip>
+							)}
 						</Stack>
 					</Stack>
-					<Stack direction="row" alignItems="center" gap={1}>
-						<Button
-							color="inherit"
-							endIcon={<ArrowDropDown />}
-							ref={datePickerButtonRef}
-							onClick={() => setShowDatePicker((showing) => !showing)}>
-							<Typography
-								variant={headingSize}
-								sx={{ fontWeight: 500 }}>
-								{formattedDateString}
-							</Typography>
-						</Button>
-						{!hideNextPrevButtons && (
-							<Stack direction="row">
-								<Tooltip title={prevButtonTooltip}>
-									<IconButton onClick={() => journalEntryContext.onPrevPage()}>
-										<ArrowBack />
-									</IconButton>
-								</Tooltip>
-								<Tooltip title={nextButtonTooltip}>
-									<IconButton onClick={() => journalEntryContext.onNextPage()}>
-										<ArrowForward />
-									</IconButton>
-								</Tooltip>
-							</Stack>
-						)}
-						{!hideTodayButton && (
-							<Tooltip title={formattedCurrentDay}>
-								<IconButton color="inherit" onClick={() => jumpToToday()}>
-									<CalendarToday />
-								</IconButton>
-							</Tooltip>
-						)}
-					</Stack>
 				</Stack>
+				<Tabs value='JOURNAL'>
+					<Tab value='JOURNAL' label='Journal Entries' />
+					<Tab value='TRANSFERS' label='Account Transfers' />
+				</Tabs>
 			</Stack>
 		</>
 	)
