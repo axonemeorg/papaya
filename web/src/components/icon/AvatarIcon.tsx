@@ -7,6 +7,7 @@ interface AvatarIconProps {
 	avatar?: Avatar
 	compact?: boolean
 	sx?: SxProps<Theme>
+	className?: string
 }
 
 export default function AvatarIcon(props: AvatarIconProps) {
@@ -15,12 +16,12 @@ export default function AvatarIcon(props: AvatarIconProps) {
 	switch (avatar.variant) {
 		case AvatarVariant.Enum.PICTORIAL:
 			return (
-				<Icon fontSize="small" style={{ display: 'block' }} sx={{ color: avatar.primaryColor, ...props.sx }}>
+				<Icon className={props.className} fontSize="small" style={{ display: 'block' }} sx={{ color: avatar.primaryColor, ...props.sx }}>
 					{avatar.content}
 				</Icon>
 			)
 		case AvatarVariant.Enum.IMAGE:
-			return <ImageAvatar avatar={avatar} sx={{ width: '28px', height: '28px', ...props.sx }} />
+			return <ImageAvatar className={props.className} avatar={avatar} sx={{ width: '28px', height: '28px', ...props.sx }} />
 		default:
 			return null
 	}

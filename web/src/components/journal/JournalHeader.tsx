@@ -9,6 +9,9 @@ import JournalFilters from './JournalFilters'
 
 type JournalHeaderProps = PropsWithChildren<{
 	reverseActionOrder?: boolean
+	numRows?: number
+	numSelectedRows?: number
+	toggleSelectAllRows?: () => void
 }>
 
 export default function JournalHeader(props: JournalHeaderProps) {

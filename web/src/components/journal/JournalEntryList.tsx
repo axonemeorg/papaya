@@ -26,7 +26,7 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { Flag, LocalOffer } from '@mui/icons-material'
+import { CheckBoxOutlineBlank, Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
@@ -38,34 +38,44 @@ import { sortDatesChronologically } from '@/utils/date'
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
 	buttonRow?: boolean
-	border?: boolean
 }
 
-const TableRow = ({ sx, dateRow, buttonRow, border, ...rest }: JournalTableRowProps) => {
+const TableRow = ({ sx, dateRow, selected, buttonRow, ...rest }: JournalTableRowProps) => {
+	const hoverStyles = {
+		'.checkbox': { visibility: 'visible' },
+		'.icon': { visibility: 'hidden' },
+	};
+
 	return (
 	  <MuiTableRow
+		selected={selected}
 		hover={!dateRow && !buttonRow}
 		sx={{
+			'.checkbox': {
+				visibility: 'hidden',
+			},
+			'.icon': {
+				visibility: 'visible',
+				pointerEvents: 'none',
+			},
 			'& td': {
 		  		...(dateRow || buttonRow ? {
 					cursor: 'default',
 				} : {}),
 				...(dateRow ? {
-					// verticalAlign: 'top',
 					width: '0%',
-				} : {}),
-				...(!border ? {
-					// border: 0,
 				} : {})
 			},
-		  userSelect: 'none',
-		  cursor: 'pointer',
-		  ...sx,
+			...(selected ? hoverStyles : {}),
+        	'&:hover': hoverStyles,
+			userSelect: 'none',
+			cursor: 'pointer',
+			...sx,
 		}}
 		{...rest}
 	  />
 	);
-  };
+};
 
 interface JournalTableCellProps extends Omit<TableCellProps, 'colSpan'> {
 	selectCheckbox?: boolean
@@ -186,6 +196,8 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 
 interface JournalEntryListProps {
 	journalRecordGroups: Record<string, JournalEntry[]>
+	selectedRows: Record<string, boolean>
+	toggleSelectedRow: (row: string) => void
 	onClickListItem: (event: any, entry: JournalEntry) => void
 	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
 }
@@ -210,6 +222,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 		}
 	}
 
+	console.log(props.selectedRows)
+
 	return (
 		<Table size="small" sx={{ overflowY: 'scroll' }}>
 			{sortDatesChronologically(...displayedJournalDates)
@@ -221,7 +235,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 					return (
 						<TableBody key={date}>
-							<TableRow dateRow border sx={{ verticalAlign: entries.length > 1 ? 'top' : undefined }}>
+							<TableRow dateRow sx={{ verticalAlign: entries.length > 1 ? 'top' : undefined }}>
 								<TableCell rowSpan={entries.length + (showQuckEditor ? 2 : 1)}>
 									<JournalEntryDate
 										day={day}
@@ -243,28 +257,40 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 								return (
 									<TableRow
-										border={index === entries.length - 1 && !showQuckEditor}
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
+										selected={props.selectedRows[entry._id]}
 									>
-										{/* {index === 0 && (
-											<TableCell rowSpan={entries.length} dateCell>
-												<JournalEntryDate
-													day={day}
-													isToday={isToday}
-													onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
-												/>
-											</TableCell>
-										)} */}
-										<TableCell sx={{ width: '0%' }} selectCheckbox>
+										<TableCell
+											selectCheckbox
+											sx={{
+												width: '0%',
+												position: 'relative',
+											}}
+										>
 											<Checkbox
+												className='checkbox'
 												sx={{ m: -1 }}
-												icon={<AvatarIcon avatar={category?.avatar} />}
+												checked={props.selectedRows[entry._id] || false}
+												onChange={() => props.toggleSelectedRow(entry._id)}
+												onClick={(event) => event.stopPropagation()}
+											/>
+											<AvatarIcon
+												className='icon'
+												avatar={category?.avatar}
+												sx={{
+													position: 'absolute',
+													top: '50%',
+													left: '50%',
+													transform: 'translate(-50%, -50%)',
+												}}
 											/>
 										</TableCell>
 										<TableCell sx={{ width: '40%' }}>
-											<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
+											<Typography sx={{ ml: -0.5 }}>
+												{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
+											</Typography>
 										</TableCell>
 										<TableCell sx={{ width: '0%' }}>
 											<Stack direction='row'>
@@ -301,7 +327,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 							})}
 										
 							{showQuckEditor && (
-								<TableRow border buttonRow>
+								<TableRow buttonRow>
 									<TableCell colSpan="100%">
 										<QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />
 									</TableCell>

@@ -21,6 +21,7 @@ export default function JournalEditor() {
 		entry: null,
 		anchorEl: null,
 	})
+	const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({})
 
 	const { snackbar } = useContext(NotificationsContext)
 	const journalContext = useContext(JournalContext)
@@ -99,6 +100,15 @@ export default function JournalEditor() {
 		}
 	}
 
+	const toggleSelectedRow = (row: string) => {
+		setSelectedRows((prev) => {
+			return {
+				...prev,
+				[row]: prev[row] ? false : true
+			}
+		})
+	}
+
 	// show all docs
 	useEffect(() => {
 		// const db = getDatabaseClient()
@@ -125,14 +135,15 @@ export default function JournalEditor() {
 					overflow: 'hidden',
 					flex: 1,
 				})}>
-				
-				<JournalHeader reverseActionOrder />
+				<JournalHeader />
 				<Divider />
 				<Box sx={{
 					flex: 1,
 					overflowY: 'auto',
 				}}>
 					<JournalEntryList
+						selectedRows={selectedRows}
+						toggleSelectedRow={toggleSelectedRow}
 						journalRecordGroups={journalGroups}
 						onClickListItem={handleClickListItem}
 						onDoubleClickListItem={handleDoubleClickListItem}
