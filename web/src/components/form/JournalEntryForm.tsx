@@ -137,7 +137,7 @@ export default function JournalEntryForm() {
 													
 							</Stack>
 							<Grid container columns={12} columnSpacing={2}>
-								<Grid size={8}>
+								<Grid size={entryType === 'JOURNAL_ENTRY' ? 8 : 4}>
 									<Controller
 										control={control}
 										name="amount"
@@ -164,12 +164,44 @@ export default function JournalEntryForm() {
 													onChange={(_event, newValue) => {
 														setValue(field.name, newValue ?? undefined, { shouldDirty: true })
 													}}
-													renderInput={(params) => <TextField {...params} label={'Account'} variant='filled' />}
+													renderInput={(params) => (
+														<TextField
+															{...params}
+															label={entryType === 'JOURNAL_ENTRY' ? 'Account' : 'From Account'}
+															variant='filled'
+														/>
+													)}
 												/>
 											)
 										}}
 									/>
 								</Grid>
+								{entryType === 'TRANSFER_ENTRY' && (
+									<Grid size={4}>
+										<Controller
+											control={control}
+											name="destAccountId"
+											render={({ field }) => {
+												return (
+													<AccountAutocomplete
+														{...field}
+														value={sourceAccountId}
+														onChange={(_event, newValue) => {
+															setValue(field.name, newValue ?? undefined, { shouldDirty: true })
+														}}
+														renderInput={(params) => (
+															<TextField
+																{...params}
+																label={'To Account'}
+																variant='filled'
+															/>
+														)}
+													/>
+												)
+											}}
+										/>
+									</Grid>
+								)}
 							</Grid>
 						</Stack>
 						<Collapse in={entryType === 'JOURNAL_ENTRY'}>
