@@ -7,7 +7,7 @@ export const IdentifierMetadata = z.object({
 export type IdentifierMetadata = z.output<typeof IdentifierMetadata>
 
 export const BelongsToJournal = z.object({
-    journalId: z.string(),
+	journalId: z.string(),
 })
 
 export const AttachmentMeta = z.object({
@@ -90,21 +90,135 @@ export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
 
 export type EntryTask = z.output<typeof EntryTask>
 
-export const BaseJournalEntry = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
+// CadenceFrequency enum using Zod
+export const CadenceFrequency = z.enum([
+	'D', // Daily
+	'W', // Weekly
+	'M', // Monthly
+	'Y', // Yearly
+]);
+export type CadenceFrequency = z.infer<typeof CadenceFrequency>;
+
+// Week number enum using Zod
+export const WeekNumber = z.enum(['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'LAST']);
+export type WeekNumber = z.infer<typeof WeekNumber>;
+
+// Days of week enum using Zod
+export const DayOfWeek = z.enum([
+	'SU',
+	'MO',
+	'TU',
+	'WE',
+	'TH',
+	'FR',
+	'SA',
+]);
+export type DayOfWeek = z.infer<typeof DayOfWeek>;
+
+export const MonthlyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.M),
+  on: z.union([
+    z.object({
+      // Monthly on Last Thursday, First Monday, Second Monday, etc.
+      week: WeekNumber,
+    }),
+    z.object({
+      // Monthly on the 12th day
+      day: z.number().min(1).max(31),
+    }),
+  ]),
+});
+
+export type MonthlyCadence = z.output<typeof MonthlyCadence>
+
+export const DailyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.D),
+});
+
+export type DailyCadence = z.output<typeof DailyCadence>
+
+export const YearlyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.Y),
+});
+
+export type YearlyCadence = z.output<typeof YearlyCadence>
+
+export const WeeklyCadence = z.object({
+  frequency: z.literal(CadenceFrequency.enum.W),
+  days: z.array(DayOfWeek),
+});
+
+export type WeeklyCadence = z.output<typeof WeeklyCadence>
+
+
+export const RecurringCadence = z.object({
+  interval: z.number(), // Every _ days/months/weeks
+}).and(
+  z.union([
+    MonthlyCadence,
+    WeeklyCadence,
+    DailyCadence,
+    YearlyCadence,
+  ])
+);
+
+export type RecurringCadence = z.output<typeof RecurringCadence>
+
+export const EntryRecurrence = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
-		type: z.literal('JOURNAL_ENTRY'),
+		type: z.literal('ENTRY_RECURRENCE'),
+		/**
+		 * Encodes the cadence of the recurrence, e.g. every four weeks,
+		 * every month, etc. If this value is undefined, then the it
+		 * will inherit the cadence of the last recurrence.
+		 */
+		cadence: RecurringCadence.optional(),
+		/**
+		 * The journal entry ID of the previous recurrence. If this is the
+		 * first recurrence, this value is null.
+		 */
+		lastRecurrence: z.string().nullable()
+	})
+)
+
+export type EntryRecurrence = z.output<typeof EntryRecurrence>;
+
+export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
+
+export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
+
+export const CommonEntryAttributes = DocumentMetadata.merge(BelongsToJournal).merge(AmountRecord).merge(
+	z.object({
+		type: z.union([TRANSFER_ENTRY, JOURNAL_ENTRY]),
 		memo: z.string(),
 		tagIds: z.array(z.string()).optional(),
 		categoryIds: z.array(z.string()).optional(),
-		accountId: z.string().optional(),
+		sourceAccountId: z.string().optional(),
 		date: z.string().optional(),
 		notes: z.string().optional(),
 		tasks: z.array(EntryTask).optional(),
 		artifacts: z.array(EntryArtifact).optional(),
-		paymentMethodId: z.string().nullable().optional(),
+		recurs: EntryRecurrence.optional(),
 		relatedEntryIds: z.array(z.string()).optional(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
+	})
+)
+
+export type CommonEntryAttributes = z.output<typeof CommonEntryAttributes>
+
+export const TransferEntry = CommonEntryAttributes.merge(
+	z.object({
+		type: TRANSFER_ENTRY,
+		destAccountId: z.string().optional(),
+	})
+)
+
+export type TransferEntry = z.output<typeof TransferEntry>
+
+export const BaseJournalEntry = CommonEntryAttributes.merge(
+	z.object({
+		type: z.literal('JOURNAL_ENTRY'),
 	})
 )
 
@@ -116,14 +230,18 @@ export const JournalEntry = BaseJournalEntry.merge(
 	})
 )
 
+export type JournalEntry = z.output<typeof JournalEntry>
+
+export const JournalOrTransferEntry = z.union([JournalEntry, TransferEntry])
+
+export type JournalOrTransferEntry = z.output<typeof JournalOrTransferEntry>
+
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,
 	type: z.literal('CHILD_JOURNAL_ENTRY'),
 }))
 
 export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
-
-export type JournalEntry = z.output<typeof JournalEntry>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string().optional(),
