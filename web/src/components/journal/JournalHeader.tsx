@@ -13,7 +13,6 @@ import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-picker
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
-import JournalFilters from './JournalFilters'
 
 interface JournalHeaderProps {
 	numRows: number
@@ -86,33 +85,36 @@ export default function JournalHeader(props: JournalHeaderProps) {
 			case 'all':
 				// TODO: Implement all time view to show the timestamp range from the first entry to today/the last entry
 				return 'All Time'
+
 			case 'month':
 				isCurrentYear = date.isSame(now, 'year')
 				if (isCurrentYear) {
 					return date.format('MMMM')
 				}
-
 				return date.format('MMM YYYY')
+
 			case 'year':
 				return date.format('YYYY')
+
 			case 'week':
 			default:
 				startOfWeek = date.startOf('week')
 				endOfWeek = date.endOf('week')
-				// Format into form "Jan 1 - 7, 2022"
+
+				// Formatted into form "Jan 1 - 7, 2022"
 				return `${startOfWeek.format('MMM D')} - ${endOfWeek.format('D, YYYY')}`
 		}
 	}, [journalEntryContext.date, journalEntryContext.view])
 
 	const calendarAvailableViews = useMemo((): DateView[] => {
 		switch (journalEntryContext.view) {
-			case 'month':
-			default:
-				return ['month', 'year']
 			case 'year':
 				return ['year']
 			case 'week':
 				return ['year', 'month', 'day']
+			case 'month':
+			default:
+				return ['month', 'year']
 		}
 	}, [journalEntryContext.view])
 
@@ -173,6 +175,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 						sx={{ width: '100%' }}
 						gap={2}
 					>
+						{/* TODO to be implemented by ZK-112 */}
 						{/* <JournalFilters
 							anchorEl={journalFiltersAnchorEl}
 							onClose={() => setJournalFiltersAnchorEl(null)}
@@ -248,9 +251,10 @@ export default function JournalHeader(props: JournalHeaderProps) {
 						</Stack>
 					</Stack>
 				</Stack>
+				{/* TODO To be implemented in ZK-111 */}
 				<Tabs value='JOURNAL'>
 					<Tab value='JOURNAL' label='Journal Entries' />
-					<Tab value='TRANSFERS' label='Account Transfers' />
+					<Tab value='TRANSFERS' label='Account Transfers' disabled />
 				</Tabs>
 			</Stack>
 		</>
