@@ -1,5 +1,5 @@
 import { JournalContext } from '@/contexts/JournalContext'
-import { JournalEditorState, JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalEditorDateViewSymbol, JournalEditorState, JournalEntryContext } from '@/contexts/JournalEntryContext'
 import { getJournalEntries } from '@/database/queries'
 import { DateView, JournalEntry, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
 import { useQuery } from '@tanstack/react-query'
@@ -8,7 +8,7 @@ import { PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 type JournalEntryContextProviderProps = PropsWithChildren<JournalEditorState>
 
 export default function JournalEntryContextProvider(props: JournalEntryContextProviderProps) {
-	const { dateView, onChangeDateView } = props
+	const { dateView, onChangeDateView, switchDateView } = props
 
 	const journalContext = useContext(JournalContext)
 
@@ -49,6 +49,7 @@ export default function JournalEntryContextProvider(props: JournalEntryContextPr
 				onChangeDateView,
 				getJournalEntriesQuery,
 				refetchAllDependantQueries,
+				switchDateView,
 			}}>
 			{props.children}
 		</JournalEntryContext.Provider>

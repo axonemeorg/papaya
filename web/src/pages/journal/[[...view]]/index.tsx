@@ -2,8 +2,8 @@ import JournalEditor from '@/components/journal/JournalEditor'
 import { JournalEditorDateViewSymbol } from '@/contexts/JournalEntryContext'
 import { getLayout } from '@/layouts/main'
 import JournalEntryContextProvider from '@/providers/JournalEntryContextProvider'
-import { DateView, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
-import { dateMonthNumberWithLeadingZero, getAbsoluteDateRangeFromDateView } from '@/utils/date'
+import { DatePeriod, DateView, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
+import { dateMonthNumberWithLeadingZero, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -16,9 +16,25 @@ const JournalYearMonthPage = () => {
 
 	const now = useMemo(() => dayjs(), [])
 
+	const pushToRouter = (view: JournalEditorDateViewSymbol, year: string, month: string, day: string) => {
+		const routerParts = [
+			'',
+			...[
+				'journal',
+				view,
+				...[year, month, day]
+					.filter(Boolean)
+					
+					// Removes leading zeroes
+					.map((x) => String(Number(x)))
+			]
+		]
+		router.push(routerParts.join('/'))
+	}
+
 	const handleDateChange = useCallback(
 		(newDate: string) => {
-			let [y, m, d] = newDate.split('-').map((x) => String(Number(x))) // Removes leading zeroes
+			let [y, m, d] = newDate.split('-')
 			if (view === JournalEditorDateViewSymbol.YEARLY || view === JournalEditorDateViewSymbol.MONTHLY) {
 				d = ''
 			}
@@ -26,8 +42,7 @@ const JournalYearMonthPage = () => {
 				m = ''
 			}
 
-			const routerParts = ['', ...['journal', view, y, m, d].filter(Boolean)]
-			router.push(routerParts.join('/'))
+			pushToRouter(view, y, m, d)
 		},
 		[view]
 	)
@@ -84,9 +99,44 @@ const JournalYearMonthPage = () => {
 		handleDateChange(startDate.format('YYYY-MM-DD'))
 	}
 
-	const dateView = useMemo((): DateView => {
-		console.log('dateView useMemo', view, date)
+	const handleSwitchDateView = (newView: JournalEditorDateViewSymbol) => {
+		if (newView === view || newView === JournalEditorDateViewSymbol.RANGE) {
+			return
+		}
 
+		let datePeriod: DatePeriod | undefined = undefined
+		switch (newView) {
+			case JournalEditorDateViewSymbol.YEARLY:
+				datePeriod = getAnnualPeriodFromDate(dayjs(date))
+				break
+
+			case JournalEditorDateViewSymbol.MONTHLY:
+				datePeriod = getMonthlyPeriodFromDate(dayjs(date))
+				break
+
+			case JournalEditorDateViewSymbol.WEEKLY:
+				datePeriod = getWeeklyPeriodFromDate(dayjs(date))
+				break
+		}
+
+		if (!datePeriod) {
+			return
+		}
+
+		const { year, month, day } = (datePeriod as WeeklyPeriod)
+
+		console.log('spread:', { year, month, day })
+
+		pushToRouter(
+			newView,
+			year ? String(year) : '',
+			month ? String(month) : '',
+			day ? String(day) : '',
+		)
+		
+	}
+
+	const dateView = useMemo((): DateView => {
 		if (view === JournalEditorDateViewSymbol.RANGE) {
 			// TODO startDate and endDate to be (ostensibly) pulled from query params
 			return {}
@@ -100,7 +150,7 @@ const JournalYearMonthPage = () => {
 		if (view === JournalEditorDateViewSymbol.WEEKLY) {
 			(value as WeeklyPeriod).day = dayjs(date).date()
 		}
-		console.log('returning ', value)
+
 		return value
 	}, [date, view])
 
@@ -108,6 +158,7 @@ const JournalYearMonthPage = () => {
 		<JournalEntryContextProvider
 			dateView={dateView}
 			onChangeDateView={handleChangeDateView}
+			switchDateView={handleSwitchDateView}
 		>
 			<JournalEditor />
 		</JournalEntryContextProvider>

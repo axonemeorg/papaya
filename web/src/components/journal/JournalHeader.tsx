@@ -1,6 +1,7 @@
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { KeyboardActionName } from '@/constants/keyboard'
+import { JournalEditorDateViewSymbol, JournalEntryContext } from '@/contexts/JournalEntryContext'
 import { JournalEntry } from '@/types/schema'
-import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getEmpiracleDateRangeFromJournalEntries } from '@/utils/date'
+import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
 	ArrowBack,
 	ArrowDropDown,
@@ -10,11 +11,12 @@ import {
 	CheckBoxOutlineBlank,
 	IndeterminateCheckBox
 } from '@mui/icons-material'
-import { Button, IconButton, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Button, IconButton, ListItemText, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
+import KeyboardShortcut from '../text/KeyboardShortcut'
 
 interface JournalHeaderProps {
 	numRows: number
@@ -37,13 +39,32 @@ const selectAllMenuOptionLabels: Omit<Record<SelectAllAction, string>, 'TOGGLE'>
 	[SelectAllAction.DEBIT]: 'Debits',
 }
 
+const dateViewMenuOptionLabels: Record<JournalEditorDateViewSymbol, string> = {
+	[JournalEditorDateViewSymbol.WEEKLY]: 'Week',
+	[JournalEditorDateViewSymbol.MONTHLY]: 'Month',
+	[JournalEditorDateViewSymbol.YEARLY]: 'Year',
+	[JournalEditorDateViewSymbol.RANGE]: 'Date Range',
+}
+
+type JournalEditorDateViewSymbolWithKeystroke = Exclude<JournalEditorDateViewSymbol, JournalEditorDateViewSymbol.RANGE>;
+
+const dateViewKeystrokes: Record<JournalEditorDateViewSymbolWithKeystroke, KeyboardActionName> = {
+	[JournalEditorDateViewSymbol.WEEKLY]: KeyboardActionName.DATE_VIEW_WEEKLY,
+	[JournalEditorDateViewSymbol.MONTHLY]: KeyboardActionName.DATE_VIEW_MONTHLY,
+	[JournalEditorDateViewSymbol.YEARLY]: KeyboardActionName.DATE_VIEW_ANNUALLY,
+}
+
 // Date range seperator
 const SEPERATOR = '\u00A0\u2013\u00A0'
 
 export default function JournalHeader(props: JournalHeaderProps) {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
-	const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+	const [showDateViewPicker, setShowDateViewPicker] = useState<boolean>(false)
 	const [showSelectAllMenu, setShowSelectAllMenu] = useState<boolean>(false)
+
+
+	const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+	const dateViewPickerButtonRef = useRef<HTMLButtonElement | null>(null);
 	const selectAllMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 	// const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -51,7 +72,8 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	const hideTodayButton = dateViewIsRange(journalEntryContext.dateView)
 
 	const theme = useTheme()
-	const hideNextPrevButtons = hideTodayButton || useMediaQuery(theme.breakpoints.down('md'))
+	const hideDateViewPicker = useMediaQuery(theme.breakpoints.down('md'))
+	const hideNextPrevButtons = hideTodayButton || hideDateViewPicker
 	const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
 
 	const now = useMemo(() => dayjs(), [])
@@ -84,8 +106,6 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	const formattedDateString = useMemo(() => {
 		const { dateView } = journalEntryContext
 		let { startDate, endDate } = getAbsoluteDateRangeFromDateView(dateView)
-
-		console.log('formattedDateString useMemo dateView + start+end Date:', { dateView, startDate, endDate })
 
 		// Handle case where an incomplete range is given
 		if (!startDate || !endDate) {
@@ -163,6 +183,10 @@ export default function JournalHeader(props: JournalHeaderProps) {
 		return now.format('dddd, MMMM D')
 	}, [])
 
+	const currentDateViewSymbol: JournalEditorDateViewSymbol = useMemo(() => {
+		return getDateViewSymbol(journalEntryContext.dateView)
+	}, [journalEntryContext.dateView])
+
 	// const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
 	// 	journalEntryContext.setDate(value.format('YYYY-MM-DD'))
 	// }
@@ -216,22 +240,13 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
 		if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
 			newDate = currentDate.add(1, 'month')
-			journalEntryContext.onChangeDateView({
-				year: newDate.year(),
-				month: newDate.month() + 1, // Zero-indexed
-			})
+			journalEntryContext.onChangeDateView(getMonthlyPeriodFromDate(newDate))
 		} else if (dateViewIsWeeklyPeriod(journalEntryContext.dateView)) {
 			newDate = currentDate.add(1, 'week')
-			journalEntryContext.onChangeDateView({
-				year: newDate.year(),
-				month: newDate.month() + 1, // Zero-indexed
-				day: newDate.date(),
-			})
+			journalEntryContext.onChangeDateView(getWeeklyPeriodFromDate(newDate))
 		} else if (dateViewIsAnnualPeriod(journalEntryContext.dateView)) {
 			newDate = currentDate.add(1, 'year')
-			journalEntryContext.onChangeDateView({
-				year: newDate.year()
-			})
+			journalEntryContext.onChangeDateView(getAnnualPeriodFromDate(newDate))
 		}
 	}
 
@@ -254,9 +269,14 @@ export default function JournalHeader(props: JournalHeaderProps) {
 		journalEntryContext.onChangeDateView(newDateView)
 	}, [journalEntryContext.dateView])
 
-	const handleSelectAll = (key: SelectAllAction) => {
+	const handleSelectAll = (action: SelectAllAction) => {
 		setShowSelectAllMenu(false)
-		props.onSelectAll(key)
+		props.onSelectAll(action)
+	}
+
+	const handleChangeDateView = (view: JournalEditorDateViewSymbol) => {
+		setShowDateViewPicker(false)
+		journalEntryContext.switchDateView(view)
 	}
 
 	return (
@@ -269,10 +289,38 @@ export default function JournalHeader(props: JournalHeaderProps) {
 				{Object.entries(selectAllMenuOptionLabels).map(([key, label]) => {
 					return (
 						<MenuItem key={key} onClick={() => handleSelectAll(key as SelectAllAction)} aria-label={`Select ${label}`}>
-							{label}
+							<ListItemText>{label}</ListItemText>
 						</MenuItem>
 					)
 				})}
+			</Menu>
+			<Menu
+				open={showDateViewPicker}
+				anchorEl={dateViewPickerButtonRef.current}
+				onClose={() => setShowDateViewPicker(false)}
+			>
+				{Object.entries(dateViewMenuOptionLabels)
+					.filter(([key]) => {
+						return !(key === JournalEditorDateViewSymbol.RANGE && !(currentDateViewSymbol === key))
+					})
+					.map(([key, label]) => {
+						return (
+							<MenuItem
+								key={key}
+								onClick={() => handleChangeDateView(key as JournalEditorDateViewSymbol)}
+								aria-label={`View by ${label}`}
+								selected={key === currentDateViewSymbol}
+							>
+								<ListItemText>{label}</ListItemText>
+								{dateViewKeystrokes[key as JournalEditorDateViewSymbolWithKeystroke] && (
+									<KeyboardShortcut
+										name={dateViewKeystrokes[key as JournalEditorDateViewSymbolWithKeystroke]}
+										sx={{ ml: 2 }}
+									/>
+								)}
+							</MenuItem>
+						)
+					})}
 			</Menu>
 			<Popover open={showDatePicker} onClose={() => setShowDatePicker(false)} anchorEl={datePickerButtonRef.current}>
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -340,6 +388,29 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							</Stack>
 						</Stack>
 						<Stack direction="row" alignItems="center" gap={1}>
+							{!hideDateViewPicker && (
+								<Button
+									variant='outlined'
+									sx={(theme) => ({
+										borderRadius: theme.spacing(8)
+									})}
+									ref={dateViewPickerButtonRef}
+									onClick={() => setShowDateViewPicker((showing) => !showing)}
+									color="inherit"
+									endIcon={<ArrowDropDown />}
+								>
+									<Typography>
+										{dateViewMenuOptionLabels[currentDateViewSymbol]}
+									</Typography>
+								</Button>
+							)}
+							{!hideTodayButton && (
+								<Tooltip title={formattedCurrentDay}>
+									<IconButton color="inherit" onClick={() => jumpToToday()}>
+										<CalendarToday />
+									</IconButton>
+								</Tooltip>
+							)}
 							<Button
 								color="inherit"
 								endIcon={<ArrowDropDown />}
@@ -364,13 +435,6 @@ export default function JournalHeader(props: JournalHeaderProps) {
 										</IconButton>
 									</Tooltip>
 								</Stack>
-							)}
-							{!hideTodayButton && (
-								<Tooltip title={formattedCurrentDay}>
-									<IconButton color="inherit" onClick={() => jumpToToday()}>
-										<CalendarToday />
-									</IconButton>
-								</Tooltip>
 							)}
 						</Stack>
 					</Stack>

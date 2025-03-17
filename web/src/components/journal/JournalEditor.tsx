@@ -109,6 +109,7 @@ export default function JournalEditor() {
 	}
 
 	const handleSelectAll = (action: SelectAllAction) => {
+		console.log(`handleSelectAll(${action})`)
 		setSelectedRows((prev) => {
 			let selected: Set<string>
 			const allRowIds = new Set<string>(Object.keys(journalEntryContext.getJournalEntriesQuery.data ?? {}))
@@ -149,6 +150,10 @@ export default function JournalEditor() {
 				}))
 		})
 	}
+
+	useEffect(() => {
+		setSelectedRows({})
+	}, [journalEntryContext.getJournalEntriesQuery.data])
 
 	// show all docs
 	useEffect(() => {

@@ -12,6 +12,7 @@ export enum JournalEditorDateViewSymbol {
 export interface JournalEditorState {
 	dateView: DateView
 	onChangeDateView: (dateView: DateView) => void
+	switchDateView: (view: JournalEditorDateViewSymbol) => void
 }
 
 interface JournalEntryContext extends JournalEditorState {
