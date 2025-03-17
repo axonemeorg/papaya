@@ -17,6 +17,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import KeyboardShortcut from '../text/KeyboardShortcut'
+import useKeyboardAction from '@/hooks/useKeyboardAction'
 
 interface JournalHeaderProps {
 	numRows: number
@@ -77,6 +78,19 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
 
 	const now = useMemo(() => dayjs(), [])
+
+	useKeyboardAction(KeyboardActionName.DATE_VIEW_ANNUALLY, () => {
+		journalEntryContext.switchDateView(JournalEditorDateViewSymbol.YEARLY)
+	})
+	useKeyboardAction(KeyboardActionName.DATE_VIEW_MONTHLY, () => {
+		journalEntryContext.switchDateView(JournalEditorDateViewSymbol.MONTHLY)
+	})
+	useKeyboardAction(KeyboardActionName.DATE_VIEW_WEEKLY, () => {
+		journalEntryContext.switchDateView(JournalEditorDateViewSymbol.WEEKLY)
+	})
+	useKeyboardAction(KeyboardActionName.JUMP_TO_TODAY_VIEW, () => {
+		jumpToToday()
+	})
 
 	const [prevButtonTooltip, nextButtonTooltip] = useMemo(() => {
 		if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {

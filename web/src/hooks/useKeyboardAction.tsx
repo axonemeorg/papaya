@@ -2,7 +2,7 @@ import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard";
 import { useEffect } from "react"
 import useBrowserPlatform from "./useBrowserPlatform";
 
-export default function useKeyboardActions(name: KeyboardActionName, action: () => void): void {
+export default function useKeyboardAction(name: KeyboardActionName, action: () => void): void {
 	const { macOs } = useBrowserPlatform()
     useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {

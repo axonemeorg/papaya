@@ -20,7 +20,7 @@ import { useRouter } from 'next/router'
 import React, { ReactNode, useContext, useEffect } from 'react'
 import AppLogo from '../header/AppLogo'
 import { JournalContext } from '@/contexts/JournalContext'
-import useKeyboardActions from '@/hooks/useKeyboardActions'
+import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 
 interface AppMenuProps {
@@ -36,7 +36,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 		journalContext.createJournalEntry()
 	}
 
-	useKeyboardActions(KeyboardActionName.CREATE_JOURNAL_ENTRY, () => {
+	useKeyboardAction(KeyboardActionName.CREATE_JOURNAL_ENTRY, () => {
 		handleCreateEntry();
 	})
 

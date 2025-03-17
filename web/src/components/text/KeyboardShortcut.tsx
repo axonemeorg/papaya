@@ -1,5 +1,6 @@
 import { alpha, Chip, SxProps, Theme, Typography } from "@mui/material"
 import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard"
+import { getKeystrokeLabel } from "@/utils/keyboard"
 
 interface KeyboardShortcutProps {
     name: KeyboardActionName
@@ -9,12 +10,7 @@ interface KeyboardShortcutProps {
 
 export default function KeyboardShortcut(props: KeyboardShortcutProps) {
     const keystroke = KEYBOARD_ACTIONS[props.name]
-    const keystrokeLabel = [
-        keystroke.ctrlCmd ? 'Ctrl' : '',
-        keystroke.altOpt ? 'Alt' : '',
-        keystroke.shift ? 'Shift' : '',
-        keystroke.symbol.toUpperCase(),
-    ].filter(Boolean).join('+')
+    const keystrokeLabel = getKeystrokeLabel(keystroke)
 
     if (props.chip) {
         return (
