@@ -3,8 +3,6 @@ import {
 	Avatar,
 	Button,
 	Chip,
-	Grid2 as Grid,
-	ListItemText,
 	Stack,
 	Table,
 	TableBody as MuiTableBody,
@@ -17,6 +15,7 @@ import {
 	TableCellProps,
 	TableBodyProps,
 	Grow,
+	Checkbox,
 } from '@mui/material'
 import React, { useContext, useMemo } from 'react'
 
@@ -32,55 +31,115 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import clsx from 'clsx'
+import { sortDatesChronologically } from '@/utils/date'
 
-const TableRow = (props: TableRowProps) => {
-	const { sx, ...rest } = props
-	return (
-		<MuiTableRow
-			hover
-			// component={TableRowButton}
-			sx={{
-				borderTopLeftRadius: '64px',
-				borderBottomLeftRadius: '64px',
-				overflow: 'hidden',
-				'& > *:first-of-type': {
-					borderTopLeftRadius: '64px',
-					borderBottomLeftRadius: '64px',
-				},
-				userSelect: 'none',
-				cursor: 'pointer',
-				...sx,
-			}}
-			{...rest}
-		/>
-	)
+interface JournalTableRowProps extends TableRowProps {
+	dateRow?: boolean
+	buttonRow?: boolean
 }
 
-const TableCell = (props: TableCellProps) => {
-	const { sx, ...rest } = props
+const TableRow = ({ sx, dateRow, selected, buttonRow, ...rest }: JournalTableRowProps) => {
+	const hoverStyles = {
+		'.checkbox': { visibility: 'visible' },
+		'.icon': { visibility: 'hidden' },
+	};
+
+	return (
+	  <MuiTableRow
+		selected={selected}
+		hover={!dateRow && !buttonRow}
+		sx={{
+			'.checkbox': {
+				visibility: 'hidden',
+			},
+			'.icon': {
+				visibility: 'visible',
+				pointerEvents: 'none',
+			},
+			'& td': {
+		  		...(dateRow || buttonRow ? {
+					cursor: 'default',
+				} : {}),
+				...(dateRow ? {
+					width: '0%',
+				} : {})
+			},
+			...(selected ? hoverStyles : {}),
+        	'&:hover': hoverStyles,
+			userSelect: 'none',
+			cursor: 'pointer',
+			...sx,
+		}}
+		{...rest}
+	  />
+	);
+};
+
+interface JournalTableCellProps extends Omit<TableCellProps, 'colSpan'> {
+	selectCheckbox?: boolean
+	colSpan?: string | number
+}
+
+const TableCell = (props: JournalTableCellProps) => {
+	const { sx, className, colSpan, selectCheckbox, ...rest } = props
+
 	return (
 		<MuiTableCell
 			{...rest}
+			colSpan={colSpan as number}
+			className={clsx(
+				className,
+				{
+					'--selectCheckbox': selectCheckbox,
+				}
+			)}
 			sx={{
+				border: 0,
 				alignItems: 'center',
 				px: 1,
+				'&.--selectCheckbox': {
+					borderTopLeftRadius: '64px',
+					borderBottomLeftRadius: '64px',
+					overflow: 'hidden',
+					position: 'relative',
+
+					'&::after': {
+						position: 'absolute',
+						inset: 0,
+						borderBottomWidth: '1px',
+						borderBottomStyle: 'solid',
+						borderImage: `linear-gradient(
+							to right,
+							rgba(0,0,0,0),
+							red
+						) 1 100%
+						`,
+					},
+				},
 				...sx,
 			}}
 		/>
 	)
 }
 
-const TableBody = (props: TableBodyProps) => {
+type JournalTableBodyProps = TableBodyProps
+
+const TableBody = (props: JournalTableBodyProps) => {
 	const { sx, ...rest } = props
+
 	return (
 		<MuiTableBody
 			{...rest}
-			sx={{
-				...sx,
-				'& > tr:last-of-type td': {
-					borderBottom: 'none',
+			sx={(theme) => ({
+				borderBottom: `1px solid ${theme.palette.divider}`,
+				'&::before, &::after': {
+					content: `""`,
+					display: 'table-row',
+					height: theme.spacing(1)
 				},
-			}}
+				...sx as any
+			})}
 		/>
 	)
 }
@@ -110,7 +169,7 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 				color: isToday ? undefined : 'unset',
 				// px: 1,
 				// ml: 1,
-				my: 1,
+				my: 0,
 				ml: 1,
 			}}>
 			<Avatar
@@ -125,7 +184,7 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 				{day.format('D')}
 			</Avatar>
 			<Typography
-				sx={(theme) => ({ height: theme.spacing(3.5), lineHeight: theme.spacing(3.5) })}
+				sx={(theme) => ({ height: theme.spacing(3.5), lineHeight: theme.spacing(3.5), width: '7ch' })}
 				variant="overline"
 				color={isToday ? 'primary' : undefined}>
 				{day.format('MMM')},&nbsp;{day.format('ddd')}
@@ -136,6 +195,8 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 
 interface JournalEntryListProps {
 	journalRecordGroups: Record<string, JournalEntry[]>
+	selectedRows: Record<string, boolean>
+	toggleSelectedRow: (row: string) => void
 	onClickListItem: (event: any, entry: JournalEntry) => void
 	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
 }
@@ -160,30 +221,9 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 		}
 	}
 
-
 	return (
-		<Grid
-			container
-			columns={12}
-			sx={{
-				'--Grid-borderWidth': '1px',
-				borderColor: 'divider',
-				'& > div': {
-					borderBottom: 'var(--Grid-borderWidth) solid',
-					borderColor: 'divider',
-
-					'&.date-cell': {
-						borderWidth: {
-							xs: '0',
-							sm: '1px',
-						},
-					},
-				},
-			}}>
-			{Array.from(displayedJournalDates)
-				.sort(([dateA, _a], [dateB, _b]) => {
-					return new Date(dateA).getTime() - new Date(dateB).getTime()
-				})
+		<Table size="small" sx={{ overflowY: 'scroll' }}>
+			{sortDatesChronologically(...displayedJournalDates)
 				.map((date: string) => {
 					const entries = props.journalRecordGroups[date] ?? []
 					const day = dayjs(date)
@@ -191,81 +231,109 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 					const showQuckEditor = isToday || !entries.length
 
 					return (
-						<React.Fragment key={date}>
-							<Grid size={{ xs: 12, sm: 2 }} className="date-cell">
-								<JournalEntryDate
-									day={day}
-									isToday={isToday}
-									onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
-								/>
-							</Grid>
-							<Grid size={{ xs: 12, sm: 10 }}>
-								{entries.length > 0 && (
-									<Table size="small">
-										<TableBody>
-											{entries.map((entry) => {
-												const { categoryIds } = entry
-												const categoryId: string | undefined = categoryIds?.[0]
-												const category: Category | undefined = categoryId
-													? getCategoriesQuery.data[categoryId]
-													: undefined
-												const netAmount = calculateNetAmount(entry)
-												const isFlagged = journalEntryIsFlagged(entry)
-												const hasTags = journalEntryHasTags(entry)
+						<TableBody key={date}>
+							<TableRow dateRow sx={{ verticalAlign: entries.length > 1 ? 'top' : undefined }}>
+								<TableCell rowSpan={entries.length + (showQuckEditor ? 2 : 1)}>
+									<JournalEntryDate
+										day={day}
+										isToday={isToday}
+										onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+									/>
+								</TableCell>
+							</TableRow>
+							
+							{entries.map((entry) => {
+								const { categoryIds } = entry
+								const categoryId: string | undefined = categoryIds?.[0]
+								const category: Category | undefined = categoryId
+									? getCategoriesQuery.data[categoryId]
+									: undefined
+								const netAmount = calculateNetAmount(entry)
+								const isFlagged = journalEntryIsFlagged(entry)
+								const hasTags = journalEntryHasTags(entry)
 
-												return (
-													<TableRow
-														key={entry._id}
-														onClick={(event) => props.onClickListItem(event, entry)}
-														onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-													>
-														<TableCell sx={{ width: '0%', borderBottom: 'none' }}>
-															<AvatarIcon avatar={category?.avatar} compact={isSmall} />
-														</TableCell>
-														<TableCell sx={{ width: '40%' }}>
-															<ListItemText>{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}</ListItemText>
-														</TableCell>
-														<TableCell sx={{ width: '0%' }}>
-															<Stack direction='row'>
-																<Grow in={isFlagged}>
-																	<Flag sx={{ display: 'block' }} />
-																</Grow>
-																<Grow in={hasTags}>
-																	<LocalOffer sx={{ display: 'block' }} />
-																</Grow>
-															</Stack>
-														</TableCell>
-														<TableCell align="right" sx={{ width: '10%' }}>
-															<Typography sx={{ ...getPriceStyle(netAmount) }}>
-																{getPriceString(netAmount)}
-															</Typography>
-														</TableCell>
-														<TableCell>
-															{category ? (
-																<AvatarChip avatar={category.avatar} label={category.label} />
-															) : (
-																<Chip
-																	sx={(theme) => ({
-																		backgroundColor: alpha(
-																			theme.palette.grey[400],
-																			0.125
-																		),
-																	})}
-																	label="Uncategorized"
-																/>
-															)}
-														</TableCell>
-													</TableRow>
-												)
-											})}
-										</TableBody>
-									</Table>
-								)}
-								{showQuckEditor && <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />}
-							</Grid>
-						</React.Fragment>
+								return (
+									<TableRow
+										key={entry._id}
+										onClick={(event) => props.onClickListItem(event, entry)}
+										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
+										selected={props.selectedRows[entry._id]}
+									>
+										<TableCell
+											selectCheckbox
+											sx={{
+												width: '0%',
+												position: 'relative',
+											}}
+										>
+											<Checkbox
+												className='checkbox'
+												sx={{ m: -1 }}
+												checked={props.selectedRows[entry._id] || false}
+												onChange={() => props.toggleSelectedRow(entry._id)}
+												onClick={(event) => event.stopPropagation()}
+											/>
+											<AvatarIcon
+												className='icon'
+												avatar={category?.avatar}
+												sx={{
+													position: 'absolute',
+													top: '50%',
+													left: '50%',
+													transform: 'translate(-50%, -50%)',
+												}}
+											/>
+										</TableCell>
+										<TableCell sx={{ width: '40%' }}>
+											<Typography sx={{ ml: -0.5 }}>
+												{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
+											</Typography>
+										</TableCell>
+										<TableCell sx={{ width: '0%' }}>
+											<Stack direction='row'>
+												<Grow in={isFlagged}>
+													<Flag sx={{ display: 'block' }} />
+												</Grow>
+												<Grow in={hasTags}>
+													<LocalOffer sx={{ display: 'block' }} />
+												</Grow>
+											</Stack>
+										</TableCell>
+										<TableCell align="right" sx={{ width: '10%' }}>
+											<Typography sx={{ ...getPriceStyle(netAmount) }}>
+												{getPriceString(netAmount)}
+											</Typography>
+										</TableCell>
+										<TableCell>
+											{category ? (
+												<AvatarChip avatar={category.avatar} label={category.label} />
+											) : (
+												<Chip
+													sx={(theme) => ({
+														backgroundColor: alpha(
+															theme.palette.grey[400],
+															0.125
+														),
+													})}
+													label="Uncategorized"
+												/>
+											)}
+										</TableCell>
+									</TableRow>
+								)
+							})}
+										
+							{showQuckEditor && (
+								<TableRow buttonRow>
+									<TableCell colSpan="100%">
+										<QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />
+									</TableCell>
+								</TableRow>
+							)}
+						</TableBody>
 					)
-				})}
-		</Grid>
+				})
+			}
+		</Table>
 	)
 }

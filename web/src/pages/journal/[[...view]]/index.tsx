@@ -1,7 +1,6 @@
 import JournalEditor, { JournalEditorView } from '@/components/journal/JournalEditor'
 import { getLayout } from '@/layouts/main'
 import JournalEntryContextProvider from '@/providers/JournalEntryContextProvider'
-import { Paper } from '@mui/material'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -113,23 +112,16 @@ const JournalYearMonthPage = () => {
 	}
 
 	return (
-		<Paper
-			sx={(theme) => ({
-				flex: 1,
-				borderTopLeftRadius: theme.spacing(2),
-
-			})}>
-			<JournalEntryContextProvider
-				view={view}
-				date={date}
-				onNextPage={() => handleNextPage()}
-				onPrevPage={() => handlePrevPage()}
-				setDate={(date) => handleDateChange(date)}
-			>
-				<JournalEditor />
-			</JournalEntryContextProvider>
-		</Paper>
-
+	
+		<JournalEntryContextProvider
+			view={view}
+			date={date}
+			onNextPage={() => handleNextPage()}
+			onPrevPage={() => handlePrevPage()}
+			setDate={(date) => handleDateChange(date)}
+		>
+			<JournalEditor />
+		</JournalEntryContextProvider>
 	)
 }
 

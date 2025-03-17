@@ -1,6 +1,6 @@
 import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider } from '@mui/material'
-import JournalHeader from './JournalHeader'
+import { Box, Divider, Paper, Stack } from '@mui/material'
+import JournalHeader, { SelectAllAction } from './JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
@@ -8,7 +8,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
-import { getDatabaseClient } from '@/database/client'
+import { calculateNetAmount } from '@/utils/journal'
 
 export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
 
@@ -22,6 +22,7 @@ export default function JournalEditor() {
 		entry: null,
 		anchorEl: null,
 	})
+	const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({})
 
 	const { snackbar } = useContext(NotificationsContext)
 	const journalContext = useContext(JournalContext)
@@ -100,36 +101,102 @@ export default function JournalEditor() {
 		}
 	}
 
+	const toggleSelectedRow = (row: string) => {
+		setSelectedRows((prev) => {
+			return {
+				...prev,
+				[row]: prev[row] ? false : true
+			}
+		})
+	}
+
+	const handleSelectAll = (action: SelectAllAction) => {
+		setSelectedRows((prev) => {
+			let selected: Set<string>
+			const allRowIds = new Set<string>(Object.keys(journalEntryContext.getJournalEntriesQuery.data ?? {}))
+			const emptySet = new Set<string>([])
+			const hasSelectedAll = Object.values(prev).every(Boolean)
+
+			switch (action) {
+				case SelectAllAction.ALL:
+					selected = allRowIds
+					break
+
+				case SelectAllAction.NONE:
+					selected = emptySet
+					break
+
+				case SelectAllAction.CREDIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = journalEntryContext.getJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) > 0 : false
+					}))
+					break
+
+				case SelectAllAction.DEBIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = journalEntryContext.getJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) < 0 : false
+					}))
+					break
+
+				case SelectAllAction.TOGGLE:
+				default:
+					selected = hasSelectedAll ? emptySet : allRowIds
+			}
+
+			return Object.fromEntries(Array.from(new Set([...Object.keys(prev), ...selected]))
+				.map((key) => {
+					return [key, selected.has(key)]
+				}))
+		})
+	}
+
 	// show all docs
 	useEffect(() => {
-		const db = getDatabaseClient()
-	    db.allDocs({ include_docs: true }).then((result) => {
-	        console.log('all docs', result);
-	    })
+		// const db = getDatabaseClient()
+	    // db.allDocs({ include_docs: true }).then((result) => {
+	    //     console.log('all docs', result);
+	    // })
 	}, []);
 
 	return (
 		<>
-			<Box
-				sx={{
-					px: { sm: 0 },
-				}}>
-				{selectedEntry.entry && (
-					<JournalEntryCard
-						entry={selectedEntry.entry}
-						anchorEl={selectedEntry.anchorEl}
-						onClose={() => handleDeselectListItem()}
-						onDelete={() => handleDeleteEntry(selectedEntry.entry)}
-					/>
-				)}
-				<JournalHeader reverseActionOrder />
-				<Divider />
-				<JournalEntryList
-					journalRecordGroups={journalGroups}
-					onClickListItem={handleClickListItem}
-					onDoubleClickListItem={handleDoubleClickListItem}
+			{selectedEntry.entry && (
+				<JournalEntryCard
+					entry={selectedEntry.entry}
+					anchorEl={selectedEntry.anchorEl}
+					onClose={() => handleDeselectListItem()}
+					onDelete={() => handleDeleteEntry(selectedEntry.entry)}
 				/>
-			</Box>
+			)}
+			<Stack
+				component={Paper}
+				sx={(theme) => ({
+					px: { sm: 0 },
+					borderTopLeftRadius: theme.spacing(2),
+					overflow: 'hidden',
+					flex: 1,
+				})}>
+				<JournalHeader
+					numRows={Object.values(journalEntryContext.getJournalEntriesQuery.data ?? {}).length}
+					numSelectedRows={Object.values(selectedRows).filter(Boolean).length}
+					onSelectAll={handleSelectAll}
+				/>
+				<Divider />
+				<Box sx={{
+					flex: 1,
+					overflowY: 'auto',
+				}}>
+					<JournalEntryList
+						selectedRows={selectedRows}
+						toggleSelectedRow={toggleSelectedRow}
+						journalRecordGroups={journalGroups}
+						onClickListItem={handleClickListItem}
+						onDoubleClickListItem={handleDoubleClickListItem}
+					/>
+				</Box>
+			</Stack>
 		</>
 	)
 }
