@@ -25,12 +25,6 @@ import { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import KeyboardShortcut from '../text/KeyboardShortcut'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 
-interface JournalHeaderProps {
-	numRows: number
-	numSelectedRows: number
-	onSelectAll: (action: SelectAllAction) => void
-}
-
 export enum SelectAllAction {
 	TOGGLE = 'TOGGLE',
 	ALL = 'ALL',
@@ -64,7 +58,7 @@ const dateViewKeystrokes: Record<JournalEditorDateViewSymbolWithKeystroke, Keybo
 // Date range seperator
 const SEPERATOR = '\u00A0\u2013\u00A0'
 
-export default function JournalHeader(props: JournalHeaderProps) {
+export default function JournalHeader() {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
 	const [showDateViewPicker, setShowDateViewPicker] = useState<boolean>(false)
 	const [showSelectAllMenu, setShowSelectAllMenu] = useState<boolean>(false)
@@ -76,8 +70,10 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	// const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
 
 	const journalSliceContext = useContext(JournalSliceContext)
+	const numSelectedRows = Object.values(journalSliceContext.selectedRows).filter(Boolean).length
+
 	const hideTodayButton = dateViewIsRange(journalSliceContext.dateView)
-	const hideSelectedRowsOptions = props.numSelectedRows <= 0
+	const hideSelectedRowsOptions = numSelectedRows <= 0
 
 	const hideFilterButton = false
 
@@ -294,7 +290,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
 	const handleSelectAll = (action: SelectAllAction) => {
 		setShowSelectAllMenu(false)
-		props.onSelectAll(action)
+		journalSliceContext.onSelectAll(action)
 	}
 
 	const handleChangeDateView = (view: JournalEditorDateViewSymbol) => {
@@ -385,14 +381,14 @@ export default function JournalHeader(props: JournalHeaderProps) {
 									<Button
 										sx={{ minWidth: 'unset', pr: 0.5, ml: -1 }}
 										color='inherit'
-										onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
+										onClick={() => journalSliceContext.onSelectAll(SelectAllAction.TOGGLE)}
 										ref={selectAllMenuButtonRef}
-										disabled={props.numRows === 0}
+										disabled={journalSliceContext.numRows === 0}
 									>
-										{(props.numRows === props.numSelectedRows) && props.numRows > 0 ? (
+										{(journalSliceContext.numRows === numSelectedRows) && journalSliceContext.numRows > 0 ? (
 											<CheckBox color='primary' />
 										) : <>
-											{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
+											{(numSelectedRows < journalSliceContext.numRows) && numSelectedRows > 0 ? (
 												<IndeterminateCheckBox color='inherit' />	
 											) : (
 												<CheckBoxOutlineBlank color='inherit' />
@@ -407,7 +403,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 											px: 0,
 											ml: -0.5
 										}}
-										disabled={props.numRows === 0}
+										disabled={journalSliceContext.numRows === 0}
 									>
 										<ArrowDropDown />
 									</Button>

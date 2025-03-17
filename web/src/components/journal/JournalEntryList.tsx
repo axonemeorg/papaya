@@ -195,8 +195,6 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 
 interface JournalEntryListProps {
 	journalRecordGroups: Record<string, JournalEntry[]>
-	selectedRows: Record<string, boolean>
-	toggleSelectedRow: (row: string) => void
 	onClickListItem: (event: any, entry: JournalEntry) => void
 	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
 }
@@ -258,7 +256,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-										selected={props.selectedRows[entry._id]}
+										selected={journalSliceContext.selectedRows[entry._id]}
 									>
 										<TableCell
 											selectCheckbox
@@ -270,8 +268,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											<Checkbox
 												className='checkbox'
 												sx={{ m: -1 }}
-												checked={props.selectedRows[entry._id] || false}
-												onChange={() => props.toggleSelectedRow(entry._id)}
+												checked={journalSliceContext.selectedRows[entry._id] || false}
+												onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
 												onClick={(event) => event.stopPropagation()}
 											/>
 											<AvatarIcon
