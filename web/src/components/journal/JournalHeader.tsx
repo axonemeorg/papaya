@@ -3,13 +3,19 @@ import { JournalEditorDateViewSymbol, JournalSliceContext } from '@/contexts/Jou
 import { JournalEntry } from '@/types/schema'
 import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
+	Add,
 	ArrowBack,
 	ArrowDropDown,
 	ArrowForward,
 	CalendarToday,
 	CheckBox,
 	CheckBoxOutlineBlank,
-	IndeterminateCheckBox
+	Delete,
+	Filter,
+	FilterAlt,
+	FilterAltOff,
+	IndeterminateCheckBox,
+	MoreVert
 } from '@mui/icons-material'
 import { Button, IconButton, ListItemText, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
@@ -71,6 +77,9 @@ export default function JournalHeader(props: JournalHeaderProps) {
 
 	const journalSliceContext = useContext(JournalSliceContext)
 	const hideTodayButton = dateViewIsRange(journalSliceContext.dateView)
+	const hideSelectedRowsOptions = props.numSelectedRows <= 0
+
+	const hideFilterButton = false
 
 	const theme = useTheme()
 	const hideDateViewPicker = useMediaQuery(theme.breakpoints.down('md'))
@@ -371,46 +380,84 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							}}
 						/> */}
 						<Stack direction="row" alignItems="center" gap={1}>
-							<Stack direction='row'>
+							<Stack direction="row" alignItems="center" gap={0}>
+								<Stack direction='row'>
+									<Button
+										sx={{ minWidth: 'unset', pr: 0.5, ml: -1 }}
+										color='inherit'
+										onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
+										ref={selectAllMenuButtonRef}
+										disabled={props.numRows === 0}
+									>
+										{(props.numRows === props.numSelectedRows) && props.numRows > 0 ? (
+											<CheckBox color='primary' />
+										) : <>
+											{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
+												<IndeterminateCheckBox color='inherit' />	
+											) : (
+												<CheckBoxOutlineBlank color='inherit' />
+											)}
+										</>}
+									</Button>
+									<Button
+										color='inherit'
+										onClick={() => setShowSelectAllMenu(true)}
+										sx={{
+											minWidth: 'unset',
+											px: 0,
+											ml: -0.5
+										}}
+										disabled={props.numRows === 0}
+									>
+										<ArrowDropDown />
+									</Button>
+								</Stack>
+								{!hideSelectedRowsOptions && (
+									<>
+										<IconButton>
+											<Delete fontSize='small' />
+										</IconButton>
+									</>
+								)}
+								<IconButton>
+									<MoreVert fontSize='small' />
+								</IconButton>
+							</Stack>
+							<Stack direction='row' alignItems='center' gap={0.5}>
 								<Button
-									sx={{ minWidth: 'unset', pr: 0.5, ml: -1 }}
-									color='inherit'
-									onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
-									ref={selectAllMenuButtonRef}
-									disabled={props.numRows === 0}
+									variant='text'
+									sx={(theme) => ({
+										py: 0.75,
+										backgroundColor: theme.palette.action.hover,
+										'&:hover': {
+											backgroundColor: theme.palette.action.selected,
+										},
+									})}
+									// ref={dateViewPickerButtonRef}
+									// onClick={() => setShowDateViewPicker((showing) => !showing)}
+									color="inherit"
+									startIcon={<FilterAlt fontSize='small' />}
+									endIcon={<Add fontSize='small' />}
 								>
-									{(props.numRows === props.numSelectedRows) && props.numRows > 0 ? (
-										<CheckBox color='primary' />
-									) : <>
-										{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
-											<IndeterminateCheckBox color='inherit' />	
-										) : (
-											<CheckBoxOutlineBlank color='inherit' />
-										)}
-									</>}
+									<Typography>
+										Filter
+									</Typography>
 								</Button>
-								<Button
-									color='inherit'
-									onClick={() => setShowSelectAllMenu(true)}
-									sx={{
-										minWidth: 'unset',
-										px: 0,
-										ml: -0.5
-									}}
-									disabled={props.numRows === 0}
-								>
-									<ArrowDropDown />
-								</Button>
+								<IconButton>
+									<FilterAltOff fontSize='small' />
+								</IconButton>
 							</Stack>
 						</Stack>
 						<Stack direction="row" alignItems="center" gap={1}>
 							{!hideDateViewPicker && (
 								<Button
-									variant='outlined'
+									variant='text'
 									sx={(theme) => ({
-										borderRadius: theme.spacing(8),
 										py: 0.75,
-										borderColor: theme.palette.text.secondary,
+										backgroundColor: theme.palette.action.hover,
+										'&:hover': {
+											backgroundColor: theme.palette.action.selected,
+										},
 									})}
 									ref={dateViewPickerButtonRef}
 									onClick={() => setShowDateViewPicker((showing) => !showing)}
