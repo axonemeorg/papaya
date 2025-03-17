@@ -301,24 +301,40 @@ export const Account = DocumentMetadata.merge(BelongsToJournal).merge(CreateCate
 
 export type Account = z.output<typeof Account>
 
-const AnnualPeriod = z.object({
+export const AnnualPeriod = z.object({
 	year: z.number().min(1900).max(2999)
 })
 
-const MonthlyPeriod = AnnualPeriod.extend({
+export type AnnualPeriod = z.output<typeof AnnualPeriod>
+
+
+export const MonthlyPeriod = AnnualPeriod.extend({
 	month: z.number().min(1).max(12)
 })
 
-const WeeklyPeriod = MonthlyPeriod.extend({
+export type MonthlyPeriod = z.output<typeof MonthlyPeriod>
+
+
+export const WeeklyPeriod = MonthlyPeriod.extend({
 	day: z.number().min(1).max(31)
 })
 
-const DatePeriod = z.union([AnnualPeriod, MonthlyPeriod, WeeklyPeriod])
+export type WeeklyPeriod = z.output<typeof WeeklyPeriod>
 
-const DateRange = z.object({
+export const DatePeriod = z.union([AnnualPeriod, MonthlyPeriod, WeeklyPeriod])
+
+export type DatePeriod = z.output<typeof DatePeriod>
+
+export const DateRange = z.object({
 	before: z.string().optional(),
 	after: z.string().optional(),
 })
+
+export type DateRange = z.output<typeof DateRange>
+
+export const DateView = z.union([DatePeriod, DateRange])
+
+export type DateView = z.output<typeof DateView>
 
 const AmountRange = z.object({
 	minimum: z.number().optional(),
@@ -327,8 +343,9 @@ const AmountRange = z.object({
 })
 
 export const JournalSlice = z.object({
-	date: z.union([DatePeriod, DateRange]).optional(),
+	dateView: DateView.optional(),
 	tagIds: z.array(z.string()).optional(),
+	reservedTags: z.array(ReservedTagKey).optional(),
 	categoryIds: z.array(z.string()).optional(),
 	amount: AmountRange.optional(),
 })

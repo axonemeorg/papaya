@@ -32,7 +32,7 @@ import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 import clsx from 'clsx'
-import { sortDatesChronologically } from '@/utils/date'
+import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -213,11 +213,12 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
 
-	if (journalEntryContext.view === 'month') {
-		if (dayjs(journalEntryContext.date).isSame(currentDayString, 'month')) {
+	if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
+		const startOfMonth: dayjs.Dayjs = dayjs(`${journalEntryContext.dateView.year}-${journalEntryContext.dateView.month}-01`)
+		if (startOfMonth.isSame(currentDayString, 'month')) {
 			displayedJournalDates.add(currentDayString)
 		} else {
-			displayedJournalDates.add(dayjs(journalEntryContext.date).startOf('month').format('YYYY-MM-DD'))
+			displayedJournalDates.add(startOfMonth.format('YYYY-MM-DD'))
 		}
 	}
 

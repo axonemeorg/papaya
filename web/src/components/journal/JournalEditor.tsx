@@ -10,8 +10,6 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
 import { calculateNetAmount } from '@/utils/journal'
 
-export type JournalEditorView = 'week' | 'month' | 'year' | 'all'
-
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
 	anchorEl: HTMLElement | null

@@ -1,4 +1,6 @@
 import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalEntry } from '@/types/schema'
+import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getEmpiracleDateRangeFromJournalEntries } from '@/utils/date'
 import {
 	ArrowBack,
 	ArrowDropDown,
@@ -35,6 +37,9 @@ const selectAllMenuOptionLabels: Omit<Record<SelectAllAction, string>, 'TOGGLE'>
 	[SelectAllAction.DEBIT]: 'Debits',
 }
 
+// Date range seperator
+const SEPERATOR = '\u00A0\u2013\u00A0'
+
 export default function JournalHeader(props: JournalHeaderProps) {
 	const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
 	const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -43,92 +48,211 @@ export default function JournalHeader(props: JournalHeaderProps) {
 	// const [journalFiltersAnchorEl, setJournalFiltersAnchorEl] = useState<HTMLButtonElement | null>(null)
 
 	const journalEntryContext = useContext(JournalEntryContext)
+	const hideTodayButton = dateViewIsRange(journalEntryContext.dateView)
 
 	const theme = useTheme()
-	const hideTodayButton = journalEntryContext.view === 'all'
 	const hideNextPrevButtons = hideTodayButton || useMediaQuery(theme.breakpoints.down('md'))
 	const headingSize = useMediaQuery(theme.breakpoints.down('sm')) ? 'h6' : 'h5'
 
 	const now = useMemo(() => dayjs(), [])
 
-	const nextButtonTooltip = useMemo(() => {
-		if (journalEntryContext.view === 'month') {
-			return 'Next month'
+	const [prevButtonTooltip, nextButtonTooltip] = useMemo(() => {
+		if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
+			return ['Previous month', 'Next month']
+		} else if (dateViewIsAnnualPeriod(journalEntryContext.dateView)) {
+			return ['Previous year', 'Next year']
+		} else if (dateViewIsWeeklyPeriod(journalEntryContext.dateView)) {
+			return ['Previous week', 'Next week']
+		} else {
+			return [undefined, undefined]
 		}
-		if (journalEntryContext.view === 'year') {
-			return 'Next year'
-		}
-		if (journalEntryContext.view === 'week') {
-			return 'Next week'
-		}
-	}, [journalEntryContext.view])
+	}, [journalEntryContext.dateView])
 
-	const prevButtonTooltip = useMemo(() => {
-		if (journalEntryContext.view === 'month') {
-			return 'Previous month'
-		}
-		if (journalEntryContext.view === 'year') {
-			return 'Previous year'
-		}
-		if (journalEntryContext.view === 'week') {
-			return 'Previous week'
-		}
-	}, [journalEntryContext.view])
-
+	/**
+	 * Supported formats include:
+	 * 
+	 * @example "2024" // Year view
+	 * @example "September" // Monthly view, in current year
+	 * @example "Dec 2024" // Monthly view, in past/future year
+	 * @example "Jan 1 - 7" // Weekly view in current year
+	 * @example "Sep 1 - 7, 2022" // Weekly view in past year
+	 * @example "Dec 31, 2023 - Jan 6, 2024" // Weekly view spanning multiple past/future years
+	 * @example "Jan 30 - Sep 2" // Date range in current year
+	 * @example "Jan 5 - Feb 3, 2021" // Date range in past/future year
+	 * @example "Nov 2020 - Feb 2021" // Date range spanning multiple years
+	 */
 	const formattedDateString = useMemo(() => {
-		const date = dayjs(journalEntryContext.date)
-		let isCurrentYear
-		let startOfWeek
-		let endOfWeek
+		const { dateView } = journalEntryContext
+		let { startDate, endDate } = getAbsoluteDateRangeFromDateView(dateView)
 
-		switch (journalEntryContext.view) {
-			case 'all':
-				// TODO: Implement all time view to show the timestamp range from the first entry to today/the last entry
-				return 'All Time'
+		console.log('formattedDateString useMemo dateView + start+end Date:', { dateView, startDate, endDate })
 
-			case 'month':
-				isCurrentYear = date.isSame(now, 'year')
-				if (isCurrentYear) {
-					return date.format('MMMM')
+		// Handle case where an incomplete range is given
+		if (!startDate || !endDate) {
+			const journalEntries: JournalEntry[] = Object.values(journalEntryContext.getJournalEntriesQuery.data ?? {})
+			const { startDate: empiracleStartDate, endDate: empiracleEndDate } = getEmpiracleDateRangeFromJournalEntries(journalEntries)
+			if (empiracleStartDate && empiracleEndDate) {
+				startDate = empiracleStartDate
+				endDate = empiracleEndDate
+			}
+			if (!startDate || !endDate) {
+				const date = startDate ?? endDate
+				if (!date) {
+					return dayjs(now).format('MMM D')
 				}
-				return date.format('MMM YYYY')
 
-			case 'year':
-				return date.format('YYYY')
-
-			case 'week':
-			default:
-				startOfWeek = date.startOf('week')
-				endOfWeek = date.endOf('week')
-
-				// Formatted into form "Jan 1 - 7, 2022"
-				return `${startOfWeek.format('MMM D')} - ${endOfWeek.format('D, YYYY')}`
+				if (dayjs(date).isSame(now, 'year')) {
+					return dayjs(date).format('MMM D')
+				} else {
+					return dayjs(date).format('MMM D, YYYY')
+				}
+			}
 		}
-	}, [journalEntryContext.date, journalEntryContext.view])
 
-	const calendarAvailableViews = useMemo((): DateView[] => {
-		switch (journalEntryContext.view) {
-			case 'year':
-				return ['year']
-			case 'week':
-				return ['year', 'month', 'day']
-			case 'month':
-			default:
-				return ['month', 'year']
+		if (dateViewIsAnnualPeriod(dateView)) {
+			return String(dateView.year)
 		}
-	}, [journalEntryContext.view])
+
+		const spansCurrentYear = startDate.isSame(now, 'year') && endDate.isSame(now, 'year')
+		const spansSingleYear = startDate.isSame(endDate, 'year')
+		const spansSingleMonth = startDate.isSame(endDate, 'month')
+
+		if (dateViewIsMonthlyPeriod(dateView)) {
+			if (spansCurrentYear) {
+				return startDate.format('MMMM')
+			}
+			return startDate.format('MMM YYYY')
+		}
+
+		if (spansSingleYear) {
+			const endFormat = spansCurrentYear ? 'D' : 'D, YYYY'
+			
+			if (spansSingleMonth) {
+				return [
+					startDate.format('MMM D'),
+					endDate.format(endFormat),
+				].join(SEPERATOR)
+			}
+			
+			return [
+				startDate.format('MMM D'),
+				endDate.format(`MMM ${endFormat}`)
+			].join(SEPERATOR)
+		}
+
+		const format = dateViewIsWeeklyPeriod(dateView) ? 'MMM D, YYYY' : 'MMM YYYY'
+		return [
+			startDate.format(format),
+			endDate.format(format),
+		].join(SEPERATOR)
+	}, [journalEntryContext.dateView, journalEntryContext.getJournalEntriesQuery.data])
+
+	// const calendarAvailableViews = useMemo((): DateView[] => {
+	// 	switch (journalEntryContext.view) {
+	// 		case 'year':
+	// 			return ['year']
+	// 		case 'week':
+	// 			return ['year', 'month', 'day']
+	// 		case 'month':
+	// 		default:
+	// 			return ['month', 'year']
+	// 	}
+	// }, [journalEntryContext.view])
 
 	const formattedCurrentDay = useMemo(() => {
 		return now.format('dddd, MMMM D')
 	}, [])
 
-	const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
-		journalEntryContext.setDate(value.format('YYYY-MM-DD'))
+	// const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
+	// 	journalEntryContext.setDate(value.format('YYYY-MM-DD'))
+	// }
+
+	const handlePrevPage = () => {
+		if (dateViewIsRange(journalEntryContext.dateView)) {
+			return
+		}
+
+		const absoluteDateRange = getAbsoluteDateRangeFromDateView(journalEntryContext.dateView)
+		if (!absoluteDateRange.startDate) {
+			return
+		}
+
+		const currentDate = dayjs(absoluteDateRange.startDate)
+		let newDate: dayjs.Dayjs
+
+		if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.subtract(1, 'month')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year(),
+				month: newDate.month() + 1, // Zero-indexed
+			})
+		} else if (dateViewIsWeeklyPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.subtract(1, 'week')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year(),
+				month: newDate.month() + 1, // Zero-indexed
+				day: newDate.date(),
+			})
+		} else if (dateViewIsAnnualPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.subtract(1, 'year')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year()
+			})
+		}
+	}
+
+	const handleNextPage = () => {
+		if (dateViewIsRange(journalEntryContext.dateView)) {
+			return
+		}
+
+		const absoluteDateRange = getAbsoluteDateRangeFromDateView(journalEntryContext.dateView)
+		if (!absoluteDateRange.startDate) {
+			return
+		}
+
+		const currentDate = dayjs(absoluteDateRange.startDate)
+		let newDate: dayjs.Dayjs
+
+		if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.add(1, 'month')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year(),
+				month: newDate.month() + 1, // Zero-indexed
+			})
+		} else if (dateViewIsWeeklyPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.add(1, 'week')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year(),
+				month: newDate.month() + 1, // Zero-indexed
+				day: newDate.date(),
+			})
+		} else if (dateViewIsAnnualPeriod(journalEntryContext.dateView)) {
+			newDate = currentDate.add(1, 'year')
+			journalEntryContext.onChangeDateView({
+				year: newDate.year()
+			})
+		}
 	}
 
 	const jumpToToday = useCallback(() => {
-		journalEntryContext.setDate(now.format('YYYY-MM-DD'))
-	}, [journalEntryContext.view])
+		if (dateViewIsRange(journalEntryContext.dateView)) {
+			return
+		}
+
+		const newDateView = { ...journalEntryContext.dateView, year: now.year() }
+
+		if (dateViewIsMonthlyPeriod(newDateView)) {
+			newDateView.month = now.month() + 1 // Zero-indexed
+		} else if (dateViewIsWeeklyPeriod(newDateView)) {
+			newDateView.month = now.month() + 1 // Zero-indexed
+			newDateView.day = now.date()
+		} else if (!dateViewIsAnnualPeriod(newDateView)) {
+			return
+		}
+
+		journalEntryContext.onChangeDateView(newDateView)
+	}, [journalEntryContext.dateView])
 
 	const handleSelectAll = (key: SelectAllAction) => {
 		setShowSelectAllMenu(false)
@@ -153,9 +277,9 @@ export default function JournalHeader(props: JournalHeaderProps) {
 			<Popover open={showDatePicker} onClose={() => setShowDatePicker(false)} anchorEl={datePickerButtonRef.current}>
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<DateCalendar
-						views={calendarAvailableViews}
+						// views={calendarAvailableViews}
 						onChange={(value) => {
-							handleChangeDatePickerDate(value)
+							// handleChangeDatePickerDate(value)
 						}}
 					/>
 				</LocalizationProvider>
@@ -230,12 +354,12 @@ export default function JournalHeader(props: JournalHeaderProps) {
 							{!hideNextPrevButtons && (
 								<Stack direction="row">
 									<Tooltip title={prevButtonTooltip}>
-										<IconButton onClick={() => journalEntryContext.onPrevPage()}>
+										<IconButton onClick={() => handlePrevPage()}>
 											<ArrowBack />
 										</IconButton>
 									</Tooltip>
 									<Tooltip title={nextButtonTooltip}>
-										<IconButton onClick={() => journalEntryContext.onNextPage()}>
+										<IconButton onClick={() => handleNextPage()}>
 											<ArrowForward />
 										</IconButton>
 									</Tooltip>
