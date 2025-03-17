@@ -114,7 +114,7 @@ export default function JournalEditor() {
 			let selected: Set<string>
 			const allRowIds = new Set<string>(Object.keys(journalEntryContext.getJournalEntriesQuery.data ?? {}))
 			const emptySet = new Set<string>([])
-			const hasSelectedAll = Object.values(prev).every(Boolean)
+			const hasSelectedAll = Object.values(prev).length > 0 && Object.values(prev).every(Boolean)
 
 			switch (action) {
 				case SelectAllAction.ALL:

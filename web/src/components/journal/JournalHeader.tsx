@@ -377,8 +377,9 @@ export default function JournalHeader(props: JournalHeaderProps) {
 									color='inherit'
 									onClick={() => props.onSelectAll(SelectAllAction.TOGGLE)}
 									ref={selectAllMenuButtonRef}
+									disabled={props.numRows === 0}
 								>
-									{props.numRows === props.numSelectedRows ? (
+									{(props.numRows === props.numSelectedRows) && props.numRows > 0 ? (
 										<CheckBox color='primary' />
 									) : <>
 										{(props.numSelectedRows < props.numRows) && props.numSelectedRows > 0 ? (
@@ -396,6 +397,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 										px: 0,
 										ml: -0.5
 									}}
+									disabled={props.numRows === 0}
 								>
 									<ArrowDropDown />
 								</Button>
