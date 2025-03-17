@@ -13,6 +13,7 @@ export enum JournalEditorDateViewSymbol {
 export interface JournalEditorState extends JournalSlice {
 	onChangeDateView: (dateView: DateView) => void
 	switchDateView: (view: JournalEditorDateViewSymbol) => void
+	onChangeCategoryIds: (categoryIds: string[] | undefined) => void
 }
 
 interface JournalSliceContext extends JournalEditorState {
@@ -21,6 +22,10 @@ interface JournalSliceContext extends JournalEditorState {
 		Error
 	>
 	refetchAllDependantQueries: () => void
+
+	// Filters
+	getSliceFilterCount: () => number
+	clearAllSliceFilters: () => void
 
 	// Selecting
 	numRows: number

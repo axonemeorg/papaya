@@ -5,13 +5,15 @@ import { getJournalEntries } from '@/database/queries'
 import { JournalEntry, JournalSlice } from '@/types/schema'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
-import { PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 type JournalSliceContextProviderProps = PropsWithChildren<JournalEditorState>
 
 export default function JournalSliceContextProvider(props: JournalSliceContextProviderProps) {
 	const { dateView, onChangeDateView, switchDateView } = props
 	const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({})
+
+	const [categoryIds, setCategoryIds] = useState<string[] | undefined>(undefined)
 
 	const journalContext = useContext(JournalContext)
 
@@ -20,8 +22,27 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	const journalSlice: JournalSlice = useMemo(() => {
 		return {
 			dateView,
+			categoryIds,
 		}
-	}, [dateView])
+	}, [
+		dateView,
+		categoryIds
+	])
+
+	const getSliceFilterCount = useCallback(() => {
+		let totalFilterCount = 0
+		if (categoryIds && categoryIds.length > 0) {
+			totalFilterCount ++
+		}
+		return totalFilterCount
+	}, [
+		dateView,
+		categoryIds
+	])
+
+	const clearAllSliceFilters = () => {
+		setCategoryIds(undefined)
+	}
 
 	const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
 		queryKey: ['journalEntries', journalSlice],
@@ -112,9 +133,14 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 			value={{
 				...journalSlice,
 				onChangeDateView,
+				switchDateView,
+				onChangeCategoryIds: setCategoryIds,
+
 				getJournalEntriesQuery,
 				refetchAllDependantQueries,
-				switchDateView,
+
+				getSliceFilterCount,
+				clearAllSliceFilters,
 
 				numRows: Object.values(getJournalEntriesQuery.data ?? {}).length,
 				selectedRows,

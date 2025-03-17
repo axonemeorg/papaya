@@ -350,6 +350,7 @@ export const JournalSlice = z.object({
 	reservedTags: z.array(ReservedTagKey).optional(),
 	categoryIds: z.array(z.string()).optional(),
 	amount: AmountRange.optional(),
+	hasAttachments: z.boolean().optional(),
 })
 
 export type JournalSlice = z.output<typeof JournalSlice>
