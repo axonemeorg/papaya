@@ -15,7 +15,7 @@ export interface JournalEditorState {
 	switchDateView: (view: JournalEditorDateViewSymbol) => void
 }
 
-interface JournalEntryContext extends JournalEditorState {
+interface JournalSliceContext extends JournalEditorState {
 	getJournalEntriesQuery: DefinedUseQueryResult<
 		Record<JournalEntry['_id'], JournalEntry>,
 		Error
@@ -23,4 +23,4 @@ interface JournalEntryContext extends JournalEditorState {
 	refetchAllDependantQueries: () => void
 }
 
-export const JournalEntryContext = createContext<JournalEntryContext>({} as JournalEntryContext)
+export const JournalSliceContext = createContext<JournalSliceContext>({} as JournalSliceContext)

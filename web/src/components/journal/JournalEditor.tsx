@@ -7,7 +7,7 @@ import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { calculateNetAmount } from '@/utils/journal'
 
 export interface JournalEntrySelection {
@@ -24,10 +24,10 @@ export default function JournalEditor() {
 
 	const { snackbar } = useContext(NotificationsContext)
 	const journalContext = useContext(JournalContext)
-	const journalEntryContext = useContext(JournalEntryContext)
+	const journalSliceContext = useContext(JournalSliceContext)
 
 	const journalGroups = useMemo(() => {
-		const entries = journalEntryContext.getJournalEntriesQuery.data
+		const entries = journalSliceContext.getJournalEntriesQuery.data
 		const groups: Record<JournalEntry['_id'], JournalEntry[]> = Object.values(entries).reduce(
 			(acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
 				const { date } = entry
@@ -45,7 +45,7 @@ export default function JournalEditor() {
 		)
 
 		return groups
-	}, [journalEntryContext.getJournalEntriesQuery.data])
+	}, [journalSliceContext.getJournalEntriesQuery.data])
 
 	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
 		setSelectedEntry({
@@ -75,7 +75,7 @@ export default function JournalEditor() {
 
 		try {
 			const record = await deleteJournalEntry(entry._id)
-			journalEntryContext.refetchAllDependantQueries()
+			journalSliceContext.refetchAllDependantQueries()
 			handleDeselectListItem()
 			snackbar({
 				message: 'Deleted 1 entry',
@@ -112,7 +112,7 @@ export default function JournalEditor() {
 		console.log(`handleSelectAll(${action})`)
 		setSelectedRows((prev) => {
 			let selected: Set<string>
-			const allRowIds = new Set<string>(Object.keys(journalEntryContext.getJournalEntriesQuery.data ?? {}))
+			const allRowIds = new Set<string>(Object.keys(journalSliceContext.getJournalEntriesQuery.data ?? {}))
 			const emptySet = new Set<string>([])
 			const hasSelectedAll = Object.values(prev).length > 0 && Object.values(prev).every(Boolean)
 
@@ -127,14 +127,14 @@ export default function JournalEditor() {
 
 				case SelectAllAction.CREDIT:
 					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
-						const entry = journalEntryContext.getJournalEntriesQuery.data[id]
+						const entry = journalSliceContext.getJournalEntriesQuery.data[id]
 						return entry ? calculateNetAmount(entry) > 0 : false
 					}))
 					break
 
 				case SelectAllAction.DEBIT:
 					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
-						const entry = journalEntryContext.getJournalEntriesQuery.data[id]
+						const entry = journalSliceContext.getJournalEntriesQuery.data[id]
 						return entry ? calculateNetAmount(entry) < 0 : false
 					}))
 					break
@@ -153,7 +153,7 @@ export default function JournalEditor() {
 
 	useEffect(() => {
 		setSelectedRows({})
-	}, [journalEntryContext.getJournalEntriesQuery.data])
+	}, [journalSliceContext.getJournalEntriesQuery.data])
 
 	// show all docs
 	useEffect(() => {
@@ -182,7 +182,7 @@ export default function JournalEditor() {
 					flex: 1,
 				})}>
 				<JournalHeader
-					numRows={Object.values(journalEntryContext.getJournalEntriesQuery.data ?? {}).length}
+					numRows={Object.values(journalSliceContext.getJournalEntriesQuery.data ?? {}).length}
 					numSelectedRows={Object.values(selectedRows).filter(Boolean).length}
 					onSelectAll={handleSelectAll}
 				/>

@@ -1,7 +1,7 @@
 import JournalEditor from '@/components/journal/JournalEditor'
-import { JournalEditorDateViewSymbol } from '@/contexts/JournalEntryContext'
+import { JournalEditorDateViewSymbol } from '@/contexts/JournalSliceContext'
 import { getLayout } from '@/layouts/main'
-import JournalEntryContextProvider from '@/providers/JournalEntryContextProvider'
+import JournalSliceContextProvider from '@/providers/JournalSliceContextProvider'
 import { DatePeriod, DateView, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
 import { dateMonthNumberWithLeadingZero, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import dayjs from 'dayjs'
@@ -155,13 +155,13 @@ const JournalYearMonthPage = () => {
 	}, [date, view])
 
 	return (
-		<JournalEntryContextProvider
+		<JournalSliceContextProvider
 			dateView={dateView}
 			onChangeDateView={handleChangeDateView}
 			switchDateView={handleSwitchDateView}
 		>
 			<JournalEditor />
-		</JournalEntryContextProvider>
+		</JournalSliceContextProvider>
 	)
 }
 

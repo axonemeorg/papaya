@@ -30,7 +30,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
 import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
 
@@ -205,7 +205,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
-	const journalEntryContext = useContext(JournalEntryContext)
+	const journalSliceContext = useContext(JournalSliceContext)
 	const getPriceStyle = useGetPriceStyle()
 
 
@@ -213,8 +213,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
 
-	if (dateViewIsMonthlyPeriod(journalEntryContext.dateView)) {
-		const startOfMonth: dayjs.Dayjs = dayjs(`${journalEntryContext.dateView.year}-${journalEntryContext.dateView.month}-01`)
+	if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
+		const startOfMonth: dayjs.Dayjs = dayjs(`${journalSliceContext.dateView.year}-${journalSliceContext.dateView.month}-01`)
 		if (startOfMonth.isSame(currentDayString, 'month')) {
 			displayedJournalDates.add(currentDayString)
 		} else {
