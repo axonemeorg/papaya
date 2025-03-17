@@ -37,7 +37,7 @@ export default function SearchLaunchButton(props: SearchLaunchButtonProps) {
             >
 				<Typography sx={{ userSelect: 'none', display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'space-between', flex: 1 }}>
 					{placeholderText}
-					<KeyboardShortcut name={KeyboardActionName.OPEN_SEARCH_MODAL} />
+					<KeyboardShortcut name={KeyboardActionName.OPEN_SEARCH_MODAL} chip />
 				</Typography>
 			</Button>
 		)
