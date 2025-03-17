@@ -1,4 +1,4 @@
-import { SelectAllAction } from '@/components/journal/JournalHeader'
+import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
 import { DateView, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'

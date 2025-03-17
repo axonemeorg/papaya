@@ -1,6 +1,6 @@
 import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Divider, Paper, Stack } from '@mui/material'
-import JournalHeader, { SelectAllAction } from './JournalHeader'
+import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
