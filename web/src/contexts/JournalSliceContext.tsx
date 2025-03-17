@@ -1,5 +1,5 @@
 import { SelectAllAction } from '@/components/journal/JournalHeader'
-import { DateView, JournalEntry } from '@/types/schema'
+import { DateView, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
@@ -10,8 +10,7 @@ export enum JournalEditorDateViewSymbol {
 	RANGE = 'r',
 }
 
-export interface JournalEditorState {
-	dateView: DateView
+export interface JournalEditorState extends JournalSlice {
 	onChangeDateView: (dateView: DateView) => void
 	switchDateView: (view: JournalEditorDateViewSymbol) => void
 }

@@ -6,6 +6,7 @@ import {
 	EntryTag,
 	JournalEntry,
 	JournalMeta,
+	JournalSlice,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
@@ -46,7 +47,7 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 }
 
 export const getJournalEntries = async (
-	dateView: DateView,
+	journalSlice: JournalSlice,
 	journalId: string
 ): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
 	const selectorClauses: any[] = [
@@ -54,7 +55,8 @@ export const getJournalEntries = async (
 		{ journalId },
 	]
 	
-	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(dateView)
+	// Date Range
+	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
 
 	if (startDate || endDate) {
 		selectorClauses.push({

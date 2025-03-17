@@ -2,7 +2,7 @@ import { SelectAllAction } from '@/components/journal/JournalHeader'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorDateViewSymbol, JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
-import { DateView, JournalEntry, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
+import { DateView, JournalEntry, JournalSlice, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react'
@@ -17,13 +17,19 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 
 	const hasSelectedJournal = Boolean(journalContext.journal)
 
+	const journalSlice: JournalSlice = useMemo(() => {
+		return {
+			dateView,
+		}
+	}, [dateView])
+
 	const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
-		queryKey: ['journalEntries', dateView],
+		queryKey: ['journalEntries', journalSlice],
 		queryFn: async () => {
 			if (!journalContext.journal) {
 				return {}
 			}
-			return getJournalEntries(dateView, journalContext.journal._id)
+			return getJournalEntries(journalSlice, journalContext.journal._id)
 		},
 		initialData: {},
 		enabled: hasSelectedJournal,
@@ -104,7 +110,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	return (
 		<JournalSliceContext.Provider
 			value={{
-				dateView,
+				...journalSlice,
 				onChangeDateView,
 				getJournalEntriesQuery,
 				refetchAllDependantQueries,

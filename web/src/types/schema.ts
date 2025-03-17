@@ -342,13 +342,17 @@ const AmountRange = z.object({
 	absolute: z.boolean().optional(),
 })
 
+export type AmountRange = z.output<typeof AmountRange>
+
 export const JournalSlice = z.object({
-	dateView: DateView.optional(),
+	dateView: DateView,
 	tagIds: z.array(z.string()).optional(),
 	reservedTags: z.array(ReservedTagKey).optional(),
 	categoryIds: z.array(z.string()).optional(),
 	amount: AmountRange.optional(),
 })
+
+export type JournalSlice = z.output<typeof JournalSlice>
 
 export const CloudZiskServer = z.object({
 	serverType: z.literal('ZISK_CLOUD'),
