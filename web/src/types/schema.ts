@@ -301,6 +301,38 @@ export const Account = DocumentMetadata.merge(BelongsToJournal).merge(CreateCate
 
 export type Account = z.output<typeof Account>
 
+const AnnualPeriod = z.object({
+	year: z.number().min(1900).max(2999)
+})
+
+const MonthlyPeriod = AnnualPeriod.extend({
+	month: z.number().min(1).max(12)
+})
+
+const WeeklyPeriod = MonthlyPeriod.extend({
+	day: z.number().min(1).max(31)
+})
+
+const DatePeriod = z.union([AnnualPeriod, MonthlyPeriod, WeeklyPeriod])
+
+const DateRange = z.object({
+	before: z.string().optional(),
+	after: z.string().optional(),
+})
+
+const AmountRange = z.object({
+	minimum: z.number().optional(),
+	maximum: z.number().optional(),
+	absolute: z.boolean().optional(),
+})
+
+export const JournalSlice = z.object({
+	date: z.union([DatePeriod, DateRange]).optional(),
+	tagIds: z.array(z.string()).optional(),
+	categoryIds: z.array(z.string()).optional(),
+	amount: AmountRange.optional(),
+})
+
 export const CloudZiskServer = z.object({
 	serverType: z.literal('ZISK_CLOUD'),
 	user: z.object({
