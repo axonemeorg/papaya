@@ -255,6 +255,7 @@ export default function JournalHeader(props: JournalHeaderProps) {
 				<Tabs value='JOURNAL'>
 					<Tab value='JOURNAL' label='Journal Entries' />
 					<Tab value='TRANSFERS' label='Account Transfers' disabled />
+					<Tab value='ANALYSIS' label='Analysis' disabled />
 				</Tabs>
 			</Stack>
 		</>
