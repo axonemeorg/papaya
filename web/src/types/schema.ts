@@ -336,9 +336,9 @@ export const DateView = z.union([DatePeriod, DateRange])
 
 export type DateView = z.output<typeof DateView>
 
-const AmountRange = z.object({
-	minimum: z.number().optional(),
-	maximum: z.number().optional(),
+export const AmountRange = z.object({
+	minimum: z.string().optional(),
+	maximum: z.string().optional(),
 	absolute: z.boolean().optional(),
 })
 

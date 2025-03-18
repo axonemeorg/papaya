@@ -25,9 +25,11 @@ export default function useKeyboardAction(name: KeyboardActionName, action: () =
 				} else if (!event.ctrlKey) {
 					return
 				}
-			} else if (keystroke.altOpt && !event.altKey) {
+			} else if (event.ctrlKey) {
 				return
-			} else if (keystroke.shift && !event.shiftKey) {
+			} else if ((keystroke.altOpt && !event.altKey) || (!keystroke.altOpt && event.altKey)) {
+				return
+			} else if ((keystroke.shift && !event.shiftKey) || (!keystroke.shift && event.shiftKey)) {
 				return
 			} else if (event.key !== keystroke.symbol) {
 				return

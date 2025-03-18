@@ -3,7 +3,7 @@ import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPick
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
-import { JournalEntry, JournalSlice } from '@/types/schema'
+import { AmountRange, JournalEntry, JournalSlice } from '@/types/schema'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -15,6 +15,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({})
 
 	const [categoryIds, setCategoryIds] = useState<string[] | undefined>(undefined)
+	const [amountRange, setAmountRange] = useState<AmountRange | undefined>(undefined)
 
 	const journalContext = useContext(JournalContext)
 
@@ -24,10 +25,12 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		return {
 			dateView,
 			categoryIds,
+			amount: amountRange,
 		}
 	}, [
 		dateView,
-		categoryIds
+		categoryIds,
+		amountRange,
 	])
 
 	const getSliceFilterCount = useCallback(() => {
@@ -160,6 +163,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 				onChangeDateView,
 				switchDateView,
 				onChangeCategoryIds: setCategoryIds,
+				onChangeAmountRange: setAmountRange,
 
 				getJournalEntriesQuery,
 				refetchAllDependantQueries,

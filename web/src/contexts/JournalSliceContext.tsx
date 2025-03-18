@@ -1,6 +1,6 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
-import { DateView, JournalEntry, JournalSlice } from '@/types/schema'
+import { AmountRange, DateView, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
@@ -15,6 +15,7 @@ export interface JournalEditorState extends JournalSlice {
 	onChangeDateView: (dateView: DateView) => void
 	switchDateView: (view: JournalEditorDateViewSymbol) => void
 	onChangeCategoryIds: (categoryIds: string[] | undefined) => void
+	onChangeAmountRange: (amountRange: AmountRange | undefined) => void
 }
 
 interface JournalSliceContext extends JournalEditorState {

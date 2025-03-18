@@ -3,6 +3,7 @@ import { Badge, Box, Button, Fade, IconButton, ListItemIcon, ListItemText, Menu,
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
 import { JournalSliceContext } from "@/contexts/JournalSliceContext";
+import AmountFilter from "./filters/AmountFilter";
 
 export enum JournalFilterSlot {
     AMOUNT = 'AMOUNT',
@@ -26,7 +27,7 @@ const journalFilterSlots: Record<JournalFilterSlot, JournalFilterSlotProperties>
         icon: <Paid />,
         title: 'Amount is',
         component: (
-            <div />
+            <AmountFilter />
         ),
     },
     
