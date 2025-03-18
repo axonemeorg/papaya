@@ -1,27 +1,13 @@
-import { JournalEntry } from '@/types/schema'
-import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
-	Add,
-	ArrowBack,
 	ArrowDropDown,
-	ArrowForward,
-	CalendarToday,
 	CheckBox,
 	CheckBoxOutlineBlank,
 	Delete,
-	Filter,
-	FilterAlt,
-	FilterAltOff,
 	IndeterminateCheckBox,
 	MoreVert
 } from '@mui/icons-material'
-import { Button, IconButton, ListItemText, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import dayjs from 'dayjs'
-import { useCallback, useContext, useMemo, useRef, useState } from 'react'
-import KeyboardShortcut from '../../text/KeyboardShortcut'
-import useKeyboardAction from '@/hooks/useKeyboardAction'
+import { Button, Fade, IconButton, ListItemText, Menu, MenuItem, Stack } from '@mui/material'
+import { useContext, useRef, useState } from 'react'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 
 export enum SelectAllAction {
@@ -102,11 +88,13 @@ export default function JournalEntrySelectionActions() {
 					</Button>
 				</Stack>
 				{!hideSelectedRowsOptions && (
-					<>
-						<IconButton>
-							<Delete fontSize='small' />
-						</IconButton>
-					</>
+					<Fade in>
+						<Stack direction='row' alignItems='center'>
+							<IconButton>
+								<Delete fontSize='small' />
+							</IconButton>
+						</Stack>
+					</Fade>
 				)}
 				<IconButton>
 					<MoreVert fontSize='small' />
