@@ -1,22 +1,13 @@
 import { JournalEntry } from '@/types/schema'
 import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
-	Add,
 	ArrowBack,
 	ArrowDropDown,
 	ArrowForward,
 	CalendarToday,
-	CheckBox,
-	CheckBoxOutlineBlank,
-	Delete,
-	Filter,
-	FilterAlt,
-	FilterAltOff,
-	IndeterminateCheckBox,
-	MoreVert
 } from '@mui/icons-material'
-import { Button, IconButton, ListItemText, Menu, MenuItem, Popover, Stack, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { DateCalendar, DateView, LocalizationProvider } from '@mui/x-date-pickers'
+import { Button, IconButton, ListItemText, Menu, MenuItem, Popover, Stack, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
@@ -303,9 +294,9 @@ export default function JournalDateActions() {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DateCalendar
                         // views={calendarAvailableViews}
-                        onChange={(value) => {
-                            // handleChangeDatePickerDate(value)
-                        }}
+                        // onChange={(value) => {
+                        //     // handleChangeDatePickerDate(value)
+                        // }}
                     />
                 </LocalizationProvider>
             </Popover>

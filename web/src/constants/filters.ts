@@ -1,4 +1,7 @@
-import { JournalAllFilters } from "@/components/journal/JournalFilters";
+
+// TODO to be replaced
+export type JournalAllFilters = any
+export type JournalFilters = any
 
 type Serializer<T> = {
     [K in keyof T]: (value: T[K]) => string;

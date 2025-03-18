@@ -8,7 +8,6 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
-import { calculateNetAmount } from '@/utils/journal'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null

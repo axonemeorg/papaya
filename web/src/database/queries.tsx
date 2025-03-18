@@ -1,7 +1,6 @@
 import {
 	Account,
 	Category,
-	DateView,
 	EntryArtifact,
 	EntryTag,
 	JournalEntry,
@@ -10,9 +9,8 @@ import {
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
-import dayjs from 'dayjs'
 import { makeDefaultZiskMeta } from '@/utils/database'
-import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView } from '@/utils/date'
+import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
 
 const db = getDatabaseClient()
 

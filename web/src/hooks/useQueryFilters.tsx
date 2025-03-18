@@ -1,5 +1,4 @@
-import { JournalAllFilters, JournalFilters } from "@/components/journal/JournalFilters"
-import { JOURNAL_FILTER_KEY_DESERIALIZER, JOURNAL_FILTER_KEY_SERIALIZER, JOURNAL_FILTER_SHORTHAND_KEY_MAP, JOURNAL_FILTER_SHORTHAND_KEY_MAP_INVERSE } from "@/constants/filters"
+import { JOURNAL_FILTER_KEY_DESERIALIZER, JOURNAL_FILTER_KEY_SERIALIZER, JOURNAL_FILTER_SHORTHAND_KEY_MAP, JOURNAL_FILTER_SHORTHAND_KEY_MAP_INVERSE, JournalAllFilters, JournalFilters } from "@/constants/filters"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 
@@ -7,12 +6,12 @@ export function serializeJournalFilters(filters: JournalFilters): Record<string,
     const result: Record<string, string> = {}
 
     // Use Object.keys and then cast to (keyof JournalAllFilters)[]
-    for (const key of Object.keys(filters) as (keyof JournalAllFilters)[]) {
+    for (const key of (Object.keys(filters) as (keyof JournalAllFilters)[])) {
         const val = filters[key]
         // Check that val is defined and that key is in the shorthand map
         if (val !== undefined && key in JOURNAL_FILTER_SHORTHAND_KEY_MAP) {
             const shorthand = JOURNAL_FILTER_SHORTHAND_KEY_MAP[key]
-            const serializer = JOURNAL_FILTER_KEY_SERIALIZER[key] as (value: any) => string
+            const serializer = JOURNAL_FILTER_KEY_SERIALIZER[key as string] as (value: any) => string
             result[shorthand] = serializer(val)
         }
     }
@@ -28,7 +27,7 @@ export function deserializeJournalFilters(record: Record<string, string>): Journ
         // Ensure we have a matching original key
         if (shorthandKey in JOURNAL_FILTER_SHORTHAND_KEY_MAP_INVERSE) {
             const originalKey = JOURNAL_FILTER_SHORTHAND_KEY_MAP_INVERSE[shorthandKey]
-            const deserializer = JOURNAL_FILTER_KEY_DESERIALIZER[originalKey]
+            const deserializer = JOURNAL_FILTER_KEY_DESERIALIZER[originalKey as string]
             result[originalKey] = deserializer(value) as any
         }
     }

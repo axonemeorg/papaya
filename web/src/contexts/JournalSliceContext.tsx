@@ -11,21 +11,24 @@ export enum JournalEditorDateViewSymbol {
 	RANGE = 'r',
 }
 
-export interface JournalEditorState extends JournalSlice {
+export type JournalEditorState = { dateView: DateView } & {
 	onChangeDateView: (dateView: DateView) => void
 	switchDateView: (view: JournalEditorDateViewSymbol) => void
-	onChangeCategoryIds: (categoryIds: string[] | undefined) => void
-	onChangeAmountRange: (amountRange: AmountRange | undefined) => void
 }
 
-interface JournalSliceContext extends JournalEditorState {
+type JournalSliceContext = JournalEditorState & JournalSlice & {
+	// Queries
 	getJournalEntriesQuery: DefinedUseQueryResult<
 		Record<JournalEntry['_id'], JournalEntry>,
 		Error
 	>
 	refetchAllDependantQueries: () => void
 
-	// Filters
+	// Filter slots
+	onChangeCategoryIds: (categoryIds: string[] | undefined) => void
+	onChangeAmountRange: (amountRange: AmountRange | undefined) => void
+
+	// Filter Actions
 	getActiveFilterSet: () => Set<JournalFilterSlot>
 	clearAllSliceFilters: () => void
 	removeFilterBySlot: (slice: JournalFilterSlot) => void
