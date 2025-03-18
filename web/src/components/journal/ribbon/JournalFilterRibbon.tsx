@@ -14,7 +14,7 @@ export default function JournalFilterRibbon() {
 
     const journalSliceContext = useContext(JournalSliceContext)
 
-    const numFilters = journalSliceContext.getSliceFilterCount()
+    const numFilters: number = journalSliceContext.getActiveFilterSet().size
 
     const { getCategoriesQuery } = useContext(JournalContext)
 

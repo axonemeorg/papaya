@@ -13,7 +13,7 @@ export default function JournalHeader() {
     const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
 	const journalSliceContext = useContext(JournalSliceContext)
-    const numFilters = journalSliceContext.getSliceFilterCount()
+    const numFilters = journalSliceContext.getActiveFilterSet().size
 
 	const hideFilterButton = false
 

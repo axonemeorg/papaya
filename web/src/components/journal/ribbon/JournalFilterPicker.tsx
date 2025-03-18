@@ -1,6 +1,6 @@
-import { Add, Attachment, Category, DateRange, Delete, FilterAltOff, LocalOffer, Paid } from "@mui/icons-material";
-import { Badge, Box, Button, Fade, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Tooltip, Typography } from "@mui/material";
-import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { Attachment, Category, DateRange, Delete, LocalOffer, Paid } from "@mui/icons-material";
+import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
 import { JournalSliceContext } from "@/contexts/JournalSliceContext";
 import AmountFilter from "./filters/AmountFilter";
@@ -63,6 +63,13 @@ const journalFilterSlots: Record<JournalFilterSlot, JournalFilterSlotProperties>
         ),
     },
 }
+
+const NON_IMPELEMENTED_FILTERS: Set<JournalFilterSlot> = new Set([
+    JournalFilterSlot.AMOUNT,
+    JournalFilterSlot.ATTACHMENTS,
+    JournalFilterSlot.DATE_RANGE,
+    JournalFilterSlot.TAGS,
+])
 
 interface JournalFilterPickerProps {
     open: boolean
@@ -132,12 +139,19 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
                     <TextField
                         size='small'
                         placeholder="Filter by..."
+                        disabled
                         autoFocus
                         sx={{ m: 1, mt: 0 }}
                     />
                     {Object.entries(journalFilterSlots).map(([key, properties]) => {
+                        const disabled = NON_IMPELEMENTED_FILTERS.has(key as JournalFilterSlot)
                         return (
-                            <MenuItem key={key} onClick={() => handleClickSlotButton(key as JournalFilterSlot)} dense>
+                            <MenuItem
+                                key={key}
+                                disabled={disabled}
+                                onClick={disabled ? undefined : () => handleClickSlotButton(key as JournalFilterSlot)}
+                                dense
+                            >
                                 <ListItemIcon sx={(theme) => ({ color: theme.palette.text.secondary })}>{properties.icon}</ListItemIcon>
                                 <ListItemText>{properties.label}</ListItemText>
                             </MenuItem>

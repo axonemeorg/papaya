@@ -4,6 +4,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
 import { AmountRange, JournalEntry, JournalSlice } from '@/types/schema'
+import { enumerateFilters } from '@/utils/filtering'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -33,29 +34,32 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		amountRange,
 	])
 
-	const getSliceFilterCount = useCallback(() => {
-		let totalFilterCount = 0
-		if (categoryIds && categoryIds.length > 0) {
-			totalFilterCount ++
+	const getActiveFilterSet = useCallback(() => {
+		const journalSlice = {
+			dateView,
+			categoryIds,
+			amount: amountRange,
 		}
-		return totalFilterCount
+		return enumerateFilters(journalSlice)
 	}, [
 		dateView,
-		categoryIds
+		categoryIds,
+		amountRange,
 	])
 
 	const clearAllSliceFilters = () => {
 		setCategoryIds(undefined)
+		setAmountRange(undefined)
 	}
 	
 	const removeFilterBySlot = (slot: JournalFilterSlot) => {
 		switch (slot) {
 			case JournalFilterSlot.AMOUNT:
-
+				setAmountRange(undefined)
 				return
 			
 			case JournalFilterSlot.ATTACHMENTS:
-
+				throw new Error('Not implemented')
 				return
 
 			case JournalFilterSlot.CATEGORIES:
@@ -63,11 +67,11 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 				return
 
 			case JournalFilterSlot.DATE_RANGE:
-
+				throw new Error('Not implemented')
 				return
 
 			case JournalFilterSlot.TAGS:
-
+				throw new Error('Not implemented')
 				return
 		}
 	}
@@ -168,7 +172,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 				getJournalEntriesQuery,
 				refetchAllDependantQueries,
 
-				getSliceFilterCount,
+				getActiveFilterSet,
 				clearAllSliceFilters,
 				removeFilterBySlot,
 

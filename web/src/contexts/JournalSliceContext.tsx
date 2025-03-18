@@ -26,7 +26,7 @@ interface JournalSliceContext extends JournalEditorState {
 	refetchAllDependantQueries: () => void
 
 	// Filters
-	getSliceFilterCount: () => number
+	getActiveFilterSet: () => Set<JournalFilterSlot>
 	clearAllSliceFilters: () => void
 	removeFilterBySlot: (slice: JournalFilterSlot) => void
 

@@ -33,10 +33,10 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
 	}
 }
 
-export const parseJournalEntryAmount = (amount: string): number => {
+export const parseJournalEntryAmount = (amount: string): number | undefined => {
 	const sanitizedAmount = String(amount).replace(/[^0-9.-]/g, '');
 	if (!amount || !sanitizedAmount) {
-		return 0;
+		return undefined;
 	}
 
 	const parsedAmount = parseFloat(sanitizedAmount)
@@ -58,9 +58,9 @@ export const calculateNetAmount = (entry: JournalEntry): number => {
 	const children: JournalEntry[] = entry.children ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
-			return acc + parseJournalEntryAmount(child.amount)
+			return acc + (parseJournalEntryAmount(child.amount) ?? 0)
 		},
-		parseJournalEntryAmount(entry.amount)
+		parseJournalEntryAmount(entry.amount) ?? 0
 	)
 
 	return netAmount
