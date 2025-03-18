@@ -57,7 +57,6 @@ export const getJournalEntries = async (
 	
 	// Date Range
 	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
-
 	if (startDate || endDate) {
 		selectorClauses.push({
 			date: {
@@ -65,6 +64,15 @@ export const getJournalEntries = async (
 				$lte: endDate?.format('YYYY-MM-DD'),
 			}
 		});
+	}
+
+	// Categories
+	if (journalSlice.categoryIds) {
+		selectorClauses.push({
+			categoryIds: {
+				$in: journalSlice.categoryIds
+			}
+		})
 	}
 
 	const selector = {

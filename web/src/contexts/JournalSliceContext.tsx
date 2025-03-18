@@ -1,4 +1,5 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
+import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
 import { DateView, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
@@ -26,6 +27,7 @@ interface JournalSliceContext extends JournalEditorState {
 	// Filters
 	getSliceFilterCount: () => number
 	clearAllSliceFilters: () => void
+	removeFilterBySlot: (slice: JournalFilterSlot) => void
 
 	// Selecting
 	numRows: number

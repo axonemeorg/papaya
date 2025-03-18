@@ -1,4 +1,5 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
+import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
@@ -42,6 +43,30 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 
 	const clearAllSliceFilters = () => {
 		setCategoryIds(undefined)
+	}
+	
+	const removeFilterBySlot = (slot: JournalFilterSlot) => {
+		switch (slot) {
+			case JournalFilterSlot.AMOUNT:
+
+				return
+			
+			case JournalFilterSlot.ATTACHMENTS:
+
+				return
+
+			case JournalFilterSlot.CATEGORIES:
+				setCategoryIds(undefined)
+				return
+
+			case JournalFilterSlot.DATE_RANGE:
+
+				return
+
+			case JournalFilterSlot.TAGS:
+
+				return
+		}
 	}
 
 	const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
@@ -141,6 +166,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 
 				getSliceFilterCount,
 				clearAllSliceFilters,
+				removeFilterBySlot,
 
 				numRows: Object.values(getJournalEntriesQuery.data ?? {}).length,
 				selectedRows,

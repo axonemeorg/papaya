@@ -4,7 +4,7 @@ import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
 import { JournalSliceContext } from "@/contexts/JournalSliceContext";
 
-enum JournalFilterSlot {
+export enum JournalFilterSlot {
     AMOUNT = 'AMOUNT',
     ATTACHMENTS = 'ATTACHMENTS',
     CATEGORIES = 'CATEGORIES',
@@ -72,16 +72,26 @@ interface JournalFilterPickerProps {
 export default function JournalFilterPicker(props: JournalFilterPickerProps) {
     const [activeSlot, setActiveSlot] = useState<JournalFilterSlot | null>(null)
 
+    const journalSliceContext = useContext(JournalSliceContext)
+
     const handleClickSlotButton = (slot: JournalFilterSlot) => {
         setActiveSlot(slot)
     }
 
-    // useEffect(() => {
-    //     if (!props.open) {
-    //         return
-    //     }
-    //     setActiveSlot(null)
-    // }, [props.open])
+    const handleRemoveActiveSlotFilters = () => {
+        if (!activeSlot) {
+            return
+        }
+        journalSliceContext.removeFilterBySlot(activeSlot)
+        setActiveSlot(null)
+    }
+
+    useEffect(() => {
+        if (!props.open) {
+            return
+        }
+        setActiveSlot(null)
+    }, [props.open])
 
     return (
         <>
@@ -110,7 +120,7 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
                         <Typography variant='caption' sx={{ textTransform: 'unset', mb: -1 }}>
                             {journalFilterSlots[activeSlot].title}
                         </Typography>
-                        <IconButton size='small' sx={{ mr: -1 }}>
+                        <IconButton size='small' sx={{ mr: -1 }} onClick={() => handleRemoveActiveSlotFilters()}>
                             <Delete fontSize="small" />
                         </IconButton>
                     </Stack>
