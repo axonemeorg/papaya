@@ -3,7 +3,7 @@ import { CalculatorContext } from "@/contexts/CalculatorContext";
 import { ScreenCalculator } from '@/components/ScreenCalculator';
 
 export default function CalculatorContextProvider(props: PropsWithChildren) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [_isOpen, setIsOpen] = useState(true);
     const [_currentElement, setCurrentElement] = useState<HTMLElement | null>(null);
 
     const open = (element: HTMLElement) => {
@@ -20,7 +20,7 @@ export default function CalculatorContextProvider(props: PropsWithChildren) {
     return (
         <CalculatorContext.Provider value={contextValue}>
             {props.children}
-            <ScreenCalculator open={isOpen} />
+            <ScreenCalculator open={false} />
         </CalculatorContext.Provider>
     );
 }
