@@ -12,6 +12,13 @@ const appTheme = createTheme({
 		// primary:{
 		//     main: 'rgb(251, 202, 4)'
 		// }
+
+		// forestGreen: {
+		// 	main: green[700],  // Dark green
+		// 	light: green[500], // Lighter shade
+		// 	dark: green[900],  // Even darker shade
+		// 	contrastText: "#fff", // White text for contrast
+		// },
 	},
 	// colorSchemes: {
 	//     light: {
