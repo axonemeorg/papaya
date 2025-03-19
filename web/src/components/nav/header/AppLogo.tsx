@@ -1,5 +1,10 @@
 import { Box, Stack } from '@mui/material'
-import Link from 'next/link'
+
+const Link = (props: any) => {
+	return (
+		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
+	)
+}
 
 export default function AppLogo() {
 	return (

@@ -17,7 +17,7 @@ import {
 	Grow,
 	Checkbox,
 } from '@mui/material'
-import React, { useContext, useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 
 import { Category, JournalEntry } from '@/types/schema'
 import dayjs from 'dayjs'

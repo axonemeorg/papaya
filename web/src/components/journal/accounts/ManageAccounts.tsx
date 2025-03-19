@@ -21,8 +21,13 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
-import Link from 'next/link'
 import { useContext, useState } from 'react'
+
+const Link = (props: any) => {
+	return (
+		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
+	)
+}
 
 export default function ManageAccounts() {
 	const [showCreateAccountModal, setShowCreateAccountModal] = useState(false)

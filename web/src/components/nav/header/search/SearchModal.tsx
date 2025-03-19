@@ -32,7 +32,12 @@ import AvatarIcon from "@/components/icon/AvatarIcon";
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from "@/constants/journal";
 import { formatJournalEntryDate } from "@/utils/date";
 import { generateCategoryLink } from "@/utils/link";
-import Link from "next/link";
+
+const Link = (props: any) => {
+	return (
+		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
+	)
+}
 
 type SearchModalProps =
     & DialogProps

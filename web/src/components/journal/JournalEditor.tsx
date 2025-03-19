@@ -1,4 +1,4 @@
-import React, { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
+import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry } from '@/types/schema'

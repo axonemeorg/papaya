@@ -15,13 +15,17 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { ReactNode, useContext, useEffect } from 'react'
+import { ReactNode, useContext, useEffect } from 'react'
 import AppLogo from '../header/AppLogo'
 import { JournalContext } from '@/contexts/JournalContext'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
+
+const Link = (props: any) => {
+	return (
+		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
+	)
+}
 
 interface AppMenuProps {
 	view: 'desktop' | 'mobile'

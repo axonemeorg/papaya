@@ -5,8 +5,6 @@ import { Box, ClickAwayListener, Fade, IconButton, Paper, Popper, Stack, Typogra
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY } from './JournalEntryLoupe'
-import { useRouter } from 'next/router'
 import { getPriceString } from '@/utils/string'
 import { Category, JournalEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
@@ -14,6 +12,8 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
+
+export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
 	entry: JournalEntry
@@ -24,12 +24,9 @@ interface JournalEntryCardProps extends JournalEntrySelection {
 const JournalEntryNumber = (props: { value: string | number | null | undefined }) => {
 	const { snackbar } = useContext(NotificationsContext)
 
-	const router = useRouter()
-	const currentPath = router.pathname
-
 	const entryNumber = Number(props.value ?? 0)
 	const entryNumberString = `#${entryNumber}`
-	const entryLink = `${currentPath}?${JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY}=${entryNumber}`
+	const entryLink = `?${JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY}=${entryNumber}`
 
 	const copyText = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		e.preventDefault() // Prevent the default anchor tag behavior

@@ -22,6 +22,7 @@
     "@mui/material": "^6.4.8",
     "@mui/x-date-pickers": "^7.28.0",
     "@tanstack/react-query": "^5.69.0",
+    "@tanstack/react-router": "^1.114.25",
     "axios": "^1.8.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
