@@ -2,7 +2,7 @@ import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard";
 import { useEffect } from "react"
 import useBrowserPlatform from "./useBrowserPlatform";
 
-export default function useKeyboardActions(name: KeyboardActionName, action: () => void): void {
+export default function useKeyboardAction(name: KeyboardActionName, action: () => void): void {
 	const { macOs } = useBrowserPlatform()
     useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -25,9 +25,11 @@ export default function useKeyboardActions(name: KeyboardActionName, action: () 
 				} else if (!event.ctrlKey) {
 					return
 				}
-			} else if (keystroke.altOpt && !event.altKey) {
+			} else if (event.ctrlKey) {
 				return
-			} else if (keystroke.shift && !event.shiftKey) {
+			} else if ((keystroke.altOpt && !event.altKey) || (!keystroke.altOpt && event.altKey)) {
+				return
+			} else if ((keystroke.shift && !event.shiftKey) || (!keystroke.shift && event.shiftKey)) {
 				return
 			} else if (event.key !== keystroke.symbol) {
 				return

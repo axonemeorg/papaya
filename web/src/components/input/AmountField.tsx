@@ -4,13 +4,18 @@ import { TextField, InputAdornment, TextFieldProps, Stack } from "@mui/material"
 import { IconButton } from "@mui/material"
 // import { ToggleButtonGroup, ToggleButton } from "@mui/material"
 
-type AmountFieldProps = TextFieldProps
+type AmountFieldProps = TextFieldProps & {
+    disableSignChange?: boolean
+}
 
 export default function AmountField(props: AmountFieldProps) {
     const value = String(props.value ?? '');
     const isIncome = value.startsWith('+')
 
     const toggleSign = () => {
+        if (props.disableSignChange) {
+            return
+        }
         const event = new Event('change', { bubbles: true });
         const syntheticEvent = {
             ...event,
@@ -43,14 +48,14 @@ export default function AmountField(props: AmountFieldProps) {
         props.onChange?.({ ...event, target: { ...event.target, value: newValue } })
     }
 
-    const { slotProps, sx, ...rest } = props
+    const { disableSignChange, slotProps, sx, ...rest } = props
 
     return (
         <Stack direction='row' gap={1}>
             <TextField
                 label="Amount"
                 placeholder="00.00"
-                fullWidth
+                fullWidth={props.fullWidth !== false}
                 slotProps={{
                     htmlInput: {
                         inputMode: 'decimal',
@@ -59,7 +64,7 @@ export default function AmountField(props: AmountFieldProps) {
                         startAdornment: (
                             <InputAdornment position="start">$</InputAdornment>
                         ),
-                        endAdornment: (
+                        endAdornment: disableSignChange ? undefined : (
                             <IconButton onClick={() => toggleSign()}>
                                 <SwapHoriz />
                             </IconButton>
@@ -68,6 +73,7 @@ export default function AmountField(props: AmountFieldProps) {
                             color: isIncome ? theme.palette.success.main : undefined,
                         }),
                     },
+                    ...slotProps,
                 }}
                 sx={{ flex: 1 }}
                 autoComplete="off"

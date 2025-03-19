@@ -5,12 +5,12 @@ import {
 	EntryTag,
 	JournalEntry,
 	JournalMeta,
+	JournalSlice,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
-import { JournalEditorView } from '@/components/journal/JournalEditor'
-import dayjs from 'dayjs'
 import { makeDefaultZiskMeta } from '@/utils/database'
+import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
 
 const db = getDatabaseClient()
 
@@ -45,23 +45,32 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 }
 
 export const getJournalEntries = async (
-	view: JournalEditorView,
-	date: string,
+	journalSlice: JournalSlice,
 	journalId: string
 ): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
 	const selectorClauses: any[] = [
 		{ type: 'JOURNAL_ENTRY' },
 		{ journalId },
 	]
-	if (view !== 'all') {
-		const startDate = dayjs(date).startOf(view).format('YYYY-MM-DD')
-		const endDate = dayjs(date).endOf(view).format('YYYY-MM-DD')
+	
+	// Date Range
+	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
+	if (startDate || endDate) {
 		selectorClauses.push({
 			date: {
-				$gte: startDate,
-				$lte: endDate,
+				$gte: startDate?.format('YYYY-MM-DD'),
+				$lte: endDate?.format('YYYY-MM-DD'),
 			}
 		});
+	}
+
+	// Categories
+	if (journalSlice.categoryIds) {
+		selectorClauses.push({
+			categoryIds: {
+				$in: journalSlice.categoryIds
+			}
+		})
 	}
 
 	const selector = {

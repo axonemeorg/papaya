@@ -30,9 +30,9 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
-import { sortDatesChronologically } from '@/utils/date'
+import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -195,8 +195,6 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 
 interface JournalEntryListProps {
 	journalRecordGroups: Record<string, JournalEntry[]>
-	selectedRows: Record<string, boolean>
-	toggleSelectedRow: (row: string) => void
 	onClickListItem: (event: any, entry: JournalEntry) => void
 	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
 }
@@ -205,7 +203,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
 	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
-	const journalEntryContext = useContext(JournalEntryContext)
+	const journalSliceContext = useContext(JournalSliceContext)
 	const getPriceStyle = useGetPriceStyle()
 
 
@@ -213,11 +211,12 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
 
-	if (journalEntryContext.view === 'month') {
-		if (dayjs(journalEntryContext.date).isSame(currentDayString, 'month')) {
+	if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
+		const startOfMonth: dayjs.Dayjs = dayjs(`${journalSliceContext.dateView.year}-${journalSliceContext.dateView.month}-01`)
+		if (startOfMonth.isSame(currentDayString, 'month')) {
 			displayedJournalDates.add(currentDayString)
 		} else {
-			displayedJournalDates.add(dayjs(journalEntryContext.date).startOf('month').format('YYYY-MM-DD'))
+			displayedJournalDates.add(startOfMonth.format('YYYY-MM-DD'))
 		}
 	}
 
@@ -257,7 +256,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-										selected={props.selectedRows[entry._id]}
+										selected={journalSliceContext.selectedRows[entry._id]}
 									>
 										<TableCell
 											selectCheckbox
@@ -269,8 +268,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											<Checkbox
 												className='checkbox'
 												sx={{ m: -1 }}
-												checked={props.selectedRows[entry._id] || false}
-												onChange={() => props.toggleSelectedRow(entry._id)}
+												checked={journalSliceContext.selectedRows[entry._id] || false}
+												onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
 												onClick={(event) => event.stopPropagation()}
 											/>
 											<AvatarIcon

@@ -1,12 +1,15 @@
 import { Avatar } from '@/types/schema'
 import { alpha, Chip, Icon, useTheme } from '@mui/material'
 import AvatarIcon from './AvatarIcon'
+import { ReactElement } from 'react'
 
 interface AvatarChipProps {
 	avatar?: Avatar
 	label?: string
 	contrast?: boolean
 	icon?: boolean
+	onDelete?: () => void
+	deleteIcon?: ReactElement
 }
 
 export default function AvatarChip(props: AvatarChipProps) {
@@ -40,6 +43,8 @@ export default function AvatarChip(props: AvatarChipProps) {
 					<AvatarIcon avatar={props.avatar} sx={{ color: `${color} !important` }} />
 				</Icon>
 			) : undefined}
+			onDelete={props.onDelete}
+			deleteIcon={props.deleteIcon}
 		/>
 	)
 }

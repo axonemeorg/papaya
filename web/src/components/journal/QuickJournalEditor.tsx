@@ -9,7 +9,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
 import { makeJournalEntry } from '@/utils/journal'
 import { createJournalEntry } from '@/database/actions'
-import { JournalEntryContext } from '@/contexts/JournalEntryContext'
+import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 
 interface QuickJournalEditorProps {
 	onAdd?: () => void
@@ -19,7 +19,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 	const [isActive, setIsActive] = useState<boolean>(false)
 
 	const { snackbar } = useContext(NotificationsContext)
-	const { refetchAllDependantQueries } = useContext(JournalEntryContext)
+	const { refetchAllDependantQueries } = useContext(JournalSliceContext)
 	const { journal } = useContext(JournalContext)
 
 	const createQuickJournalEntryForm = useForm<CreateQuickJournalEntry>({
