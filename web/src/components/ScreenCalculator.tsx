@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Button, ButtonProps, Grid2 as Grid, Grow, IconButton, Paper, Stack, TextareaAutosize } from "@mui/material";
+import { Box, Button, ButtonProps, Grow, Paper, Stack, TextareaAutosize } from "@mui/material";
 
 interface ScreenCalculatorProps {
     open: boolean
@@ -203,27 +203,27 @@ export function ScreenCalculator(props: ScreenCalculatorProps) {
                             <Stack direction='row'>
                                 <Stack gap={0.5} direction='column'>
                                     <Stack direction='row' gap={0.5}>
-                                        <CalculatorButton color="forestGreen">7</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">8</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">9</CalculatorButton>
+                                        <CalculatorButton>7</CalculatorButton>
+                                        <CalculatorButton>8</CalculatorButton>
+                                        <CalculatorButton>9</CalculatorButton>
                                         <CalculatorButton color="primary">&times;</CalculatorButton>
                                     </Stack>                                    
                                     <Stack direction='row' gap={0.5}>
-                                        <CalculatorButton color="forestGreen">4</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">5</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">6</CalculatorButton>
+                                        <CalculatorButton>4</CalculatorButton>
+                                        <CalculatorButton>5</CalculatorButton>
+                                        <CalculatorButton>6</CalculatorButton>
                                         <CalculatorButton color="primary">&ndash;</CalculatorButton>
                                     </Stack>
                                     <Stack direction='row' gap={0.5}>
-                                        <CalculatorButton color="forestGreen">1</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">2</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">3</CalculatorButton>
+                                        <CalculatorButton>1</CalculatorButton>
+                                        <CalculatorButton>2</CalculatorButton>
+                                        <CalculatorButton>3</CalculatorButton>
                                         <CalculatorButton color="primary">+</CalculatorButton>
                                     </Stack>
                                     <Stack direction='row' gap={0.5}>
-                                        <CalculatorButton color="forestGreen">&plusmn;</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">0</CalculatorButton>
-                                        <CalculatorButton color="forestGreen">.</CalculatorButton>
+                                        <CalculatorButton>&plusmn;</CalculatorButton>
+                                        <CalculatorButton>0</CalculatorButton>
+                                        <CalculatorButton>.</CalculatorButton>
                                         <CalculatorButton color="primary">=</CalculatorButton>
                                     </Stack>
                                 </Stack>

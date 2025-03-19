@@ -3,8 +3,8 @@ interface CalculatorExpressionProps {
     expression: Expression
 }
 
-export default function CalculatorExpression(props: CalculatorExpressionProps) {
+export default function CalculatorExpression(_props: CalculatorExpressionProps) {
     return (
-        
+        <></>
     )
 }
