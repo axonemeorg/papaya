@@ -6,8 +6,7 @@ import Head from 'next/head'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import NotificationsProvider from '@/providers/NotificationsProvider'
 
-// Imports styles
-import '@/styles/main.scss'
+
 import JournalContextProvider from '@/providers/JournalContextProvider'
 import ZiskContextProvider from '@/providers/ZiskContextProvider'
 import RemoteContextProvider from '@/providers/RemoteContextProvider'
