@@ -6,7 +6,6 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { deleteRecord, restoreRecord } from '@/database/actions'
 import { Account } from '@/types/schema'
-import { generateAccountLink } from '@/utils/link'
 import { pluralize as p } from '@/utils/string'
 import { Add, Search } from '@mui/icons-material'
 import {
@@ -22,12 +21,6 @@ import {
 	Typography,
 } from '@mui/material'
 import { useContext, useState } from 'react'
-
-const Link = (props: any) => {
-	return (
-		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
-	)
-}
 
 export default function ManageAccounts() {
 	const [showCreateAccountModal, setShowCreateAccountModal] = useState(false)
@@ -139,9 +132,9 @@ export default function ManageAccounts() {
 										<ListItemIcon>
 											<AvatarIcon avatar={account?.avatar} />
 										</ListItemIcon>
-										<Link href={generateAccountLink(account)}>
+										<a  href='#'>
 											<AvatarChip avatar={account.avatar} label={account.label} contrast />
-										</Link>
+										</a>
 									</ListItem>
 								)
 							})}

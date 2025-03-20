@@ -31,13 +31,6 @@ import AvatarChip from "@/components/icon/AvatarChip";
 import AvatarIcon from "@/components/icon/AvatarIcon";
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from "@/constants/journal";
 import { formatJournalEntryDate } from "@/utils/date";
-import { generateCategoryLink } from "@/utils/link";
-
-const Link = (props: any) => {
-	return (
-		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
-	)
-}
 
 type SearchModalProps =
     & DialogProps
@@ -85,7 +78,7 @@ export default function SearchModal(props: SearchModalProps) {
         let secondaryTextFirstPart: ReactNode | undefined = undefined
         let secondaryTextSecondPart: ReactNode | undefined = undefined
         let icon: ReactNode | undefined = undefined
-        let link: string | undefined = undefined
+        // let link: string | undefined = undefined
         let onClickHandler: (() => void) | undefined = undefined
     
         // Journal Entry or Child Journal Entry
@@ -122,7 +115,7 @@ export default function SearchModal(props: SearchModalProps) {
         // Category
         else if (documentIsCategory(result.item)) {
             primaryTextFirstPart = <AvatarChip avatar={result.item.avatar} label={result.item.label} icon contrast />
-            link = generateCategoryLink(result.item)
+            // link = generateCategoryLink(result.item)
         }
     
         // Child Journal Entry
@@ -134,12 +127,8 @@ export default function SearchModal(props: SearchModalProps) {
             }
         }
 
-        const MenuItemProps = link
-            ? { component: Link, href: link }
-            : {}
-    
         return (
-            <MenuItem key={key} {...MenuItemProps} onClick={() => {
+            <MenuItem key={key} onClick={() => {
                 props.onClose?.()
                 if (onClickHandler) {
                     onClickHandler()

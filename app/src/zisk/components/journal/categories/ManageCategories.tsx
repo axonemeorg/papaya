@@ -6,7 +6,6 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import {  deleteCategory, undeleteCategory } from '@/database/actions'
 import { Category } from '@/types/schema'
-import { generateCategoryLink } from '@/utils/link'
 import { pluralize as p } from '@/utils/string'
 import { Add, Search } from '@mui/icons-material'
 import {
@@ -22,12 +21,6 @@ import {
 	Typography,
 } from '@mui/material'
 import { useContext, useState } from 'react'
-
-const Link = (props: any) => {
-	return (
-		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
-	)
-}
 
 export default function ManageCategories() {
 	const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false)
@@ -139,9 +132,9 @@ export default function ManageCategories() {
 										<ListItemIcon>
 											<AvatarIcon avatar={category?.avatar} />
 										</ListItemIcon>
-										<Link href={generateCategoryLink(category)}>
+										<a href='#'>
 											<AvatarChip avatar={category.avatar} label={category.label} contrast />
-										</Link>
+										</a>
 									</ListItem>
 								)
 							})}

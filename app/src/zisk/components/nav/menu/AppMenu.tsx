@@ -23,7 +23,7 @@ import { KeyboardActionName } from '@/constants/keyboard'
 
 const Link = (props: any) => {
 	return (
-		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
+		<a {...props} />
 	)
 }
 

@@ -1,6 +1,6 @@
 import { Alert, Button, Link, Paper, Stack, Typography } from "@mui/material"
 import SettingsSectionHeader from "./SettingsSectionHeader"
-import React, { useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { SyncingStrategy } from "@/types/schema"
 import { ZiskContext } from "@/contexts/ZiskContext"
 import { LeakAdd, LeakRemove, Shuffle } from "@mui/icons-material"

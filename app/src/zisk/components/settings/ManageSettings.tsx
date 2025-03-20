@@ -7,10 +7,19 @@ import {
 } from '@mui/material'
 import JournalSettings from './JournalSettings'
 import SyncingSettings from './SyncingSettings'
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router';
+import { ReactNode } from 'react';
 
-export const SETTINGS_TABS = {
+export enum SettingsTab {
+	SYNCING = 'syncing',
+	APPEARANCE = 'appearance',
+	JOURNAL = 'journal',
+}
+
+export const DEFAULT_SETTINGS_TAB = SettingsTab.SYNCING as const
+
+const SETTINGS_TABS: Record<SettingsTab, { label: string, component: ReactNode }> = {
 	syncing: {
 	  label: "Syncing & Account",
 	  component: <SyncingSettings />,
@@ -25,27 +34,25 @@ export const SETTINGS_TABS = {
 	},
 };
 
-const DEFAULT_TAB = Object.keys(SETTINGS_TABS)[0]
-
 export default function ManageSettings() {
-	const router = useRouter();
-
-	const section = useParams({ strict: false }).section ?? ''
-
-	const tabKeys = Object.keys(SETTINGS_TABS);
-	const tabIndex = tabKeys.indexOf(section);
+	const section = useParams({ strict: false }).section ?? DEFAULT_SETTINGS_TAB
 
 	return (
 		<>
 			<Stack mb={4} gap={0.5}>
 				<Typography variant='h4'>Settings</Typography>
-				<Tabs value={tabIndex} sx={{ mx: -1 }}>
+				<Tabs value={section} sx={{ mx: -1 }}>
 					{Object.entries(SETTINGS_TABS).map(([key, tab]) => {
+						const section = key as SettingsTab
 						return (
 							<Tab
 								component={Link}
-								to={{ pathname: "/settings/$section", params: { section: key } } as unknown as string}
-								key={key}
+								{...{
+									to: "/settings/$section",
+									params: { section }
+								} as any}
+								key={section}							
+								value={section}
 								label={tab.label}
 								sx={{
 									px: 1,

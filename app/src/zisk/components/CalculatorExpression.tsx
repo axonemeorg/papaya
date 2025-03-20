@@ -1,6 +1,6 @@
 
 interface CalculatorExpressionProps {
-    expression: Expression
+    expression: any // Expression
 }
 
 export default function CalculatorExpression(_props: CalculatorExpressionProps) {

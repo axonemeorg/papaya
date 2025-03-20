@@ -1,14 +1,9 @@
 import { Box, Stack } from '@mui/material'
-
-const Link = (props: any) => {
-	return (
-		<a {...props} onClick={() => { throw new Error("Rendered temporary link. Replace with Tanstack Router link.")}}/>
-	)
-}
+import { Link } from '@tanstack/react-router'
 
 export default function AppLogo() {
 	return (
-		<Link href={'/'} style={{ textDecoration: 'none', color: 'inherit' }}>
+		<Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
 			<Stack direction="row" gap={1} alignItems="center" sx={(theme) => ({ color: theme.palette.primary.main })}>
 				<svg
 					fill="currentColor"
