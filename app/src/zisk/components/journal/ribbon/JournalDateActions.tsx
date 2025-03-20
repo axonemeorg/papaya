@@ -1,4 +1,4 @@
-import { JournalEntry } from '@/types/schema'
+import { DateViewSymbol, JournalEntry } from '@/types/schema'
 import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
 	ArrowBack,
@@ -13,22 +13,22 @@ import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import KeyboardShortcut from '../../text/KeyboardShortcut'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
-import { JournalEditorDateViewSymbol, JournalSliceContext } from '@/contexts/JournalSliceContext'
+import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { KeyboardActionName } from '@/constants/keyboard'
 
-const dateViewMenuOptionLabels: Record<JournalEditorDateViewSymbol, string> = {
-    [JournalEditorDateViewSymbol.WEEKLY]: 'Week',
-    [JournalEditorDateViewSymbol.MONTHLY]: 'Month',
-    [JournalEditorDateViewSymbol.YEARLY]: 'Year',
-    [JournalEditorDateViewSymbol.RANGE]: 'Date Range',
+const dateViewMenuOptionLabels: Record<DateViewSymbol, string> = {
+    [DateViewSymbol.WEEKLY]: 'Week',
+    [DateViewSymbol.MONTHLY]: 'Month',
+    [DateViewSymbol.YEARLY]: 'Year',
+    [DateViewSymbol.RANGE]: 'Date Range',
 }
 
-type JournalEditorDateViewSymbolWithKeystroke = Exclude<JournalEditorDateViewSymbol, JournalEditorDateViewSymbol.RANGE>;
+type JournalEditorDateViewSymbolWithKeystroke = Exclude<DateViewSymbol, DateViewSymbol.RANGE>;
 
 const dateViewKeystrokes: Record<JournalEditorDateViewSymbolWithKeystroke, KeyboardActionName> = {
-    [JournalEditorDateViewSymbol.WEEKLY]: KeyboardActionName.DATE_VIEW_WEEKLY,
-    [JournalEditorDateViewSymbol.MONTHLY]: KeyboardActionName.DATE_VIEW_MONTHLY,
-    [JournalEditorDateViewSymbol.YEARLY]: KeyboardActionName.DATE_VIEW_ANNUALLY,
+    [DateViewSymbol.WEEKLY]: KeyboardActionName.DATE_VIEW_WEEKLY,
+    [DateViewSymbol.MONTHLY]: KeyboardActionName.DATE_VIEW_MONTHLY,
+    [DateViewSymbol.YEARLY]: KeyboardActionName.DATE_VIEW_ANNUALLY,
 }
 
 const DATE_RANGE_SEPERATOR = '\u00A0\u2013\u00A0'
@@ -52,13 +52,13 @@ export default function JournalDateActions() {
     const now = useMemo(() => dayjs(), [])
 
     useKeyboardAction(KeyboardActionName.DATE_VIEW_ANNUALLY, () => {
-        journalSliceContext.switchDateView(JournalEditorDateViewSymbol.YEARLY)
+        journalSliceContext.switchDateView(DateViewSymbol.YEARLY)
     })
     useKeyboardAction(KeyboardActionName.DATE_VIEW_MONTHLY, () => {
-        journalSliceContext.switchDateView(JournalEditorDateViewSymbol.MONTHLY)
+        journalSliceContext.switchDateView(DateViewSymbol.MONTHLY)
     })
     useKeyboardAction(KeyboardActionName.DATE_VIEW_WEEKLY, () => {
-        journalSliceContext.switchDateView(JournalEditorDateViewSymbol.WEEKLY)
+        journalSliceContext.switchDateView(DateViewSymbol.WEEKLY)
     })
     useKeyboardAction(KeyboardActionName.JUMP_TO_TODAY_VIEW, () => {
         jumpToToday()
@@ -169,7 +169,7 @@ export default function JournalDateActions() {
         return now.format('dddd, MMMM D')
     }, [])
 
-    const currentDateViewSymbol: JournalEditorDateViewSymbol = useMemo(() => {
+    const currentDateViewSymbol: DateViewSymbol = useMemo(() => {
         return getDateViewSymbol(journalSliceContext.dateView)
     }, [journalSliceContext.dateView])
 
@@ -236,7 +236,7 @@ export default function JournalDateActions() {
         }
     }
 
-    const handleChangeDateView = (view: JournalEditorDateViewSymbol) => {
+    const handleChangeDateView = (view: DateViewSymbol) => {
 		setShowDateViewPicker(false)
 		journalSliceContext.switchDateView(view)
 	}
@@ -269,13 +269,13 @@ export default function JournalDateActions() {
             >
                 {Object.entries(dateViewMenuOptionLabels)
                     .filter(([key]) => {
-                        return !(key === JournalEditorDateViewSymbol.RANGE && !(currentDateViewSymbol === key))
+                        return !(key === DateViewSymbol.RANGE && !(currentDateViewSymbol === key))
                     })
                     .map(([key, label]) => {
                         return (
                             <MenuItem
                                 key={key}
-                                onClick={() => handleChangeDateView(key as JournalEditorDateViewSymbol)}
+                                onClick={() => handleChangeDateView(key as DateViewSymbol)}
                                 aria-label={`View by ${label}`}
                                 selected={key === currentDateViewSymbol}
                             >

@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_mainLayout/settings/$section')({
     component: SettingsPage,
     params: {
         parse: (params) => {
-            const section = Object.keys(SETTINGS_TABS).find((tab) => tab === params.section.toLowerCase())
+            const section = Object.keys(SETTINGS_TABS).find((tab) => tab === params.section.toLowerCase()) as keyof typeof SETTINGS_TABS
             if (!section) throw Error(`"${params.section}" is not a valid section name.`)
             return { section }
         }

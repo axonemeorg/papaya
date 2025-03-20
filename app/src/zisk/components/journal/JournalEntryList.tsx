@@ -231,7 +231,12 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 					return (
 						<TableBody key={date}>
-							<TableRow dateRow sx={{ verticalAlign: entries.length > 1 ? 'top' : undefined }}>
+							<TableRow
+								dateRow
+								sx={{
+									verticalAlign: (entries.length + (showQuckEditor ? 1 : 0)) > 1 ? 'top' : undefined
+								}}
+							>
 								<TableCell rowSpan={entries.length + (showQuckEditor ? 2 : 1)}>
 									<JournalEntryDate
 										day={day}

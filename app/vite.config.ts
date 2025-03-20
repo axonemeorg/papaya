@@ -24,6 +24,9 @@ export default defineConfig({
   // },
   server: {
     port: 9476,
-    host: '127.0.0.1'
+    host: '127.0.0.1',
+    allowedHosts: [
+      'ax0ne.me'
+    ]
   }
 })

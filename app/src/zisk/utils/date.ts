@@ -1,5 +1,4 @@
-import { JournalEditorDateViewSymbol } from '@/contexts/JournalSliceContext'
-import { AnnualPeriod, DateRange, DateView, JournalEntry, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
+import { AnnualPeriod, DateRange, DateView, DateViewSymbol, JournalEntry, MonthlyPeriod, WeeklyPeriod } from '@/types/schema'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
@@ -79,16 +78,16 @@ export const dateViewIsAnnualPeriod = (dateView: DateView): dateView is AnnualPe
     return 'year' in dateView && !('month' in dateView) && !('day' in dateView)
 }
 
-export const getDateViewSymbol = (dateView: DateView): JournalEditorDateViewSymbol => {
+export const getDateViewSymbol = (dateView: DateView): DateViewSymbol => {
     if (dateViewIsWeeklyPeriod(dateView)) {
-        return JournalEditorDateViewSymbol.WEEKLY
+        return DateViewSymbol.WEEKLY
     } else if (dateViewIsMonthlyPeriod(dateView)) {
-        return JournalEditorDateViewSymbol.MONTHLY
+        return DateViewSymbol.MONTHLY
     } else if (dateViewIsAnnualPeriod(dateView)) {
-        return JournalEditorDateViewSymbol.YEARLY
+        return DateViewSymbol.YEARLY
     }
 
-    return JournalEditorDateViewSymbol.RANGE
+    return DateViewSymbol.RANGE
 }
 
 export const getWeeklyPeriodFromDate = (date: dayjs.Dayjs): WeeklyPeriod => {

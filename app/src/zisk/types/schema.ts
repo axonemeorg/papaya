@@ -314,7 +314,6 @@ export const MonthlyPeriod = AnnualPeriod.extend({
 
 export type MonthlyPeriod = z.output<typeof MonthlyPeriod>
 
-
 export const WeeklyPeriod = MonthlyPeriod.extend({
 	day: z.number().min(1).max(31)
 })
@@ -335,6 +334,13 @@ export type DateRange = z.output<typeof DateRange>
 export const DateView = z.union([DatePeriod, DateRange])
 
 export type DateView = z.output<typeof DateView>
+
+export enum DateViewSymbol {
+	WEEKLY = 'w',
+	MONTHLY = 'm',
+	YEARLY = 'y',
+	RANGE = 'r',
+}
 
 export const AmountRange = z.object({
 	minimum: z.string().optional(),

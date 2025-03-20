@@ -1,19 +1,12 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
-import { AmountRange, DateView, JournalEntry, JournalSlice } from '@/types/schema'
+import { AmountRange, DateView, DateViewSymbol, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
-export enum JournalEditorDateViewSymbol {
-	WEEKLY = 'w',
-	MONTHLY = 'm',
-	YEARLY = 'y',
-	RANGE = 'r',
-}
-
 export type JournalEditorState = { dateView: DateView } & {
 	onChangeDateView: (dateView: DateView) => void
-	switchDateView: (view: JournalEditorDateViewSymbol) => void
+	switchDateView: (view: DateViewSymbol) => void
 }
 
 type JournalSliceContext = JournalEditorState & JournalSlice & {
