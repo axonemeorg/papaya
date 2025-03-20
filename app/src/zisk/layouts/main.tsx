@@ -3,9 +3,7 @@ import AppMenu from '@/components/nav/menu/AppMenu'
 import { Stack, useMediaQuery, useTheme } from '@mui/material'
 import { PropsWithChildren } from 'react'
 
-const MainLayout = (props: PropsWithChildren) => {
-	const { children } = props
-
+export default function MainLayout(props: PropsWithChildren) {
 	const theme = useTheme()
 	const usingMobileMenu = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -20,13 +18,9 @@ const MainLayout = (props: PropsWithChildren) => {
 					sx={() => ({
 						flex: 1,
 					})}>
-					{children}
+					{props.children}
 				</Stack>
 			</Stack>
 		</Stack>
 	)
-}
-
-export const getLayout = (page: any) => {
-	return <MainLayout>{page}</MainLayout>
 }

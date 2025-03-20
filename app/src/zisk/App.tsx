@@ -1,50 +1,11 @@
-import { ThemeProvider } from '@mui/material'
-import { CssBaseline } from '@mui/material'
-import appTheme from '@/components/theme/theme'
-import { montserrat } from '@/fonts/montserrat'
-import Head from 'next/head'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import NotificationsProvider from '@/providers/NotificationsProvider'
 
 
-import JournalContextProvider from '@/providers/JournalContextProvider'
-import ZiskContextProvider from '@/providers/ZiskContextProvider'
-import RemoteContextProvider from '@/providers/RemoteContextProvider'
-import CalculatorContextProvider from '@/providers/CalculatorContextProvider'
-
-const queryClient = new QueryClient()
-
-function MyApp(props: any) {
-	const { Component } = props
-	const { session, ...rest } = props.pageProps
-
-	// Use the layout defined at the page level, if available
-	const getLayout = Component.getLayout ?? ((page: any) => page)
+export default function App() {
 
 	return (
 		<>
-			<Head>
-				<title>Zisk</title>
-			</Head>
 
-			<ThemeProvider theme={appTheme}>
-				<CssBaseline />
-				<main id="root" className={montserrat.className}>
-					<NotificationsProvider>
-						<QueryClientProvider client={queryClient}>
-							<ZiskContextProvider>
-								<RemoteContextProvider>
-									<JournalContextProvider>
-										<CalculatorContextProvider>
-											{getLayout(<Component {...rest} />)}
-										</CalculatorContextProvider>
-									</JournalContextProvider>
-								</RemoteContextProvider>
-							</ZiskContextProvider>
-						</QueryClientProvider>
-					</NotificationsProvider>
-				</main>
-			</ThemeProvider>
+			
 		</>
 	)
 }

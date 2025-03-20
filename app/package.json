@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "routes": "tsr generate",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@tanstack/react-router-devtools": "^1.114.25",
+    "@tanstack/router-cli": "^1.114.25",
     "@tanstack/router-plugin": "^1.114.25",
     "@types/file-saver": "^2.0.7",
     "@types/jsonwebtoken": "^9.0.9",

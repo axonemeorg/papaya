@@ -1,6 +1,6 @@
 import ManageAccounts from '@/components/journal/accounts/ManageAccounts'
-import { getLayout } from '@/layouts/main'
 import { Container } from '@mui/material'
+import { createFileRoute } from '@tanstack/react-router'
 
 const AccountsPage = () => {
 	return (
@@ -10,6 +10,7 @@ const AccountsPage = () => {
 	)
 }
 
-AccountsPage.getLayout = getLayout
+export const Route = createFileRoute('/_mainLayout/accounts')({
+	component: AccountsPage,
+})
 
-export default AccountsPage
