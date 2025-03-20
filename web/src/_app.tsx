@@ -10,6 +10,7 @@ import NotificationsProvider from '@/providers/NotificationsProvider'
 import JournalContextProvider from '@/providers/JournalContextProvider'
 import ZiskContextProvider from '@/providers/ZiskContextProvider'
 import RemoteContextProvider from '@/providers/RemoteContextProvider'
+import CalculatorContextProvider from '@/providers/CalculatorContextProvider'
 
 const queryClient = new QueryClient()
 
@@ -34,7 +35,9 @@ function MyApp(props: any) {
 							<ZiskContextProvider>
 								<RemoteContextProvider>
 									<JournalContextProvider>
-										{getLayout(<Component {...rest} />)}
+										<CalculatorContextProvider>
+											{getLayout(<Component {...rest} />)}
+										</CalculatorContextProvider>
 									</JournalContextProvider>
 								</RemoteContextProvider>
 							</ZiskContextProvider>
