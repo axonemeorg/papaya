@@ -13,4 +13,3 @@ const AccountsPage = () => {
 export const Route = createFileRoute('/_mainLayout/accounts')({
 	component: AccountsPage,
 })
-

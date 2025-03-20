@@ -1,5 +1,3 @@
-'use client'
-
 import { Save } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
 import CategoryForm from '../form/CategoryForm'

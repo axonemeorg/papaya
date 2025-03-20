@@ -1,5 +1,3 @@
-'use client'
-
 import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
 import { Close, Done } from "@mui/icons-material";
 

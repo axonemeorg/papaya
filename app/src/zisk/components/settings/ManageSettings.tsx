@@ -5,33 +5,35 @@ import {
 	Tabs,
 	Tab,
 } from '@mui/material'
-import Link from 'next/link'
-import { useMemo } from 'react'
-import { useRouter } from 'next/router'
 import JournalSettings from './JournalSettings'
 import SyncingSettings from './SyncingSettings'
+import { Link, useRouter } from '@tanstack/react-router'
+import { useParams } from '@tanstack/react-router';
 
-const SETTINGS_TABS = {
-	'syncing': {
-		label: 'Syncing & Account',
+export const SETTINGS_TABS = {
+	syncing: {
+	  label: "Syncing & Account",
+	  component: <SyncingSettings />,
 	},
-	'appearance': {
-		label: 'Appearance & Behavior',
+	appearance: {
+	  label: "Appearance & Behavior",
+	  component: <Typography>Appearance Settings</Typography>,
 	},
-	'journal': {
-		label: 'Journal'
+	journal: {
+	  label: "Journal",
+	  component: <JournalSettings />,
 	},
-}
+};
 
 const DEFAULT_TAB = Object.keys(SETTINGS_TABS)[0]
 
 export default function ManageSettings() {
-	const router = useRouter()
-	const [tab] = (router.query['page'] as string) ?? DEFAULT_TAB
+	const router = useRouter();
 
-	const tabIndex = useMemo(() => {
-		return Object.keys(SETTINGS_TABS).indexOf(tab)
-	}, [tab])
+	const section = useParams({ strict: false }).section ?? ''
+
+	const tabKeys = Object.keys(SETTINGS_TABS);
+	const tabIndex = tabKeys.indexOf(section);
 
 	return (
 		<>
@@ -39,11 +41,10 @@ export default function ManageSettings() {
 				<Typography variant='h4'>Settings</Typography>
 				<Tabs value={tabIndex} sx={{ mx: -1 }}>
 					{Object.entries(SETTINGS_TABS).map(([key, tab]) => {
-						const href = `/settings/${key}`
 						return (
 							<Tab
 								component={Link}
-								href={href}
+								to={{ pathname: "/settings/$section", params: { section: key } } as unknown as string}
 								key={key}
 								label={tab.label}
 								sx={{
@@ -56,14 +57,7 @@ export default function ManageSettings() {
 			</Stack>
 
 			<Paper sx={(theme) => ({ p: 3, borderRadius: theme.spacing(1), mb: 5 })}>
-				<>
-					{tab === 'syncing' && (
-						<SyncingSettings />
-					)}
-					{tab === 'journal' && (
-						<JournalSettings />
-					)}
-				</>
+				{SETTINGS_TABS[section]?.component}
 			</Paper>
 		</>
 	)

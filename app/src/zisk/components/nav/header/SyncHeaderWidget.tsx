@@ -1,5 +1,3 @@
-'use client'
-
 import SyncIcon from '@/components/icon/SyncIcon'
 import SyncWidget from '@/components/widget/SyncWidget'
 import { RemoteContext, SyncStatusEnum } from '@/contexts/RemoteContext'

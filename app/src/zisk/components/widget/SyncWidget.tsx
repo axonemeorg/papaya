@@ -1,5 +1,3 @@
-'use client'
-
 import { RemoteContext, SyncStatusEnum } from '@/contexts/RemoteContext'
 import {
     Box,
@@ -13,7 +11,7 @@ import { useContext, useMemo } from 'react'
 import SyncIcon from '../icon/SyncIcon'
 import { getSyncStatusTitles } from '@/utils/string'
 
-const ENABLE_SYNC_DEBUGGING = process.env.NEXT_PUBLIC_SYNC_DEBUGGING === 'true'
+const ENABLE_SYNC_DEBUGGING = false
 
 export default function SyncWidget() {
 	const remoteContext = useContext(RemoteContext)

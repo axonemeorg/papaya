@@ -1,6 +1,4 @@
-'use client'
-
-import { montserrat } from '@/fonts/montserrat'
+// import { montserrat } from '@/fonts/montserrat'
 import { createTheme } from '@mui/material'
 
 /**
@@ -39,7 +37,7 @@ const appTheme = createTheme({
 	//     }
 	// },
 	typography: {
-		fontFamily: montserrat.style.fontFamily,
+		fontFamily: `'Montserrat', sans-serif`,
 	},
 	components: {
 		MuiBreadcrumbs: {

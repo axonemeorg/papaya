@@ -1,5 +1,3 @@
-'use client'
-
 import { Menu as MenuIcon } from '@mui/icons-material'
 import { Avatar, Badge, Box, Button, Menu, MenuItem, Typography } from '@mui/material'
 import { useState } from 'react'

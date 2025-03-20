@@ -1,6 +1,6 @@
 import ManageCategories from '@/components/journal/categories/ManageCategories'
-import { getLayout } from '@/layouts/main'
 import { Container } from '@mui/material'
+import { createFileRoute } from '@tanstack/react-router'
 
 const CategoriesPage = () => {
 	return (
@@ -10,6 +10,6 @@ const CategoriesPage = () => {
 	)
 }
 
-CategoriesPage.getLayout = getLayout
-
-export default CategoriesPage
+export const Route = createFileRoute('/_mainLayout/categories')({
+	component: CategoriesPage,
+})

@@ -11,18 +11,19 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@/': `${path.resolve(__dirname, 'src')}/`
+      '@/': `${path.resolve(__dirname, 'src/zisk')}/`
     }
   },
-  build: {
-    rollupOptions: {
-      input: {
-        app: './src/web/index.html',
-      },
-    },
-  },
+  // root: path.resolve('./src/web'),
+  // build: {
+  //   rollupOptions: {
+  //     input: {
+  //       app: './src/web/index.html',
+  //     },
+  //   },
+  // },
   server: {
-    port: 9475,
+    port: 9476,
     host: '127.0.0.1'
   }
 })

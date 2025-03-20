@@ -93,8 +93,7 @@ export default function AppMenu(props: AppMenuProps) {
 	const openMenu = useAppMenuStateStore((state) => state.expand)
 	const closeDrawer = useAppMenuStateStore((state) => state.closeDrawer)
 
-	const router = useRouter()
-	const pathname = router.pathname
+	const pathname = ''
 
 	useEffect(() => {
 		const openState = localStorage.getItem(LOCAL_STORAGE_KEY)

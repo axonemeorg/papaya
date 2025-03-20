@@ -7,8 +7,8 @@ import { getServerDatabaseUrl } from "@/utils/server";
 import { usernameToDbName } from "@/utils/database";
 import { getDatabaseClient } from "@/database/client";
 
-const ZISK_CLOUD_HOST = process.env.NEXT_PUBLIC_ZISK_CLOUD_HOST
-const ENABLE_ZISK_CLOUD = process.env.NEXT_PUBLIC_F_ENABLE_ZISK_CLOUD === 'true'
+const ZISK_CLOUD_HOST = '' // process.env.NEXT_PUBLIC_ZISK_CLOUD_HOST
+const ENABLE_ZISK_CLOUD = false // process.env.NEXT_PUBLIC_F_ENABLE_ZISK_CLOUD === 'true'
 
 interface UserContext {
     name: string | null

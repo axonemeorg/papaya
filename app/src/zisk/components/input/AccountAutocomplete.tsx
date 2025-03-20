@@ -1,5 +1,3 @@
-'use client'
-
 import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, TextField } from '@mui/material'
 
 import { useContext } from 'react'

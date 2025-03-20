@@ -1,5 +1,3 @@
-'use client'
-
 import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import AppLogo from './AppLogo'
 import { Menu, MenuOpen, Settings } from '@mui/icons-material'

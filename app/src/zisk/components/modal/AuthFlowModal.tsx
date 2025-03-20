@@ -1,5 +1,3 @@
-'use client'
-
 import { PropsWithChildren } from 'react'
 
 import { alpha, Box, Container, IconButton, Paper, Stack, Typography } from '@mui/material'

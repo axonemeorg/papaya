@@ -1,5 +1,3 @@
-'use client'
-
 import { Close, Delete, Edit, MoreVert } from '@mui/icons-material'
 import { Box, ClickAwayListener, Fade, IconButton, Paper, Popper, Stack, Typography } from '@mui/material'
 import AvatarIcon from '@/components/icon/AvatarIcon'

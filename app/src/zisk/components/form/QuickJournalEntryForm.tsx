@@ -1,5 +1,3 @@
-'use client'
-
 import { Grid2 as Grid, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 import { CreateQuickJournalEntry } from '@/types/schema'

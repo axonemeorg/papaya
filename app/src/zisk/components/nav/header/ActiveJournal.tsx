@@ -1,5 +1,3 @@
-'use client'
-
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import { UnfoldMore } from '@mui/icons-material'

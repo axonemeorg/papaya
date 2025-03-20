@@ -1,5 +1,3 @@
-'use client'
-
 import { FormControl, MenuItem, Paper, Select, Tooltip } from '@mui/material'
 import * as _muiColors from '@mui/material/colors'
 

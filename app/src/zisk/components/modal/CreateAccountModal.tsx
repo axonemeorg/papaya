@@ -1,5 +1,3 @@
-'use client'
-
 import { Add } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
 import AccountForm from '../form/AccountForm'

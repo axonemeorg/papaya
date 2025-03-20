@@ -1,5 +1,3 @@
-'use client'
-
 import { Avatar, AvatarVariant } from '@/types/schema'
 import { createImageAvatar, getPaletteColors } from '@/utils/image'
 import { AddPhotoAlternate, RemoveCircle } from '@mui/icons-material'

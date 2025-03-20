@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Box, Button, ButtonProps, Grow, Paper, Stack, TextareaAutosize } from "@mui/material";

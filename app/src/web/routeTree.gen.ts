@@ -13,8 +13,10 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as MainLayoutIndexImport } from './routes/_mainLayout/index'
+import { Route as MainLayoutImport } from './routes/_mainLayout'
+import { Route as MainLayoutCategoriesImport } from './routes/_mainLayout/categories'
 import { Route as MainLayoutAccountsImport } from './routes/_mainLayout/accounts'
+import { Route as MainLayoutSettingsSectionImport } from './routes/_mainLayout/settings.$section'
 
 // Create Virtual Routes
 
@@ -22,22 +24,33 @@ const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
 
+const MainLayoutRoute = MainLayoutImport.update({
+  id: '/_mainLayout',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
-const MainLayoutIndexRoute = MainLayoutIndexImport.update({
-  id: '/_mainLayout/',
-  path: '/',
-  getParentRoute: () => rootRoute,
+const MainLayoutCategoriesRoute = MainLayoutCategoriesImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => MainLayoutRoute,
 } as any)
 
 const MainLayoutAccountsRoute = MainLayoutAccountsImport.update({
-  id: '/_mainLayout/accounts',
+  id: '/accounts',
   path: '/accounts',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => MainLayoutRoute,
+} as any)
+
+const MainLayoutSettingsSectionRoute = MainLayoutSettingsSectionImport.update({
+  id: '/settings/$section',
+  path: '/settings/$section',
+  getParentRoute: () => MainLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -51,61 +64,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/_mainLayout': {
+      id: '/_mainLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MainLayoutImport
+      parentRoute: typeof rootRoute
+    }
     '/_mainLayout/accounts': {
       id: '/_mainLayout/accounts'
       path: '/accounts'
       fullPath: '/accounts'
       preLoaderRoute: typeof MainLayoutAccountsImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof MainLayoutImport
     }
-    '/_mainLayout/': {
-      id: '/_mainLayout/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof MainLayoutIndexImport
-      parentRoute: typeof rootRoute
+    '/_mainLayout/categories': {
+      id: '/_mainLayout/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof MainLayoutCategoriesImport
+      parentRoute: typeof MainLayoutImport
+    }
+    '/_mainLayout/settings/$section': {
+      id: '/_mainLayout/settings/$section'
+      path: '/settings/$section'
+      fullPath: '/settings/$section'
+      preLoaderRoute: typeof MainLayoutSettingsSectionImport
+      parentRoute: typeof MainLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface MainLayoutRouteChildren {
+  MainLayoutAccountsRoute: typeof MainLayoutAccountsRoute
+  MainLayoutCategoriesRoute: typeof MainLayoutCategoriesRoute
+  MainLayoutSettingsSectionRoute: typeof MainLayoutSettingsSectionRoute
+}
+
+const MainLayoutRouteChildren: MainLayoutRouteChildren = {
+  MainLayoutAccountsRoute: MainLayoutAccountsRoute,
+  MainLayoutCategoriesRoute: MainLayoutCategoriesRoute,
+  MainLayoutSettingsSectionRoute: MainLayoutSettingsSectionRoute,
+}
+
+const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
+  MainLayoutRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
-  '/': typeof MainLayoutIndexRoute
+  '/': typeof IndexLazyRoute
+  '': typeof MainLayoutRouteWithChildren
   '/accounts': typeof MainLayoutAccountsRoute
+  '/categories': typeof MainLayoutCategoriesRoute
+  '/settings/$section': typeof MainLayoutSettingsSectionRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof MainLayoutIndexRoute
+  '/': typeof IndexLazyRoute
+  '': typeof MainLayoutRouteWithChildren
   '/accounts': typeof MainLayoutAccountsRoute
+  '/categories': typeof MainLayoutCategoriesRoute
+  '/settings/$section': typeof MainLayoutSettingsSectionRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/_mainLayout': typeof MainLayoutRouteWithChildren
   '/_mainLayout/accounts': typeof MainLayoutAccountsRoute
-  '/_mainLayout/': typeof MainLayoutIndexRoute
+  '/_mainLayout/categories': typeof MainLayoutCategoriesRoute
+  '/_mainLayout/settings/$section': typeof MainLayoutSettingsSectionRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/accounts'
+  fullPaths: '/' | '' | '/accounts' | '/categories' | '/settings/$section'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/accounts'
-  id: '__root__' | '/' | '/_mainLayout/accounts' | '/_mainLayout/'
+  to: '/' | '' | '/accounts' | '/categories' | '/settings/$section'
+  id:
+    | '__root__'
+    | '/'
+    | '/_mainLayout'
+    | '/_mainLayout/accounts'
+    | '/_mainLayout/categories'
+    | '/_mainLayout/settings/$section'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
-  MainLayoutAccountsRoute: typeof MainLayoutAccountsRoute
-  MainLayoutIndexRoute: typeof MainLayoutIndexRoute
+  MainLayoutRoute: typeof MainLayoutRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
-  MainLayoutAccountsRoute: MainLayoutAccountsRoute,
-  MainLayoutIndexRoute: MainLayoutIndexRoute,
+  MainLayoutRoute: MainLayoutRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -119,18 +174,31 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_mainLayout/accounts",
-        "/_mainLayout/"
+        "/_mainLayout"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/_mainLayout/accounts": {
-      "filePath": "_mainLayout/accounts.tsx"
+    "/_mainLayout": {
+      "filePath": "_mainLayout.tsx",
+      "children": [
+        "/_mainLayout/accounts",
+        "/_mainLayout/categories",
+        "/_mainLayout/settings/$section"
+      ]
     },
-    "/_mainLayout/": {
-      "filePath": "_mainLayout/index.tsx"
+    "/_mainLayout/accounts": {
+      "filePath": "_mainLayout/accounts.tsx",
+      "parent": "/_mainLayout"
+    },
+    "/_mainLayout/categories": {
+      "filePath": "_mainLayout/categories.tsx",
+      "parent": "/_mainLayout"
+    },
+    "/_mainLayout/settings/$section": {
+      "filePath": "_mainLayout/settings.$section.tsx",
+      "parent": "/_mainLayout"
     }
   }
 }

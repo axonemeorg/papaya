@@ -1,5 +1,3 @@
-'use client'
-
 import { Box, FormHelperText, Stack, TextField } from '@mui/material'
 import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'

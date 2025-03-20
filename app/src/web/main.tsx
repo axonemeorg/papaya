@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 // Imports styles
-// import '../zisk/styles/main.scss'
+import '/src/zisk/assets/styles/App.css'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
