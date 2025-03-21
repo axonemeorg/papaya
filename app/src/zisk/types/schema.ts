@@ -62,7 +62,6 @@ const amountValidationPattern = /[-+]?\d{1,3}(,\d{3})*(\.\d+)?/;
 const AmountRecord = z.object({
 	amount: z.string()
 		.regex(amountValidationPattern, 'A valid amount is required'),
-	parsedAmount: z.number().optional(),
 })
 
 export type AmountRecord = z.output<typeof AmountRecord>
@@ -228,6 +227,7 @@ export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
+		parsedNetAmount: z.number().optional(),
 	})
 )
 
@@ -344,8 +344,8 @@ export enum DateViewSymbol {
 }
 
 export const AmountRange = z.object({
-	minimum: z.string().optional(),
-	maximum: z.string().optional(),
+	gt: z.string().optional(),
+	lt: z.string().optional(),
 	absolute: z.boolean().optional(),
 })
 

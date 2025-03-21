@@ -65,7 +65,6 @@ const journalFilterSlots: Record<JournalFilterSlot, JournalFilterSlotProperties>
 }
 
 const NON_IMPELEMENTED_FILTERS: Set<JournalFilterSlot> = new Set([
-    JournalFilterSlot.AMOUNT,
     JournalFilterSlot.ATTACHMENTS,
     JournalFilterSlot.DATE_RANGE,
     JournalFilterSlot.TAGS,
