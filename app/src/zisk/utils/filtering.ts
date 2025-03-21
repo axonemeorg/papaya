@@ -45,7 +45,9 @@ export const transformAmountRange = (amountRange: AmountRange): { greaterThan: n
         } else {
             // "Less than $X" where X is an income
             lessThan.push(lt)
-            greaterThan.push(0)
+            if (!greaterThan.length) {
+                greaterThan.push(0)
+            }
         }
     }
     

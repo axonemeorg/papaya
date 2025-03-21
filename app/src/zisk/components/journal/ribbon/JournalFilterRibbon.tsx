@@ -2,10 +2,13 @@ import AvatarChip from "@/components/icon/AvatarChip"
 import { JournalContext } from "@/contexts/JournalContext"
 import { JournalSliceContext } from "@/contexts/JournalSliceContext"
 import { Category } from "@/types/schema"
-import { Add } from "@mui/icons-material"
-import { Collapse, IconButton, Stack } from "@mui/material"
+import { Add, MonetizationOn, Savings } from "@mui/icons-material"
+import { Chip, Collapse, IconButton, Stack, Typography } from "@mui/material"
 import { useContext, useRef, useState } from "react"
 import JournalFilterPicker from "./JournalFilterPicker"
+import { getPriceString } from "@/utils/string"
+import { parseJournalEntryAmount } from "@/utils/journal"
+import { useGetPriceStyle } from "@/hooks/useGetPriceStyle"
 
 
 export default function JournalFilterRibbon() {
@@ -13,6 +16,8 @@ export default function JournalFilterRibbon() {
     const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
     const journalSliceContext = useContext(JournalSliceContext)
+
+    const getPriceStyle = useGetPriceStyle()
 
     const numFilters: number = journalSliceContext.getActiveFilterSet().size
 
@@ -31,6 +36,18 @@ export default function JournalFilterRibbon() {
 
         journalSliceContext.onChangeCategoryIds(newCategoryIds.length > 0 ? newCategoryIds : undefined)
     }
+
+    const handleRemoveMinimumAmount = () => {
+        journalSliceContext.onChangeAmountRange({ ...journalSliceContext.amount, gt: undefined })
+    }
+
+    const handleRemoveMaximumAmount = () => {
+        journalSliceContext.onChangeAmountRange({ ...journalSliceContext.amount, lt: undefined })
+    }
+
+    const amountRange = journalSliceContext.amount
+    const parsedMinimumAmount = amountRange && amountRange.gt ? parseJournalEntryAmount(amountRange.gt) : undefined
+    const parsedMaximumAmount = amountRange && amountRange.lt ? parseJournalEntryAmount(amountRange.lt) : undefined
 
     return (
         <>
@@ -53,6 +70,43 @@ export default function JournalFilterRibbon() {
                             />
                         )
                     })}
+                    {parsedMinimumAmount !== undefined && (
+                        <Chip
+                            icon={parsedMinimumAmount > 0 ? <Savings fontSize="small" /> : <MonetizationOn fontSize="small" />}
+                            label={
+                                <Typography variant="inherit">
+                                    More than&nbsp;
+                                    <Typography
+                                        variant="inherit"
+                                        component='span'
+                                        sx={{ ...getPriceStyle(parsedMinimumAmount), fontWeight: '600' }}
+                                    >
+                                        {getPriceString(parsedMinimumAmount)}
+                                    </Typography>
+                                </Typography>
+                            }
+                            onDelete={() => handleRemoveMinimumAmount()}
+                        />
+                    )}
+                    {parsedMaximumAmount !== undefined && (
+                        <Chip
+                            icon={parsedMaximumAmount > 0 ? <Savings fontSize="small" /> : <MonetizationOn fontSize="small" />}
+                            label={
+                                <Typography variant="inherit">
+                                    Less than&nbsp;
+                                    <Typography
+                                        variant="inherit"
+                                        component='span'
+                                        sx={{ ...getPriceStyle(parsedMaximumAmount), fontWeight: '600' }}
+                                    >
+                                        {getPriceString(parsedMaximumAmount)}
+                                    </Typography>
+                                </Typography>
+                            }
+                            onDelete={() => handleRemoveMaximumAmount()}
+                        />
+                    )}
+
                     <IconButton size='small' ref={filtersMenuButtonRef} onClick={() => setShowFiltersMenu((showing) => !showing)}>
                         <Add fontSize="small" sx={(theme) => ({ color: theme.palette.text.secondary })}/>
                     </IconButton>

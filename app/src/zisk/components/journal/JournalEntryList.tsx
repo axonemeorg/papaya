@@ -206,7 +206,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const journalSliceContext = useContext(JournalSliceContext)
 	const getPriceStyle = useGetPriceStyle()
 
-
 	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
