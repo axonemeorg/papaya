@@ -116,48 +116,50 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
                     }
                 }}
             >
-                {activeSlot ? <>
-                    <Stack
-                        component='header'
-                        direction='row'
-                        alignItems='center'
-                        justifyContent='space-between'
-                        gap={2}
-                        sx={{ px: 2, mt: -0.5 }}
-                    >
-                        <Typography variant='caption' sx={{ textTransform: 'unset', mb: -1 }}>
-                            {journalFilterSlots[activeSlot].title}
-                        </Typography>
-                        <IconButton size='small' sx={{ mr: -1 }} onClick={() => handleRemoveActiveSlotFilters()}>
-                            <Delete fontSize="small" />
-                        </IconButton>
-                    </Stack>
-                    <Box sx={{ px: 2, py: 1, pt: 2 }}>
-                        {journalFilterSlots[activeSlot].component}
-                    </Box>
-                </> : <>
-                    <TextField
-                        size='small'
-                        placeholder="Filter by..."
-                        disabled
-                        autoFocus
-                        sx={{ m: 1, mt: 0 }}
-                    />
-                    {Object.entries(journalFilterSlots).map(([key, properties]) => {
-                        const disabled = NON_IMPELEMENTED_FILTERS.has(key as JournalFilterSlot)
-                        return (
-                            <MenuItem
-                                key={key}
-                                disabled={disabled}
-                                onClick={disabled ? undefined : () => handleClickSlotButton(key as JournalFilterSlot)}
-                                dense
-                            >
-                                <ListItemIcon sx={(theme) => ({ color: theme.palette.text.secondary })}>{properties.icon}</ListItemIcon>
-                                <ListItemText>{properties.label}</ListItemText>
-                            </MenuItem>
-                        )
-                    })}
-                </>}
+                <Box>
+                    {activeSlot ? <>
+                        <Stack
+                            component='header'
+                            direction='row'
+                            alignItems='center'
+                            justifyContent='space-between'
+                            gap={2}
+                            sx={{ px: 2, mt: -0.5 }}
+                        >
+                            <Typography variant='caption' sx={{ textTransform: 'unset', mb: -1 }}>
+                                {journalFilterSlots[activeSlot].title}
+                            </Typography>
+                            <IconButton size='small' sx={{ mr: -1 }} onClick={() => handleRemoveActiveSlotFilters()}>
+                                <Delete fontSize="small" />
+                            </IconButton>
+                        </Stack>
+                        <Box sx={{ px: 2, py: 1, pt: 2 }}>
+                            {journalFilterSlots[activeSlot].component}
+                        </Box>
+                    </> : <>
+                        <TextField
+                            size='small'
+                            placeholder="Filter by..."
+                            disabled
+                            autoFocus
+                            sx={{ m: 1, mt: 0 }}
+                        />
+                        {Object.entries(journalFilterSlots).map(([key, properties]) => {
+                            const disabled = NON_IMPELEMENTED_FILTERS.has(key as JournalFilterSlot)
+                            return (
+                                <MenuItem
+                                    key={key}
+                                    disabled={disabled}
+                                    onClick={disabled ? undefined : () => handleClickSlotButton(key as JournalFilterSlot)}
+                                    dense
+                                >
+                                    <ListItemIcon sx={(theme) => ({ color: theme.palette.text.secondary })}>{properties.icon}</ListItemIcon>
+                                    <ListItemText>{properties.label}</ListItemText>
+                                </MenuItem>
+                            )
+                        })}
+                    </>}
+                </Box>
             </Menu>
         </>
     )
