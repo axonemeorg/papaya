@@ -18,6 +18,7 @@ import { getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
+import { MigrationEngine } from './migrate'
 
 const db = getDatabaseClient()
 
@@ -141,7 +142,7 @@ export const createJournal = async (journal: CreateJournalMeta): Promise<Journal
 	const newJournal: JournalMeta = {
 		...journal,
 		type: 'JOURNAL',
-		journalVersion: 1,
+		journalVersion: MigrationEngine.latestVersion,
 		_id: generateJournalId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
