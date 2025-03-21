@@ -1,5 +1,5 @@
 import { JournalMeta, JournalVersion, ZiskDocument } from "@/types/schema";
-import { parseJournalEntryAmount } from "@/utils/journal";
+import { calculateNetAmount } from "@/utils/journal";
 import { Migration, MigrationRun } from "@/database/migrate";
 
 export default class AddParseAmountToEntries implements Migration {
@@ -10,12 +10,12 @@ export default class AddParseAmountToEntries implements Migration {
             if (record.type === 'JOURNAL') {
                 return [record, ...acc]
             }
-            if (record.type === 'CHILD_JOURNAL_ENTRY' || record.type === 'JOURNAL_ENTRY') {
-                let parsedAmount: number | undefined = undefined
+            if (record.type === 'JOURNAL_ENTRY') {
+                let parsedNetAmount: number | undefined = undefined
                 if (record.amount) {
-                    parsedAmount = parseJournalEntryAmount(record.amount)
+                    parsedNetAmount = calculateNetAmount(record)
                 }
-                record.parsedAmount = parsedAmount
+                record.parsedNetAmount = parsedNetAmount
             }
             acc.push(record)
             return acc
