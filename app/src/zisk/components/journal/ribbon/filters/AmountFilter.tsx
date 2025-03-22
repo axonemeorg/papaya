@@ -1,13 +1,13 @@
 import AmountField from "@/components/input/AmountField";
 import { JournalSliceContext } from "@/contexts/JournalSliceContext";
 import { AmountRange } from "@/types/schema";
-import { Stack, Table, TableBody, TableCell, TableRow, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { useContext } from "react";
 
 export const DEFAULT_AMOUNT_RANGE: AmountRange = {
-    absolute: true,
-    minimum: '',
-    maximum: '',
+    // absolute: true,
+    gt: '',
+    lt: '',
 }
 
 export default function AmountFilter() {
@@ -42,12 +42,12 @@ export default function AmountFilter() {
                             <AmountField
                                 size='small'
                                 fullWidth={false}
-                                disableSignChange
-                                value={amountRange?.minimum ?? ''}
+                                disableSignChange={false}
+                                value={amountRange?.gt ?? ''}
                                 onChange={(event) => {
                                     journalSliceContext.onChangeAmountRange({
                                         ...amountRange,
-                                        minimum: event.target.value,
+                                        gt: event.target.value,
                                     })
                                 }}
                                 label={undefined}
@@ -65,12 +65,12 @@ export default function AmountFilter() {
                             <AmountField
                                 size='small'
                                 fullWidth={false}
-                                disableSignChange
-                                value={amountRange?.maximum ?? ''}
+                                disableSignChange={false}
+                                value={amountRange?.lt ?? ''}
                                 onChange={(event) => {
                                     journalSliceContext.onChangeAmountRange({
                                         ...amountRange,
-                                        maximum: event.target.value,
+                                        lt: event.target.value,
                                     })
                                 }}
                                 label={undefined}
@@ -80,7 +80,7 @@ export default function AmountFilter() {
                     </TableRow>
                 </TableBody>
             </Table>
-            <ToggleButtonGroup
+            {/* <ToggleButtonGroup
                 exclusive
                 value={amountRange.absolute ? 'ABSOLUTE' : 'SIGNED'}
                 onChange={(_event, newValue: 'ABSOLUTE' | 'SIGNED') => {
@@ -96,7 +96,7 @@ export default function AmountFilter() {
                 <ToggleButton value={'SIGNED'}>
                     Signed
                 </ToggleButton>
-            </ToggleButtonGroup>
+            </ToggleButtonGroup> */}
         </Stack>
     )
 }

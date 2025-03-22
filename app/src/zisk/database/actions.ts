@@ -18,6 +18,7 @@ import { getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
+import { calculateNetAmount } from '@/utils/journal'
 import { MigrationEngine } from './migrate'
 
 const db = getDatabaseClient()
@@ -27,6 +28,7 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 
 	const newJournalEntry: JournalEntry = {
 		...formData,
+		parsedNetAmount: calculateNetAmount(formData),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
 	}
@@ -45,6 +47,7 @@ export const updateJournalEntry = async (formData: JournalEntry) => {
 		{
 			...existingRecord,
 			...formData,
+			parsedNetAmount: calculateNetAmount(formData),
 			updatedAt: now,
 		},
 	]

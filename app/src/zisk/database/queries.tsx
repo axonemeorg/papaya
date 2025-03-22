@@ -1,5 +1,6 @@
 import {
 	Account,
+	AmountRange,
 	Category,
 	EntryArtifact,
 	EntryTag,
@@ -11,6 +12,8 @@ import {
 import { getDatabaseClient } from './client'
 import { makeDefaultZiskMeta } from '@/utils/database'
 import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
+import { enumerateFilters, transformAmountRange } from '@/utils/filtering'
+import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
 
 const db = getDatabaseClient()
 
@@ -64,11 +67,24 @@ export const getJournalEntries = async (
 		});
 	}
 
+	const filters = enumerateFilters(journalSlice)
+
 	// Categories
-	if (journalSlice.categoryIds) {
+	if (filters.has(JournalFilterSlot.CATEGORIES)) {
 		selectorClauses.push({
 			categoryIds: {
 				$in: journalSlice.categoryIds
+			}
+		})
+	}
+
+	// Amount range
+	if (filters.has(JournalFilterSlot.AMOUNT)) {
+		const { greaterThan, lessThan } = transformAmountRange(journalSlice.amount as AmountRange)
+		selectorClauses.push({
+			parsedNetAmount: {
+				$gt: greaterThan,
+				$lt: lessThan,
 			}
 		})
 	}

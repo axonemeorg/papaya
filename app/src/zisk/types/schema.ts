@@ -344,8 +344,8 @@ export enum DateViewSymbol {
 }
 
 export const AmountRange = z.object({
-	minimum: z.string().optional(),
-	maximum: z.string().optional(),
+	gt: z.string().optional(),
+	lt: z.string().optional(),
 	absolute: z.boolean().optional(),
 })
 

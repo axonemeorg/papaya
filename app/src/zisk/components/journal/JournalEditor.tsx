@@ -8,6 +8,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
+import { getDatabaseClient } from '@/database/client'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
@@ -101,10 +102,10 @@ export default function JournalEditor() {
 
 	// show all docs
 	useEffect(() => {
-		// const db = getDatabaseClient()
-	    // db.allDocs({ include_docs: true }).then((result) => {
-	    //     console.log('all docs', result);
-	    // })
+		const db = getDatabaseClient()
+	    db.allDocs({ include_docs: true }).then((result) => {
+	        console.log('all docs', result);
+	    })
 	}, []);
 
 	return (
