@@ -17,7 +17,7 @@ import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPick
 
 const db = getDatabaseClient()
 
-const ARBITRARY_MAX_FIND_LIMIT = 10000 as const;
+export const ARBITRARY_MAX_FIND_LIMIT = 10000 as const;
 
 export const getCategories = async (journalId: string): Promise<Record<Category['_id'], Category>> => {
 	const result = await db.find({
