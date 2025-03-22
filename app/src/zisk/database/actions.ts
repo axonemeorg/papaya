@@ -14,7 +14,7 @@ import {
 } from '@/types/schema'
 import { getDatabaseClient, initializeDatabaseClient } from './client'
 import { generateAccountId, generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
-import { getOrCreateZiskMeta } from './queries'
+import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
@@ -169,6 +169,7 @@ export const getAllJournalObjects = async (journalId: string): Promise<ZiskDocum
 		selector: {
 			journalId,
 		},
+		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 	return result.docs as ZiskDocument[]
 }
