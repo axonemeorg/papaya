@@ -5,8 +5,9 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { ZiskContext } from '@/contexts/ZiskContext'
-import { updateActiveJournal, createJournalEntry } from '@/database/actions'
+import { updateActiveJournal, createJournalEntry, getAllJournalObjects } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
+import { MigrationEngine } from '@/database/migrate'
 import { getAccounts, getCategories, getEntryTags, getJournals } from '@/database/queries'
 import { Account, Category, EntryTag, JournalEntry, JournalMeta } from '@/types/schema'
 import { makeJournalEntry } from '@/utils/journal'
@@ -111,12 +112,31 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		setShowSelectJournalModal(true)
 	}
 
-	const handleSelectJournal = (journal: JournalMeta) => {
-		setActiveJournal((prev) => {
-			if (prev) {
-				snackbar({ message: `Switched to ${journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}` })
-			}
+	const migrateJournal = async (journal: JournalMeta): Promise<JournalMeta> => {
+		if (!MigrationEngine.shouldMigrate(journal)) {
+			console.log(`Journal ${journal.journalName}@${journal.journalVersion} is on the latest version.`)
 			return journal
+		} else {
+			console.log('Migrating...')
+		}
+		const journalObjects = await getAllJournalObjects(journal._id)
+		const [updatedJournal, ...rest] = await MigrationEngine.migrate([journal, ...journalObjects])
+		await db.bulkDocs([updatedJournal, ...rest])
+		return updatedJournal
+	}
+
+	const loadActiveJournal = async (journal: JournalMeta): Promise<JournalMeta> => {
+		const updatedJournal = await migrateJournal(journal)
+		
+		setActiveJournal(updatedJournal)
+		return updatedJournal
+	}
+
+	const handleSelectJournal = async (journal: JournalMeta): Promise<void> => {		
+		loadActiveJournal(journal).then((updatedJournal) => {
+			if (updatedJournal) {
+				snackbar({ message: `Switched to ${updatedJournal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}` })
+			}
 		})
 	}
 	
@@ -154,7 +174,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 			if (!journal) {
 				promptSelectJournal()
 			} else {
-				setActiveJournal(journal)
+				loadActiveJournal(journal)
 			}
 		}
 	}, [ziskContext.data, getJournalsQuery.data, getJournalsQuery.isFetched])
