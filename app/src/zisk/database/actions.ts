@@ -202,6 +202,7 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 export const exportJournal = async (journalId: string) => {
 	const journal: JournalMeta = await db.get(journalId)
 	const journalObjects = await getAllJournalObjects(journalId)
+	console.log('Exporting ' + String(journalObjects.length) + ' journal object(s)...')
 
 	const zip = new JSZip()
 	zip.file('journal.json', JSON.stringify(journal))
@@ -226,6 +227,7 @@ export const importJournal = async (archive: File) => {
 
 	const journal = JSON.parse(await journalFile.async("string"));
 	const journalObjects = JSON.parse(await objectsFile.async("string"));
+	console.log('Importing ' + String(journalObjects.length) + ' journal object(s)...')
 
 	const documents = [
 		journal,
