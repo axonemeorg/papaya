@@ -61,7 +61,7 @@ const amountValidationPattern = /[-+]?\d{1,3}(,\d{3})*(\.\d+)?/;
 
 const AmountRecord = z.object({
 	amount: z.string()
-		.regex(amountValidationPattern, 'A valid amount is required')
+		.regex(amountValidationPattern, 'A valid amount is required'),
 })
 
 export type AmountRecord = z.output<typeof AmountRecord>
@@ -227,6 +227,7 @@ export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
+		parsedNetAmount: z.number().optional(),
 	})
 )
 
@@ -452,10 +453,15 @@ export const CreateJournalMeta = z.object({
 
 export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
 
+export enum JournalVersion {
+    INITIAL_VERSION = '2025-03-01',
+    '2025-03-02' = '2025-03-02',
+}
+
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	z.object({
 		type: z.literal('JOURNAL'),
-		journalVersion: z.number(),
+		journalVersion: z.nativeEnum(JournalVersion),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
 	})
@@ -467,7 +473,8 @@ export const ZiskDocument = z.union([
 	Category,
 	JournalEntry,
 	ChildJournalEntry,
-	EntryTag
+	EntryTag,
+	JournalMeta,
 ])
 
 export type ZiskDocument = z.output<typeof ZiskDocument>
