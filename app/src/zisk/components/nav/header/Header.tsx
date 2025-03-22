@@ -4,7 +4,6 @@ import { Menu, MenuOpen, Settings } from '@mui/icons-material'
 import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
 import ActiveJournal from './ActiveJournal'
 import SearchWidget from './search/SearchWidget'
-import UserWidget from './UserWidget'
 import SyncHeaderWidget from './SyncHeaderWidget'
 
 interface HeaderProps {
@@ -57,7 +56,6 @@ export default function Header(props: HeaderProps) {
 				<IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
 					<Settings />
 				</IconButton>
-				<UserWidget />
 			</Stack>
 		</Stack>
 	)

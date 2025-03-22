@@ -1,47 +1,47 @@
 import Header from '@/components/nav/header/Header'
 import AppMenu from '@/components/nav/menu/AppMenu'
 import { ZiskUserThemeContext } from '@/contexts/UserThemeContext'
-import { createTheme, Stack, ThemeOptions, ThemeProvider, useMediaQuery, useTheme } from '@mui/material'
+import { createTheme, Stack, Theme, ThemeOptions, ThemeProvider, useMediaQuery, useTheme } from '@mui/material'
 import { CSSProperties, PropsWithChildren, useContext, useMemo } from 'react'
 
 export default function MainLayout(props: PropsWithChildren) {
-	const outerTheme = useTheme()
-	const usingMobileMenu = useMediaQuery(outerTheme.breakpoints.down('sm'))
+	const globalTheme = useTheme()
+	const usingMobileMenu = useMediaQuery(globalTheme.breakpoints.down('sm'))
 
 	const view = usingMobileMenu ? 'mobile' : 'desktop'
 
 	const { activeTheme } = useContext(ZiskUserThemeContext)
 
-	const innerTheme = useMemo(() => {
+	const outerTheme = useMemo(() => {
 		if (!activeTheme) {
-			return outerTheme
+			return globalTheme
 		}
-		const theme: ThemeOptions = { ...outerTheme }
+		const theme: ThemeOptions = { ...globalTheme }
 
 		if (activeTheme.primaryColor || activeTheme.secondaryColor) {
-			theme.palette = outerTheme.palette ?? {}
+			theme.palette = globalTheme.palette ?? {}
 			if (activeTheme.primaryColor) {
 				theme.palette.primary = {
-					...outerTheme.palette.primary,
+					...globalTheme.palette.primary,
 					main: activeTheme.primaryColor
 				}
 			}
 			if (activeTheme.secondaryColor) {
 				theme.palette.secondary = {
-					...outerTheme.palette.secondary,
+					...globalTheme.palette.secondary,
 					main: activeTheme.secondaryColor
 				}
 			}
 		}
 		if (activeTheme.background) {
-			theme.components = outerTheme.components ?? {}
+			theme.components = globalTheme.components ?? {}
 			theme.components.MuiPaper = {
-				...outerTheme.components?.MuiPaper,
+				...globalTheme.components?.MuiPaper,
 				styleOverrides: {
-					...outerTheme.components?.MuiPaper?.styleOverrides,
+					...globalTheme.components?.MuiPaper?.styleOverrides,
 					root: {
-						...outerTheme.components?.MuiPaper?.styleOverrides?.root,
-						backgroundColor: "rgba(255, 255, 255, 0.5)", // Transparent white
+						...globalTheme.components?.MuiPaper?.styleOverrides?.root,
+						backgroundColor: "rgba(255, 255, 255, 0.75)", // Transparent white
           				backdropFilter: "blur(2px)", // Adds a glassmorphism effect
 					}
 				}
@@ -51,7 +51,20 @@ export default function MainLayout(props: PropsWithChildren) {
 		return createTheme(theme)
 	}, [activeTheme])
 
+	const innerTheme = useMemo(() => {
+		const theme: ThemeOptions = {
+			...outerTheme,
+			palette: {
+				// ...outerTheme.palette,
+				mode: 'light'
+			}
+		}
+
+		return createTheme(theme)
+	}, [outerTheme])
+
 	console.log('activeTheme:', activeTheme)
+	console.log('innerTheme:', innerTheme)
 
 	let mainStyle: CSSProperties = {}
 	if (activeTheme?.background && ('image' in activeTheme.background)) {
@@ -65,7 +78,7 @@ export default function MainLayout(props: PropsWithChildren) {
 	}
 
 	return (
-		<ThemeProvider theme={innerTheme}>
+		<ThemeProvider theme={outerTheme}>
 			<Stack
 				component="main"
 				sx={{
@@ -82,7 +95,10 @@ export default function MainLayout(props: PropsWithChildren) {
 							flex: 1,
 						})}
 					>
-						<ThemeProvider theme={{ ...innerTheme, palette: { ...innerTheme.palette, mode: 'light' } }}>
+						<ThemeProvider
+							// theme={{ ...outerTheme, palette: { ...outerTheme.palette, mode: 'light' } }}
+							theme={innerTheme}
+						>
 							{props.children}
 						</ThemeProvider>
 					</Stack>
