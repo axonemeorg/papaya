@@ -7,6 +7,7 @@ import {
 	JournalEntry,
 	JournalMeta,
 	JournalSlice,
+	UserTheme,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
@@ -14,6 +15,7 @@ import { makeDefaultZiskMeta } from '@/utils/database'
 import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
 import { enumerateFilters, transformAmountRange } from '@/utils/filtering'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
+import { ziskFactoryUserThemes } from '@/constants/themes'
 
 const db = getDatabaseClient()
 
@@ -45,6 +47,20 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 	})
 
 	return Object.fromEntries((result.docs as Account[]).map((account) => [account._id, account]))
+}
+
+export const getUserThemes = async (): Promise<Record<UserTheme['_id'], UserTheme>> => {
+	const result = await db.find({
+		selector: {
+			type: 'ZISK_USER_THEME',
+		},
+	})
+	const themes: UserTheme[] = [
+		...(result.docs as UserTheme[]),
+		...ziskFactoryUserThemes,
+	]
+
+	return Object.fromEntries(themes.map((theme) => [theme._id, theme]))
 }
 
 export const getJournalEntries = async (

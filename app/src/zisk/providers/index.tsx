@@ -6,7 +6,7 @@ import JournalContextProvider from '@/providers/JournalContextProvider'
 import ZiskContextProvider from '@/providers/ZiskContextProvider'
 import RemoteContextProvider from '@/providers/RemoteContextProvider'
 import CalculatorContextProvider from '@/providers/CalculatorContextProvider'
-import ZiskThemeProvider from "./ZiskThemeProvider";
+import ZiskThemeProvider from "./ZiskThemeContextProvider";
 
 interface ZiskProviders extends PropsWithChildren {
     queryClient: QueryClient

@@ -292,6 +292,18 @@ export const CreateAccount = z.object({
 
 export type CreateAccount = z.output<typeof CreateAccount>
 
+export const UserTheme = DocumentMetadata.merge(z.object({
+	type: z.literal('ZISK_USER_THEME'),
+    background: z.union([
+		z.object({ color: z.string() }),
+		z.object({ image: z.string() }),
+	]).optional(),
+    primaryColor: z.string().optional(),
+    secondaryColor: z.string().optional(),
+}))
+
+export type UserTheme = z.output<typeof UserTheme>
+
 export const Account = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
 		type: z.literal('ACCOUNT'),
@@ -462,6 +474,7 @@ export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	z.object({
 		type: z.literal('JOURNAL'),
 		journalVersion: z.nativeEnum(JournalVersion),
+		activeThemeId: z.string().optional().nullable(),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
 	})
