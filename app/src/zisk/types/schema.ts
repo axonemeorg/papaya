@@ -371,6 +371,13 @@ export const BasicAnalytics = z.object({
 	 * Absolute sum of all incurred losses
 	 */
 	sumLoss: z.number(),
+	/**
+	 * Data array for chart display
+	 */
+	chart: z.object({
+		data: z.array(z.number()),
+		labels: z.array(z.string()),
+	})
 })
 
 export type BasicAnalytics = z.output<typeof BasicAnalytics>

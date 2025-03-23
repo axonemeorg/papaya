@@ -1,5 +1,5 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider, Paper, Stack } from '@mui/material'
+import { Box, Divider, Grid2 as Grid, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -9,6 +9,7 @@ import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getDatabaseClient } from '@/database/client'
+import SpendChart from '../chart/SpendChart'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
@@ -98,8 +99,6 @@ export default function JournalEditor() {
 		}
 	}
 
-	
-
 	// show all docs
 	useEffect(() => {
 		const db = getDatabaseClient()
@@ -119,30 +118,46 @@ export default function JournalEditor() {
 				/>
 			)}
 			<Stack direction="row" sx={{ gap: 2, overflow: 'hidden', flex: 1, pr: 2, pb: { sm: 0, md: 2 } }}>
-			
 				<Stack
-					component={Paper}
-					sx={(theme) => ({
-						borderTopLeftRadius: theme.spacing(2),
-						borderTopRightRadius: theme.spacing(2),
-						borderBottomLeftRadius: { sm: 0, md: theme.spacing(2) },
-						borderBottomRightRadius: { sm: 0, md: theme.spacing(2) },
+					sx={{
 						overflow: 'hidden',
 						flex: 2,
-					})}>
-					<JournalHeader />
-					<Divider />
-					<Box sx={{
-						flex: 1,
-						overflowY: 'auto',
-					}}>
-						<JournalEntryList
-							journalRecordGroups={journalGroups}
-							onClickListItem={handleClickListItem}
-							onDoubleClickListItem={handleDoubleClickListItem}
-						/>
-						<Stack component='footer'></Stack>
-					</Box>
+						gap: 2,
+					}}
+				>
+					{/* <Grid columns={12} container>
+						<Grid size={4}> */}
+					<Stack direction='row'>
+						<SpendChart />
+					</Stack>
+						{/* </Grid>
+					</Grid> */}
+					
+					<Stack
+						component={Paper}
+						sx={(theme) => ({
+							flex: 1,
+							borderTopLeftRadius: theme.spacing(2),
+							borderTopRightRadius: theme.spacing(2),
+							borderBottomLeftRadius: { sm: 0, md: theme.spacing(2) },
+							borderBottomRightRadius: { sm: 0, md: theme.spacing(2) },
+							overflow: 'hidden',
+						})}
+					>
+						<JournalHeader />
+						<Divider />
+						<Box sx={{
+							flex: 1,
+							overflowY: 'auto',
+						}}>
+							<JournalEntryList
+								journalRecordGroups={journalGroups}
+								onClickListItem={handleClickListItem}
+								onDoubleClickListItem={handleDoubleClickListItem}
+							/>
+							<Stack component='footer'></Stack>
+						</Box>
+					</Stack>
 				</Stack>
 				{/* <Stack
 					component={Paper}

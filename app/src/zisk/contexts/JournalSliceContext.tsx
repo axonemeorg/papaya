@@ -34,7 +34,7 @@ type JournalSliceContext = JournalEditorState & JournalSlice & {
 
 	// Analytics
 	basicAnalyticsQuery: DefinedUseQueryResult<
-		BasicAnalytics | null,
+		BasicAnalytics,
 		Error
 	>
 }

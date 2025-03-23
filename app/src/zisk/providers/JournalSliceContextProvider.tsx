@@ -4,25 +4,11 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
 import { AmountRange, BasicAnalytics, JournalEntry, JournalSlice } from '@/types/schema'
+import { calculateBasicAnalytics } from '@/utils/analytics'
 import { enumerateFilters } from '@/utils/filtering'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-
-const calculateBasicAnalytics = (journalEntries: JournalEntry[]): BasicAnalytics => {
-	let sumGain: number = 0
-	let sumLoss: number = 0
-	journalEntries.forEach((entry) => {
-		if (entry.parsedNetAmount) {
-			if (entry.parsedNetAmount > 0) {
-				sumGain += entry.parsedNetAmount
-			} else {
-				sumLoss += Math.abs(entry.parsedNetAmount)
-			}
-		}
-	})
-	return { sumLoss, sumGain }
-}
 
 type JournalSliceContextProviderProps = PropsWithChildren<JournalEditorState>
 
@@ -103,10 +89,14 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		enabled: hasSelectedJournal,
 	})
 
-	const basicAnalyticsQuery = useQuery<BasicAnalytics | null>({
+	const basicAnalyticsQuery = useQuery<BasicAnalytics>({
 		queryKey: ["basicAnalytics", getJournalEntriesQuery.data],
-		queryFn: () => calculateBasicAnalytics(Object.values(getJournalEntriesQuery.data ?? {})),
-		initialData: null,
+		queryFn: () => calculateBasicAnalytics(Object.values(getJournalEntriesQuery.data ?? {}), dateView),
+		initialData: {
+			chart: { data: [], labels: [] },
+			sumGain: 0,
+			sumLoss: 0,
+		},
 		enabled: Boolean(getJournalEntriesQuery.data),
 	});
 
