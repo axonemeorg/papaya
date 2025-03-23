@@ -192,7 +192,7 @@ export const CommonEntryAttributes = DocumentMetadata.merge(BelongsToJournal).me
 		type: z.union([TRANSFER_ENTRY, JOURNAL_ENTRY]),
 		memo: z.string(),
 		tagIds: z.array(z.string()).optional(),
-		categoryIds: z.array(z.string()).optional(),
+		categoryId: z.string().optional(),
 		sourceAccountId: z.string().optional(),
 		date: z.string().optional(),
 		notes: z.string().optional(),
@@ -246,7 +246,7 @@ export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string().optional(),
-	categoryIds: z.array(z.string()).optional(),
+	categoryId: z.string().optional(),
 }))
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
@@ -468,7 +468,8 @@ export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
 
 export enum JournalVersion {
     INITIAL_VERSION = '2025-03-01',
-    '2025-03-02' = '2025-03-02',
+    ADD_PARSE_AMOUNT_TO_ENTRIES = '2025-03-02',
+    REPLACE_CATEGORY_IDS = '2025-03-23',
 }
 
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(

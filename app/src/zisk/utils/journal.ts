@@ -23,8 +23,8 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
 	if (!entry.relatedEntryIds?.length) {
 		delete entry.relatedEntryIds
 	}
-	if (!entry.categoryIds?.length) {
-		delete entry.categoryIds
+	if (!entry.categoryId) {
+		delete entry.categoryId
 	}
 	if (!entry.notes) {
 		delete entry.notes

@@ -59,7 +59,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const getPriceStyle = useGetPriceStyle()
 
 	const netAmount = calculateNetAmount(entry)
-	const categoryId: string | undefined = entry?.categoryIds?.[0]
+	const categoryId: string | undefined = entry?.categoryId
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
 

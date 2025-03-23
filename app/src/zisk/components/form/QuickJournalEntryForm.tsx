@@ -62,19 +62,20 @@ export default function QuickJournalEntryForm() {
 			<Grid size={5}>
 				<Controller
 					control={control}
-					name="categoryIds"
+					name="categoryId"
 					render={({ field }) => {
-						const categoryIds = watch('categoryIds')
+						const categoryId = watch('categoryId')
 						// const categoryId: Category['_id'] | null = categoryIds?.length > 0 ? categoryIds[0] : null
 
 						return (
 							<CategoryAutocomplete
 								{...field}
 								ref={null}
-								value={categoryIds}
+								value={categoryId}
 								onChange={(_event, newValue) => {
-									// setManuallySetCategory(Boolean(newValue))
-									setValue(field.name, newValue, { shouldDirty: true })
+									if (!Array.isArray(newValue)) {
+										setValue(field.name, newValue ?? undefined, { shouldDirty: true })
+									}
 								}}
 								size="small"
 							/>
