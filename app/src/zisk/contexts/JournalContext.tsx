@@ -12,7 +12,7 @@ export interface JournalContext {
 	journal: JournalMeta | null
 	journalEntryForm: UseFormReturn<JournalEntry | TransferEntry>
 	closeEntryModal: () => void
-	createJournalEntry: (value: Partial<JournalEntry | TransferEntry>) => void
+	createJournalEntry: (value?: Partial<JournalEntry | TransferEntry>) => void
 	editJournalEntry: (entry: JournalEntry | TransferEntry) => void
 	openJournalManager: () => void
 	closeActiveJournal: () => void

@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
 
-import { Category, JournalEntry, TransferEntry } from '@/types/schema'
+import { Account, Category, JournalEntry, TransferEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -210,7 +210,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 	const isTransferEntryList = props.type === 'TRANSFER_ENTRY' // isTransferEntryRecordGroup(props.journalRecordGroups)
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
+	const { getCategoriesQuery, getAccountsQuery, createJournalEntry } = useContext(JournalContext)
 	const journalSliceContext = useContext(JournalSliceContext)
 	const getPriceStyle = useGetPriceStyle()
 
@@ -259,10 +259,20 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 							</TableRow>
 							
 							{entries.map((entry) => {
+								const { sourceAccountId, destAccountId } = (entry.type === 'TRANSFER_ENTRY' ? entry : {})
+								const sourceAccount: Account | undefined = sourceAccountId
+									? getAccountsQuery.data[sourceAccountId]
+									: undefined
+
+								const destinationAccount: Account | undefined = destAccountId
+									? getAccountsQuery.data[destAccountId]
+									: undefined
+
 								const { categoryId } = entry
 								const category: Category | undefined = categoryId
 									? getCategoriesQuery.data[categoryId]
 									: undefined
+
 								const netAmount = calculateNetAmount(entry)
 								const isFlagged = journalEntryIsFlagged(entry)
 								const hasTags = journalEntryHasTags(entry)
@@ -299,10 +309,21 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												}}
 											/>
 										</TableCell>
-										<TableCell sx={{ width: '40%' }}>
+										<TableCell sx={{ width: '20%' }}>
 											<Typography sx={{ ml: -0.5 }}>
 												{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
 											</Typography>
+										</TableCell>
+										<TableCell sx={{ width: '20%' }}>
+											{sourceAccount && (
+												<AvatarChip icon avatar={sourceAccount.avatar} label={sourceAccount.label} />
+											)}
+											{(sourceAccount && destinationAccount) && (
+												<Typography component='span'>&rarr;</Typography>
+											)}
+											{destinationAccount && (
+												<AvatarChip icon avatar={destinationAccount.avatar} label={destinationAccount.label} />
+											)}
 										</TableCell>
 										<TableCell sx={{ width: '0%' }}>
 											<Stack direction='row'>

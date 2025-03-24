@@ -87,8 +87,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		enabled: hasSelectedJournal,
 	})
 
-	const openCreateEntryModal = (values: Partial<JournalEntry | TransferEntry>) => {
-		console.log('openCreateEntryModal:', values)
+	const openCreateEntryModal = (values: Partial<JournalEntry | TransferEntry> = {}) => {
 		if (!activeJournal) {
 			return
 		}

@@ -3,7 +3,7 @@ import { Box, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry, TransferEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
-import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
+import { deleteJournalOrTransferEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -99,7 +99,7 @@ export default function JournalEditor() {
 		}
 
 		try {
-			const record = await deleteJournalEntry(entry._id)
+			await deleteJournalOrTransferEntry(entry._id)
 			journalSliceContext.refetchAllDependantQueries()
 			handleDeselectListItem()
 			snackbar({
@@ -107,15 +107,15 @@ export default function JournalEditor() {
 				action: {
 					label: 'Undo',
 					onClick: async () => {
-						undeleteJournalEntry(record)
-							.then(() => {
-								journalContext.getCategoriesQuery.refetch()
-								snackbar({ message: 'Category restored' })
-							})
-							.catch((error) => {
-								console.error(error)
-								snackbar({ message: 'Failed to restore category: ' + error.message })
-							})
+						// undeleteJournalEntry(record)
+						// 	.then(() => {
+						// 		journalContext.getCategoriesQuery.refetch()
+						// 		snackbar({ message: 'Category restored' })
+						// 	})
+						// 	.catch((error) => {
+						// 		console.error(error)
+						// 		snackbar({ message: 'Failed to restore category: ' + error.message })
+						// 	})
 					},
 				},
 			})

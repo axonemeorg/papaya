@@ -52,7 +52,7 @@ export const createTransferEntry = async (formData: TransferEntry): Promise<Tran
 	return newJournalEntry
 }
 
-export const updateJournalEntry = async (formData: JournalEntry) => {
+export const updateJournalOrTransferEntry = async <T extends JournalEntry | TransferEntry>(formData: T) => {
 	delete formData._rev
 
 	const existingRecord = await db.get(formData._id)
@@ -84,10 +84,10 @@ export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
 	return db.bulkDocs(updatedChildren)
 }
 
-export const deleteJournalEntry = async (journalEntryId: string): Promise<JournalEntry> => {
-	const record = await db.get(journalEntryId)
+export const deleteJournalOrTransferEntry = async <T extends JournalEntry | TransferEntry>(entryId: string): Promise<T> => {
+	const record = await db.get(entryId)
 	await db.remove(record)
-	return record as JournalEntry
+	return record as T
 }
 
 export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
