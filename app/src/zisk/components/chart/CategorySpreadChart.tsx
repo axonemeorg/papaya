@@ -10,7 +10,7 @@ import {
   } from 'chart.js';
 import { useContext, useMemo } from 'react';
 import { JournalSliceContext } from '@/contexts/JournalSliceContext';
-import { alpha, Box, Card, CardContent, CardMedia, Chip, Skeleton, Stack, Tooltip, Typography, useTheme } from '@mui/material';
+import { alpha, Card, CardContent, CardMedia, Chip, Skeleton, Stack, Tooltip, Typography, useTheme } from '@mui/material';
 import { formatBasisPointsDiff, getPriceString, PriceStringOptions } from '@/utils/string';
 import { InfoOutlined, TrendingDown, TrendingFlat, TrendingUp } from '@mui/icons-material';
 import { JournalContext } from '@/contexts/JournalContext';
@@ -91,7 +91,7 @@ export default function CategorySpreadChart() {
         // const borderColor: (string | undefined)[] = []
         // const backgroundColor: (string | undefined)[] = []
 
-        const datasets = []
+        const datasets: any[] = []
 
         Object.entries(analyticsQuery.data.categories.spendByCategoryId)
             .filter(([_, amount]) => Boolean(amount))
@@ -118,7 +118,7 @@ export default function CategorySpreadChart() {
                 }
             })
 
-        const chartData = {
+        const chartData: any = {
             labels: ['Spend by category'],
             datasets,
             // [
@@ -170,7 +170,7 @@ export default function CategorySpreadChart() {
             </CardContent>
             {!isLoading ? (
                 <CardMedia sx={{ boxSizing: 'border-box', px: 2, mx: -0.5 }}>
-                    <Bar options={chartOptions} data={chartData} width={'100%%'} height={theme.spacing(4)} />
+                    <Bar options={chartOptions as any} data={chartData} width={'100%%'} height={theme.spacing(4)} />
                 </CardMedia>
             ) : (
                 <Skeleton variant='rectangular' height={theme.spacing(10)} />
