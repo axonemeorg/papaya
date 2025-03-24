@@ -44,8 +44,14 @@ export const Route = createFileRoute('/_mainLayout/journal/$view/$')({
 			const _splat = [y, m, d].filter(Boolean).join('/')
 
 			return { view, y, m, d, _splat }
+		},
+	},
+	validateSearch: (search: Record<string, unknown>): { tab: 'journal' | 'transfers' } => {
+		const tab = (search.tab ?? 'journal') as 'journal' | 'transfers'
+		return {
+			tab
 		}
-	}
+	},
 })
 
 function JournalPage() {
@@ -65,6 +71,7 @@ function JournalPage() {
 		navigate({
 			to: '/journal/$view/$',
 			params: { view: newView, y: year, m: month, d: day },
+			search: { tab: 'journal' },
 		})
 	}, [navigate])
 

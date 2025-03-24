@@ -5,6 +5,7 @@ import {
 	EntryArtifact,
 	EntryTask,
 	ReservedTagKey,
+	TransferEntry,
 	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
@@ -56,8 +57,8 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const calculateNetAmount = (entry: JournalEntry): number => {
-	const children: JournalEntry[] = entry.children ?? []
+export const calculateNetAmount = (entry: JournalEntry | TransferEntry): number => {
+	const children: JournalEntry[] = (entry.type === 'TRANSFER_ENTRY' ? null : entry.children) ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
 			return acc + (parseJournalEntryAmount(child.amount) ?? 0)
@@ -71,7 +72,7 @@ export const calculateNetAmount = (entry: JournalEntry): number => {
 export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: string): JournalEntry => {
 	const now = new Date().toISOString()
 
-	const journalEntry: JournalEntry = {
+	const entry: JournalEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
 		type: 'JOURNAL_ENTRY',
 		createdAt: now,
@@ -81,7 +82,23 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 		journalId,
 	}
 
-	return journalEntry
+	return entry
+}
+
+export const makeTransferEntry = (formData: Partial<TransferEntry>, journalId: string): TransferEntry => {
+	const now = new Date().toISOString()
+
+	const entry: TransferEntry = {
+		_id: formData._id ?? generateJournalEntryId(),
+		type: 'TRANSFER_ENTRY',
+		createdAt: now,
+		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
+		amount: formData.amount || '',
+		memo: formData.memo || '',
+		journalId,
+	}
+
+	return entry
 }
 
 export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: string): EntryArtifact => {
@@ -114,12 +131,12 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 	return newTask
 }
 
-export const journalEntryHasTags = (entry: JournalEntry): boolean => {
+export const journalEntryHasTags = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !ReservedTagKey.options.includes(tagId as ReservedTagKey))
 }
 
-export const journalEntryIsFlagged = (entry: JournalEntry): boolean => {
+export const journalEntryIsFlagged = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
 }

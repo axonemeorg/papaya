@@ -9,6 +9,7 @@ import {
 	EntryTag,
 	JournalEntry,
 	JournalMeta,
+	TransferEntry,
 	ZiskDocument,
 	ZiskSettings,
 } from '@/types/schema'
@@ -30,6 +31,20 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 		...formData,
 		parsedNetAmount: calculateNetAmount(formData),
 		type: 'JOURNAL_ENTRY',
+		createdAt: now,
+	}
+
+	await db.put(newJournalEntry)
+	return newJournalEntry
+}
+
+export const createTransferEntry = async (formData: TransferEntry): Promise<TransferEntry> => {
+	const now = new Date().toISOString()
+
+	const newJournalEntry: TransferEntry = {
+		...formData,
+		parsedNetAmount: calculateNetAmount(formData),
+		type: 'TRANSFER_ENTRY',
 		createdAt: now,
 	}
 

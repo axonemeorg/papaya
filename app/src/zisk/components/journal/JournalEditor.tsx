@@ -1,7 +1,7 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
-import { JournalEntry } from '@/types/schema'
+import { JournalEntry, TransferEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry, undeleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
@@ -11,9 +11,10 @@ import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getDatabaseClient } from '@/database/client'
 import SpendChart from '../chart/SpendChart'
 import CategorySpreadChart from '../chart/CategorySpreadChart'
+import { useSearch } from '@tanstack/react-router'
 
 export interface JournalEntrySelection {
-	entry: JournalEntry | null
+	entry: JournalEntry | TransferEntry | null
 	anchorEl: HTMLElement | null
 }
 
@@ -26,6 +27,8 @@ export default function JournalEditor() {
 	const { snackbar } = useContext(NotificationsContext)
 	const journalContext = useContext(JournalContext)
 	const journalSliceContext = useContext(JournalSliceContext)
+
+	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
 
 	const journalGroups = useMemo(() => {
 		const entries = journalSliceContext.getJournalEntriesQuery.data
@@ -48,14 +51,35 @@ export default function JournalEditor() {
 		return groups
 	}, [journalSliceContext.getJournalEntriesQuery.data])
 
-	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
+	const transferGroups = useMemo(() => {
+		const entries = journalSliceContext.getTransferEntriesQuery.data
+		const groups: Record<TransferEntry['_id'], TransferEntry[]> = Object.values(entries).reduce(
+			(acc: Record<TransferEntry['_id'], TransferEntry[]>, entry: TransferEntry) => {
+				const { date } = entry
+				if (!date) {
+					return acc
+				}
+				if (acc[date]) {
+					acc[date].push(entry)
+				} else {
+					acc[date] = [entry]
+				}
+
+				return acc
+			}, {}
+		)
+
+		return groups
+	}, [journalSliceContext.getJournalEntriesQuery.data])
+
+	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry | TransferEntry) => {
 		setSelectedEntry({
 			anchorEl: event.currentTarget,
 			entry: entry,
 		})
 	}
 
-	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
+	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry| TransferEntry) => {
 		journalContext.editJournalEntry(entry)
 	}
 
@@ -69,7 +93,7 @@ export default function JournalEditor() {
 		})
 	}
 
-	const handleDeleteEntry = async (entry: JournalEntry | null) => {
+	const handleDeleteEntry = async (entry: JournalEntry | TransferEntry | null) => {
 		if (!entry) {
 			return
 		}
@@ -153,7 +177,8 @@ export default function JournalEditor() {
 							overflowY: 'auto',
 						}}>
 							<JournalEntryList
-								journalRecordGroups={journalGroups}
+								type={tab === 'journal' ? 'JOURNAL_ENTRY' : 'TRANSFER_ENTRY'}
+								journalRecordGroups={tab === 'journal' ? journalGroups : transferGroups}
 								onClickListItem={handleClickListItem}
 								onDoubleClickListItem={handleDoubleClickListItem}
 							/>

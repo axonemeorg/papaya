@@ -7,6 +7,8 @@ import JournalFilterRibbon from './JournalFilterRibbon'
 import { useContext, useRef, useState } from 'react'
 import { Add, FilterAltOff } from '@mui/icons-material'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
+import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 
 export default function JournalHeader() {
 	const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)
@@ -16,6 +18,15 @@ export default function JournalHeader() {
     const numFilters = journalSliceContext.getActiveFilterSet().size
 
 	const hideFilterButton = false
+
+	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
+	const navigate = useNavigate({ from: Route.fullPath })
+
+	const handleChangeTab = (newTab: 'journal' | 'transfers') => {
+		navigate({
+			search: { tab: newTab }
+		})
+	}
 
 	return (
 		<>
@@ -84,9 +95,9 @@ export default function JournalHeader() {
 				<JournalFilterRibbon />
 
 				{/* TODO To be implemented in ZK-111 */}
-				<Tabs value='JOURNAL'>
-					<Tab value='JOURNAL' label='Journal Entries' />
-					<Tab value='TRANSFERS' label='Account Transfers' disabled />
+				<Tabs value={tab} onChange={(_event, newValue: 'journal' | 'transfers') => handleChangeTab(newValue)}>
+					<Tab value='journal' label='Journal Entries' />
+					<Tab value='transfers' label='Account Transfers' />
 					{/* <Tab value='ANALYSIS' label='Analysis' disabled /> */}
 				</Tabs>
 			</Stack>

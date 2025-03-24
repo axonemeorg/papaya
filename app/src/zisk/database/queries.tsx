@@ -7,6 +7,7 @@ import {
 	JournalEntry,
 	JournalMeta,
 	JournalSlice,
+	TransferEntry,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
@@ -49,10 +50,25 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 
 export const getJournalEntries = async (
 	journalSlice: JournalSlice,
-	journalId: string
-): Promise<Record<JournalEntry['_id'], JournalEntry>> => {
+	journalId: string,
+): Promise<Record<string, JournalEntry>> => {
+	return getJournalOrTransferEntries(journalSlice, journalId, "JOURNAL_ENTRY") as Promise<Record<string, JournalEntry>>
+}
+
+export const getTransferEntries = async (
+	journalSlice: JournalSlice,
+	journalId: string,
+): Promise<Record<string, TransferEntry>> => {
+	return getJournalOrTransferEntries(journalSlice, journalId, "TRANSFER_ENTRY") as Promise<Record<string, TransferEntry>>
+}
+
+export const getJournalOrTransferEntries = async (
+	journalSlice: JournalSlice,
+	journalId: string,
+	type: JournalEntry['type'] | TransferEntry['type']
+): Promise<Record<string, JournalEntry | TransferEntry>> => {
 	const selectorClauses: any[] = [
-		{ type: 'JOURNAL_ENTRY' },
+		{ type },
 		{ journalId },
 	]
 	
@@ -98,7 +114,9 @@ export const getJournalEntries = async (
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
-	return Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry]))
+	const entries = Object.fromEntries((result.docs as (JournalEntry[] | TransferEntry[])).map((entry) => [entry._id, entry])) as Record<string, JournalEntry> | Record<string, TransferEntry>
+
+	return entries
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['_id'], EntryTag>> => {
