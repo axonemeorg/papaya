@@ -1,7 +1,7 @@
-import { BasicAnalytics, Category, DateView, JournalEntry } from "@/types/schema"
+import { Analytics, BasicAnalytics, Category, DateView, EmptyCategoryIdSymbol, JournalEntry } from "@/types/schema"
 import { getAbsoluteDateRangeFromDateView } from "./date"
 import dayjs from "dayjs"
-import { calculateNetAmount } from "./journal"
+import { calculateNetAmount, parseJournalEntryAmount } from "./journal"
 
 export const calculateBasicAnalytics = (journalEntries: JournalEntry[], dateView: DateView): BasicAnalytics => {
     if (!journalEntries.length) {
@@ -43,13 +43,51 @@ export const calculateBasicAnalytics = (journalEntries: JournalEntry[], dateView
     return { sumLoss, sumGain, chart: { data, labels } }
 }
 
-
-export const calculateCategorySums = (journalEntries: JournalEntry[]): Record<string, number> => {
-    return journalEntries.reduce((acc: Record<Category['_id'], number>, entry: JournalEntry) => {
+export const calculateCategorySums = (journalEntries: JournalEntry[]): Record<string | symbol, number> => {
+    const parseAmount = (amount: string): number => {
+        const parsed = parseJournalEntryAmount(amount) ?? 0
+        return Math.abs(Math.min(0, parsed))
+    }
+    const categoryIds = journalEntries.reduce((acc: Set<string>, entry) => {
         if (entry.categoryId) {
-
+            acc.add(entry.categoryId)
         }
+        return acc
+    }, new Set<string>([]))
+
+    return journalEntries.reduce((acc: Record<Category['_id'] | symbol, number>, entry: JournalEntry) => {
+        let parent = entry
+        let children = entry.children ?? []
+        
+        const amounts: { categoryId: string | undefined, amount: number }[] = [
+            { categoryId: parent.categoryId, amount: parseAmount(parent.amount) }
+        ]
+
+        children.forEach((child) => {
+            amounts.push({
+                categoryId: child.categoryId ?? parent.categoryId,
+                amount: parseAmount(child.amount),
+            })
+        })
+
+        amounts.forEach(({ categoryId, amount }) => {
+            acc[categoryId ?? EmptyCategoryIdSymbol.value] += amount
+        })
 
         return acc
-    }, {})
+    }, {
+        ...Object.fromEntries(Array.from(categoryIds).map((categoryId => [categoryId, 0]))),
+        [EmptyCategoryIdSymbol.value]: 0,
+    })
+}
+
+export const generateAnalytics = (journalEntries: JournalEntry[], dateView: DateView): Promise<Analytics> => {
+    return new Promise<Analytics>((resolve) => {
+        resolve({
+            basic: calculateBasicAnalytics(journalEntries, dateView),
+            categories: {
+                spendByCategoryId: calculateCategorySums(journalEntries),
+            },
+        })
+    })
 }

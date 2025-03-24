@@ -3,8 +3,8 @@ import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPick
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
-import { AmountRange, BasicAnalytics, JournalEntry, JournalSlice } from '@/types/schema'
-import { calculateBasicAnalytics } from '@/utils/analytics'
+import { AmountRange, Analytics, JournalEntry, JournalSlice } from '@/types/schema'
+import { generateAnalytics } from '@/utils/analytics'
 import { enumerateFilters } from '@/utils/filtering'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
@@ -89,13 +89,18 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		enabled: hasSelectedJournal,
 	})
 
-	const basicAnalyticsQuery = useQuery<BasicAnalytics>({
-		queryKey: ["basicAnalytics", getJournalEntriesQuery.data],
-		queryFn: () => calculateBasicAnalytics(Object.values(getJournalEntriesQuery.data ?? {}), dateView),
+	const analyticsQuery = useQuery<Analytics>({
+		queryKey: ["analytics", getJournalEntriesQuery.data],
+		queryFn: () => generateAnalytics(Object.values(getJournalEntriesQuery.data ?? {}), dateView),
 		initialData: {
-			chart: { data: [], labels: [] },
-			sumGain: 0,
-			sumLoss: 0,
+			basic: {
+				chart: { data: [], labels: [] },
+				sumGain: 0,
+				sumLoss: 0,
+			},
+			categories: {
+				spendByCategoryId: {},
+			},
 		},
 		enabled: Boolean(getJournalEntriesQuery.data),
 	});
@@ -194,7 +199,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 				toggleSelectedRow,
 
 				// Analytics
-				basicAnalyticsQuery,
+				analyticsQuery,
 			}}>
 			{props.children}
 		</JournalSliceContext.Provider>

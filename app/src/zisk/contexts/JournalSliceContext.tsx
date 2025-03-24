@@ -1,6 +1,6 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
-import { AmountRange, BasicAnalytics, DateView, DateViewSymbol, JournalEntry, JournalSlice } from '@/types/schema'
+import { AmountRange, Analytics, DateView, DateViewSymbol, JournalEntry, JournalSlice } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
@@ -33,8 +33,8 @@ type JournalSliceContext = JournalEditorState & JournalSlice & {
 	toggleSelectedRow: (row: string) => void
 
 	// Analytics
-	basicAnalyticsQuery: DefinedUseQueryResult<
-		BasicAnalytics,
+	analyticsQuery: DefinedUseQueryResult<
+		Analytics,
 		Error
 	>
 }

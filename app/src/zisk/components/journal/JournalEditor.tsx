@@ -1,5 +1,5 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider, Grid2 as Grid, Paper, Stack } from '@mui/material'
+import { Box, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -10,6 +10,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getDatabaseClient } from '@/database/client'
 import SpendChart from '../chart/SpendChart'
+import CategorySpreadChart from '../chart/CategorySpreadChart'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
@@ -127,8 +128,9 @@ export default function JournalEditor() {
 				>
 					{/* <Grid columns={12} container>
 						<Grid size={4}> */}
-					<Stack direction='row'>
+					<Stack direction='row' gap={2}>
 						<SpendChart />
+						<CategorySpreadChart />
 					</Stack>
 						{/* </Grid>
 					</Grid> */}

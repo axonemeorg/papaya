@@ -382,6 +382,23 @@ export const BasicAnalytics = z.object({
 
 export type BasicAnalytics = z.output<typeof BasicAnalytics>
 
+export const EmptyCategoryIdSymbol = z.literal(Symbol("EMPTY_CATEGORY_ID_SYMBOL"))
+
+export type EmptyCategoryIdSymbol = z.output<typeof EmptyCategoryIdSymbol>
+
+export const CategoryAnalytics = z.object({
+	spendByCategoryId: z.record(z.union([Category.shape._id, EmptyCategoryIdSymbol]), z.number())
+})
+
+export type CategoryAnalytics = z.output<typeof CategoryAnalytics>
+
+export const Analytics = z.object({
+	basic: BasicAnalytics,
+	categories: CategoryAnalytics,
+})
+
+export type Analytics = z.output<typeof Analytics>
+
 export const CloudZiskServer = z.object({
 	serverType: z.literal('ZISK_CLOUD'),
 	user: z.object({
