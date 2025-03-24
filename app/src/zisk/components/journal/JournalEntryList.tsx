@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
 
-import { Category, JournalEntry } from '@/types/schema'
+import { Account, Category, JournalEntry, TransferEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -46,33 +46,33 @@ const TableRow = ({ sx, dateRow, selected, buttonRow, ...rest }: JournalTableRow
 	};
 
 	return (
-	  <MuiTableRow
-		selected={selected}
-		hover={!dateRow && !buttonRow}
-		sx={{
-			'.checkbox': {
-				visibility: 'hidden',
-			},
-			'.icon': {
-				visibility: 'visible',
-				pointerEvents: 'none',
-			},
-			'& td': {
-		  		...(dateRow || buttonRow ? {
-					cursor: 'default',
-				} : {}),
-				...(dateRow ? {
-					width: '0%',
-				} : {})
-			},
-			...(selected ? hoverStyles : {}),
-        	'&:hover': hoverStyles,
-			userSelect: 'none',
-			cursor: 'pointer',
-			...sx,
-		}}
-		{...rest}
-	  />
+		<MuiTableRow
+			selected={selected}
+			hover={!dateRow && !buttonRow}
+			sx={{
+				'.checkbox': {
+					visibility: 'hidden',
+				},
+				'.icon': {
+					visibility: 'visible',
+					pointerEvents: 'none',
+				},
+				'& td': {
+					...(dateRow || buttonRow ? {
+						cursor: 'default',
+					} : {}),
+					...(dateRow ? {
+						width: '0%',
+					} : {})
+				},
+				...(selected ? hoverStyles : {}),
+				'&:hover': hoverStyles,
+				userSelect: 'none',
+				cursor: 'pointer',
+				...sx,
+			}}
+			{...rest}
+		/>
 	);
 };
 
@@ -165,10 +165,7 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 			sx={{
 				py: 0,
 				px: 2,
-				// pt: 0,
 				color: isToday ? undefined : 'unset',
-				// px: 1,
-				// ml: 1,
 				my: 0,
 				ml: 1,
 			}}>
@@ -194,15 +191,26 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 }
 
 interface JournalEntryListProps {
-	journalRecordGroups: Record<string, JournalEntry[]>
-	onClickListItem: (event: any, entry: JournalEntry) => void
-	onDoubleClickListItem: (event: any, entry: JournalEntry) => void
+	type: JournalEntry['type'] | TransferEntry['type']
+	journalRecordGroups: Record<string, JournalEntry[]> | Record<string, TransferEntry[]>
+	onClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
+	onDoubleClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
 }
 
+// const isTransferEntryRecordGroup = (
+// 	journalRecordGroups: Record<string, JournalEntry[]> | Record<string, TransferEntry[]>
+// ): journalRecordGroups is Record<string, TransferEntry[]> => {
+// 	return [...Object.values(journalRecordGroups)].some((record: JournalEntry | TransferEntry) => {
+// 		return record.type === 'TRANSFER_ENTRY'
+// 	})
+// }
+
+
 export default function JournalEntryList(props: JournalEntryListProps) {
+	const isTransferEntryList = props.type === 'TRANSFER_ENTRY' // isTransferEntryRecordGroup(props.journalRecordGroups)
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery, createJournalEntry } = useContext(JournalContext)
+	const { getCategoriesQuery, getAccountsQuery, createJournalEntry } = useContext(JournalContext)
 	const journalSliceContext = useContext(JournalSliceContext)
 	const getPriceStyle = useGetPriceStyle()
 
@@ -240,16 +248,31 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									<JournalEntryDate
 										day={day}
 										isToday={isToday}
-										onClick={() => createJournalEntry(day.format('YYYY-MM-DD'))}
+										onClick={() => {
+											createJournalEntry({
+												date: day.format('YYYY-MM-DD'),
+												type: isTransferEntryList ? 'TRANSFER_ENTRY' : 'JOURNAL_ENTRY'
+											})
+										}}
 									/>
 								</TableCell>
 							</TableRow>
 							
 							{entries.map((entry) => {
+								const { sourceAccountId, destAccountId } = (entry.type === 'TRANSFER_ENTRY' ? entry : {})
+								const sourceAccount: Account | undefined = sourceAccountId
+									? getAccountsQuery.data[sourceAccountId]
+									: undefined
+
+								const destinationAccount: Account | undefined = destAccountId
+									? getAccountsQuery.data[destAccountId]
+									: undefined
+
 								const { categoryId } = entry
 								const category: Category | undefined = categoryId
 									? getCategoriesQuery.data[categoryId]
 									: undefined
+
 								const netAmount = calculateNetAmount(entry)
 								const isFlagged = journalEntryIsFlagged(entry)
 								const hasTags = journalEntryHasTags(entry)
@@ -286,10 +309,21 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												}}
 											/>
 										</TableCell>
-										<TableCell sx={{ width: '40%' }}>
+										<TableCell sx={{ width: '20%' }}>
 											<Typography sx={{ ml: -0.5 }}>
 												{entry.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO}
 											</Typography>
+										</TableCell>
+										<TableCell sx={{ width: '20%' }}>
+											{sourceAccount && (
+												<AvatarChip icon avatar={sourceAccount.avatar} label={sourceAccount.label} />
+											)}
+											{(sourceAccount && destinationAccount) && (
+												<Typography component='span'>&rarr;</Typography>
+											)}
+											{destinationAccount && (
+												<AvatarChip icon avatar={destinationAccount.avatar} label={destinationAccount.label} />
+											)}
 										</TableCell>
 										<TableCell sx={{ width: '0%' }}>
 											<Stack direction='row'>

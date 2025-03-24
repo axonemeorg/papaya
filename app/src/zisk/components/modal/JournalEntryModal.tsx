@@ -3,11 +3,11 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { Category, JournalEntry } from '@/types/schema'
+import { Category, JournalEntry, TransferEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
-import { deleteJournalEntry, updateJournalEntry } from '@/database/actions'
+import { deleteJournalOrTransferEntry, updateJournalOrTransferEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
@@ -32,8 +32,8 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		if (!journal) {
 			return Promise.resolve()
 		}
-		const formData: JournalEntry = journalEntryForm.getValues()
-		return updateJournalEntry(formData)
+		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
+		return updateJournalOrTransferEntry(formData)
 			.then(() => {
 				console.log('Put journal entry.', formData)
 				disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
@@ -62,6 +62,10 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'journalEntries' })
 	}
 
+	const refreshTransferEntriesQuery = () => {
+		queryClient.invalidateQueries({ predicate: query => query.queryKey[0] === 'transferEntries' })
+	}
+
 	const handleClose = () => {
 		props.onClose();
 		if (!journalEntryForm.formState.isDirty) {
@@ -70,15 +74,17 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		flushSaveFormDebounce()
 		handleSaveFormWithCurrentValues().then(() => {
 			refreshJournalEntriesQuery()
-			snackbar({ message: 'Saved journal entry.' })
+			refreshTransferEntriesQuery()
+			snackbar({ message: 'Saved entry.' })
 			disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 		})
 	}
 
 	const handleDelete = useCallback(async () => {
-		const formData: JournalEntry = journalEntryForm.getValues()
-		deleteJournalEntry(formData._id).then(() => {
+		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
+		deleteJournalOrTransferEntry(formData._id).then(() => {
 			refreshJournalEntriesQuery()
+			refreshTransferEntriesQuery()
 			snackbar({ message: 'Deleted journal entry.' })
 			disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
 			props.onClose()

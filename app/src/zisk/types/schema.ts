@@ -193,6 +193,7 @@ export const CommonEntryAttributes = DocumentMetadata.merge(BelongsToJournal).me
 		memo: z.string(),
 		tagIds: z.array(z.string()).optional(),
 		categoryId: z.string().optional(),
+		parsedNetAmount: z.number().optional(),
 		sourceAccountId: z.string().optional(),
 		date: z.string().optional(),
 		notes: z.string().optional(),
@@ -227,7 +228,6 @@ export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
-		parsedNetAmount: z.number().optional(),
 	})
 )
 
@@ -510,6 +510,7 @@ export type JournalMeta = z.output<typeof JournalMeta>
 export const ZiskDocument = z.union([
 	Category,
 	JournalEntry,
+	TransferEntry,
 	ChildJournalEntry,
 	EntryTag,
 	JournalMeta,

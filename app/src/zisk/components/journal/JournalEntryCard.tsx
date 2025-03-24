@@ -4,7 +4,7 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { getPriceString } from '@/utils/string'
-import { Category, JournalEntry } from '@/types/schema'
+import { Category, JournalEntry, TransferEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
@@ -14,7 +14,7 @@ import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
-	entry: JournalEntry
+	entry: JournalEntry | TransferEntry
 	onClose: () => void
 	onDelete: () => void
 }
@@ -67,7 +67,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 		props.onDelete()
 	}
 
-	const handleEditJournalEntry = (entry: JournalEntry) => {
+	const handleEditJournalEntry = (entry: JournalEntry | TransferEntry) => {
 		editJournalEntry(entry)
 		props.onClose()
 	}
