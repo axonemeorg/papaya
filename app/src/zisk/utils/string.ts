@@ -1,17 +1,45 @@
 import { SyncStatusEnum } from "@/contexts/RemoteContext"
 
-const formatCurrencyAmount = (amount: number): string => {
-	return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export interface FormatCurrencyAmountOptions {
+	minimumFractionDigits: number
+	maximumFractionDigits: number
 }
 
-export const getPriceString = (price: number): string => {
+const formatCurrencyAmount = (amount: number, options: Partial<FormatCurrencyAmountOptions> = {}): string => {
+	const combinedOptions: FormatCurrencyAmountOptions = {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+		...options,
+	}
+	return amount.toLocaleString('en-US', combinedOptions);
+}
+
+export interface PriceStringOptions {
+	sign: 'never' | 'whenPositive' | 'always'
+	round: boolean
+}
+
+export const getPriceString = (price: number, options: Partial<PriceStringOptions> = {}): string => {
+	const combinedOptions: PriceStringOptions = {
+		sign: 'whenPositive',
+		round: false,
+		...options,
+	}
+	const formatOptions: Partial<FormatCurrencyAmountOptions> = combinedOptions.round ? {
+		maximumFractionDigits: 0,
+		minimumFractionDigits: 0,
+	} : {}
 	if (price === 0) {
 		return '$0.00'
 	} else if (price > 0) {
-		return `+$${formatCurrencyAmount(price)}`
+		return `${['always', 'whenPositive'].includes(combinedOptions.sign) ? '+' : ''}$${formatCurrencyAmount(price, formatOptions)}`
 	} else {
-		return `$${formatCurrencyAmount(-price)}`
+		return `${options.sign === 'always' ? '-' : ''}$${formatCurrencyAmount(-price)}`
 	}
+}
+
+export const formatBasisPointsDiff = (basisPoints: number) => {
+	return `${basisPoints >= 0 ? '+' : '-'}${(basisPoints / 100).toFixed(1)}%`
 }
 
 export const formatFileSize = (bytes: number): string => {

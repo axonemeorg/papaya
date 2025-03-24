@@ -12,14 +12,9 @@ export default function MainLayout(props: PropsWithChildren) {
 	return (
 		<Stack component="main" sx={{ minHeight: '100dvh', maxHeight: '100dvh' }}>
 			<Header view={view} />
-			<Stack direction="row" sx={{ flex: 1, gap: 0, overflow: 'hidden' }}>
+			<Stack direction="row" sx={{ gap: 0, overflow: 'hidden', flex: 1 }}>
 				<AppMenu view={view} />
-				<Stack
-					sx={() => ({
-						flex: 1,
-					})}>
-					{props.children}
-				</Stack>
+				{props.children}
 			</Stack>
 		</Stack>
 	)

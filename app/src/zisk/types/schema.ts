@@ -192,7 +192,7 @@ export const CommonEntryAttributes = DocumentMetadata.merge(BelongsToJournal).me
 		type: z.union([TRANSFER_ENTRY, JOURNAL_ENTRY]),
 		memo: z.string(),
 		tagIds: z.array(z.string()).optional(),
-		categoryIds: z.array(z.string()).optional(),
+		categoryId: z.string().optional(),
 		sourceAccountId: z.string().optional(),
 		date: z.string().optional(),
 		notes: z.string().optional(),
@@ -246,7 +246,7 @@ export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
 
 export const CreateQuickJournalEntry = AmountRecord.merge(z.object({
 	memo: z.string().optional(),
-	categoryIds: z.array(z.string()).optional(),
+	categoryId: z.string().optional(),
 }))
 
 export type CreateQuickJournalEntry = z.output<typeof CreateQuickJournalEntry>
@@ -362,6 +362,43 @@ export const JournalSlice = z.object({
 
 export type JournalSlice = z.output<typeof JournalSlice>
 
+export const BasicAnalytics = z.object({
+	/**
+	 * Absolute sum of all accrued gains
+	 */
+	sumGain: z.number(),
+	/**
+	 * Absolute sum of all incurred losses
+	 */
+	sumLoss: z.number(),
+	/**
+	 * Data array for chart display
+	 */
+	chart: z.object({
+		data: z.array(z.number()),
+		labels: z.array(z.string()),
+	})
+})
+
+export type BasicAnalytics = z.output<typeof BasicAnalytics>
+
+export const EmptyCategoryIdSymbol = z.literal(Symbol("EMPTY_CATEGORY_ID_SYMBOL"))
+
+export type EmptyCategoryIdSymbol = z.output<typeof EmptyCategoryIdSymbol>
+
+export const CategoryAnalytics = z.object({
+	spendByCategoryId: z.record(z.union([Category.shape._id, EmptyCategoryIdSymbol]), z.number())
+})
+
+export type CategoryAnalytics = z.output<typeof CategoryAnalytics>
+
+export const Analytics = z.object({
+	basic: BasicAnalytics,
+	categories: CategoryAnalytics,
+})
+
+export type Analytics = z.output<typeof Analytics>
+
 export const CloudZiskServer = z.object({
 	serverType: z.literal('ZISK_CLOUD'),
 	user: z.object({
@@ -455,7 +492,8 @@ export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
 
 export enum JournalVersion {
     INITIAL_VERSION = '2025-03-01',
-    '2025-03-02' = '2025-03-02',
+    ADD_PARSE_AMOUNT_TO_ENTRIES = '2025-03-02',
+    REPLACE_CATEGORY_IDS = '2025-03-23',
 }
 
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(

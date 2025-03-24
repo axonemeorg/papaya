@@ -21,8 +21,8 @@ import AvatarChip from "../icon/AvatarChip";
 import { JournalContext } from "@/contexts/JournalContext";
 import AvatarIcon from "../icon/AvatarIcon";
 import { createCategory } from "@/database/actions";
-import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
 import clsx from "clsx";
+import { generateRandomAvatar } from "@/utils/journal";
 
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
 
@@ -31,11 +31,9 @@ export default function CategorySelector(props: CategorySelectorProps) {
     const [open, setOpen] = useState<boolean>(false)
     const [searchValue, setSearchValue] = useState<string>('')
     const { getCategoriesQuery, journal } = useContext(JournalContext)
-    const value = props.value ?? []
+    const value: string | undefined = !Array.isArray(props.value) && props.value || undefined
 
-    const selectedCategories: Category[] = value
-        .map((categoryId) => getCategoriesQuery.data[categoryId])
-        .filter(Boolean)
+    const selectedCategory: Category | undefined = value ? getCategoriesQuery.data[value] : undefined
 
     const handleClose = () => {
         setOpen(false)
@@ -49,7 +47,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
         await createCategory({
             label: searchValue,
             description: '',
-            avatar: DEFAULT_AVATAR,
+            avatar: generateRandomAvatar(),
         }, journalId)
         getCategoriesQuery.refetch()
     }
@@ -83,20 +81,16 @@ export default function CategorySelector(props: CategorySelectorProps) {
                     <Settings />
                 </IconButton>
             </Button>
-            {selectedCategories.length === 0 ? (
+            {!selectedCategory ? (
                 <Typography sx={{ mt: -1 }} variant='body2' color='textSecondary'>
                     <span>No category — </span>
                     <Link onClick={() => setOpen(true)}>Add one</Link>
                 </Typography>
             ) : (
                 <Stack direction='row' alignItems='flex-start' gap={1} sx={{ flexWrap: 'wrap', mx: -0.5 }}>
-                    {selectedCategories.map((category) => {
-                        return (
-                            <ButtonBase disableRipple onClick={() => setOpen(true)} key={category._id}>
-                                <AvatarChip icon contrast avatar={category.avatar} label={category.label} />
-                            </ButtonBase>
-                        )
-                    })}
+                    <ButtonBase disableRipple onClick={() => setOpen(true)} key={selectedCategory._id}>
+                        <AvatarChip icon contrast avatar={selectedCategory.avatar} label={selectedCategory.label} />
+                    </ButtonBase>
                 </Stack>
             )}
             <Popper

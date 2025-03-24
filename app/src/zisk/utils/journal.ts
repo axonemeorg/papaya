@@ -1,4 +1,5 @@
 import {
+	Avatar,
 	Category,
 	ChildJournalEntry,
 	EntryArtifact,
@@ -10,6 +11,7 @@ import {
 import { generateJournalEntryId, generateTaskId } from './id'
 import dayjs from 'dayjs'
 import { RESERVED_TAGS } from '@/constants/tags'
+import { DEFAULT_AVATAR } from '@/components/pickers/AvatarPicker'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -21,8 +23,8 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
 	if (!entry.relatedEntryIds?.length) {
 		delete entry.relatedEntryIds
 	}
-	if (!entry.categoryIds?.length) {
-		delete entry.categoryIds
+	if (!entry.categoryId) {
+		delete entry.categoryId
 	}
 	if (!entry.notes) {
 		delete entry.notes
@@ -132,4 +134,12 @@ export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJour
 
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
 	return doc.type === 'CATEGORY'
+}
+
+export const generateRandomAvatar = (): Avatar => {
+	const primaryColor = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`
+	return {
+		...DEFAULT_AVATAR,
+		primaryColor,
+	}
 }

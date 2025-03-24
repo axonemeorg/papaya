@@ -246,8 +246,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 							</TableRow>
 							
 							{entries.map((entry) => {
-								const { categoryIds } = entry
-								const categoryId: string | undefined = categoryIds?.[0]
+								const { categoryId } = entry
 								const category: Category | undefined = categoryId
 									? getCategoriesQuery.data[categoryId]
 									: undefined
@@ -318,6 +317,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 															0.125
 														),
 													})}
+													size='small'
 													label="Uncategorized"
 												/>
 											)}

@@ -85,8 +85,7 @@ export default function SearchModal(props: SearchModalProps) {
         if (documentIsJournalEntryOrChildJournalEntry(result.item)) {
             const netAmount = calculateNetAmount(result.item as JournalEntry)
             const isNetPositive = netAmount > 0
-            const { categoryIds } = result.item
-            const categoryId: string | undefined = categoryIds?.[0]
+            const { categoryId } = result.item
             const category: Category | undefined = categoryId
                 ? journalContext.getCategoriesQuery.data[categoryId]
                 : undefined

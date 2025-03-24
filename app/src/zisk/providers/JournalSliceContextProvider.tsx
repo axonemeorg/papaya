@@ -3,7 +3,8 @@ import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPick
 import { JournalContext } from '@/contexts/JournalContext'
 import { JournalEditorState, JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getJournalEntries } from '@/database/queries'
-import { AmountRange, JournalEntry, JournalSlice } from '@/types/schema'
+import { AmountRange, Analytics, JournalEntry, JournalSlice } from '@/types/schema'
+import { generateAnalytics } from '@/utils/analytics'
 import { enumerateFilters } from '@/utils/filtering'
 import { calculateNetAmount } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
@@ -87,6 +88,22 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		initialData: {},
 		enabled: hasSelectedJournal,
 	})
+
+	const analyticsQuery = useQuery<Analytics>({
+		queryKey: ["analytics", getJournalEntriesQuery.data],
+		queryFn: () => generateAnalytics(Object.values(getJournalEntriesQuery.data ?? {}), dateView),
+		initialData: {
+			basic: {
+				chart: { data: [], labels: [] },
+				sumGain: 0,
+				sumLoss: 0,
+			},
+			categories: {
+				spendByCategoryId: {},
+			},
+		},
+		enabled: Boolean(getJournalEntriesQuery.data),
+	});
 
 	const refetchAllDependantQueries = () => {
 		getJournalEntriesQuery.refetch()
@@ -180,6 +197,9 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 				selectedRows,
 				onSelectAll: handleSelectAll,
 				toggleSelectedRow,
+
+				// Analytics
+				analyticsQuery,
 			}}>
 			{props.children}
 		</JournalSliceContext.Provider>

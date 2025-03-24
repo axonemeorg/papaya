@@ -2,7 +2,7 @@ import { JournalEntry, JournalMeta, JournalVersion, ZiskDocument } from "@/types
 import { Migration, MigrationRun } from "@/database/migrate";
 
 export default class AddParseAmountToEntries implements Migration {
-    public version = JournalVersion["2025-03-02"]
+    public version = JournalVersion.ADD_PARSE_AMOUNT_TO_ENTRIES
     public description = 'Adds the parseAmount field to journal entries'
     public run: MigrationRun = async (records) => {
         return records.reduce((acc: ZiskDocument[], record: ZiskDocument) => {

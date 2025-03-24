@@ -38,7 +38,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
 		const journalEntry: JournalEntry = makeJournalEntry({
 			amount: formData.amount,
 			memo: formData.memo,
-			categoryIds: formData.categoryIds
+			categoryId: formData.categoryId
 		}, journal._id)
 
 		await createJournalEntry(journalEntry)

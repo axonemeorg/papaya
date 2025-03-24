@@ -31,7 +31,7 @@ export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalOrTransferEntry>()
 
 	const date: string = useWatch({ control, name: 'date' }) ?? dayjs().format('YYYY-MM-DD')
-	const categoryIds = useWatch({ control, name: 'categoryIds' })
+	const categoryId = useWatch({ control, name: 'categoryId' })
 	const sourceAccountId = useWatch({ control, name: 'sourceAccountId' })
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
@@ -211,14 +211,18 @@ export default function JournalEntryForm() {
 						<Stack gap={3} pt={1}>
 							<Controller
 								control={control}
-								name="categoryIds"
+								name="categoryId"
 								render={({ field }) => {
 									return (
 										<CategorySelector
 											{...field}
-											value={categoryIds}
-											onChange={(_event, newValue) => {
-												setValue(field.name, newValue ?? [], { shouldDirty: true })
+											value={categoryId}
+											onChange={(_event, newValue: string | string[] | null) => {
+												setValue(
+													field.name,
+													!Array.isArray(newValue) && newValue ? newValue : undefined,
+													{ shouldDirty: true }
+												)
 											}}
 										/>
 									)

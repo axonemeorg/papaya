@@ -48,8 +48,8 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const children = useWatch({ control: journalEntryForm.control, name: 'children' }) ?? []
 	const memo = currentFormState.memo ?? ''
-	const categoryIds = useWatch({ control: journalEntryForm.control, name: 'categoryIds' }) ?? []
-	const category: Category | undefined = categoryIds[0] ? getCategoriesQuery.data[categoryIds[0]] : undefined
+	const categoryId = useWatch({ control: journalEntryForm.control, name: 'categoryId' })
+	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 
 	const hasTags = journalEntryHasTags(currentFormState as JournalEntry)
 	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
