@@ -131,6 +131,13 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 	return newTask
 }
 
+export const journalEntryHasTasks = (entry: JournalEntry | TransferEntry): boolean => {
+	if (!entry.tasks) {
+		return false
+	}
+	return entry.tasks.length > 0
+}
+
 export const journalEntryHasTags = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !ReservedTagKey.options.includes(tagId as ReservedTagKey))
