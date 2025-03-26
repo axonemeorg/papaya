@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
 
-import { Account, Category, JournalEntry, TransferEntry } from '@/types/schema'
+import { Account, Category, EntryTask, JournalEntry, TransferEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -28,11 +28,12 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
 import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
+import CircularProgressWithLabel from '../icon/CircularProgressWithLabel'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -276,6 +277,13 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 								const netAmount = calculateNetAmount(entry)
 								const isFlagged = journalEntryIsFlagged(entry)
 								const hasTags = journalEntryHasTags(entry)
+								const hasTasks = journalEntryHasTasks(entry)
+								const tasks: EntryTask[] = entry.tasks ?? []
+								const numCompletedTasks: number = hasTasks ? tasks.filter((task) => task.completedAt).length : 0
+								const taskProgressString = Math.max(numCompletedTasks, tasks.length) > 9
+									? '9+'
+									: `${numCompletedTasks}/${tasks.length}`
+								const taskProgressPercentage = Math.round(100 * (numCompletedTasks / Math.max(tasks.length, 1)))
 
 								return (
 									<TableRow
@@ -323,6 +331,13 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											)}
 											{destinationAccount && (
 												<AvatarChip icon avatar={destinationAccount.avatar} label={destinationAccount.label} />
+											)}
+											{(hasTasks && taskProgressPercentage < 100) && (
+												<Stack alignItems='center' sx={{ my: -2 }}>
+													<CircularProgressWithLabel value={taskProgressPercentage}>
+														{taskProgressString}
+													</CircularProgressWithLabel>
+												</Stack>
 											)}
 										</TableCell>
 										<TableCell sx={{ width: '0%' }}>
