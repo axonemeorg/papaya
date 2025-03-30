@@ -1,5 +1,5 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Divider, Paper, Stack } from '@mui/material'
+import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
 import { JournalEntry, TransferEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
@@ -147,15 +147,17 @@ export default function JournalEditor() {
 					sx={{
 						overflow: 'hidden',
 						flex: 2,
-						gap: 2,
+						gap: 0,
 					}}
 				>
 					{/* <Grid columns={12} container>
 						<Grid size={4}> */}
-					<Stack direction='row' gap={2}>
-						<SpendChart />
-						<CategorySpreadChart />
-					</Stack>
+					<Collapse in={false}>
+						<Stack direction='row' gap={2} mb={2}>
+							<SpendChart />
+							<CategorySpreadChart />
+						</Stack>
+					</Collapse>
 						{/* </Grid>
 					</Grid> */}
 					
