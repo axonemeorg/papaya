@@ -148,8 +148,17 @@ export const journalEntryIsFlagged = (entry: JournalEntry | TransferEntry): bool
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
 }
 
+export const journalEntryHasApproximateTag = (entry: JournalEntry | TransferEntry): boolean => {
+	const entryTagIds = entry.tagIds ?? []
+	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
+}
+
 export const documentIsJournalEntryOrChildJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
 	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.type)
+}
+
+export const journalOrTransferEntryIsTransferEntry = (doc: JournalEntry | TransferEntry): doc is TransferEntry => {
+	return doc.type === 'TRANSFER_ENTRY'
 }
 
 export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {

@@ -37,17 +37,17 @@ export default function useKeyboardAction(
             }
             
             const keystroke = KEYBOARD_ACTIONS[name]
-			if (keystroke.ctrlCmd) {
-				if (macOs && !event.metaKey) {
+			if (keystroke.ctrlCmd !== undefined) {
+				if (macOs && event.metaKey === undefined) {
 					return
-				} else if (!event.ctrlKey) {
+				} else if (event.ctrlKey === undefined) {
 					return
 				}
 			} else if (event.ctrlKey) {
 				return
-			} else if ((keystroke.altOpt && !event.altKey) || (!keystroke.altOpt && event.altKey)) {
+			} else if ((keystroke.altOpt && !event.altKey) || (keystroke.altOpt === undefined && event.altKey)) {
 				return
-			} else if ((keystroke.shift && !event.shiftKey) || (!keystroke.shift && event.shiftKey)) {
+			} else if ((keystroke.shift && !event.shiftKey) || (keystroke.shift === undefined && event.shiftKey)) {
 				return
 			} else if (event.key !== keystroke.symbol) {
 				return

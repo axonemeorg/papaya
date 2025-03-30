@@ -13,7 +13,10 @@ import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
 import { Delete, Flag, LocalOffer } from '@mui/icons-material'
-import { journalEntryHasTags, journalEntryIsFlagged } from '@/utils/journal'
+import { journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import useKeyboardAction from '@/hooks/useKeyboardAction'
+import { KeyboardActionName } from '@/constants/keyboard'
+import { RESERVED_TAGS } from '@/constants/tags'
 
 interface EditJournalEntryModalProps {
 	open: boolean
@@ -93,6 +96,45 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			snackbar({ message: 'Failed to delete journal entry' })
 		})
 	}, [journal])
+
+	const toggleApproximateReservedTag = (entryId: string | null) => {
+		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
+
+		let name: 'tagIds' | `children.${number}.tagIds`
+		let existingTagIds: string[] = []
+		if (!entryId || entryId === formData._id || journalOrTransferEntryIsTransferEntry(formData)) {
+			// If no particular entry/child is targeted, target the root entry
+			entryId = formData._id
+			name = 'tagIds'
+			existingTagIds = formData.tagIds ?? []
+		} else {
+			const childrenIds = (formData as JournalEntry).children?.map((child) => child._id) ?? []
+			const childIndex: number = childrenIds.findIndex((childId) => childId === entryId)
+			name = `children.${childIndex}.tagIds`
+			existingTagIds = formData.children?.[childIndex]?.tagIds ?? []
+		}
+
+		let newTags: string[]
+		if (existingTagIds.includes(RESERVED_TAGS.APPROXIMATE._id)) {
+			newTags = existingTagIds.filter((tagId) => tagId !== RESERVED_TAGS.APPROXIMATE._id)
+		} else {
+			newTags = [...existingTagIds, RESERVED_TAGS.APPROXIMATE._id]
+		}
+
+		journalEntryForm.setValue(
+			name, newTags
+		)
+	}
+
+	useKeyboardAction(KeyboardActionName.TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG, (event) => {
+		const target = event.target as HTMLElement
+		const journalEntryIdElement = target.closest("[data-journalEntryId]");
+		let journalEntryId: string | null = null
+		if (journalEntryIdElement) {
+			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
+		}
+		toggleApproximateReservedTag(journalEntryId)
+	}, { ignoredByEditableTargets: false })
 
 	useEffect(() => {
 		if (props.open) {
