@@ -10,6 +10,8 @@ import { getDatabaseClient } from '@/database/client'
 import { MigrationEngine } from '@/database/migrate'
 import { getAccounts, getCategories, getEntryTags, getJournals } from '@/database/queries'
 import { Account, Category, EntryTag, JournalEntry, JournalMeta, TransferEntry } from '@/types/schema'
+import useKeyboardAction from '@/hooks/useKeyboardAction'
+import { KeyboardActionName } from '@/constants/keyboard'
 import { makeJournalEntry, makeTransferEntry } from '@/utils/journal'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -156,6 +158,13 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		getCategoriesQuery.refetch()
 		getEntryTagsQuery.refetch()
 	}
+
+	useKeyboardAction(KeyboardActionName.CREATE_JOURNAL_ENTRY, () => {
+		if (showJournalEntryModal) {
+			return
+		}
+		openCreateEntryModal();
+	})
 
 	useEffect(() => {
 		if (!activeJournal) {

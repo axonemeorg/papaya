@@ -18,8 +18,6 @@ import {
 import { ReactNode, useContext, useEffect } from 'react'
 import AppLogo from '../header/AppLogo'
 import { JournalContext } from '@/contexts/JournalContext'
-import useKeyboardAction from '@/hooks/useKeyboardAction'
-import { KeyboardActionName } from '@/constants/keyboard'
 
 const Link = (props: any) => {
 	return (
@@ -39,10 +37,6 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
 	const handleCreateEntry = () => {
 		journalContext.createJournalEntry()
 	}
-
-	useKeyboardAction(KeyboardActionName.CREATE_JOURNAL_ENTRY, () => {
-		handleCreateEntry();
-	})
 
 	const journalContext = useContext(JournalContext)
 	if (props.view === 'mobile') {
