@@ -2,8 +2,26 @@ import { KEYBOARD_ACTIONS, KeyboardActionName } from "@/constants/keyboard";
 import { useEffect } from "react"
 import useBrowserPlatform from "./useBrowserPlatform";
 
-export default function useKeyboardAction(name: KeyboardActionName, action: () => void): void {
+interface UseKeyboardActionOptions {
+	/**
+	 * If `true`, then attempts to trigger the action from a textarea, input,
+	 * or contenteditable target element will be ignored.
+	 */
+	ignoredByEditableTargets: boolean
+}
+
+const DEFAULT_OPTIONS: UseKeyboardActionOptions = {
+	ignoredByEditableTargets: true
+}
+
+export default function useKeyboardAction(
+	name: KeyboardActionName,
+	action: (event: KeyboardEvent) => void,
+	options: Partial<UseKeyboardActionOptions> = {}
+): void {
+	const restOptions: UseKeyboardActionOptions = { ...DEFAULT_OPTIONS, ...options }
 	const { macOs } = useBrowserPlatform()
+
     useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			const activeElement = document.activeElement as HTMLElement;
@@ -14,7 +32,7 @@ export default function useKeyboardAction(name: KeyboardActionName, action: () =
 				activeElement.tagName === 'TEXTAREA' ||
 				activeElement.isContentEditable;
 
-			if (isEditable) {
+			if (isEditable && options.ignoredByEditableTargets) {
                 return
             }
             
@@ -35,12 +53,12 @@ export default function useKeyboardAction(name: KeyboardActionName, action: () =
 				return
 			}
 
-			action()
+			action(event)
 			event.stopPropagation();
 			event.preventDefault();
 		};
 	
 		document.addEventListener('keydown', handleKeyDown);
 		return () => document.removeEventListener('keydown', handleKeyDown);
-	}, [name, action]);
+	}, [name, action, restOptions]);
 }
