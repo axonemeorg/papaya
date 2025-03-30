@@ -1,4 +1,4 @@
-import { APP_MENU } from '@/constants/menu'
+import { APP_MENU, NavMenuItem } from '@/constants/menu'
 import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
 import { Add, Create, Menu } from '@mui/icons-material'
 import {
@@ -20,12 +20,7 @@ import AppLogo from '../header/AppLogo'
 import { JournalContext } from '@/contexts/JournalContext'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
-
-const Link = (props: any) => {
-	return (
-		<a {...props} />
-	)
-}
+import { Link } from '@tanstack/react-router'
 
 interface AppMenuProps {
 	view: 'desktop' | 'mobile'
@@ -114,27 +109,30 @@ export default function AppMenu(props: AppMenuProps) {
 
 	const MenuItemList = ({ children }: { children?: ReactNode }) => {
 		return (
-			<MenuList sx={(theme) => ({ pr: 2, minWidth: theme.spacing(24) })}>
+			<MenuList component='nav' sx={(theme) => ({ pr: 2, minWidth: theme.spacing(24) })}>
 				{children}
-				{Object.entries(APP_MENU).map(([slug, menuItem]) => {
-					const selected = menuItem.pathPattern.test(pathname)
+				{APP_MENU.map((menuItem: NavMenuItem) => {
+					const selected = false
 					return (
-						<MenuItem
-							key={slug}
-							component={Link}
-							href={slug}
-							selected={selected}
-							disabled={menuItem.disabled}
-							sx={{ borderTopRightRadius: 32, borderBottomRightRadius: 32 }}>
-							<ListItemIcon>{menuItem.icon}</ListItemIcon>
-							<ListItemText>
-								<Typography
-									sx={{ fontWeight: selected ? 500 : undefined }}
-									variant={props.view === 'desktop' ? 'body2' : 'body1'}>
-									{menuItem.label}
-								</Typography>
-							</ListItemText>
-						</MenuItem>
+						<Link
+							to={menuItem.to}
+							key={menuItem.label}
+							style={{ color: 'unset', textDecoration: 'none' }}
+						>
+							<MenuItem
+								selected={selected}
+								disabled={menuItem.disabled}
+								sx={{ borderTopRightRadius: 32, borderBottomRightRadius: 32 }}>
+								<ListItemIcon>{menuItem.icon}</ListItemIcon>
+								<ListItemText>
+									<Typography
+										sx={{ fontWeight: selected ? 500 : undefined }}
+										variant={props.view === 'desktop' ? 'body2' : 'body1'}>
+										{menuItem.label}
+									</Typography>
+								</ListItemText>
+							</MenuItem>
+						</Link>
 					)
 				})}
 			</MenuList>
@@ -156,20 +154,23 @@ export default function AppMenu(props: AppMenuProps) {
 					<Box mb={2}>
 						<CreateEntryButton expanded={false} view="desktop" />
 					</Box>
-					{Object.entries(APP_MENU).map(([slug, menuItem]) => {
-						const selected = menuItem.pathPattern.test(pathname)
+					{APP_MENU.map((menuItem: NavMenuItem) => {
+						const selected = false
 						return (
-							<Tooltip key={slug} title={menuItem.label} placement="right">
-								<IconButton
-									component={Link}
-									href={slug}
-									sx={(theme) => ({
-										color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
-										backgroundColor: selected ? theme.palette.action.hover : undefined,
-									})}
-									disabled={menuItem.disabled}>
-									{menuItem.icon}
-								</IconButton>
+							<Tooltip key={menuItem.to} title={menuItem.label} placement="right">
+								<Link
+									style={{ color: 'unset', textDecoration: 'none' }}
+									to={menuItem.to}
+								>
+									<IconButton
+										sx={(theme) => ({
+											color: selected ? theme.palette.primary.main : theme.palette.text.secondary,
+											backgroundColor: selected ? theme.palette.action.hover : undefined,
+										})}
+										disabled={menuItem.disabled}>
+										{menuItem.icon}
+									</IconButton>
+								</Link>
 							</Tooltip>
 						)
 					})}
