@@ -12,8 +12,8 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
-import { Delete, Flag, LocalOffer } from '@mui/icons-material'
-import { journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import { Delete, Flag, LocalOffer, Pending } from '@mui/icons-material'
+import { journalEntryHasApproximateTag, journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -56,8 +56,10 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	const hasTags = journalEntryHasTags(currentFormState as JournalEntry)
 	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
+	const isApproximate = journalEntryHasApproximateTag(currentFormState as JournalEntry)
 	const childIsFlagged = children.some(journalEntryIsFlagged)
 	const childHasTags = children.some(journalEntryHasTags)
+	const childIsApproximate = children.some(journalEntryHasApproximateTag)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
@@ -184,6 +186,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 								<Grow key="TAGS" in>
 									<Tooltip title='Tags applied'>
 										<LocalOffer fontSize='small' sx={{ cursor: 'pointer' }} />
+									</Tooltip>
+								</Grow>
+							)}
+							{(isApproximate || childIsApproximate) && (
+								<Grow key="APPROXIMATE" in>
+									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
+										<Pending fontSize='small' sx={{ cursor: 'pointer' }} />
 									</Tooltip>
 								</Grow>
 							)}

@@ -66,7 +66,9 @@ export default function AmountField(props: AmountFieldProps) {
                     },
                     input: {  
                         startAdornment: (
-                            <InputAdornment position="start">{props.approximate ? '~' : ''}$</InputAdornment>
+                            <InputAdornment position="start" sx={(theme) => ({ color: props.approximate ? theme.palette.warning.main : undefined })}>
+                                {props.approximate ? '~' : ''}$
+                            </InputAdornment>
                         ),
                         endAdornment: disableSignChange ? undefined : (
                             <IconButton onClick={() => toggleSign()}>
