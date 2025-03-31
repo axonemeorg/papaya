@@ -32,7 +32,7 @@ export default function useKeyboardAction(
 				activeElement.tagName === 'TEXTAREA' ||
 				activeElement.isContentEditable;
 
-			if (isEditable && options.ignoredByEditableTargets) {
+			if (isEditable && options.ignoredByEditableTargets !== false) {
                 return
             }
             
