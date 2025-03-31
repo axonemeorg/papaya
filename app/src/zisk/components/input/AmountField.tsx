@@ -6,11 +6,14 @@ import { IconButton } from "@mui/material"
 
 type AmountFieldProps = TextFieldProps & {
     disableSignChange?: boolean
+    approximate?: boolean
 }
 
 export default function AmountField(props: AmountFieldProps) {
     const value = String(props.value ?? '');
     const isIncome = value.startsWith('+')
+
+    const valueWithSanitizedSymbols = value.replace(/[+-]/g, '')
 
     const toggleSign = () => {
         if (props.disableSignChange) {
@@ -21,7 +24,7 @@ export default function AmountField(props: AmountFieldProps) {
             ...event,
             target: {
                 ...event.target,
-                value: isIncome ? value.slice(1) : '+' + value,
+                value: isIncome ? valueWithSanitizedSymbols : `+${valueWithSanitizedSymbols}`,
             },
         };
 
@@ -44,6 +47,7 @@ export default function AmountField(props: AmountFieldProps) {
             .replace(/(\..*?)\..*/g, '$1') // Allow only one dot
             .replace(/(\.\d{2})\d+/g, '$1') // Limit to two decimal places
             .replace(/[-+](?!.)/g, '') // Remove any pluses or minuses that are not at the beginning of the string
+            .replace(/^([+-])\1+/, '$1') // Removes pluses or minuses that are duplicated at the start
 
         props.onChange?.({ ...event, target: { ...event.target, value: newValue } })
     }
@@ -62,7 +66,9 @@ export default function AmountField(props: AmountFieldProps) {
                     },
                     input: {  
                         startAdornment: (
-                            <InputAdornment position="start">$</InputAdornment>
+                            <InputAdornment position="start" sx={(theme) => ({ color: props.approximate ? theme.palette.warning.main : undefined })}>
+                                {props.approximate ? '~' : ''}$
+                            </InputAdornment>
                         ),
                         endAdornment: disableSignChange ? undefined : (
                             <IconButton onClick={() => toggleSign()}>

@@ -9,6 +9,7 @@ import SelectionActionModal from "../modal/SelectionActionModal"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeJournalEntry } from "@/utils/journal"
 import { EntryTagPicker } from "../pickers/EntryTagPicker"
+import { RESERVED_TAGS } from "@/constants/tags"
 
 export default function ChildJournalEntryForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
@@ -107,8 +108,10 @@ export default function ChildJournalEntryForm() {
             )}
             <Stack mt={2} mx={-1} gap={2}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
+                    const childEntryId: string = watch(`children.${index}._id`)
                     const childTags = watch(`children.${index}.tagIds`) ?? []
                     const isTagged = childTags.length > 0
+                    const isApproximate = childTags.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     
                     return (
@@ -126,6 +129,8 @@ export default function ChildJournalEntryForm() {
                                             <AmountField
                                                 {...field}
                                                 size="small"
+                                                data-journalEntryId={childEntryId}
+                                                approximate={isApproximate}
                                             />
                                         )}
                                     />

@@ -19,4 +19,10 @@ export const RESERVED_TAGS: Record<ReservedTagKey, ReservedTag> = {
         label: 'Reviewed',
         description: 'This entry has been reviewed',
     },
+    'APPROXIMATE': {
+        type: 'RESERVED_TAG',
+        _id: 'APPROXIMATE',
+        label: 'Approximate',
+        description: 'Amounts are only rough estimates'
+    }
 }

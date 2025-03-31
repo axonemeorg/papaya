@@ -16,12 +16,14 @@ const formatCurrencyAmount = (amount: number, options: Partial<FormatCurrencyAmo
 
 export interface PriceStringOptions {
 	sign: 'never' | 'whenPositive' | 'always'
+	isApproximate: boolean
 	round: boolean
 }
 
 export const getPriceString = (price: number, options: Partial<PriceStringOptions> = {}): string => {
 	const combinedOptions: PriceStringOptions = {
 		sign: 'whenPositive',
+		isApproximate: false,
 		round: false,
 		...options,
 	}
@@ -29,12 +31,18 @@ export const getPriceString = (price: number, options: Partial<PriceStringOption
 		maximumFractionDigits: 0,
 		minimumFractionDigits: 0,
 	} : {}
+	let priceString: string
 	if (price === 0) {
-		return '$0.00'
+		priceString = '$0.00'
 	} else if (price > 0) {
-		return `${['always', 'whenPositive'].includes(combinedOptions.sign) ? '+' : ''}$${formatCurrencyAmount(price, formatOptions)}`
+		priceString = `${['always', 'whenPositive'].includes(combinedOptions.sign) ? '+' : ''}$${formatCurrencyAmount(price, formatOptions)}`
 	} else {
-		return `${options.sign === 'always' ? '-' : ''}$${formatCurrencyAmount(-price)}`
+		priceString = `${options.sign === 'always' ? '-' : ''}$${formatCurrencyAmount(-price)}`
+	}
+	if (combinedOptions.isApproximate) {
+		return `~${priceString}`
+	} else {
+		return priceString
 	}
 }
 

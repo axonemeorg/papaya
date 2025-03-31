@@ -6,7 +6,7 @@ interface DollarDisplayWithTrendProps {
     price: number
     label: string
     color?: string
-    priceStringOptions?: PriceStringOptions
+    priceStringOptions?: Partial<PriceStringOptions>
     diff?: {
         basisPoints: number
         description: string

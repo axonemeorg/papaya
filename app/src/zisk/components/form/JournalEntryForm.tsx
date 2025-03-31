@@ -26,11 +26,13 @@ import EntryTasksForm from './EntryTasksForm'
 import AccountAutocomplete from '../input/AccountAutocomplete'
 import { Book, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
 import RecurrenceSelect from '../input/RecurrenceSelect'
+import { RESERVED_TAGS } from '@/constants/tags'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalOrTransferEntry>()
 
 	const date: string = useWatch({ control, name: 'date' }) ?? dayjs().format('YYYY-MM-DD')
+	const parentEntryId = useWatch({ control, name: '_id' })
 	const categoryId = useWatch({ control, name: 'categoryId' })
 	const sourceAccountId = useWatch({ control, name: 'sourceAccountId' })
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
@@ -38,6 +40,7 @@ export default function JournalEntryForm() {
 	const journalEntryId = useWatch({ control, name: '_id' })
 	const entryType = useWatch({ control, name: 'type' })
 	const childEntries = useWatch({ control, name: 'children' })
+	const isApproximate = entryTagIds && entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 
 	const handleChangeEntryType = (newType: JournalOrTransferEntry['type']) => {
 		if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
@@ -146,6 +149,8 @@ export default function JournalEntryForm() {
 												fullWidth
 												sx={{ flex: 1 }}
 												autoComplete="off"
+												data-journalEntryId={parentEntryId}
+												approximate={isApproximate}
 											/>
 										)}
 									/>

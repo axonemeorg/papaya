@@ -25,10 +25,10 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { Flag, LocalOffer } from '@mui/icons-material'
+import { Flag, LocalOffer, Pending } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasApproximateTag, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
@@ -276,8 +276,10 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 								const netAmount = calculateNetAmount(entry)
 								const isFlagged = journalEntryIsFlagged(entry)
+								const isApproximate = journalEntryHasApproximateTag(entry)
 								const hasTags = journalEntryHasTags(entry)
 								const hasTasks = journalEntryHasTasks(entry)
+								const childIsApproximate = false // TODO
 								const tasks: EntryTask[] = entry.tasks ?? []
 								const numCompletedTasks: number = hasTasks ? tasks.filter((task) => task.completedAt).length : 0
 								const taskProgressString = Math.max(numCompletedTasks, tasks.length) > 9
@@ -348,11 +350,14 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 												<Grow in={hasTags}>
 													<LocalOffer sx={{ display: 'block' }} />
 												</Grow>
+												<Grow in={isApproximate || childIsApproximate}>
+													<Pending sx={{ display: 'block' }} />
+												</Grow>
 											</Stack>
 										</TableCell>
 										<TableCell align="right" sx={{ width: '10%' }}>
-											<Typography sx={{ ...getPriceStyle(netAmount) }}>
-												{getPriceString(netAmount)}
+											<Typography sx={{ ...getPriceStyle(netAmount, isApproximate) }}>
+												{getPriceString(netAmount, { isApproximate })}
 											</Typography>
 										</TableCell>
 										<TableCell>
