@@ -25,7 +25,7 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { Flag, LocalOffer, Pending } from '@mui/icons-material'
+import { Flag, LocalOffer, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasApproximateTag, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
@@ -351,7 +351,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 													<LocalOffer sx={{ display: 'block' }} />
 												</Grow>
 												<Grow in={isApproximate || childIsApproximate}>
-													<Pending sx={{ display: 'block' }} />
+													<Update sx={{ display: 'block' }} />
 												</Grow>
 											</Stack>
 										</TableCell>

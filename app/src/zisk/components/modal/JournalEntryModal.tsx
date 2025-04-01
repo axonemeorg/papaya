@@ -12,7 +12,7 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
-import { Delete, Flag, LocalOffer, Pending } from '@mui/icons-material'
+import { Delete, Flag, LocalOffer, Update } from '@mui/icons-material'
 import { journalEntryHasApproximateTag, journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
@@ -123,9 +123,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 			newTags = [...existingTagIds, RESERVED_TAGS.APPROXIMATE._id]
 		}
 
-		journalEntryForm.setValue(
-			name, newTags
-		)
+		journalEntryForm.setValue(name, newTags, { shouldDirty: true })
 	}
 
 	useKeyboardAction(KeyboardActionName.TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG, (event) => {
@@ -192,7 +190,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 							{(isApproximate || childIsApproximate) && (
 								<Grow key="APPROXIMATE" in>
 									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
-										<Pending fontSize='small' sx={{ cursor: 'pointer' }} />
+										<Update fontSize='small' sx={{ cursor: 'pointer' }} />
 									</Tooltip>
 								</Grow>
 							)}

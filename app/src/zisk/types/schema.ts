@@ -263,6 +263,7 @@ export const ReservedTagKey = z.enum([
 	'NEEDS_REVIEW',
 	'WAS_REVIEWED',
 	'APPROXIMATE',
+	'PENDING',
 ])
 
 export type ReservedTagKey = z.output<typeof ReservedTagKey>

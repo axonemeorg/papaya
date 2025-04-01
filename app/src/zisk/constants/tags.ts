@@ -24,5 +24,11 @@ export const RESERVED_TAGS: Record<ReservedTagKey, ReservedTag> = {
         _id: 'APPROXIMATE',
         label: 'Approximate',
         description: 'Amounts are only rough estimates'
-    }
+    },
+    'PENDING': {
+        type: 'RESERVED_TAG',
+        _id: 'PENDING',
+        label: 'Pending',
+        description: 'Entry amount'
+    },
 }
