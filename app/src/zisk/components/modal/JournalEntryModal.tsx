@@ -3,7 +3,7 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { Category, JournalEntry, TransferEntry } from '@/types/schema'
+import { Category, JournalEntry, ReservedTagKey, TransferEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
@@ -12,8 +12,8 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
-import { Delete, Flag, LocalOffer, Pending } from '@mui/icons-material'
-import { journalEntryHasApproximateTag, journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
+import { enumerateJournalEntryReservedTag, journalEntryHasUserDefinedTags, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -54,12 +54,20 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const categoryId = useWatch({ control: journalEntryForm.control, name: 'categoryId' })
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 
-	const hasTags = journalEntryHasTags(currentFormState as JournalEntry)
-	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
-	const isApproximate = journalEntryHasApproximateTag(currentFormState as JournalEntry)
-	const childIsFlagged = children.some(journalEntryIsFlagged)
-	const childHasTags = children.some(journalEntryHasTags)
-	const childIsApproximate = children.some(journalEntryHasApproximateTag)
+	const hasTags = journalEntryHasUserDefinedTags(currentFormState as JournalEntry)
+	const childHasTags = children.some(journalEntryHasUserDefinedTags)
+
+	// Reserved Tags
+	const { parent: parentReservedTags, children: childReservedTags }
+		= enumerateJournalEntryReservedTag(currentFormState as JournalEntry)
+
+	const isFlagged = parentReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+	const isApproximate = parentReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+	const isPending = parentReservedTags.has(ReservedTagKey.Enum.PENDING)
+
+	const childIsFlagged = childReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+	const childIsApproximate = childReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+	const childIsPending = childReservedTags.has(ReservedTagKey.Enum.PENDING)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
@@ -99,7 +107,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		})
 	}, [journal])
 
-	const toggleApproximateReservedTag = (entryId: string | null) => {
+	const toggleReservedTag = (entryId: string | null, reservedTag: ReservedTagKey) => {
 		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
 
 		let name: 'tagIds' | `children.${number}.tagIds`
@@ -117,15 +125,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		}
 
 		let newTags: string[]
-		if (existingTagIds.includes(RESERVED_TAGS.APPROXIMATE._id)) {
-			newTags = existingTagIds.filter((tagId) => tagId !== RESERVED_TAGS.APPROXIMATE._id)
+		if (existingTagIds.includes(RESERVED_TAGS[reservedTag]._id)) {
+			newTags = existingTagIds.filter((tagId) => tagId !== RESERVED_TAGS[reservedTag]._id)
 		} else {
-			newTags = [...existingTagIds, RESERVED_TAGS.APPROXIMATE._id]
+			newTags = [...existingTagIds, RESERVED_TAGS[reservedTag]._id]
 		}
 
-		journalEntryForm.setValue(
-			name, newTags
-		)
+		journalEntryForm.setValue(name, newTags, { shouldDirty: true })
 	}
 
 	useKeyboardAction(KeyboardActionName.TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG, (event) => {
@@ -135,7 +141,17 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		if (journalEntryIdElement) {
 			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
 		}
-		toggleApproximateReservedTag(journalEntryId)
+		toggleReservedTag(journalEntryId, RESERVED_TAGS.APPROXIMATE._id)
+	}, { ignoredByEditableTargets: false })
+
+	useKeyboardAction(KeyboardActionName.TOGGLE_JOURNAL_ENTRY_PENDING_RESERVED_TAG, (event) => {
+		const target = event.target as HTMLElement
+		const journalEntryIdElement = target.closest("[data-journalEntryId]");
+		let journalEntryId: string | null = null
+		if (journalEntryIdElement) {
+			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
+		}
+		toggleReservedTag(journalEntryId, RESERVED_TAGS.PENDING._id)
 	}, { ignoredByEditableTargets: false })
 
 	useEffect(() => {
@@ -192,6 +208,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 							{(isApproximate || childIsApproximate) && (
 								<Grow key="APPROXIMATE" in>
 									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
+										<Update fontSize='small' sx={{ cursor: 'pointer' }} />
+									</Tooltip>
+								</Grow>
+							)}
+							{(isPending || childIsPending) && (
+								<Grow key="PENDING" in>
+									<Tooltip title={isApproximate ? 'Pending' : 'Sub-entry is pending'}>
 										<Pending fontSize='small' sx={{ cursor: 'pointer' }} />
 									</Tooltip>
 								</Grow>

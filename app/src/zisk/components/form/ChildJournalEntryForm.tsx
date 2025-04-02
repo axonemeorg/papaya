@@ -115,7 +115,13 @@ export default function ChildJournalEntryForm() {
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     
                     return (
-                        <Stack direction='row' alignItems={'flex-start'} sx={{ width: '100%' }} key={entry._id}>
+                        <Stack
+                            direction='row'
+                            alignItems={'flex-start'}
+                            sx={{ width: '100%' }}
+                            key={entry._id}
+                            data-journalEntryId={childEntryId}
+                        >
                             <Checkbox
                                 checked={selectedRows.includes(entry._id)}
                                 onChange={() => handleToggleSelected(entry._id)}
@@ -129,7 +135,6 @@ export default function ChildJournalEntryForm() {
                                             <AmountField
                                                 {...field}
                                                 size="small"
-                                                data-journalEntryId={childEntryId}
                                                 approximate={isApproximate}
                                             />
                                         )}

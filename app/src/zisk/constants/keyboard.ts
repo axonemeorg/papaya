@@ -6,6 +6,7 @@ export enum KeyboardActionName {
     JUMP_TO_TODAY_VIEW = 'JUMP_TO_TODAY_VIEW',
     OPEN_SEARCH_MODAL = 'OPEN_SEARCH_MODAL',
     TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG = 'TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG',
+    TOGGLE_JOURNAL_ENTRY_PENDING_RESERVED_TAG = 'TOGGLE_JOURNAL_ENTRY_PENDING_RESERVED_TAG',
 }
 
 export interface Keystroke {
@@ -23,4 +24,5 @@ export const KEYBOARD_ACTIONS: Record<KeyboardActionName, Keystroke> = {
     JUMP_TO_TODAY_VIEW: { symbol: 't' },
     OPEN_SEARCH_MODAL: { symbol: '/' },
     TOGGLE_JOURNAL_ENTRY_APPROXIMATE_RESERVED_TAG: { symbol: '~', shift: false },
+    TOGGLE_JOURNAL_ENTRY_PENDING_RESERVED_TAG: { symbol: '?', shift: false },
 }

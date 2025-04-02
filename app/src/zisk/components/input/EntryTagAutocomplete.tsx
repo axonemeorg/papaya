@@ -4,7 +4,13 @@ import { Close, Done } from "@mui/icons-material";
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
 import { RESERVED_TAGS } from '@/constants/tags'
-import { EntryTag, ReservedTag } from '@/types/schema'
+import { EntryTag, ReservedTag, ReservedTagKey } from '@/types/schema'
+
+const filteredReservedTags: Partial<Record<ReservedTagKey, ReservedTag>> = Object.fromEntries(
+	Object.entries(RESERVED_TAGS).filter(([, tag]) => {
+		return !tag.disabled && !tag.archived
+	})
+)
 
 export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
@@ -15,14 +21,14 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 	const { data, isLoading } = getEntryTagsQuery
 
 	const options: Record<string, EntryTag | ReservedTag> = {
-		...RESERVED_TAGS,
+		...filteredReservedTags,
 		...data,
 	}
 
 	return (
 		<Autocomplete
 			loading={isLoading || loading}
-			options={[...Object.keys(RESERVED_TAGS), ...Object.keys(data)]}
+			options={[...Object.keys(filteredReservedTags), ...Object.keys(data)]}
 			renderInput={(params) => <TextField {...params} label={'Tag'} />}
 			getOptionLabel={(option) => options[option]?.label}
 			renderOption={(props, option, { selected }) => {

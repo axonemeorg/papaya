@@ -19,16 +19,16 @@ import {
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
 
-import { Account, Category, EntryTask, JournalEntry, TransferEntry } from '@/types/schema'
+import { Account, Category, EntryTask, JournalEntry, ReservedTagKey, TransferEntry } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
-import { Flag, LocalOffer, Pending } from '@mui/icons-material'
+import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasApproximateTag, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryReservedTag } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
@@ -198,15 +198,6 @@ interface JournalEntryListProps {
 	onDoubleClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
 }
 
-// const isTransferEntryRecordGroup = (
-// 	journalRecordGroups: Record<string, JournalEntry[]> | Record<string, TransferEntry[]>
-// ): journalRecordGroups is Record<string, TransferEntry[]> => {
-// 	return [...Object.values(journalRecordGroups)].some((record: JournalEntry | TransferEntry) => {
-// 		return record.type === 'TRANSFER_ENTRY'
-// 	})
-// }
-
-
 export default function JournalEntryList(props: JournalEntryListProps) {
 	const isTransferEntryList = props.type === 'TRANSFER_ENTRY' // isTransferEntryRecordGroup(props.journalRecordGroups)
 	const theme = useTheme()
@@ -275,11 +266,23 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									: undefined
 
 								const netAmount = calculateNetAmount(entry)
-								const isFlagged = journalEntryIsFlagged(entry)
-								const isApproximate = journalEntryHasApproximateTag(entry)
-								const hasTags = journalEntryHasTags(entry)
+								
+								const hasTags = journalEntryHasUserDefinedTags(entry)
+								const childHasTags = (entry as JournalEntry).children?.some(journalEntryHasUserDefinedTags)
+							
+								// Reserved Tags
+								const { parent: parentReservedTags, children: childReservedTags }
+									= enumerateJournalEntryReservedTag(entry)
+							
+								const isFlagged = parentReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+								const isApproximate = parentReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+								const isPending = parentReservedTags.has(ReservedTagKey.Enum.PENDING)
+							
+								const childIsFlagged = childReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+								const childIsApproximate = childReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+								const childIsPending = childReservedTags.has(ReservedTagKey.Enum.PENDING)
+								
 								const hasTasks = journalEntryHasTasks(entry)
-								const childIsApproximate = false // TODO
 								const tasks: EntryTask[] = entry.tasks ?? []
 								const numCompletedTasks: number = hasTasks ? tasks.filter((task) => task.completedAt).length : 0
 								const taskProgressString = Math.max(numCompletedTasks, tasks.length) > 9
@@ -344,13 +347,16 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										</TableCell>
 										<TableCell sx={{ width: '0%' }}>
 											<Stack direction='row'>
-												<Grow in={isFlagged}>
+												<Grow in={isFlagged || childIsFlagged}>
 													<Flag sx={{ display: 'block' }} />
 												</Grow>
-												<Grow in={hasTags}>
+												<Grow in={hasTags || childHasTags}>
 													<LocalOffer sx={{ display: 'block' }} />
 												</Grow>
 												<Grow in={isApproximate || childIsApproximate}>
+													<Update sx={{ display: 'block' }} />
+												</Grow>
+												<Grow in={isPending || childIsPending}>
 													<Pending sx={{ display: 'block' }} />
 												</Grow>
 											</Stack>
