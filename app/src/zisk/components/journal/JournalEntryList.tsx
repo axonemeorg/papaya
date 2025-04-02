@@ -28,7 +28,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasApproximateTag, journalEntryHasTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasApproximateTag, journalEntryHasUserDefinedTags, journalEntryHasTasks, journalEntryIsFlagged } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
@@ -277,7 +277,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 								const netAmount = calculateNetAmount(entry)
 								const isFlagged = journalEntryIsFlagged(entry)
 								const isApproximate = journalEntryHasApproximateTag(entry)
-								const hasTags = journalEntryHasTags(entry)
+								const hasTags = journalEntryHasUserDefinedTags(entry)
 								const hasTasks = journalEntryHasTasks(entry)
 								const childIsApproximate = false // TODO
 								const tasks: EntryTask[] = entry.tasks ?? []

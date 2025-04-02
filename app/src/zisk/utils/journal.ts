@@ -138,7 +138,11 @@ export const journalEntryHasTasks = (entry: JournalEntry | TransferEntry): boole
 	return entry.tasks.length > 0
 }
 
-export const journalEntryHasTags = (entry: JournalEntry | TransferEntry): boolean => {
+/**
+ * Determines if an entry has any user-defined tags, namely any entry tag which
+ * isn't a Reserved Tag.
+ */
+export const journalEntryHasUserDefinedTags = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !ReservedTagKey.options.includes(tagId as ReservedTagKey))
 }

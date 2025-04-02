@@ -13,7 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
 import { Delete, Flag, LocalOffer, Update } from '@mui/icons-material'
-import { journalEntryHasApproximateTag, journalEntryHasTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import { journalEntryHasApproximateTag, journalEntryHasUserDefinedTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -54,11 +54,11 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const categoryId = useWatch({ control: journalEntryForm.control, name: 'categoryId' })
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 
-	const hasTags = journalEntryHasTags(currentFormState as JournalEntry)
+	const hasTags = journalEntryHasUserDefinedTags(currentFormState as JournalEntry)
 	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
 	const isApproximate = journalEntryHasApproximateTag(currentFormState as JournalEntry)
 	const childIsFlagged = children.some(journalEntryIsFlagged)
-	const childHasTags = children.some(journalEntryHasTags)
+	const childHasTags = children.some(journalEntryHasUserDefinedTags)
 	const childIsApproximate = children.some(journalEntryHasApproximateTag)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
@@ -198,6 +198,13 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 								</Grow>
 							)}
 							{(isApproximate || childIsApproximate) && (
+								<Grow key="APPROXIMATE" in>
+									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
+										<Update fontSize='small' sx={{ cursor: 'pointer' }} />
+									</Tooltip>
+								</Grow>
+							)}
+							{(isPending || childIsPending) && (
 								<Grow key="APPROXIMATE" in>
 									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
 										<Update fontSize='small' sx={{ cursor: 'pointer' }} />
