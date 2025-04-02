@@ -7,16 +7,18 @@ export const RESERVED_TAGS: Record<ReservedTagKey, ReservedTag> = {
         label: 'Flagged',
         description: 'This entry has been flagged for review',
     },
-    'NEEDS_REVIEW': {
+    'NEEDS_REVIEW': { // Disabled
         type: 'RESERVED_TAG',
         _id: 'NEEDS_REVIEW',
         label: 'Needs Review',
+        disabled: true,
         description: 'This entry needs to be reviewed',
     },
-    'WAS_REVIEWED': {
+    'WAS_REVIEWED': { // Disabled
         type: 'RESERVED_TAG',
         _id: 'WAS_REVIEWED',
         label: 'Reviewed',
+        disabled: true,
         description: 'This entry has been reviewed',
     },
     'APPROXIMATE': {
