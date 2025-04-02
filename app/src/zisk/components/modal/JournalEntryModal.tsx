@@ -12,8 +12,8 @@ import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
-import { Delete, Flag, LocalOffer, Update } from '@mui/icons-material'
-import { journalEntryHasApproximateTag, journalEntryHasUserDefinedTags, journalEntryIsFlagged, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
+import { enumerateJournalEntryReservedTag, journalEntryHasUserDefinedTags, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -55,11 +55,19 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 
 	const hasTags = journalEntryHasUserDefinedTags(currentFormState as JournalEntry)
-	const isFlagged = journalEntryIsFlagged(currentFormState as JournalEntry)
-	const isApproximate = journalEntryHasApproximateTag(currentFormState as JournalEntry)
-	const childIsFlagged = children.some(journalEntryIsFlagged)
 	const childHasTags = children.some(journalEntryHasUserDefinedTags)
-	const childIsApproximate = children.some(journalEntryHasApproximateTag)
+
+	// Reserved Tags
+	const { parent: parentReservedTags, children: childReservedTags }
+		= enumerateJournalEntryReservedTag(currentFormState as JournalEntry)
+
+	const isFlagged = parentReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+	const isApproximate = parentReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+	const isPending = parentReservedTags.has(ReservedTagKey.Enum.PENDING)
+
+	const childIsFlagged = childReservedTags.has(ReservedTagKey.Enum.FLAGGED)
+	const childIsApproximate = childReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
+	const childIsPending = childReservedTags.has(ReservedTagKey.Enum.PENDING)
 
 	const [debouncedhandleSaveFormWithCurrentValues, flushSaveFormDebounce] = useDebounce(handleSaveFormWithCurrentValues, 1000)
 
@@ -205,9 +213,9 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 								</Grow>
 							)}
 							{(isPending || childIsPending) && (
-								<Grow key="APPROXIMATE" in>
-									<Tooltip title={isApproximate ? 'Approximation' : 'Sub-entry is approximation'}>
-										<Update fontSize='small' sx={{ cursor: 'pointer' }} />
+								<Grow key="PENDING" in>
+									<Tooltip title={isApproximate ? 'Pending' : 'Sub-entry is pending'}>
+										<Pending fontSize='small' sx={{ cursor: 'pointer' }} />
 									</Tooltip>
 								</Grow>
 							)}

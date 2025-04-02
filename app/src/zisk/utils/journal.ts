@@ -138,20 +138,30 @@ export const journalEntryHasTasks = (entry: JournalEntry | TransferEntry): boole
 	return entry.tasks.length > 0
 }
 
+const tagIdBelongsToReservedTag = (tagId: string): tagId is ReservedTagKey => {
+	return ReservedTagKey.options.includes(tagId as ReservedTagKey)
+}
+
 /**
  * Determines if an entry has any user-defined tags, namely any entry tag which
  * isn't a Reserved Tag.
  */
 export const journalEntryHasUserDefinedTags = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
-	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !ReservedTagKey.options.includes(tagId as ReservedTagKey))
+	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !tagIdBelongsToReservedTag(tagId))
 }
 
+/**
+ * @deprecated Use enumerateJournalEntryReservedTag instead.
+ */
 export const journalEntryIsFlagged = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
 }
 
+/**
+ * @deprecated Use enumerateJournalEntryReservedTag instead.
+ */
 export const journalEntryHasApproximateTag = (entry: JournalEntry | TransferEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
@@ -180,3 +190,18 @@ export const generateRandomAvatar = (): Avatar => {
 		primaryColor,
 	}
 }
+
+export const enumerateJournalEntryReservedTag = (entry: JournalEntry | TransferEntry):
+	{ parent: Set<ReservedTagKey>, children: Set<ReservedTagKey> } => {
+		const parentTagIds: string[] = entry.tagIds ?? []
+		let childTagIds: string[]
+		if (documentIsJournalEntryOrChildJournalEntry(entry)) {
+			childTagIds = entry.children?.flatMap((child) => child.tagIds ?? []) ?? []
+		} else {
+			childTagIds = []
+		}
+		return {
+			parent: new Set<ReservedTagKey>(parentTagIds.filter(tagIdBelongsToReservedTag)),
+			children: new Set<ReservedTagKey>(childTagIds.filter(tagIdBelongsToReservedTag)),
+		}
+	}
