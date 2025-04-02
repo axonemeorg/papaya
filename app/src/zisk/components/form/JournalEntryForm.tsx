@@ -62,7 +62,7 @@ export default function JournalEntryForm() {
 
 	return (
 		<>
-			<Box sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
+			<Box data-journalEntryId={parentEntryId} sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
 				<ToggleButtonGroup exclusive value={entryType} size='small' onChange={(_event, value) => handleChangeEntryType(value)}>
 					<ToggleButton value={JOURNAL_ENTRY.value}>
 						<Stack direction='row' gap={0.5} alignItems='center'>
@@ -135,7 +135,6 @@ export default function JournalEntryForm() {
 										/>
 									)}
 								/>
-													
 							</Stack>
 							<Grid container columns={12} columnSpacing={2}>
 								<Grid size={entryType === 'JOURNAL_ENTRY' ? 8 : 4}>
@@ -149,7 +148,6 @@ export default function JournalEntryForm() {
 												fullWidth
 												sx={{ flex: 1 }}
 												autoComplete="off"
-												data-journalEntryId={parentEntryId}
 												approximate={isApproximate}
 											/>
 										)}
