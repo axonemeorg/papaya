@@ -3,7 +3,7 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { Category, JournalEntry, TransferEntry } from '@/types/schema'
+import { Category, JournalEntry, ReservedTagKey, TransferEntry } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
@@ -99,7 +99,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		})
 	}, [journal])
 
-	const toggleApproximateReservedTag = (entryId: string | null) => {
+	const toggleReservedTag = (entryId: string | null, reservedTag: ReservedTagKey) => {
 		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
 
 		let name: 'tagIds' | `children.${number}.tagIds`
@@ -117,10 +117,10 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		}
 
 		let newTags: string[]
-		if (existingTagIds.includes(RESERVED_TAGS.APPROXIMATE._id)) {
-			newTags = existingTagIds.filter((tagId) => tagId !== RESERVED_TAGS.APPROXIMATE._id)
+		if (existingTagIds.includes(RESERVED_TAGS[reservedTag]._id)) {
+			newTags = existingTagIds.filter((tagId) => tagId !== RESERVED_TAGS[reservedTag]._id)
 		} else {
-			newTags = [...existingTagIds, RESERVED_TAGS.APPROXIMATE._id]
+			newTags = [...existingTagIds, RESERVED_TAGS[reservedTag]._id]
 		}
 
 		journalEntryForm.setValue(name, newTags, { shouldDirty: true })
@@ -133,7 +133,17 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		if (journalEntryIdElement) {
 			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
 		}
-		toggleApproximateReservedTag(journalEntryId)
+		toggleReservedTag(journalEntryId, RESERVED_TAGS.APPROXIMATE._id)
+	}, { ignoredByEditableTargets: false })
+
+	useKeyboardAction(KeyboardActionName.TOGGLE_JOURNAL_ENTRY_PENDING_RESERVED_TAG, (event) => {
+		const target = event.target as HTMLElement
+		const journalEntryIdElement = target.closest("[data-journalEntryId]");
+		let journalEntryId: string | null = null
+		if (journalEntryIdElement) {
+			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
+		}
+		toggleReservedTag(journalEntryId, RESERVED_TAGS.PENDING._id)
 	}, { ignoredByEditableTargets: false })
 
 	useEffect(() => {
