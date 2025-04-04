@@ -1,4 +1,4 @@
-import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, WeekNumber } from "@/types/schema";
+import { CadenceFrequency, DayOfWeek, EntryRecurrency, MonthlyCadence, RecurringCadence, WeekNumber } from "@/types/schema";
 import { getWeekOfMonth } from "./date";
 import dayjs from "dayjs";
 import { DAYS_OF_WEEK_NAMES } from "@/constants/date";
@@ -131,8 +131,9 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
     return labelParts.join(' ')
 }
 
-export const getRecurringCadenceString = (cadence: RecurringCadence, date: string): string | undefined => {
+export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): string | undefined => {
     const stringParts = []
+    const { cadence } = recurrency
     if (cadence.interval === 1) {
         stringParts.push(FREQUENCY_LABELS[cadence.frequency].adverb)
     } else if (cadence.interval > 1) {
@@ -178,28 +179,31 @@ export const getRecurringCadenceString = (cadence: RecurringCadence, date: strin
 /**
  * @TODO optimization target
  */
-export const serializeRecurrenceCadence = (cadence: RecurringCadence): string => {
-    return JSON.stringify(cadence)
+export const serializeEntryRecurrency = (recurrency: EntryRecurrency): string => {
+    return JSON.stringify(recurrency)
 }
 
-export const deserializeRecurrenceCadence = (cadence: string): RecurringCadence | undefined => {
-    if (!cadence) {
+export const deserializeEntryRecurrency = (recurrency: string): EntryRecurrency | undefined => {
+    if (!recurrency) {
         return undefined
     }
-    let parsed: RecurringCadence
+    let parsed: EntryRecurrency
     try {
-        parsed = JSON.parse(cadence) as RecurringCadence
+        parsed = JSON.parse(recurrency) as EntryRecurrency
     } catch (_error: any) {
         return undefined
     }
     return parsed
 }
 
-export const updateRecurrenceCadenceForNewDate = (cadence: RecurringCadence | undefined, date: string): RecurringCadence | undefined => {
-    let newValue: RecurringCadence | undefined = undefined
-    if (!cadence || !date) {
+export const updateRecurrencyNewDate = (recurrency: EntryRecurrency | undefined, date: string): EntryRecurrency | undefined => {
+    if (!recurrency || !date) {
         return
     }
+
+    let newCadence: RecurringCadence | undefined = undefined
+    const { cadence } = recurrency
+
     if (cadence.frequency === 'W') {
         const dateWeekday = dayOfWeekFromDate(date)
         if (cadence.days.includes(dateWeekday)) {
@@ -210,21 +214,27 @@ export const updateRecurrenceCadenceForNewDate = (cadence: RecurringCadence | un
             return
         } else {
             // Replace the day of week
-            newValue = { ...cadence, days: [dateWeekday] }
+            newCadence = { ...cadence, days: [dateWeekday] }
         }
     } else if (cadence.frequency === 'M') {
         if ('day' in cadence.on) {
-            newValue = {
+            newCadence = {
                 ...cadence,
                 on: { day: dayjs(date).date() }
             }
         } else {
             const weekNumber = getWeekOfMonth(date)
-            newValue = {
+            newCadence = {
                 ...cadence,
                 on: { week: WeekNumber.options[weekNumber - 1] }
             }
         }
     }
-    return newValue
+
+    return newCadence
+        ? {
+            cadence: newCadence,
+            ends: null, // TODO!!
+        }
+        : undefined
 }
