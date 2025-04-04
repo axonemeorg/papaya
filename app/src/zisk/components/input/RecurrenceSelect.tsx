@@ -109,27 +109,27 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
         let cadence: RecurringCadence
         let ends: EntryRecurrency['ends']
         switch (frequency) {
-            case 'Y':
+            case CadenceFrequency.Enum.Y:
                 cadence = {
-                    frequency: 'Y',
+                    frequency: CadenceFrequency.Enum.Y,
                     interval: Number(interval),
                 }
                 break
-            case 'D':
+            case CadenceFrequency.Enum.D:
                 cadence = {
-                    frequency: 'D',
+                    frequency: CadenceFrequency.Enum.D,
                     interval: Number(interval),
                 }
                 break
-            case 'W': {
+            case CadenceFrequency.Enum.W: {
                 cadence = {
-                    frequency: 'W',
+                    frequency: CadenceFrequency.Enum.W,
                     interval: Number(interval),
                     days: Array.from(selectedWeekDays),
                 }
                 break
             }
-            case 'M':
+            case CadenceFrequency.Enum.M:
             default:
                 cadence = {
                     ...monthlyCadenceOptions[selectedMonthlyCadenceOption],
@@ -173,7 +173,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
         }
         setInterval(props.initialValue.cadence.interval)
         setFrequency(props.initialValue.cadence.frequency)
-        if (props.initialValue.cadence.frequency === 'W') {
+        if (props.initialValue.cadence.frequency ===CadenceFrequency.Enum.W) {
             setSelectedWeekDays(new Set<DayOfWeek>(props.initialValue.cadence.days))
         }
         if (props.initialValue.ends) {
@@ -260,7 +260,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             })}
                         </Select>
                     </Stack>
-                    {frequency === 'M' && (
+                    {frequency === CadenceFrequency.Enum.M && (
                         <Select
                             hiddenLabel
                             fullWidth
@@ -283,7 +283,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                             })}
                         </Select>
                     )}
-                    {frequency === 'W' && (
+                    {frequency === CadenceFrequency.Enum.W && (
                         <Stack gap={1}>
                             <Typography variant='body2'>Repeats on</Typography>
                             <DaysOfWeekPicker

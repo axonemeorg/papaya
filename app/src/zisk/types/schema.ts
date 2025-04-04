@@ -190,7 +190,11 @@ export type EntryRecurrency = z.output<typeof EntryRecurrency>;
 
 export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
 
+export type TRANSFER_ENTRY = z.output<typeof TRANSFER_ENTRY>;
+
 export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
+
+export type JOURNAL_ENTRY = z.output<typeof JOURNAL_ENTRY>;
 
 export const CommonEntryAttributes = DocumentMetadata
 	.merge(BelongsToJournal)
