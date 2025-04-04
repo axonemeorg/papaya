@@ -306,8 +306,10 @@ export const getRecurrencesForDateView = (
 			date = dateGenerator.next().value
 			numRemainingOccurrences -= 1
 			if (date) {
-				if (date.isAfter(dateViewAbsoluteEnd)) {
+				if (date.isAfter(dateViewAbsoluteEnd, 'days')) {
 					return
+				} else if (date.isBefore(dateViewAbsoluteStart, 'days')) {
+					continue
 				} else {
 					recurrenceDates[entryId].add(date.format('YYYY-MM-DD'))
 				}

@@ -226,7 +226,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 			console.log(entryId)
 			console.log(Array.from(dates))
 		})
-	}, [journalSliceContext.getJournalEntriesQuery.data])
+	}, [journalSliceContext.dateView])
 
 	return (
 		<Table size="small" sx={{ overflowY: 'scroll' }}>
