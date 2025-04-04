@@ -185,23 +185,34 @@ export const EntryRecurrency = z.object({
 		afterDate: z.string().optional(),
 	}).optional(),
 })
-
 export type EntryRecurrency = z.output<typeof EntryRecurrency>;
 
 export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
-
 export type TRANSFER_ENTRY = z.output<typeof TRANSFER_ENTRY>;
 
 export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
-
 export type JOURNAL_ENTRY = z.output<typeof JOURNAL_ENTRY>;
+
+export const TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.literal('TENTATIVE_JOURNAL_ENTRY_RECURRENCE')
+export type TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_JOURNAL_ENTRY_RECURRENCE>;
+
+export const TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.literal('TENTATIVE_TRANSFER_ENTRY_RECURRENCE')
+export type TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_TRANSFER_ENTRY_RECURRENCE>;
+
+export const NON_SPECIFIC_ENTRY = z.union([
+	TRANSFER_ENTRY,
+	JOURNAL_ENTRY,
+	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
+	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
+])
+export type NON_SPECIFIC_ENTRY = z.output<typeof NON_SPECIFIC_ENTRY>;
 
 export const CommonEntryAttributes = DocumentMetadata
 	.merge(BelongsToJournal)
 	.merge(AmountRecord)
 	.merge(
 		z.object({
-			type: z.union([TRANSFER_ENTRY, JOURNAL_ENTRY]),
+			type: NON_SPECIFIC_ENTRY,
 			memo: z.string(),
 			tagIds: z.array(z.string()).optional(),
 			categoryId: z.string().optional(),
@@ -227,7 +238,6 @@ export const TransferEntry = CommonEntryAttributes.merge(
 		destAccountId: z.string().optional(),
 	})
 )
-
 export type TransferEntry = z.output<typeof TransferEntry>
 
 export const BaseJournalEntry = CommonEntryAttributes.merge(
@@ -235,7 +245,6 @@ export const BaseJournalEntry = CommonEntryAttributes.merge(
 		type: JOURNAL_ENTRY,
 	})
 )
-
 export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 
 export const JournalEntry = BaseJournalEntry.merge(
@@ -243,12 +252,32 @@ export const JournalEntry = BaseJournalEntry.merge(
 		children: z.array(BaseJournalEntry).optional(),
 	})
 )
-
 export type JournalEntry = z.output<typeof JournalEntry>
 
-export const JournalOrTransferEntry = z.union([JournalEntry, TransferEntry])
+export const TentativeJournalEntry = JournalEntry.merge(
+	z.object({
+		type: TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
+		recurrenceOf: z.string(),
+	})
+)
+export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
 
-export type JournalOrTransferEntry = z.output<typeof JournalOrTransferEntry>
+export const TentativeTransferEntry = TransferEntry.merge(
+	z.object({
+		type: TENTATIVE_TRANSFER_ENTRY_RECURRENCE,
+		recurrenceOf: z.string(),
+	})
+)
+export type TentativeTransferEntry = z.output<typeof TentativeTransferEntry>
+
+export const NonspecificEntry = z.union([
+	JournalEntry,
+	TransferEntry,
+	TentativeJournalEntry,
+	TentativeTransferEntry,
+])
+
+export type NonspecificEntry = z.output<typeof NonspecificEntry>
 
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,
