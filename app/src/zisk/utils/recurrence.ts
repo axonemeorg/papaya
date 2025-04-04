@@ -132,12 +132,17 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
 }
 
 export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): string | undefined => {
-    const stringParts = []
-    const { cadence } = recurrency
+    const { cadence, ends } = recurrency
+
+    if (ends && 'afterNumOccurrences' in ends && ends.afterNumOccurrences === 1) {
+        return 'Once'
+    }
+
+    const cadenceStringParts = []
     if (cadence.interval === 1) {
-        stringParts.push(FREQUENCY_LABELS[cadence.frequency].adverb)
+        cadenceStringParts.push(FREQUENCY_LABELS[cadence.frequency].adverb)
     } else if (cadence.interval > 1) {
-        stringParts.push(
+        cadenceStringParts.push(
             'every',
             String(cadence.interval),
             FREQUENCY_LABELS[cadence.frequency].plural)
@@ -147,7 +152,7 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
 
     switch (cadence.frequency) {
         case CadenceFrequency.Enum.W:
-            stringParts.push(
+            cadenceStringParts.push(
                 'on',
                 isSetOfWeekdays(cadence.days)
                     ? 'weekdays'
@@ -157,13 +162,13 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
             )
             break
         case CadenceFrequency.Enum.M:
-            stringParts.push(
+            cadenceStringParts.push(
                 'on',
                 getMonthlyCadenceLabel(cadence, date)
             )
             break
         case CadenceFrequency.Enum.Y:
-            stringParts.push(
+            cadenceStringParts.push(
                 'on',
                 dayjs(date).format('MMMM D')
             )
@@ -173,7 +178,22 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
             break
     }
 
-    return stringParts.join(' ');
+    const stringParts = [
+        cadenceStringParts.join(' ')
+    ]
+    if (ends) {
+        if ('onDate' in ends) {
+            const endDay = dayjs(ends.onDate)
+            const formattedDate: string = dayjs().isSame(endDay, 'year')
+                ? endDay.format('MMM D')
+                : endDay.format('MMM D, YYYY')
+                stringParts.push(`until ${formattedDate}`)
+        } else if ('afterNumOccurrences' in ends && ends.afterNumOccurrences > 1) {
+            stringParts.push(`${ends.afterNumOccurrences} times`)
+        }
+    }
+
+    return stringParts.join(', ');
 }
 
 /**
