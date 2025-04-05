@@ -8,8 +8,10 @@ import {
 	EntryArtifact,
 	EntryRecurrency,
 	EntryTask,
+	NonspecificEntry,
 	RecurringCadence,
 	ReservedTagKey,
+	TentativeJournalEntry,
 	TransferEntry,
 	ZiskDocument,
 	type JournalEntry,
@@ -63,8 +65,12 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const calculateNetAmount = (entry: JournalEntry | TransferEntry): number => {
-	const children: JournalEntry[] = (entry.type === 'TRANSFER_ENTRY' ? null : entry.children) ?? []
+export const calculateNetAmount = (entry: NonspecificEntry): number => {
+	const children: JournalEntry[] = (
+		entry.type === 'TRANSFER_ENTRY' || entry.type === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE'
+			? null
+			: entry.children
+	) ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
 			return acc + (parseJournalEntryAmount(child.amount) ?? 0)
@@ -85,6 +91,28 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
 		memo: formData.memo || '',
+		journalId,
+	}
+
+	return entry
+}
+
+export const makeTentativeJournalEntry = (
+	formData: Partial<TentativeJournalEntry>,
+	journalId: string,
+	date: string,
+	recurrenceOf: string
+): TentativeJournalEntry => {
+	const now = new Date().toISOString()
+
+	const entry: TentativeJournalEntry = {
+		_id: formData._id ?? generateJournalEntryId(),
+		type: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
+		createdAt: now,
+		date,
+		amount: formData.amount || '',
+		memo: formData.memo || '',
+		recurrenceOf,
 		journalId,
 	}
 
@@ -137,7 +165,7 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 	return newTask
 }
 
-export const journalEntryHasTasks = (entry: JournalEntry | TransferEntry): boolean => {
+export const journalEntryHasTasks = (entry: NonspecificEntry): boolean => {
 	if (!entry.tasks) {
 		return false
 	}
@@ -152,7 +180,7 @@ const tagIdBelongsToReservedTag = (tagId: string): tagId is ReservedTagKey => {
  * Determines if an entry has any user-defined tags, namely any entry tag which
  * isn't a Reserved Tag.
  */
-export const journalEntryHasUserDefinedTags = (entry: JournalEntry | TransferEntry): boolean => {
+export const journalEntryHasUserDefinedTags = (entry: NonspecificEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !tagIdBelongsToReservedTag(tagId))
 }
@@ -160,7 +188,7 @@ export const journalEntryHasUserDefinedTags = (entry: JournalEntry | TransferEnt
 /**
  * @deprecated Use enumerateJournalEntryReservedTag instead.
  */
-export const journalEntryIsFlagged = (entry: JournalEntry | TransferEntry): boolean => {
+export const journalEntryIsFlagged = (entry: NonspecificEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
 }
@@ -168,7 +196,7 @@ export const journalEntryIsFlagged = (entry: JournalEntry | TransferEntry): bool
 /**
  * @deprecated Use enumerateJournalEntryReservedTag instead.
  */
-export const journalEntryHasApproximateTag = (entry: JournalEntry | TransferEntry): boolean => {
+export const journalEntryHasApproximateTag = (entry: NonspecificEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 }
@@ -177,7 +205,7 @@ export const documentIsJournalEntryOrChildJournalEntry = (doc: ZiskDocument): do
 	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.type)
 }
 
-export const journalOrTransferEntryIsTransferEntry = (doc: JournalEntry | TransferEntry): doc is TransferEntry => {
+export const journalOrTransferEntryIsTransferEntry = (doc: NonspecificEntry): doc is TransferEntry => {
 	return doc.type === 'TRANSFER_ENTRY'
 }
 
@@ -198,7 +226,7 @@ export const generateRandomAvatar = (): Avatar => {
 }
 
 export const enumerateJournalEntryReservedTag = (
-	entry: JournalEntry | TransferEntry
+	entry: NonspecificEntry
 ): { parent: Set<ReservedTagKey>, children: Set<ReservedTagKey> } => {
 	const parentTagIds: string[] = entry.tagIds ?? []
 	let childTagIds: string[]
@@ -252,6 +280,9 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 	}
 }
 
+/**
+ * Given a set of nonspecific entries that are known to 
+ */
 export const getRecurrencesForDateView = (
 	recurringEntries: Record<string, JournalEntry | TransferEntry>, dateView: DateView
 ): Record<string, Set<string>> => {

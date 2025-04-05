@@ -1,9 +1,9 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
-import { JournalEntry, TransferEntry } from '@/types/schema'
+import { JOURNAL_ENTRY, JournalEntry, NonspecificEntry, TentativeJournalEntry, TentativeTransferEntry, TRANSFER_ENTRY, TransferEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
-import { deleteJournalOrTransferEntry } from '@/database/actions'
+import { deleteNonspecificEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
 import { JournalContext } from '@/contexts/JournalContext'
@@ -14,7 +14,7 @@ import CategorySpreadChart from '../chart/CategorySpreadChart'
 import { useSearch } from '@tanstack/react-router'
 
 export interface JournalEntrySelection {
-	entry: JournalEntry | TransferEntry | null
+	entry: NonspecificEntry | null
 	anchorEl: HTMLElement | null
 }
 
@@ -30,10 +30,13 @@ export default function JournalEditor() {
 
 	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
 
-	const journalGroups = useMemo(() => {
-		const entries = journalSliceContext.getJournalEntriesQuery.data
-		const groups: Record<JournalEntry['_id'], JournalEntry[]> = Object.values(entries).reduce(
-			(acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
+	const journalGroups: Record<string, (JournalEntry | TentativeJournalEntry)[]> = useMemo(() => {
+		const entries: Record<string, JournalEntry | TentativeJournalEntry> = {
+			...journalSliceContext.getJournalEntriesQuery.data,
+			...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
+		}
+		const groups = Object.values(entries).reduce(
+			(acc: Record<JournalEntry['_id'], (JournalEntry | TentativeJournalEntry)[]>, entry: JournalEntry | TentativeJournalEntry) => {
 				const { date } = entry
 				if (!date) {
 					return acc
@@ -49,12 +52,15 @@ export default function JournalEditor() {
 		)
 
 		return groups
-	}, [journalSliceContext.getJournalEntriesQuery.data])
+	}, [journalSliceContext.getJournalEntriesQuery.data, journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data])
 
-	const transferGroups = useMemo(() => {
-		const entries = journalSliceContext.getTransferEntriesQuery.data
-		const groups: Record<TransferEntry['_id'], TransferEntry[]> = Object.values(entries).reduce(
-			(acc: Record<TransferEntry['_id'], TransferEntry[]>, entry: TransferEntry) => {
+	const transferGroups: Record<string, (TransferEntry | TentativeTransferEntry)[]> = useMemo(() => {
+		const entries: Record<string, TransferEntry | TentativeTransferEntry> = {
+			...journalSliceContext.getTransferEntriesQuery.data,
+			...journalSliceContext.getTentativeTransferEntryRecurrencesQuery.data,
+		}
+		const groups = Object.values(entries).reduce(
+			(acc: Record<TransferEntry['_id'], (TransferEntry | TentativeTransferEntry)[]>, entry: TransferEntry | TentativeTransferEntry) => {
 				const { date } = entry
 				if (!date) {
 					return acc
@@ -70,17 +76,21 @@ export default function JournalEditor() {
 		)
 
 		return groups
-	}, [journalSliceContext.getJournalEntriesQuery.data])
+	}, [journalSliceContext.getTransferEntriesQuery.data, journalSliceContext.getTentativeTransferEntryRecurrencesQuery.data])
 
-	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry | TransferEntry) => {
+	const handleClickListItem = (event: MouseEvent<any>, entry: NonspecificEntry) => {
 		setSelectedEntry({
 			anchorEl: event.currentTarget,
 			entry: entry,
 		})
 	}
 
-	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry| TransferEntry) => {
-		journalContext.editJournalEntry(entry)
+	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: NonspecificEntry) => {
+		if (entry.type === JOURNAL_ENTRY.value || entry.type === TRANSFER_ENTRY.value) {
+			journalContext.editJournalEntry(entry)
+		} else {
+			// TODO could add logic for double-clicking a tentative entry?
+		}
 	}
 
 	const handleDeselectListItem = () => {
@@ -93,13 +103,13 @@ export default function JournalEditor() {
 		})
 	}
 
-	const handleDeleteEntry = async (entry: JournalEntry | TransferEntry | null) => {
+	const handleDeleteEntry = async (entry: NonspecificEntry | null) => {
 		if (!entry) {
 			return
 		}
 
 		try {
-			await deleteJournalOrTransferEntry(entry._id)
+			await deleteNonspecificEntry(entry._id)
 			journalSliceContext.refetchAllDependantQueries()
 			handleDeselectListItem()
 			snackbar({

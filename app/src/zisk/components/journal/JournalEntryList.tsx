@@ -17,9 +17,9 @@ import {
 	Grow,
 	Checkbox,
 } from '@mui/material'
-import { useContext, useEffect, useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 
-import { Account, Category, EntryTask, JOURNAL_ENTRY, JournalEntry, ReservedTagKey, TRANSFER_ENTRY, TransferEntry } from '@/types/schema'
+import { Account, Category, EntryTask, JOURNAL_ENTRY, JournalEntry, NonspecificEntry, ReservedTagKey, TRANSFER_ENTRY } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -28,7 +28,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryReservedTag, getRecurrencesForDateView } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryReservedTag } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
@@ -193,9 +193,13 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 
 interface JournalEntryListProps {
 	type: JOURNAL_ENTRY | TRANSFER_ENTRY
-	journalRecordGroups: Record<string, JournalEntry[]> | Record<string, TransferEntry[]>
-	onClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
-	onDoubleClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
+	/**
+	 * Entries grouped by date, where the key is the date and the value is the
+	 * array of entries occurring on this date.
+	 */
+	journalRecordGroups: Record<string, NonspecificEntry[]>
+	onClickListItem: (event: any, entry: NonspecificEntry) => void
+	onDoubleClickListItem: (event: any, entry: NonspecificEntry) => void
 }
 
 export default function JournalEntryList(props: JournalEntryListProps) {
@@ -218,15 +222,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 			displayedJournalDates.add(startOfMonth.format('YYYY-MM-DD'))
 		}
 	}
-
-	useEffect(() => {
-		const xs = getRecurrencesForDateView(journalSliceContext.getRecurrentJournalEntriesQuery.data, journalSliceContext.dateView)
-		console.log('recurrences:')
-		Object.entries(xs).forEach(([entryId, dates]) => {
-			console.log(entryId)
-			console.log(Array.from(dates))
-		})
-	}, [journalSliceContext.dateView])
 
 	return (
 		<Table size="small" sx={{ overflowY: 'scroll' }}>
@@ -258,8 +253,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									/>
 								</TableCell>
 							</TableRow>
-							
-							{entries.map((entry) => {
+
+							{entries.map((entry: NonspecificEntry) => {
 								const { sourceAccountId, destAccountId } = (entry.type === 'TRANSFER_ENTRY' ? entry : {})
 								const sourceAccount: Account | undefined = sourceAccountId
 									? getAccountsQuery.data[sourceAccountId]
@@ -305,6 +300,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
 										selected={journalSliceContext.selectedRows[entry._id]}
+										sx={{ opacity: entry.type === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE' ? '0.5' : undefined }}
 									>
 										<TableCell
 											selectCheckbox

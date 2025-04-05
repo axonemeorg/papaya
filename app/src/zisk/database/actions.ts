@@ -9,6 +9,7 @@ import {
 	EntryTag,
 	JournalEntry,
 	JournalMeta,
+	NonspecificEntry,
 	TransferEntry,
 	ZiskDocument,
 	ZiskSettings,
@@ -84,7 +85,10 @@ export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
 	return db.bulkDocs(updatedChildren)
 }
 
-export const deleteJournalOrTransferEntry = async <T extends JournalEntry | TransferEntry>(entryId: string): Promise<T> => {
+export const deleteNonspecificEntry = async <T extends NonspecificEntry>(entryId: string): Promise<T> => {
+
+	// TODO check if it's a tentative entry; If so, add an exception in the recurring entry's exception field.
+
 	const record = await db.get(entryId)
 	await db.remove(record)
 	return record as T

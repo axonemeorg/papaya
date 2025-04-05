@@ -3,11 +3,11 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { Category, JournalEntry, ReservedTagKey, TransferEntry } from '@/types/schema'
+import { Category, JournalEntry, NonspecificEntry, ReservedTagKey } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
-import { deleteJournalOrTransferEntry, updateJournalOrTransferEntry } from '@/database/actions'
+import { deleteNonspecificEntry, updateJournalOrTransferEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
@@ -35,7 +35,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		if (!journal) {
 			return Promise.resolve()
 		}
-		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
+		const formData: NonspecificEntry = journalEntryForm.getValues()
 		return updateJournalOrTransferEntry(formData)
 			.then(() => {
 				console.log('Put journal entry.', formData)
@@ -94,8 +94,8 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}
 
 	const handleDelete = useCallback(async () => {
-		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
-		deleteJournalOrTransferEntry(formData._id).then(() => {
+		const formData: NonspecificEntry = journalEntryForm.getValues()
+		deleteNonspecificEntry(formData._id).then(() => {
 			refreshJournalEntriesQuery()
 			refreshTransferEntriesQuery()
 			snackbar({ message: 'Deleted journal entry.' })
@@ -108,7 +108,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}, [journal])
 
 	const toggleReservedTag = (entryId: string | null, reservedTag: ReservedTagKey) => {
-		const formData: JournalEntry | TransferEntry = journalEntryForm.getValues()
+		const formData: NonspecificEntry = journalEntryForm.getValues()
 
 		let name: 'tagIds' | `children.${number}.tagIds`
 		let existingTagIds: string[] = []
