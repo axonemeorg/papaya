@@ -13,6 +13,7 @@ import {
 	ReservedTagKey,
 	TentativeJournalEntry,
 	TransferEntry,
+	WeekNumber,
 	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
@@ -272,9 +273,47 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 		case CadenceFrequency.Enum.W:
 			for(;;) {
 				const weekDates = getWeekDates(date.add(interval, 'weeks'))
-				for (let day in cadence.days) {
-					date = weekDates[day as DayOfWeek]
+				for (let i in cadence.days) {
+					date = weekDates[cadence.days[i]]
 					yield date
+				}
+			}
+		case CadenceFrequency.Enum.M:
+			if ('day' in cadence.on) {
+				for(;;) {
+					date = date.startOf('month').add(interval, 'months')
+					if (cadence.on.day <= date.daysInMonth()) {
+						yield date.date(cadence.on.day)
+					}	
+				}
+			} else if ('week' in cadence.on) {
+				const dayOfWeek = date.day() // 0 = Sunday, 1 = Monday
+				const weekNumberToInteger: Record<WeekNumber, 0 | 1 | 2 | 3> = {
+					[WeekNumber.Enum.FIRST]: 0,
+					[WeekNumber.Enum.SECOND]: 1,
+					[WeekNumber.Enum.THIRD]: 2,
+					[WeekNumber.Enum.FOURTH]: 3,
+					[WeekNumber.Enum.LAST]: 0,
+				} as const
+				if (cadence.on.week === WeekNumber.Enum.LAST) {
+					let endOfMonth: dayjs.Dayjs
+					for(;;) {
+						endOfMonth = date.add(interval, 'month').endOf('month')
+						date = endOfMonth.startOf('week').add(dayOfWeek)
+						if (date.isSame(endOfMonth, 'month')) {
+							yield date
+						}
+					}
+				} else {
+					const weekDifference = weekNumberToInteger[cadence.on.week]
+					let startOfMonth: dayjs.Dayjs
+					for(;;) {
+						startOfMonth = date.add(interval, 'month').startOf('month')
+						date = startOfMonth.add(weekDifference, 'weeks').startOf('week').add(dayOfWeek)
+						if (date.isSame(startOfMonth, 'month')) {
+							yield date
+						}
+					}
 				}
 			}
 	}
@@ -287,6 +326,10 @@ export const getRecurrencesForDateView = (
 	recurringEntries: Record<string, JournalEntry | TransferEntry>, dateView: DateView
 ): Record<string, Set<string>> => {
 	const { startDate: dateViewAbsoluteStart, endDate: dateViewAbsoluteEnd } = getAbsoluteDateRangeFromDateView(dateView)
+	let maxRecurrenceCount = 0
+	if (dateViewAbsoluteStart && dateViewAbsoluteEnd) {
+		maxRecurrenceCount = dateViewAbsoluteStart.diff(dateViewAbsoluteEnd, 'days')
+	}
 
 	// Filter all entry IDs which definitely don't occur in the given date view
 	const filteredEntryIds: string[] = []
@@ -345,7 +388,12 @@ export const getRecurrencesForDateView = (
 					recurrenceDates[entryId].add(date.format('YYYY-MM-DD'))
 				}
 			}
-		} while (numRemainingOccurrences > 0 && date && (!endDate || date.isBefore(endDate, 'days')));
+		} while (
+			numRemainingOccurrences > 0
+			&& date
+			&& (!endDate || date.isBefore(endDate, 'days'))
+			&& maxRecurrenceCount-- > 0
+		)
 	})
 	return recurrenceDates
 }

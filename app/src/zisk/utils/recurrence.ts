@@ -71,13 +71,13 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
             {
                 frequency: CadenceFrequency.Enum.M,
                 on: {
-                    week: 'FOURTH'
+                    week: WeekNumber.Enum.FOURTH
                 }
             },
             {
                 frequency: CadenceFrequency.Enum.M,
                 on: {
-                    week: 'LAST'
+                    week: WeekNumber.Enum.LAST
                 }
             },
         )
@@ -109,19 +109,19 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
     } else {
         labelParts.push('the')
         switch (cadence.on.week) {
-            case 'FIRST':
+            case WeekNumber.Enum.FIRST:
                 labelParts.push('first')
                 break
-            case 'SECOND':
+            case WeekNumber.Enum.SECOND:
                 labelParts.push('second')
                 break
-            case 'THIRD':
+            case WeekNumber.Enum.THIRD:
                 labelParts.push('third')
                 break
-            case 'FOURTH':
+            case WeekNumber.Enum.FOURTH:
                 labelParts.push('fourth')
                 break
-            case 'LAST':
+            case WeekNumber.Enum.LAST:
                 labelParts.push('last')
                 break
         }
