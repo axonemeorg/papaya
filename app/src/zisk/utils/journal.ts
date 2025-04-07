@@ -21,7 +21,7 @@ import { generateJournalEntryId, generateTaskId } from './id'
 import dayjs from 'dayjs'
 import { RESERVED_TAGS } from '@/constants/tags'
 import { DEFAULT_AVATAR } from '@/components/pickers/AvatarPicker'
-import { getAbsoluteDateRangeFromDateView } from './date'
+import { getAbsoluteDateRangeFromDateView, getNthWeekdayOfMonthFromDate } from './date'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -288,31 +288,15 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 				}
 			} else if ('week' in cadence.on) {
 				const dayOfWeek = date.day() // 0 = Sunday, 1 = Monday
-				const weekNumberToInteger: Record<WeekNumber, 0 | 1 | 2 | 3> = {
-					[WeekNumber.Enum.FIRST]: 0,
-					[WeekNumber.Enum.SECOND]: 1,
-					[WeekNumber.Enum.THIRD]: 2,
-					[WeekNumber.Enum.FOURTH]: 3,
-					[WeekNumber.Enum.LAST]: 0,
-				} as const
-				if (cadence.on.week === WeekNumber.Enum.LAST) {
-					let endOfMonth: dayjs.Dayjs
-					for(;;) {
-						endOfMonth = date.add(interval, 'month').endOf('month')
-						date = endOfMonth.startOf('week').add(dayOfWeek)
-						if (date.isSame(endOfMonth, 'month')) {
-							yield date
-						}
-					}
-				} else {
-					const weekDifference = weekNumberToInteger[cadence.on.week]
-					let startOfMonth: dayjs.Dayjs
-					for(;;) {
-						startOfMonth = date.add(interval, 'month').startOf('month')
-						date = startOfMonth.add(weekDifference, 'weeks').startOf('week').add(dayOfWeek)
-						if (date.isSame(startOfMonth, 'month')) {
-							yield date
-						}
+				let month: dayjs.Dayjs = date.clone()
+				let nthWeekday: dayjs.Dayjs | undefined
+
+				for(;;) {
+					month = month.add(interval, 'months').startOf('month')
+					nthWeekday = getNthWeekdayOfMonthFromDate(month, dayOfWeek, cadence.on.week)
+					if (nthWeekday) {
+						date = nthWeekday
+						yield date
 					}
 				}
 			}
@@ -392,7 +376,7 @@ export const getRecurrencesForDateView = (
 			numRemainingOccurrences > 0
 			&& date
 			&& (!endDate || date.isBefore(endDate, 'days'))
-			&& maxRecurrenceCount-- > 0
+			// && maxRecurrenceCount-- > 0
 		)
 	})
 	return recurrenceDates
