@@ -31,6 +31,6 @@ export const RESERVED_TAGS: Record<ReservedTagKey, ReservedTag> = {
         type: 'RESERVED_TAG',
         _id: 'PENDING',
         label: 'Pending',
-        description: 'Entry amount'
+        description: 'Entry is pending'
     },
 }
