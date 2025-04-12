@@ -1,6 +1,6 @@
 import { SelectAllAction } from '@/components/journal/ribbon/JournalEntrySelectionActions'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
-import { AmountRange, Analytics, DateView, DateViewSymbol, JournalEntry, JournalSlice, TransferEntry } from '@/types/schema'
+import { AmountRange, Analytics, DateView, DateViewSymbol, JournalEntry, JournalSlice, TentativeJournalEntry, TentativeTransferEntry, TransferEntry } from '@/types/schema'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
@@ -11,6 +11,14 @@ export type JournalEditorState = { dateView: DateView } & {
 
 type JournalSliceContext = JournalEditorState & JournalSlice & {
 	// Queries
+	getTentativeJournalEntryRecurrencesQuery: DefinedUseQueryResult<
+		Record<JournalEntry['_id'], TentativeJournalEntry>,
+		Error
+	>
+	getTentativeTransferEntryRecurrencesQuery: DefinedUseQueryResult<
+		Record<JournalEntry['_id'], TentativeTransferEntry>,
+		Error
+	>
 	getJournalEntriesQuery: DefinedUseQueryResult<
 		Record<JournalEntry['_id'], JournalEntry>,
 		Error

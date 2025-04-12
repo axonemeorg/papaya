@@ -19,7 +19,7 @@ import {
 } from '@mui/material'
 import { useContext, useMemo } from 'react'
 
-import { Account, Category, EntryTask, JournalEntry, ReservedTagKey, TransferEntry } from '@/types/schema'
+import { Account, Category, EntryTask, JOURNAL_ENTRY, JournalEntry, NonspecificEntry, ReservedTagKey, TRANSFER_ENTRY } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getPriceString } from '@/utils/string'
@@ -192,10 +192,14 @@ const JournalEntryDate = (props: JournalEntryDateProps) => {
 }
 
 interface JournalEntryListProps {
-	type: JournalEntry['type'] | TransferEntry['type']
-	journalRecordGroups: Record<string, JournalEntry[]> | Record<string, TransferEntry[]>
-	onClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
-	onDoubleClickListItem: (event: any, entry: JournalEntry | TransferEntry) => void
+	type: JOURNAL_ENTRY | TRANSFER_ENTRY
+	/**
+	 * Entries grouped by date, where the key is the date and the value is the
+	 * array of entries occurring on this date.
+	 */
+	journalRecordGroups: Record<string, NonspecificEntry[]>
+	onClickListItem: (event: any, entry: NonspecificEntry) => void
+	onDoubleClickListItem: (event: any, entry: NonspecificEntry) => void
 }
 
 export default function JournalEntryList(props: JournalEntryListProps) {
@@ -249,8 +253,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									/>
 								</TableCell>
 							</TableRow>
-							
-							{entries.map((entry) => {
+
+							{entries.map((entry: NonspecificEntry) => {
 								const { sourceAccountId, destAccountId } = (entry.type === 'TRANSFER_ENTRY' ? entry : {})
 								const sourceAccount: Account | undefined = sourceAccountId
 									? getAccountsQuery.data[sourceAccountId]
@@ -296,6 +300,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
 										selected={journalSliceContext.selectedRows[entry._id]}
+										sx={{ opacity: entry.type === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE' ? '0.5' : undefined }}
 									>
 										<TableCell
 											selectCheckbox
