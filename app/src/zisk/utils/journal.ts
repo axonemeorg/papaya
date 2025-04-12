@@ -12,8 +12,8 @@ import {
 	RecurringCadence,
 	ReservedTagKey,
 	TentativeJournalEntry,
+	TentativeTransferEntry,
 	TransferEntry,
-	WeekNumber,
 	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
@@ -70,7 +70,7 @@ export const calculateNetAmount = (entry: NonspecificEntry): number => {
 	const children: JournalEntry[] = (
 		entry.type === 'TRANSFER_ENTRY' || entry.type === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE'
 			? null
-			: entry.children
+			: (entry as JournalEntry).children
 	) ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
@@ -130,6 +130,28 @@ export const makeTransferEntry = (formData: Partial<TransferEntry>, journalId: s
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
 		memo: formData.memo || '',
+		journalId,
+	}
+
+	return entry
+}
+
+export const makeTentativeTransferEntry = (
+	formData: Partial<TentativeTransferEntry>,
+	journalId: string,
+	date: string,
+	recurrenceOf: string
+): TentativeTransferEntry => {
+	const now = new Date().toISOString()
+
+	const entry: TentativeTransferEntry = {
+		_id: formData._id ?? generateJournalEntryId(),
+		type: 'TENTATIVE_TRANSFER_ENTRY_RECURRENCE',
+		createdAt: now,
+		date,
+		amount: formData.amount || '',
+		memo: formData.memo || '',
+		recurrenceOf,
 		journalId,
 	}
 
@@ -231,8 +253,8 @@ export const enumerateJournalEntryReservedTag = (
 ): { parent: Set<ReservedTagKey>, children: Set<ReservedTagKey> } => {
 	const parentTagIds: string[] = entry.tagIds ?? []
 	let childTagIds: string[]
-	if (documentIsJournalEntryOrChildJournalEntry(entry)) {
-		childTagIds = entry.children?.flatMap((child) => child.tagIds ?? []) ?? []
+	if (documentIsJournalEntryOrChildJournalEntry(entry as ZiskDocument)) {
+		childTagIds = (entry as JournalEntry).children?.flatMap((child) => child.tagIds ?? []) ?? []
 	} else {
 		childTagIds = []
 	}
@@ -310,10 +332,10 @@ export const getRecurrencesForDateView = (
 	recurringEntries: Record<string, JournalEntry | TransferEntry>, dateView: DateView
 ): Record<string, Set<string>> => {
 	const { startDate: dateViewAbsoluteStart, endDate: dateViewAbsoluteEnd } = getAbsoluteDateRangeFromDateView(dateView)
-	let maxRecurrenceCount = 0
-	if (dateViewAbsoluteStart && dateViewAbsoluteEnd) {
-		maxRecurrenceCount = dateViewAbsoluteStart.diff(dateViewAbsoluteEnd, 'days')
-	}
+	// let maxRecurrenceCount = 0
+	// if (dateViewAbsoluteStart && dateViewAbsoluteEnd) {
+	// 	maxRecurrenceCount = dateViewAbsoluteStart.diff(dateViewAbsoluteEnd, 'days')
+	// }
 
 	// Filter all entry IDs which definitely don't occur in the given date view
 	const filteredEntryIds: string[] = []

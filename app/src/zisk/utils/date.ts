@@ -1,4 +1,4 @@
-import { AnnualPeriod, DateRange, DateView, DateViewSymbol, DayOfWeek, JournalEntry, MonthlyPeriod, WeeklyPeriod, WeekNumber } from '@/types/schema'
+import { AnnualPeriod, DateRange, DateView, DateViewSymbol, JournalEntry, MonthlyPeriod, WeeklyPeriod, WeekNumber } from '@/types/schema'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'

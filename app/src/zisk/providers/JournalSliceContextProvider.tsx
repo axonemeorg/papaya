@@ -6,7 +6,7 @@ import { getJournalEntries, getRecurringJournalOrTransferEntries, getTransferEnt
 import { AmountRange, Analytics, JournalEntry, JournalSlice, TentativeJournalEntry, TentativeTransferEntry, TransferEntry } from '@/types/schema'
 import { generateAnalytics } from '@/utils/analytics'
 import { enumerateFilters } from '@/utils/filtering'
-import { calculateNetAmount, getRecurrencesForDateView, makeTentativeJournalEntry } from '@/utils/journal'
+import { calculateNetAmount, getRecurrencesForDateView, makeTentativeJournalEntry, makeTentativeTransferEntry } from '@/utils/journal'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
@@ -154,7 +154,22 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 			}
 			const recurringTransferEntries = await getRecurringJournalOrTransferEntries(journalContext.journal._id, 'TRANSFER_ENTRY')
 			const recurringEntryDates = getRecurrencesForDateView(recurringTransferEntries, journalSlice.dateView)
-			return Todo // Map the dates to fabricated TentativeJorunalEntyr
+			return Object.fromEntries(
+				Object.entries(recurringEntryDates).reduce((acc: [string, TentativeTransferEntry][], [recurringEntryId, dates]) => {
+					Array.from(dates).forEach((date: string) => {
+						const entry: TentativeTransferEntry = makeTentativeTransferEntry(
+							{},
+							journalContext.journal!._id ?? '',
+							date,
+							recurringEntryId
+						);
+
+						acc.push([entry._id, entry])
+					})
+
+					return acc
+				}, [])
+			)
 		},
 		initialData: {},
 		enabled: true,
