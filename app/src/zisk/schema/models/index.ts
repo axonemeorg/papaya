@@ -1,4 +1,4 @@
-import { z, ZodObject, ZodRawShape, ZodSchema } from "zod";
+import { z, ZodLiteral, ZodObject, ZodRawShape, ZodSchema } from "zod";
 
 export const ModelBase = z.object({
     kind: z.string(),
@@ -13,9 +13,14 @@ export const ZiskModel = z.union([
 ])
 
 
+type ZiskKindLiteral = ZodLiteral<`zisk:${string}`>;
+
+type ShapeWithKind = {
+  kind: ZiskKindLiteral;
+} & ZodRawShape;
 
 class ModelFactory {
-    public static extend<Shape extends ZodRawShape>(shape: Shape) {
+    public static extend<Shape extends ShapeWithKind>(shape: Shape) {
       const schema = z.object(shape);
       type SchemaType = z.infer<typeof schema>;
   
@@ -36,7 +41,7 @@ class ModelFactory {
   // --- DOCUMENT FACTORY ---
   
   class DocumentFactory {
-    public static extend<Shape extends ZodRawShape>(shape: Shape) {
+    public static extend<Shape extends ShapeWithKind>(shape: Shape) {
       const Base = ModelFactory.extend(shape);
       type SchemaType = z.infer<typeof Base.schema>;
   
@@ -53,7 +58,7 @@ class ModelFactory {
 
   class CategoryModel extends ModelFactory
     .extend({
-        kind: z.literal('zisk:category'),
+        kind: z.literal('zisk:hello'),
         categoryId: z.string(),
         label: z.string(),
     }) {
