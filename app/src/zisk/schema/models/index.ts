@@ -1,4 +1,4 @@
-import { z, ZodRawShape, ZodSchema } from "zod";
+import { z, ZodObject, ZodRawShape, ZodSchema } from "zod";
 
 export const ModelBase = z.object({
     kind: z.string(),
@@ -14,34 +14,42 @@ export const ZiskModel = z.union([
 
 
 
-
 class ModelFactory {
-    private static async create<M>(props: M): Promise<M> {
-      return db.create(props);
-    }
-  
     public static extend<Shape extends ZodRawShape>(shape: Shape) {
       const schema = z.object(shape);
       type SchemaType = z.infer<typeof schema>;
   
-      return class ExtendedModel {
-        private static schema: typeof schema = schema;
-  
+      return class BaseModel {
+        public static schema: ZodObject<Shape> = schema;
+
         public static async make(props: Partial<SchemaType>): Promise<SchemaType> {
-          return schema.parse(props);
+            return this.schema.parse(props);
         }
   
-        public static async create(props: Partial<SchemaType>): Promise<SchemaType> {
-          const parsed = await this.make(props);
-          return ModelFactory.create(parsed);
-        }
-  
-        public static validate(props: unknown): SchemaType {
+        public static parse(props: unknown): SchemaType {
           return this.schema.parse(props);
         }
       };
     }
   }
+  
+  // --- DOCUMENT FACTORY ---
+  
+  class DocumentFactory {
+    public static extend<Shape extends ZodRawShape>(shape: Shape) {
+      const Base = ModelFactory.extend(shape);
+      type SchemaType = z.infer<typeof Base.schema>;
+  
+      return class DocumentModel extends Base {
+  
+        public static async create(props: Partial<SchemaType>): Promise<SchemaType> {
+          const parsed = await this.make(props);
+          return db.create(parsed);
+        }
+      };
+    }
+  }
+
 
   class CategoryModel extends ModelFactory
     .extend({
