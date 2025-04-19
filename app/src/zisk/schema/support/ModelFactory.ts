@@ -1,4 +1,5 @@
 import { z, ZodLiteral, ZodObject, ZodRawShape } from "zod";
+import { v7 as uuidv7 } from 'uuid'
 
 /**
  * Type representing the string literal attriute used to disambiguate Zisk
@@ -7,15 +8,15 @@ import { z, ZodLiteral, ZodObject, ZodRawShape } from "zod";
 export type ZiskModelKind = ZodLiteral<`zisk:${string}`>;
 
 /**
- * Represents the schema shape for which all subclasses for BaseModel must
+ * Represents the schema shape for which all subclasses for Model must
  * specify.
  */
-export type ZiskModelRequiredShape = {
+export type ShapeWithZiskModelKind = {
 	kind: ZiskModelKind;
 } & ZodRawShape;
 
 /**
- * A factor class for producing Zisk ORM BaseModel classes.
+ * A factor class for producing Zisk ORM Model classes.
  */
 export class ModelFactory {
 	protected static intrinsicSchemaShape = {
@@ -28,14 +29,14 @@ export class ModelFactory {
 	 * instantiating an object instance.
 	 * 
 	 * @param domainSchemaShape The shape of the Domain schema, namely the schema
-	 * of interest for the superclass of BaseModel.
+	 * of interest for the superclass of Model.
 	 */
-	public static extend<Shape extends ZiskModelRequiredShape>(domainSchemaShape: Shape) {
+	public static fromSchema<Shape extends ShapeWithZiskModelKind>(domainSchemaShape: Shape) {
 		const intrinsicSchema = z.object(ModelFactory.intrinsicSchemaShape)
 		const derivedSchema = intrinsicSchema.extend(domainSchemaShape);
 
 		/**
-		 * Represents the type of BaseModel intrinsic schema
+		 * Represents the type of Model intrinsic schema
 		 */
 		type IntrinsicSchemaType = z.infer<typeof intrinsicSchema>
 
@@ -49,8 +50,12 @@ export class ModelFactory {
 		 * A class for performing basic static methods pertaining to domain
 		 * schema.
 		 */
-		class BaseModel {
+		class Model {
 			private static schema: ZodObject<DerivedSchemaType> = derivedSchema;
+
+			public static async generateId(): Promise<string> {
+				return uuidv7().replace(/-/g, '');
+			}
 
 			/**
 			 * Returns an object containing preset values for all intrinsic
@@ -58,7 +63,7 @@ export class ModelFactory {
 			 */
 			public static async intrinsics(): Promise<IntrinsicSchemaType> {
 				return {
-					_id: 'some-randomly-generated-model-id',
+					_id: await this.generateId(),
 					createdAt: new Date().toISOString(),
 				}
 			}
@@ -84,6 +89,6 @@ export class ModelFactory {
 			}
 		};
 
-		return BaseModel;
+		return Model;
 	}
 }

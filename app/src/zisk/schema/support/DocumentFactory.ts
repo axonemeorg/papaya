@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { ModelFactory, ZiskModelRequiredShape } from "./ModelFactory";
+import { ModelFactory, ShapeWithZiskModelKind } from "./ModelFactory";
 
 const db: any = {}
 
 /**
- * A factor class for producing Zisk ORM DocumentModel classes.
+ * A factor class for producing Zisk ORM Document classes.
  */
 export class DocumentFactory extends ModelFactory {
 	protected static override intrinsicSchemaShape = {
@@ -14,13 +14,13 @@ export class DocumentFactory extends ModelFactory {
 	};
 
 	/**
-	 * Constructs a DocumentModel class which implements extensible methods for
+	 * Constructs a Document class which implements extensible methods for
 	 * instantiating an object instance, as well as persisting it to a database.
 	 * 
 	 * @param domainSchemaShape The shape of the Domain schema, namely the schema
-	 * of interest for the superclass of BaseModel.
+	 * of interest for the superclass of Model.
 	 */
-	public static extend<Shape extends ZiskModelRequiredShape>(domainSchemaShape: Shape) {
+	public static fromSchema<Shape extends ShapeWithZiskModelKind>(domainSchemaShape: Shape) {
 		const intrinsicSchema = z.object(DocumentFactory.intrinsicSchemaShape)
 		const derivedSchema = intrinsicSchema.extend(domainSchemaShape);
 
@@ -28,11 +28,11 @@ export class DocumentFactory extends ModelFactory {
 		 * A class for performing basic static methods pertaining to domain
 		 * schema.
 		 */
-		const BaseModel = ModelFactory.extend(domainSchemaShape);
+		const Model = ModelFactory.fromSchema(domainSchemaShape);
 
 		/**
-		 * Represents the extended type of DocumentModel intrinsic schema, which
-		 * extends BaseModel intrinsic schema.
+		 * Represents the extended type of Document intrinsic schema, which
+		 * extends Model intrinsic schema.
 		 */
 		type IntrinsicSchemaType = z.infer<typeof intrinsicSchema>
 
@@ -46,17 +46,16 @@ export class DocumentFactory extends ModelFactory {
 		 * A class for performing basic static methods pertaining to domain
 		 * schema.
 		 * 
-		 * @extends BaseModel
+		 * @extends Model
 		 */
-		class DocumentModel extends BaseModel {
+		class Document extends Model {
 			/**
 			 * Returns an object containing preset values for all intrinsic
 			 * properties.
 			 */
 			public static override async intrinsics(): Promise<IntrinsicSchemaType> {
 				return {
-					_id: 'some-randomly-generated-document-id',
-					createdAt: new Date().toISOString(),
+					...(await Model.intrinsics()),
 					_rev: undefined,
 				}
 			}
@@ -72,6 +71,6 @@ export class DocumentFactory extends ModelFactory {
 			}
 		};
 
-		return DocumentModel;
+		return Document;
 	}
 }
