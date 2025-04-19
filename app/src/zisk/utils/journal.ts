@@ -68,7 +68,7 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 
 export const calculateNetAmount = (entry: NonspecificEntry): number => {
 	const children: JournalEntry[] = (
-		entry.type === 'TRANSFER_ENTRY' || entry.type === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE'
+		entry.kind === 'TRANSFER_ENTRY' || entry.kind === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE'
 			? null
 			: (entry as JournalEntry).children
 	) ?? []
@@ -87,7 +87,7 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 
 	const entry: JournalEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
-		type: 'JOURNAL_ENTRY',
+		kind: 'JOURNAL_ENTRY',
 		createdAt: now,
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
@@ -108,7 +108,7 @@ export const makeTentativeJournalEntry = (
 
 	const entry: TentativeJournalEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
-		type: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
+		kind: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
 		createdAt: now,
 		date,
 		amount: formData.amount || '',
@@ -125,7 +125,7 @@ export const makeTransferEntry = (formData: Partial<TransferEntry>, journalId: s
 
 	const entry: TransferEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
-		type: 'TRANSFER_ENTRY',
+		kind: 'TRANSFER_ENTRY',
 		createdAt: now,
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
@@ -146,7 +146,7 @@ export const makeTentativeTransferEntry = (
 
 	const entry: TentativeTransferEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
-		type: 'TENTATIVE_TRANSFER_ENTRY_RECURRENCE',
+		kind: 'TENTATIVE_TRANSFER_ENTRY_RECURRENCE',
 		createdAt: now,
 		date,
 		amount: formData.amount || '',
@@ -163,7 +163,7 @@ export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: s
 
 	const entryArtifact: EntryArtifact = {
 		_id: formData._id ?? generateTaskId(),
-		type: 'ENTRY_ARTIFACT',
+		kind: 'ENTRY_ARTIFACT',
 		originalFileName: formData.originalFileName ?? '',
     	contentType: formData.contentType ?? '',
 		size: formData.size ?? 0,
@@ -179,7 +179,7 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 
 	const newTask: EntryTask = {
 		_id: formData._id ?? generateTaskId(),
-		type: 'ENTRY_TASK',
+		kind: 'ENTRY_TASK',
 		description: formData.description ?? '',
 		completedAt: formData.completedAt ?? null,
 		journalId,
@@ -225,19 +225,19 @@ export const journalEntryHasApproximateTag = (entry: NonspecificEntry): boolean 
 }
 
 export const documentIsJournalEntryOrChildJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
-	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.type)
+	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.kind)
 }
 
 export const journalOrTransferEntryIsTransferEntry = (doc: NonspecificEntry): doc is TransferEntry => {
-	return doc.type === 'TRANSFER_ENTRY'
+	return doc.kind === 'TRANSFER_ENTRY'
 }
 
 export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {
-	return doc.type === 'CHILD_JOURNAL_ENTRY'
+	return doc.kind === 'CHILD_JOURNAL_ENTRY'
 }
 
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
-	return doc.type === 'CATEGORY'
+	return doc.kind === 'CATEGORY'
 }
 
 export const generateRandomAvatar = (): Avatar => {

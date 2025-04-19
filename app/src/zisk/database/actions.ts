@@ -31,7 +31,7 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 	const newJournalEntry: JournalEntry = {
 		...formData,
 		parsedNetAmount: calculateNetAmount(formData),
-		type: 'JOURNAL_ENTRY',
+		kind: 'JOURNAL_ENTRY',
 		createdAt: now,
 	}
 
@@ -45,7 +45,7 @@ export const createTransferEntry = async (formData: TransferEntry): Promise<Tran
 	const newJournalEntry: TransferEntry = {
 		...formData,
 		parsedNetAmount: calculateNetAmount(formData),
-		type: 'TRANSFER_ENTRY',
+		kind: 'TRANSFER_ENTRY',
 		createdAt: now,
 	}
 
@@ -101,7 +101,7 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 export const createCategory = async (formData: CreateCategory, journalId: string) => {
 	const category: Category = {
 		...formData,
-		type: 'CATEGORY',
+		kind: 'CATEGORY',
 		_id: generateCategoryId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
@@ -114,7 +114,7 @@ export const createCategory = async (formData: CreateCategory, journalId: string
 export const createAccount = async (formData: CreateAccount, journalId: string) => {
 	const category: Account = {
 		...formData,
-		type: 'ACCOUNT',
+		kind: 'ACCOUNT',
 		_id: generateAccountId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
@@ -163,7 +163,7 @@ export const undeleteCategory = async (category: Category) => {
 export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
 	const newJournal: JournalMeta = {
 		...journal,
-		type: 'JOURNAL',
+		kind: 'JOURNAL',
 		journalVersion: MigrationEngine.latestVersion,
 		_id: generateJournalId(),
 		createdAt: new Date().toISOString(),
@@ -209,7 +209,7 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 	const tag: EntryTag = {
 		label:  formData.label,
 		description: formData.description,
-		type: 'ENTRY_TAG',
+		kind: 'ENTRY_TAG',
 		_id: generateEntryTagId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,

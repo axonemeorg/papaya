@@ -24,7 +24,8 @@ const db = getDatabaseClient()
 db.createIndex({
 	index: {
 		fields: [
-			'type',
+			'type', // Deprecated
+			'kind',
 			'date',
 			'children',
 			'journalId',
@@ -95,7 +96,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 			return
 		}
 		let entry: JournalEntry | TransferEntry
-		if (values.type === 'TRANSFER_ENTRY') {
+		if (values.kind === 'TRANSFER_ENTRY') {
 			entry = makeTransferEntry(values as Partial<TransferEntry>, activeJournal._id)
 			createTransferEntry(entry)
 		} else {

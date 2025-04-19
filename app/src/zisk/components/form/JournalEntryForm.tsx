@@ -38,18 +38,18 @@ export default function JournalEntryForm() {
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
-	const entryType = useWatch({ control, name: 'type' })
+	const entryType = useWatch({ control, name: 'kind' })
 	const childEntries = useWatch({ control, name: 'children' })
 	const isApproximate = entryTagIds && entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 
-	const handleChangeEntryType = (newType: NonspecificEntry['type']) => {
+	const handleChangeEntryType = (newType: NonspecificEntry['kind']) => {
 		if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
 			const confirmedRemoveChildren = confirm('Making this entry a Transfer will remove any child entries. Are you sure?')
 			if (!confirmedRemoveChildren) {
 				return
 			}
 		}
-		setValue('type', newType)
+		setValue('kind', newType)
 	}
 
 	useEffect(() => {

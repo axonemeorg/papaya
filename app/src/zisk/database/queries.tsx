@@ -26,7 +26,7 @@ export const getCategories = async (journalId: string): Promise<Record<Category[
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ type: 'CATEGORY' },
+				{ kind: 'CATEGORY' },
 				{ journalId },
 			],
 		},
@@ -40,7 +40,7 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ type: 'ACCOUNT' },
+				{ kind: 'ACCOUNT' },
 				{ journalId },
 			],
 		},
@@ -67,10 +67,10 @@ export const getTransferEntries = async (
 export const getJournalOrTransferEntries = async (
 	journalSlice: JournalSlice,
 	journalId: string,
-	type: JOURNAL_ENTRY | TRANSFER_ENTRY
+	kind: JOURNAL_ENTRY | TRANSFER_ENTRY
 ): Promise<Record<string, JournalEntry | TransferEntry>> => {
 	const selectorClauses: any[] = [
-		{ type },
+		{ kind },
 		{ journalId },
 	]
 	
@@ -123,10 +123,10 @@ export const getJournalOrTransferEntries = async (
 
 export const getRecurringJournalOrTransferEntries = async (
 	journalId: string,
-	type: JOURNAL_ENTRY | TRANSFER_ENTRY
+	kind: JOURNAL_ENTRY | TRANSFER_ENTRY
 ): Promise<Record<string, JournalEntry | TransferEntry>> => {
 	const selectorClauses: any[] = [
-		{ type },
+		{ kind },
 		{ journalId },
 		{ recurs: {
 			$exists: true,
@@ -150,7 +150,7 @@ export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ type: 'ENTRY_TAG' },
+				{ kind: 'ENTRY_TAG' },
 				{ journalId },
 			],
 		},
@@ -164,7 +164,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 	// Attempt to fetch the meta document by its key
 	const results = await db.find({
 		selector: {
-			type: 'ZISK_META',
+			kind: 'ZISK_META',
 		},
 	})
 	if (results.docs.length > 0) {
@@ -179,7 +179,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalMeta>> => {
 	const result = await db.find({
 		selector: {
-			type: 'JOURNAL',
+			kind: 'JOURNAL',
 		},
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
@@ -191,7 +191,7 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ type: 'ENTRY_ARTIFACT' },
+				{ kind: 'ENTRY_ARTIFACT' },
 				{ journalId },
 			],
 		},

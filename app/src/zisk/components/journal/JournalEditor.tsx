@@ -86,7 +86,7 @@ export default function JournalEditor() {
 	}
 
 	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: NonspecificEntry) => {
-		if (entry.type === JOURNAL_ENTRY.value || entry.type === TRANSFER_ENTRY.value) {
+		if (entry.kind === JOURNAL_ENTRY.value || entry.kind === TRANSFER_ENTRY.value) {
 			journalContext.editJournalEntry(entry)
 		} else {
 			// TODO could add logic for double-clicking a tentative entry?
@@ -189,7 +189,7 @@ export default function JournalEditor() {
 							overflowY: 'auto',
 						}}>
 							<JournalEntryList
-								type={tab === 'journal' ? 'JOURNAL_ENTRY' : 'TRANSFER_ENTRY'}
+								kind={tab === 'journal' ? 'JOURNAL_ENTRY' : 'TRANSFER_ENTRY'}
 								journalRecordGroups={tab === 'journal' ? journalGroups : transferGroups}
 								onClickListItem={handleClickListItem}
 								onDoubleClickListItem={handleDoubleClickListItem}
