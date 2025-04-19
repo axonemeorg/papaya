@@ -1,6 +1,7 @@
 import AddParseAmountToEntries from "./migrations/2025-03-02_AddParseAmountToEntries";
 import { JournalMeta, JournalVersion, ZiskDocument } from "@/types/schema";
 import SingleCategory from "./migrations/2025-03-23_SingleCategory";
+import ReplaceTypeWithKind from "./migrations/2025-04-18_ReplaceTypeWithKind";
 
 export type MigrationRun = (records: ZiskDocument[]) => Promise<[JournalMeta, ...ZiskDocument[]]>
 
@@ -11,11 +12,12 @@ export abstract class Migration {
 }
 
 export class MigrationEngine {
-    public static latestVersion: JournalVersion = JournalVersion.REPLACE_CATEGORY_IDS
+    public static latestVersion: JournalVersion = JournalVersion.REPLACE_TYPE_WITH_KIND
 
     private static VERSION_STRATEGY: Omit<Record<JournalVersion, Migration>, typeof this.latestVersion> = {
         [JournalVersion.INITIAL_VERSION]: new AddParseAmountToEntries(),
         [JournalVersion.ADD_PARSE_AMOUNT_TO_ENTRIES]: new SingleCategory(),
+        [JournalVersion.REPLACE_CATEGORY_IDS]: new ReplaceTypeWithKind(),
     }
 
     private static initialMigration: MigrationRun = async (records) => {
