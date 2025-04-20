@@ -545,7 +545,6 @@ export enum JournalVersion {
     INITIAL_VERSION = '2025-03-01',
     ADD_PARSE_AMOUNT_TO_ENTRIES = '2025-03-02',
     REPLACE_CATEGORY_IDS = '2025-03-23',
-	REPLACE_TYPE_WITH_KIND = '2025-04-18',
 }
 
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
