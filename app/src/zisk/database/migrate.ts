@@ -20,7 +20,7 @@ export class MigrationEngine {
 
     private static initialMigration: MigrationRun = async (records) => {
         return records.reduce((acc: ZiskDocument[], record: ZiskDocument) => {
-            if (record.kind === 'JOURNAL') {
+            if (record.kind === 'zisk:journal') {
                 if (!record.journalVersion || typeof record.journalVersion !== 'string') {
                     record.journalVersion = JournalVersion.INITIAL_VERSION
                 }

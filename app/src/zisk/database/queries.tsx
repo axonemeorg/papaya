@@ -26,7 +26,7 @@ export const getCategories = async (journalId: string): Promise<Record<Category[
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ kind: 'CATEGORY' },
+				{ kind: 'zisk:category' },
 				{ journalId },
 			],
 		},
@@ -179,7 +179,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalMeta>> => {
 	const result = await db.find({
 		selector: {
-			kind: 'JOURNAL',
+			kind: 'zisk:journal',
 		},
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})

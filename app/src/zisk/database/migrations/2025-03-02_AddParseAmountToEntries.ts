@@ -6,7 +6,7 @@ export default class AddParseAmountToEntries implements Migration {
     public description = 'Adds the parseAmount field to journal entries'
     public run: MigrationRun = async (records) => {
         return records.reduce((acc: ZiskDocument[], record: ZiskDocument) => {
-            if (record.kind === 'JOURNAL') {
+            if (record.kind === 'zisk:journal') {
                 return [record, ...acc]
             }
             if (record.kind === 'JOURNAL_ENTRY') {

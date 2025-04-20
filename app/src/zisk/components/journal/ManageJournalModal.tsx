@@ -32,7 +32,7 @@ interface ManageJournalModalProps {
 }
 
 const JOURNAL_TYPE_LABEL_MAP = {
-	'JOURNAL': 'Zisk Journal',
+	'zisk:journal': 'Zisk Journal',
 }
 
 function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {

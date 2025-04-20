@@ -101,7 +101,7 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 export const createCategory = async (formData: CreateCategory, journalId: string) => {
 	const category: Category = {
 		...formData,
-		kind: 'CATEGORY',
+		kind: 'zisk:category',
 		_id: generateCategoryId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
@@ -163,7 +163,7 @@ export const undeleteCategory = async (category: Category) => {
 export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
 	const newJournal: JournalMeta = {
 		...journal,
-		kind: 'JOURNAL',
+		kind: 'zisk:journal',
 		journalVersion: MigrationEngine.latestVersion,
 		_id: generateJournalId(),
 		createdAt: new Date().toISOString(),

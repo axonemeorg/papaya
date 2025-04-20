@@ -49,7 +49,7 @@ export type CreateCategory = z.output<typeof CreateCategory>
 
 export const Category = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
-		kind: z.literal('CATEGORY'),
+		kind: z.literal('zisk:category'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
@@ -254,30 +254,30 @@ export const JournalEntry = BaseJournalEntry.merge(
 )
 export type JournalEntry = z.output<typeof JournalEntry>
 
-export const TentativeJournalEntry = JournalEntry.merge(
-	z.object({
-		kind: TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-		recurrenceOf: z.string(),
-	})
-)
-export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
+// export const TentativeJournalEntry = JournalEntry.merge(
+// 	z.object({
+// 		kind: TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
+// 		recurrenceOf: z.string(),
+// 	})
+// )
+// export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
 
-export const TentativeTransferEntry = TransferEntry.merge(
-	z.object({
-		kind: TENTATIVE_TRANSFER_ENTRY_RECURRENCE,
-		recurrenceOf: z.string(),
-	})
-)
-export type TentativeTransferEntry = z.output<typeof TentativeTransferEntry>
+// export const TentativeTransferEntry = TransferEntry.merge(
+// 	z.object({
+// 		kind: TENTATIVE_TRANSFER_ENTRY_RECURRENCE,
+// 		recurrenceOf: z.string(),
+// 	})
+// )
+// export type TentativeTransferEntry = z.output<typeof TentativeTransferEntry>
 
-export const NonspecificEntry = z.union([
-	JournalEntry,
-	TransferEntry,
-	TentativeJournalEntry,
-	TentativeTransferEntry,
-])
+// export const NonspecificEntry = z.union([
+// 	JournalEntry,
+// 	TransferEntry,
+// 	TentativeJournalEntry,
+// 	TentativeTransferEntry,
+// ])
 
-export type NonspecificEntry = z.output<typeof NonspecificEntry>
+// export type NonspecificEntry = z.output<typeof NonspecificEntry>
 
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,
@@ -549,7 +549,7 @@ export enum JournalVersion {
 
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	z.object({
-		kind: z.literal('JOURNAL'),
+		kind: z.literal('zisk:journal'),
 		journalVersion: z.nativeEnum(JournalVersion),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),

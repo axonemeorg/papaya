@@ -237,7 +237,7 @@ export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJour
 }
 
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
-	return doc.kind === 'CATEGORY'
+	return doc.kind === 'zisk:category'
 }
 
 export const generateRandomAvatar = (): Avatar => {
