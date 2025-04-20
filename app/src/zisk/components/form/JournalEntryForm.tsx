@@ -13,7 +13,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
-import { EntryRecurrency, JOURNAL_ENTRY, NonspecificEntry, TRANSFER_ENTRY } from '@/types/schema'
+import { EntryRecurrency, JournalEntry } from '@/types/schema'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
 import ChildJournalEntryForm from './ChildJournalEntryForm'
@@ -29,7 +29,7 @@ import RecurrenceSelect from '../input/RecurrenceSelect'
 import { RESERVED_TAGS } from '@/constants/tags'
 
 export default function JournalEntryForm() {
-	const { setValue, control, register } = useFormContext<NonspecificEntry>()
+	const { setValue, control, register } = useFormContext<JournalEntry>()
 
 	const date: string = useWatch({ control, name: 'date' }) ?? dayjs().format('YYYY-MM-DD')
 	const parentEntryId = useWatch({ control, name: '_id' })
@@ -38,18 +38,18 @@ export default function JournalEntryForm() {
 	const entryTagIds = useWatch({ control, name: 'tagIds' })
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
-	const entryType = useWatch({ control, name: 'type' })
-	const childEntries = useWatch({ control, name: 'children' })
+	const entryType = useWatch({ control, name: 'kind' })
+	const _childEntries = useWatch({ control, name: 'children' })
 	const isApproximate = entryTagIds && entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 
-	const handleChangeEntryType = (newType: NonspecificEntry['type']) => {
-		if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
-			const confirmedRemoveChildren = confirm('Making this entry a Transfer will remove any child entries. Are you sure?')
-			if (!confirmedRemoveChildren) {
-				return
-			}
-		}
-		setValue('type', newType)
+	const handleChangeEntryType = (_newType: JournalEntry['kind']) => {
+		// if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
+		// 	const confirmedRemoveChildren = confirm('Making this entry a Transfer will remove any child entries. Are you sure?')
+		// 	if (!confirmedRemoveChildren) {
+		// 		return
+		// 	}
+		// }
+		// setValue('kind', newType)
 	}
 
 	useEffect(() => {
@@ -60,18 +60,20 @@ export default function JournalEntryForm() {
 			.catch()
 	}, [journalEntryId])
 
+	const isTransferEntry = false
+
 	return (
 		<>
 			<Box data-journalEntryId={parentEntryId} sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
 				<ToggleButtonGroup exclusive value={entryType} size='small' onChange={(_event, value) => handleChangeEntryType(value)}>
-					<ToggleButton value={JOURNAL_ENTRY.value}>
+					<ToggleButton value={''}>
 						<Stack direction='row' gap={0.5} alignItems='center'>
 							<Book sx={{ mr: 0 }} />
 							<span>Ledger</span>
 							<Tooltip title="Journal entry"><InfoOutlined fontSize='small' /></Tooltip>
 						</Stack>
 					</ToggleButton>
-					<ToggleButton value={TRANSFER_ENTRY.value}>
+					<ToggleButton value={'_transfer_old'}>
 						<Stack direction='row' gap={0.5} alignItems='center'>
 							<TransferWithinAStation sx={{ mr: 0 }} />
 							<span>Transfer</span>
@@ -137,7 +139,7 @@ export default function JournalEntryForm() {
 								/>
 							</Stack>
 							<Grid container columns={12} columnSpacing={2}>
-								<Grid size={entryType === 'JOURNAL_ENTRY' ? 8 : 4}>
+								<Grid size={!isTransferEntry ? 8 : 4}>
 									<Controller
 										control={control}
 										name="amount"
@@ -168,7 +170,7 @@ export default function JournalEntryForm() {
 													renderInput={(params) => (
 														<TextField
 															{...params}
-															label={entryType === 'JOURNAL_ENTRY' ? 'Account' : 'From Account'}
+															label={isTransferEntry ? 'From Account' : 'Account'}
 															variant='filled'
 														/>
 													)}
@@ -177,18 +179,18 @@ export default function JournalEntryForm() {
 										}}
 									/>
 								</Grid>
-								{entryType === 'TRANSFER_ENTRY' && (
+								{isTransferEntry && (
 									<Grid size={4}>
 										<Controller
 											control={control}
-											name="destAccountId"
+											name="transfer.destAccountId" // TODO
 											render={({ field }) => {
 												return (
 													<AccountAutocomplete
 														{...field}
 														value={sourceAccountId}
 														onChange={(_event, newValue) => {
-															setValue(field.name, newValue ?? undefined, { shouldDirty: true })
+															setValue('transfer', newValue ? { destAccountId: newValue } : undefined, { shouldDirty: true })
 														}}
 														renderInput={(params) => (
 															<TextField
@@ -205,7 +207,7 @@ export default function JournalEntryForm() {
 								)}
 							</Grid>
 						</Stack>
-						<Collapse in={entryType === 'JOURNAL_ENTRY'}>
+						<Collapse in={!isTransferEntry}>
 							<ChildJournalEntryForm />
 						</Collapse>
 						<EntryArtifactsForm />

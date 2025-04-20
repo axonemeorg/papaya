@@ -22,7 +22,7 @@ export const DocumentMetadata = IdentifierMetadata.merge(
 		_rev: z.string().optional(),
 		_deleted: z.boolean().optional(),
 		_attachments: z.record(z.string(), AttachmentMeta).optional(),
-		type: z.string(),
+		kind: z.string(),
 	})
 )
 
@@ -49,7 +49,7 @@ export type CreateCategory = z.output<typeof CreateCategory>
 
 export const Category = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
-		type: z.literal('CATEGORY'),
+		kind: z.literal('zisk:category'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
@@ -68,7 +68,7 @@ export type AmountRecord = z.output<typeof AmountRecord>
 
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
-		type: z.literal('ENTRY_ARTIFACT'),
+		kind: z.literal('zisk:artifact'),
 		originalFileName: z.string(),
 		size: z.number(),
 		contentType: z.string(),
@@ -82,7 +82,7 @@ export type EntryArtifact = z.output<typeof EntryArtifact>
 
 export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
-		type: z.literal('ENTRY_TASK'),
+		kind: z.literal('zisk:task'),
 		description: z.string(),
 		completedAt: z.string().nullable(),
 	})
@@ -187,32 +187,12 @@ export const EntryRecurrency = z.object({
 })
 export type EntryRecurrency = z.output<typeof EntryRecurrency>;
 
-export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
-export type TRANSFER_ENTRY = z.output<typeof TRANSFER_ENTRY>;
-
-export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
-export type JOURNAL_ENTRY = z.output<typeof JOURNAL_ENTRY>;
-
-export const TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.literal('TENTATIVE_JOURNAL_ENTRY_RECURRENCE')
-export type TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_JOURNAL_ENTRY_RECURRENCE>;
-
-export const TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.literal('TENTATIVE_TRANSFER_ENTRY_RECURRENCE')
-export type TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_TRANSFER_ENTRY_RECURRENCE>;
-
-export const NON_SPECIFIC_ENTRY = z.union([
-	TRANSFER_ENTRY,
-	JOURNAL_ENTRY,
-	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-])
-export type NON_SPECIFIC_ENTRY = z.output<typeof NON_SPECIFIC_ENTRY>;
-
-export const CommonEntryAttributes = DocumentMetadata
+export const BaseJournalEntry = DocumentMetadata
 	.merge(BelongsToJournal)
 	.merge(AmountRecord)
 	.merge(
 		z.object({
-			type: NON_SPECIFIC_ENTRY,
+			kind: z.literal('zisk:entry'),
 			memo: z.string(),
 			tagIds: z.array(z.string()).optional(),
 			categoryId: z.string().optional(),
@@ -230,58 +210,36 @@ export const CommonEntryAttributes = DocumentMetadata
 		})
 )
 
-export type CommonEntryAttributes = z.output<typeof CommonEntryAttributes>
-
-export const TransferEntry = CommonEntryAttributes.merge(
-	z.object({
-		type: TRANSFER_ENTRY,
-		destAccountId: z.string().optional(),
-	})
-)
-export type TransferEntry = z.output<typeof TransferEntry>
-
-export const BaseJournalEntry = CommonEntryAttributes.merge(
-	z.object({
-		type: JOURNAL_ENTRY,
-	})
-)
 export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 
 export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
+		transfer: z.object({
+			destAccountId: z.string()
+		}).optional(),
 	})
 )
 export type JournalEntry = z.output<typeof JournalEntry>
 
-export const TentativeJournalEntry = JournalEntry.merge(
-	z.object({
-		type: TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-		recurrenceOf: z.string(),
-	})
-)
-export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
+// export const TentativeJournalEntry = JournalEntry.merge(
+// 	z.object({
+// 		kind: TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
+// 		recurrenceOf: z.string(),
+// 	})
+// )
+// export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
 
-export const TentativeTransferEntry = TransferEntry.merge(
-	z.object({
-		type: TENTATIVE_TRANSFER_ENTRY_RECURRENCE,
-		recurrenceOf: z.string(),
-	})
-)
-export type TentativeTransferEntry = z.output<typeof TentativeTransferEntry>
+// export const NonspecificEntry = z.union([
+// 	JournalEntry,
+// 	TentativeJournalEntry,
+// ])
 
-export const NonspecificEntry = z.union([
-	JournalEntry,
-	TransferEntry,
-	TentativeJournalEntry,
-	TentativeTransferEntry,
-])
-
-export type NonspecificEntry = z.output<typeof NonspecificEntry>
+// export type NonspecificEntry = z.output<typeof NonspecificEntry>
 
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,
-	type: z.literal('CHILD_JOURNAL_ENTRY'),
+	// kind: z.literal('CHILD_JOURNAL_ENTRY'), // Not needed?
 }))
 
 export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
@@ -312,7 +270,7 @@ export type ReservedTagKey = z.output<typeof ReservedTagKey>
 
 export const ReservedTag = CreateEntryTag.merge(z.object({
 	_id: ReservedTagKey,
-	type: z.literal('RESERVED_TAG'),
+	kind: z.literal('RESERVED_TAG'),
 	/**
 	 * The Reserved Tag is not selectable within the app.
 	 */
@@ -327,7 +285,7 @@ export type ReservedTag = z.output<typeof ReservedTag>
 
 export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
 	z.object({
-		type: z.literal('ENTRY_TAG'),
+		kind: z.literal('zisk:tag'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
 	})
@@ -345,7 +303,7 @@ export type CreateAccount = z.output<typeof CreateAccount>
 
 export const Account = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
-		type: z.literal('ACCOUNT'),
+		kind: z.literal('zisk:account'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
@@ -525,7 +483,7 @@ export type ZiskSettings = z.output<typeof ZiskSettings>
 
 export const ZiskMeta = IdentifierMetadata.merge(
 	z.object({
-		type: z.literal('ZISK_META'),
+		kind: z.literal('ZISK_META'),
 		activeJournalId: z.string().nullable(),
 		settings: ZiskSettings,
 		createdAt: z.string(),
@@ -549,7 +507,7 @@ export enum JournalVersion {
 
 export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	z.object({
-		type: z.literal('JOURNAL'),
+		kind: z.literal('zisk:journal'),
 		journalVersion: z.nativeEnum(JournalVersion),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
@@ -561,7 +519,6 @@ export type JournalMeta = z.output<typeof JournalMeta>
 export const ZiskDocument = z.union([
 	Category,
 	JournalEntry,
-	TransferEntry,
 	ChildJournalEntry,
 	EntryTag,
 	JournalMeta,
