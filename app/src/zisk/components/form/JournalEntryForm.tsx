@@ -39,10 +39,10 @@ export default function JournalEntryForm() {
 	const attachments = useWatch({ control, name: '_attachments' }) ?? {}
 	const journalEntryId = useWatch({ control, name: '_id' })
 	const entryType = useWatch({ control, name: 'kind' })
-	const childEntries = useWatch({ control, name: 'children' })
+	const _childEntries = useWatch({ control, name: 'children' })
 	const isApproximate = entryTagIds && entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 
-	const handleChangeEntryType = (newType: JournalEntry['kind']) => {
+	const handleChangeEntryType = (_newType: JournalEntry['kind']) => {
 		// if (newType === TRANSFER_ENTRY.value && childEntries && childEntries.length > 0) {
 		// 	const confirmedRemoveChildren = confirm('Making this entry a Transfer will remove any child entries. Are you sure?')
 		// 	if (!confirmedRemoveChildren) {
@@ -183,14 +183,14 @@ export default function JournalEntryForm() {
 									<Grid size={4}>
 										<Controller
 											control={control}
-											name="transferTo.destAccountId" // TODO
+											name="transfer.destAccountId" // TODO
 											render={({ field }) => {
 												return (
 													<AccountAutocomplete
 														{...field}
 														value={sourceAccountId}
 														onChange={(_event, newValue) => {
-															setValue(field.name, newValue ?? undefined, { shouldDirty: true })
+															setValue('transfer', newValue ? { destAccountId: newValue } : undefined, { shouldDirty: true })
 														}}
 														renderInput={(params) => (
 															<TextField

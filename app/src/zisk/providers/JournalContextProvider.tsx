@@ -118,7 +118,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		setShowSelectJournalModal(true)
 	}
 
-	const migrateJournal = async (journal: JournalMeta): Promise<JournalMeta> => {
+	const _migrateJournal = async (journal: JournalMeta): Promise<JournalMeta> => {
 		if (!MigrationEngine.shouldMigrate(journal)) {
 			console.log(`Journal ${journal.journalName}@${journal.journalVersion} is on the latest version.`)
 			return journal
@@ -132,7 +132,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	}
 
 	const loadActiveJournal = async (journal: JournalMeta): Promise<JournalMeta> => {
-		const updatedJournal = await migrateJournal(journal)
+		// const updatedJournal = await migrateJournal(journal)
+		const updatedJournal = journal // Migrations are deprecated for now
 		
 		setActiveJournal(updatedJournal)
 		return updatedJournal

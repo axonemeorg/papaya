@@ -98,7 +98,7 @@ export const createCategory = async (formData: CreateCategory, journalId: string
 export const createAccount = async (formData: CreateAccount, journalId: string) => {
 	const category: Account = {
 		...formData,
-		kind: 'ACCOUNT',
+		kind: 'zisk:account',
 		_id: generateAccountId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
@@ -193,7 +193,7 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 	const tag: EntryTag = {
 		label:  formData.label,
 		description: formData.description,
-		kind: 'ENTRY_TAG',
+		kind: 'zisk:tag',
 		_id: generateEntryTagId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,

@@ -37,7 +37,7 @@ export const getAccounts = async (journalId: string): Promise<Record<Account['_i
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ kind: 'ACCOUNT' },
+				{ kind: 'zisk:account' },
 				{ journalId },
 			],
 		},
@@ -131,7 +131,7 @@ export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ kind: 'ENTRY_TAG' },
+				{ kind: 'zisk:tag' },
 				{ journalId },
 			],
 		},
@@ -172,7 +172,7 @@ export const getArtifacts = async (journalId: string): Promise<Record<EntryArtif
 	const result = await db.find({
 		selector: {
 			'$and': [
-				{ kind: 'ENTRY_ARTIFACT' },
+				{ kind: 'zisk:artifact' },
 				{ journalId },
 			],
 		},

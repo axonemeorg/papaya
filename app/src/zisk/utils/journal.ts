@@ -118,7 +118,7 @@ export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: s
 
 	const entryArtifact: EntryArtifact = {
 		_id: formData._id ?? generateTaskId(),
-		kind: 'ENTRY_ARTIFACT',
+		kind: 'zisk:artifact',
 		originalFileName: formData.originalFileName ?? '',
     	contentType: formData.contentType ?? '',
 		size: formData.size ?? 0,
@@ -134,7 +134,7 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 
 	const newTask: EntryTask = {
 		_id: formData._id ?? generateTaskId(),
-		kind: 'ENTRY_TASK',
+		kind: 'zisk:task',
 		description: formData.description ?? '',
 		completedAt: formData.completedAt ?? null,
 		journalId,

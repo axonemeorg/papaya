@@ -68,7 +68,7 @@ export type AmountRecord = z.output<typeof AmountRecord>
 
 export const EntryArtifact = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
-		kind: z.literal('ENTRY_ARTIFACT'),
+		kind: z.literal('zisk:artifact'),
 		originalFileName: z.string(),
 		size: z.number(),
 		contentType: z.string(),
@@ -82,7 +82,7 @@ export type EntryArtifact = z.output<typeof EntryArtifact>
 
 export const EntryTask = DocumentMetadata.merge(BelongsToJournal).merge(
 	z.object({
-		kind: z.literal('ENTRY_TASK'),
+		kind: z.literal('zisk:task'),
 		description: z.string(),
 		completedAt: z.string().nullable(),
 	})
@@ -285,7 +285,7 @@ export type ReservedTag = z.output<typeof ReservedTag>
 
 export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
 	z.object({
-		kind: z.literal('ENTRY_TAG'),
+		kind: z.literal('zisk:tag'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable(),
 	})
@@ -303,7 +303,7 @@ export type CreateAccount = z.output<typeof CreateAccount>
 
 export const Account = DocumentMetadata.merge(BelongsToJournal).merge(CreateCategory).merge(
 	z.object({
-		kind: z.literal('ACCOUNT'),
+		kind: z.literal('zisk:account'),
 		createdAt: z.string(),
 		updatedAt: z.string().nullable().optional(),
 	})
