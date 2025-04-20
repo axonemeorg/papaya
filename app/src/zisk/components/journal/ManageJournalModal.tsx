@@ -135,7 +135,7 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 		if (!props.details.journal) {
 			return
 		}
-        await exportJournal(props.details.journal._id);
+        await exportJournal(props.details.journal._id, false);
     }
 
 	return (

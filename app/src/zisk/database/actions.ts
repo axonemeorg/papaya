@@ -219,45 +219,71 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 	return db.put(tag)
 }
 
-export const exportJournal = async (journalId: string) => {
+export const exportJournal = async (journalId: string, compress: boolean) => {
 	const journal: JournalMeta = await db.get(journalId)
-	const journalObjects = await getAllJournalObjects(journalId)
+	const journalObjects = [...await getAllJournalObjects(journalId), journal];
 	console.log('Exporting ' + String(journalObjects.length) + ' journal object(s)...')
 
-	const zip = new JSZip()
-	zip.file('journal.json', JSON.stringify(journal))
-	zip.file('objects.json', JSON.stringify(journalObjects))
-
-	const content = await zip.generateAsync({ type: 'blob' })
-	const fileName = [
+	const baseFileName = [
 		journal.journalName,
 		'_',
 		dayjs().format('YYYY-MM-DD_HH-mm-ss'),
-		'.ZISK'
+		'.json'
 	].join('')
+
+	let fileName: string;
+	let content: Blob | string;
+
+	if (compress) {
+		const zip = new JSZip()
+		zip.file(baseFileName, JSON.stringify(journalObjects))
+		fileName = [baseFileName, '.zip'].join('')
+		content = await zip.generateAsync({ type: 'blob' })
+	} else {
+		fileName = baseFileName
+		content = new Blob([JSON.stringify(journalObjects)], { type: 'application/json' })
+	}
+
 	FileSaver.saveAs(content, fileName);
 }
 
-export const importJournal = async (archive: File) => {
-	// Unzip archive file using JSZip
-	const zip = new JSZip();
-	const loadedZip = await zip.loadAsync(archive);
-	const journalFile = loadedZip.files['journal.json'];
-	const objectsFile = loadedZip.files['objects.json'];
+export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDocument[]]> => {
+	const compressed = archive.name.endsWith('.zip')
+	let journalJsonString: string;
 
-	const journal = JSON.parse(await journalFile.async("string"));
-	const journalObjects = JSON.parse(await objectsFile.async("string"));
-	console.log('Importing ' + String(journalObjects.length) + ' journal object(s)...')
+	if (compressed) {
+		// Unzip archive file using JSZip
+		const zip = new JSZip();
+		const loadedZip = await zip.loadAsync(archive);
+		const journalFile = Object.values(loadedZip.files)[0]
+		journalJsonString = await journalFile.async("string")
+	} else {
+		// File is a basic .json file
+		journalJsonString = await archive.text()
+	}
 
-	const documents = [
-		journal,
-		...journalObjects
-	].map((doc: any) => {
-		delete doc._rev
-		return doc
+	let journalObjects: ZiskDocument[]
+	try {
+		journalObjects = JSON.parse(journalJsonString)
+	} catch (err) {
+		throw new Error('Failed to parse journal JSON: ' + err)
+	}
+
+	const journal = journalObjects.find((obj: ZiskDocument) => obj.type === 'JOURNAL') as JournalMeta
+	if (!journal) {
+		throw new Error('No JOURNAL metadata found in the imported file.')
+	}
+
+	console.log(`Importing journal ${journal.journalName} having ${String(journalObjects.length)} object(s)...`)
+
+	const documents = journalObjects.map((doc: any) => {
+		const cloned: any = { ...doc }
+		delete cloned._rev // remove _rev if present
+		return cloned
 	})
 
 	await db.bulkDocs(documents)
+	return [journal, documents]
 }
 
 export const updateSettings = async (settings: Partial<ZiskSettings>) => {
