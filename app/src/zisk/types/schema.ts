@@ -232,14 +232,6 @@ export const CommonEntryAttributes = DocumentMetadata
 
 export type CommonEntryAttributes = z.output<typeof CommonEntryAttributes>
 
-export const TransferEntry = CommonEntryAttributes.merge(
-	z.object({
-		kind: TRANSFER_ENTRY,
-		destAccountId: z.string().optional(),
-	})
-)
-export type TransferEntry = z.output<typeof TransferEntry>
-
 export const BaseJournalEntry = CommonEntryAttributes.merge(
 	z.object({
 		kind: JOURNAL_ENTRY,
@@ -250,6 +242,9 @@ export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 export const JournalEntry = BaseJournalEntry.merge(
 	z.object({
 		children: z.array(BaseJournalEntry).optional(),
+		transfer: z.object({
+			destAccountId: z.string()
+		}).optional(),
 	})
 )
 export type JournalEntry = z.output<typeof JournalEntry>
@@ -262,26 +257,16 @@ export type JournalEntry = z.output<typeof JournalEntry>
 // )
 // export type TentativeJournalEntry = z.output<typeof TentativeJournalEntry>
 
-// export const TentativeTransferEntry = TransferEntry.merge(
-// 	z.object({
-// 		kind: TENTATIVE_TRANSFER_ENTRY_RECURRENCE,
-// 		recurrenceOf: z.string(),
-// 	})
-// )
-// export type TentativeTransferEntry = z.output<typeof TentativeTransferEntry>
-
 // export const NonspecificEntry = z.union([
 // 	JournalEntry,
-// 	TransferEntry,
 // 	TentativeJournalEntry,
-// 	TentativeTransferEntry,
 // ])
 
 // export type NonspecificEntry = z.output<typeof NonspecificEntry>
 
 export const ChildJournalEntry = BaseJournalEntry.merge(z.object({
 	parentEntry: JournalEntry,
-	kind: z.literal('CHILD_JOURNAL_ENTRY'),
+	// kind: z.literal('CHILD_JOURNAL_ENTRY'), // Not needed?
 }))
 
 export type ChildJournalEntry = z.output<typeof ChildJournalEntry>
@@ -561,7 +546,6 @@ export type JournalMeta = z.output<typeof JournalMeta>
 export const ZiskDocument = z.union([
 	Category,
 	JournalEntry,
-	TransferEntry,
 	ChildJournalEntry,
 	EntryTag,
 	JournalMeta,

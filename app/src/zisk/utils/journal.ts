@@ -8,12 +8,8 @@ import {
 	EntryArtifact,
 	EntryRecurrency,
 	EntryTask,
-	NonspecificEntry,
 	RecurringCadence,
 	ReservedTagKey,
-	TentativeJournalEntry,
-	TentativeTransferEntry,
-	TransferEntry,
 	ZiskDocument,
 	type JournalEntry,
 } from '@/types/schema'
@@ -98,65 +94,28 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 	return entry
 }
 
-export const makeTentativeJournalEntry = (
-	formData: Partial<TentativeJournalEntry>,
-	journalId: string,
-	date: string,
-	recurrenceOf: string
-): TentativeJournalEntry => {
-	const now = new Date().toISOString()
+// export const makeTentativeJournalEntry = (
+// 	formData: Partial<TentativeJournalEntry>,
+// 	journalId: string,
+// 	date: string,
+// 	recurrenceOf: string
+// ): TentativeJournalEntry => {
+// 	const now = new Date().toISOString()
 
-	const entry: TentativeJournalEntry = {
-		_id: formData._id ?? generateJournalEntryId(),
-		kind: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
-		createdAt: now,
-		date,
-		amount: formData.amount || '',
-		memo: formData.memo || '',
-		recurrenceOf,
-		journalId,
-	}
+// 	const entry: TentativeJournalEntry = {
+// 		_id: formData._id ?? generateJournalEntryId(),
+// 		kind: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
+// 		createdAt: now,
+// 		date,
+// 		amount: formData.amount || '',
+// 		memo: formData.memo || '',
+// 		recurrenceOf,
+// 		journalId,
+// 	}
 
-	return entry
-}
+// 	return entry
+// }
 
-export const makeTransferEntry = (formData: Partial<TransferEntry>, journalId: string): TransferEntry => {
-	const now = new Date().toISOString()
-
-	const entry: TransferEntry = {
-		_id: formData._id ?? generateJournalEntryId(),
-		kind: 'TRANSFER_ENTRY',
-		createdAt: now,
-		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
-		amount: formData.amount || '',
-		memo: formData.memo || '',
-		journalId,
-	}
-
-	return entry
-}
-
-export const makeTentativeTransferEntry = (
-	formData: Partial<TentativeTransferEntry>,
-	journalId: string,
-	date: string,
-	recurrenceOf: string
-): TentativeTransferEntry => {
-	const now = new Date().toISOString()
-
-	const entry: TentativeTransferEntry = {
-		_id: formData._id ?? generateJournalEntryId(),
-		kind: 'TENTATIVE_TRANSFER_ENTRY_RECURRENCE',
-		createdAt: now,
-		date,
-		amount: formData.amount || '',
-		memo: formData.memo || '',
-		recurrenceOf,
-		journalId,
-	}
-
-	return entry
-}
 
 export const makeEntryArtifact = (formData: Partial<EntryArtifact>, journalId: string): EntryArtifact => {
 	const now = new Date().toISOString()
@@ -224,16 +183,12 @@ export const journalEntryHasApproximateTag = (entry: NonspecificEntry): boolean 
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 }
 
-export const documentIsJournalEntryOrChildJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
-	return ['JOURNAL_ENTRY', 'CHILD_JOURNAL_ENTRY'].includes(doc.kind)
-}
-
-export const journalOrTransferEntryIsTransferEntry = (doc: NonspecificEntry): doc is TransferEntry => {
-	return doc.kind === 'TRANSFER_ENTRY'
+export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
+	return 'JOURNAL_ENTRY' === doc.kind
 }
 
 export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {
-	return doc.kind === 'CHILD_JOURNAL_ENTRY'
+	return 'parentEntry' in doc
 }
 
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
@@ -253,7 +208,7 @@ export const enumerateJournalEntryReservedTag = (
 ): { parent: Set<ReservedTagKey>, children: Set<ReservedTagKey> } => {
 	const parentTagIds: string[] = entry.tagIds ?? []
 	let childTagIds: string[]
-	if (documentIsJournalEntryOrChildJournalEntry(entry as ZiskDocument)) {
+	if (documentIsJournalEntry(entry as ZiskDocument)) {
 		childTagIds = (entry as JournalEntry).children?.flatMap((child) => child.tagIds ?? []) ?? []
 	} else {
 		childTagIds = []
@@ -329,7 +284,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
  * Given a set of nonspecific entries that are known to 
  */
 export const getRecurrencesForDateView = (
-	recurringEntries: Record<string, JournalEntry | TransferEntry>, dateView: DateView
+	recurringEntries: Record<string, JournalEntry>, dateView: DateView
 ): Record<string, Set<string>> => {
 	const { startDate: dateViewAbsoluteStart, endDate: dateViewAbsoluteEnd } = getAbsoluteDateRangeFromDateView(dateView)
 	// let maxRecurrenceCount = 0

@@ -9,7 +9,6 @@ import {
 	JournalMeta,
 	JournalSlice,
 	TRANSFER_ENTRY,
-	TransferEntry,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
@@ -54,23 +53,8 @@ export const getJournalEntries = async (
 	journalSlice: JournalSlice,
 	journalId: string,
 ): Promise<Record<string, JournalEntry>> => {
-	return getJournalOrTransferEntries(journalSlice, journalId, "JOURNAL_ENTRY") as Promise<Record<string, JournalEntry>>
-}
-
-export const getTransferEntries = async (
-	journalSlice: JournalSlice,
-	journalId: string,
-): Promise<Record<string, TransferEntry>> => {
-	return getJournalOrTransferEntries(journalSlice, journalId, "TRANSFER_ENTRY") as Promise<Record<string, TransferEntry>>
-}
-
-export const getJournalOrTransferEntries = async (
-	journalSlice: JournalSlice,
-	journalId: string,
-	kind: JOURNAL_ENTRY | TRANSFER_ENTRY
-): Promise<Record<string, JournalEntry | TransferEntry>> => {
 	const selectorClauses: any[] = [
-		{ kind },
+		{ kind: 'zisk:entry' },
 		{ journalId },
 	]
 	
@@ -116,7 +100,7 @@ export const getJournalOrTransferEntries = async (
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
-	const entries = Object.fromEntries((result.docs as (JournalEntry[] | TransferEntry[])).map((entry) => [entry._id, entry])) as Record<string, JournalEntry> | Record<string, TransferEntry>
+	const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
 
 	return entries
 }
@@ -124,7 +108,7 @@ export const getJournalOrTransferEntries = async (
 export const getRecurringJournalOrTransferEntries = async (
 	journalId: string,
 	kind: JOURNAL_ENTRY | TRANSFER_ENTRY
-): Promise<Record<string, JournalEntry | TransferEntry>> => {
+): Promise<Record<string, JournalEntry>> => {
 	const selectorClauses: any[] = [
 		{ kind },
 		{ journalId },
@@ -142,7 +126,7 @@ export const getRecurringJournalOrTransferEntries = async (
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
-	const entries = Object.fromEntries((result.docs as (JournalEntry[] | TransferEntry[])).map((entry) => [entry._id, entry])) as Record<string, JournalEntry> | Record<string, TransferEntry>
+	const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
 	return entries
 }
 

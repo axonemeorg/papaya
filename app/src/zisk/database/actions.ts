@@ -9,8 +9,6 @@ import {
 	EntryTag,
 	JournalEntry,
 	JournalMeta,
-	NonspecificEntry,
-	TransferEntry,
 	ZiskDocument,
 	ZiskSettings,
 } from '@/types/schema'
@@ -39,21 +37,7 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 	return newJournalEntry
 }
 
-export const createTransferEntry = async (formData: TransferEntry): Promise<TransferEntry> => {
-	const now = new Date().toISOString()
-
-	const newJournalEntry: TransferEntry = {
-		...formData,
-		parsedNetAmount: calculateNetAmount(formData),
-		kind: 'TRANSFER_ENTRY',
-		createdAt: now,
-	}
-
-	await db.put(newJournalEntry)
-	return newJournalEntry
-}
-
-export const updateJournalOrTransferEntry = async <T extends JournalEntry | TransferEntry>(formData: T) => {
+export const updateJournalEntry = async <T extends JournalEntry>(formData: T) => {
 	delete formData._rev
 
 	const existingRecord = await db.get(formData._id)
@@ -85,7 +69,7 @@ export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
 	return db.bulkDocs(updatedChildren)
 }
 
-export const deleteNonspecificEntry = async <T extends NonspecificEntry>(entryId: string): Promise<T> => {
+export const deleteJournalEntry = async <T extends NonspecificEntry>(entryId: string): Promise<T> => {
 
 	// TODO check if it's a tentative entry; If so, add an exception in the recurring entry's exception field.
 
