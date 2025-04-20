@@ -32,7 +32,7 @@ interface ManageJournalModalProps {
 }
 
 const JOURNAL_TYPE_LABEL_MAP = {
-	JOURNAL: 'Zisk Journal',
+	'zisk:journal': 'Zisk Journal',
 }
 
 function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {
@@ -42,7 +42,7 @@ function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {
 		return [
 			{
 				label: 'Type',
-				value: props.journal?.type ? JOURNAL_TYPE_LABEL_MAP[props.journal?.type] : '',
+				value: props.journal?.kind ? JOURNAL_TYPE_LABEL_MAP[props.journal?.kind] : '',
 			},
 			{
 				label: 'Last Activity',
@@ -135,7 +135,7 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 		if (!props.details.journal) {
 			return
 		}
-        await exportJournal(props.details.journal._id);
+        await exportJournal(props.details.journal._id, false);
     }
 
 	return (
