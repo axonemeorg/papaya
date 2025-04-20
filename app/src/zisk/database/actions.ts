@@ -29,7 +29,7 @@ export const createJournalEntry = async (formData: JournalEntry): Promise<Journa
 	const newJournalEntry: JournalEntry = {
 		...formData,
 		parsedNetAmount: calculateNetAmount(formData),
-		kind: 'JOURNAL_ENTRY',
+		kind: 'zisk:entry',
 		createdAt: now,
 	}
 
@@ -69,7 +69,7 @@ export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
 	return db.bulkDocs(updatedChildren)
 }
 
-export const deleteJournalEntry = async <T extends NonspecificEntry>(entryId: string): Promise<T> => {
+export const deleteJournalEntry = async <T extends JournalEntry>(entryId: string): Promise<T> => {
 
 	// TODO check if it's a tentative entry; If so, add an exception in the recurring entry's exception field.
 

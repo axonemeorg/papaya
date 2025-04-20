@@ -62,12 +62,8 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const calculateNetAmount = (entry: NonspecificEntry): number => {
-	const children: JournalEntry[] = (
-		entry.kind === 'TRANSFER_ENTRY' || entry.kind === 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE'
-			? null
-			: (entry as JournalEntry).children
-	) ?? []
+export const calculateNetAmount = (entry: JournalEntry): number => {
+	const children: JournalEntry[] = (entry as JournalEntry).children ?? []
 	const netAmount: number = children.reduce(
 		(acc: number, child) => {
 			return acc + (parseJournalEntryAmount(child.amount) ?? 0)
@@ -83,7 +79,7 @@ export const makeJournalEntry = (formData: Partial<JournalEntry>, journalId: str
 
 	const entry: JournalEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
-		kind: 'JOURNAL_ENTRY',
+		kind: 'zisk:entry',
 		createdAt: now,
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		amount: formData.amount || '',
@@ -147,7 +143,7 @@ export const makeEntryTask = (formData: Partial<EntryTask>, journalId: string): 
 	return newTask
 }
 
-export const journalEntryHasTasks = (entry: NonspecificEntry): boolean => {
+export const journalEntryHasTasks = (entry: JournalEntry): boolean => {
 	if (!entry.tasks) {
 		return false
 	}
@@ -162,7 +158,7 @@ const tagIdBelongsToReservedTag = (tagId: string): tagId is ReservedTagKey => {
  * Determines if an entry has any user-defined tags, namely any entry tag which
  * isn't a Reserved Tag.
  */
-export const journalEntryHasUserDefinedTags = (entry: NonspecificEntry): boolean => {
+export const journalEntryHasUserDefinedTags = (entry: JournalEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.length > 0 && entryTagIds.some((tagId) => !tagIdBelongsToReservedTag(tagId))
 }
@@ -170,7 +166,7 @@ export const journalEntryHasUserDefinedTags = (entry: NonspecificEntry): boolean
 /**
  * @deprecated Use enumerateJournalEntryReservedTag instead.
  */
-export const journalEntryIsFlagged = (entry: NonspecificEntry): boolean => {
+export const journalEntryIsFlagged = (entry: JournalEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.FLAGGED._id)
 }
@@ -178,13 +174,13 @@ export const journalEntryIsFlagged = (entry: NonspecificEntry): boolean => {
 /**
  * @deprecated Use enumerateJournalEntryReservedTag instead.
  */
-export const journalEntryHasApproximateTag = (entry: NonspecificEntry): boolean => {
+export const journalEntryHasApproximateTag = (entry: JournalEntry): boolean => {
 	const entryTagIds = entry.tagIds ?? []
 	return entryTagIds.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
 }
 
-export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry | ChildJournalEntry => {
-	return 'JOURNAL_ENTRY' === doc.kind
+export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry => {
+	return 'zisk:entry' === doc.kind
 }
 
 export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {
@@ -204,7 +200,7 @@ export const generateRandomAvatar = (): Avatar => {
 }
 
 export const enumerateJournalEntryReservedTag = (
-	entry: NonspecificEntry
+	entry: JournalEntry
 ): { parent: Set<ReservedTagKey>, children: Set<ReservedTagKey> } => {
 	const parentTagIds: string[] = entry.tagIds ?? []
 	let childTagIds: string[]

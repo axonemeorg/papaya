@@ -111,7 +111,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	// 		if (!journalContext.journal) {
 	// 			return {}
 	// 		}
-	// 		const recurringJournalEntries = await getRecurringJournalOrTransferEntries(journalContext.journal._id, 'JOURNAL_ENTRY')
+	// 		const recurringJournalEntries = await getRecurringEntries(journalContext.journal._id, 'JOURNAL_ENTRY')
 	// 		const recurringEntryDates = getRecurrencesForDateView(recurringJournalEntries, journalSlice.dateView)
 	// 		return Object.fromEntries(
 	// 			Object.entries(recurringEntryDates).reduce((acc: [string, TentativeJournalEntry][], [recurringEntryId, dates]) => {

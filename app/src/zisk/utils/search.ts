@@ -7,7 +7,7 @@ export const flattenJournalObjects = (journalObjects: ZiskDocument[]): ZiskDocum
     journalObjects.forEach((object) => {
         flattenedObjects.push(object)
 
-        if (object.kind === 'JOURNAL_ENTRY' && object.children) {
+        if (object.kind === 'zisk:entry' && 'children' in object && object.children) {
             object.children.forEach((entry: BaseJournalEntry) => {
                 flattenedObjects.push({
                     ...entry,

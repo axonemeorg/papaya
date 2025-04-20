@@ -4,11 +4,9 @@ import {
 	Category,
 	EntryArtifact,
 	EntryTag,
-	JOURNAL_ENTRY,
 	JournalEntry,
 	JournalMeta,
 	JournalSlice,
-	TRANSFER_ENTRY,
 	ZiskMeta,
 } from '@/types/schema'
 import { getDatabaseClient } from './client'
@@ -105,12 +103,11 @@ export const getJournalEntries = async (
 	return entries
 }
 
-export const getRecurringJournalOrTransferEntries = async (
+export const getRecurringEntries = async (
 	journalId: string,
-	kind: JOURNAL_ENTRY | TRANSFER_ENTRY
 ): Promise<Record<string, JournalEntry>> => {
 	const selectorClauses: any[] = [
-		{ kind },
+		{ kind: 'zisk:entry' },
 		{ journalId },
 		{ recurs: {
 			$exists: true,

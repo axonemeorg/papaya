@@ -4,7 +4,7 @@ import AvatarIcon from '@/components/icon/AvatarIcon'
 import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { getPriceString } from '@/utils/string'
-import { Category, JOURNAL_ENTRY, NonspecificEntry, TRANSFER_ENTRY } from '@/types/schema'
+import { Category, JournalEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
@@ -14,7 +14,7 @@ import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
 interface JournalEntryCardProps extends JournalEntrySelection {
-	entry: NonspecificEntry
+	entry: JournalEntry
 	onClose: () => void
 	onDelete: () => void
 }
@@ -67,12 +67,8 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 		props.onDelete()
 	}
 
-	const handleEditJournalEntry = (entry: NonspecificEntry) => {
-		if (entry.kind === JOURNAL_ENTRY.value || entry.kind === TRANSFER_ENTRY.value) {
-			editJournalEntry(entry)
-		} else {
-			// TODO could add logic for editing a tentative entry?
-		}
+	const handleEditJournalEntry = (entry: JournalEntry) => {
+		editJournalEntry(entry)
 		props.onClose()
 	}
 

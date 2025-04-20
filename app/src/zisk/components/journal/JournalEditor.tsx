@@ -1,7 +1,7 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
-import { JOURNAL_ENTRY, JournalEntry, TRANSFER_ENTRY } from '@/types/schema'
+import { JournalEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
@@ -65,11 +65,7 @@ export default function JournalEditor() {
 	}
 
 	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
-		if (entry.kind === JOURNAL_ENTRY.value || entry.kind === TRANSFER_ENTRY.value) {
-			journalContext.editJournalEntry(entry)
-		} else {
-			// TODO could add logic for double-clicking a tentative entry?
-		}
+		journalContext.editJournalEntry(entry)
 	}
 
 	const handleDeselectListItem = () => {
@@ -168,7 +164,6 @@ export default function JournalEditor() {
 							overflowY: 'auto',
 						}}>
 							<JournalEntryList
-								kind={tab === 'journal' ? 'JOURNAL_ENTRY' : 'TRANSFER_ENTRY'}
 								journalRecordGroups={tab === 'journal' ? journalGroups : {}}
 								onClickListItem={handleClickListItem}
 								onDoubleClickListItem={handleDoubleClickListItem}

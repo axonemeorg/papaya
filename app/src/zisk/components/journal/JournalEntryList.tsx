@@ -245,7 +245,6 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										onClick={() => {
 											createJournalEntry({
 												date: day.format('YYYY-MM-DD'),
-												kind: 'JOURNAL_ENTRY'
 											})
 										}}
 									/>

@@ -187,32 +187,12 @@ export const EntryRecurrency = z.object({
 })
 export type EntryRecurrency = z.output<typeof EntryRecurrency>;
 
-export const TRANSFER_ENTRY = z.literal('TRANSFER_ENTRY')
-export type TRANSFER_ENTRY = z.output<typeof TRANSFER_ENTRY>;
-
-export const JOURNAL_ENTRY = z.literal('JOURNAL_ENTRY')
-export type JOURNAL_ENTRY = z.output<typeof JOURNAL_ENTRY>;
-
-export const TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.literal('TENTATIVE_JOURNAL_ENTRY_RECURRENCE')
-export type TENTATIVE_JOURNAL_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_JOURNAL_ENTRY_RECURRENCE>;
-
-export const TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.literal('TENTATIVE_TRANSFER_ENTRY_RECURRENCE')
-export type TENTATIVE_TRANSFER_ENTRY_RECURRENCE = z.output<typeof TENTATIVE_TRANSFER_ENTRY_RECURRENCE>;
-
-export const NON_SPECIFIC_ENTRY = z.union([
-	TRANSFER_ENTRY,
-	JOURNAL_ENTRY,
-	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-	TENTATIVE_JOURNAL_ENTRY_RECURRENCE,
-])
-export type NON_SPECIFIC_ENTRY = z.output<typeof NON_SPECIFIC_ENTRY>;
-
-export const CommonEntryAttributes = DocumentMetadata
+export const BaseJournalEntry = DocumentMetadata
 	.merge(BelongsToJournal)
 	.merge(AmountRecord)
 	.merge(
 		z.object({
-			kind: NON_SPECIFIC_ENTRY,
+			kind: z.literal('zisk:entry'),
 			memo: z.string(),
 			tagIds: z.array(z.string()).optional(),
 			categoryId: z.string().optional(),
@@ -230,13 +210,6 @@ export const CommonEntryAttributes = DocumentMetadata
 		})
 )
 
-export type CommonEntryAttributes = z.output<typeof CommonEntryAttributes>
-
-export const BaseJournalEntry = CommonEntryAttributes.merge(
-	z.object({
-		kind: JOURNAL_ENTRY,
-	})
-)
 export type BaseJournalEntry = z.output<typeof BaseJournalEntry>
 
 export const JournalEntry = BaseJournalEntry.merge(

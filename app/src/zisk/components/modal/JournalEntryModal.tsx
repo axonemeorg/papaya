@@ -3,7 +3,7 @@ import JournalEntryForm from '../form/JournalEntryForm'
 import { FormProvider, useWatch } from 'react-hook-form'
 import { useCallback, useContext, useEffect } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { Category, JournalEntry, NonspecificEntry, ReservedTagKey } from '@/types/schema'
+import { Category, JournalEntry, ReservedTagKey } from '@/types/schema'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
@@ -13,7 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
 import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
-import { enumerateJournalEntryReservedTag, journalEntryHasUserDefinedTags, journalOrTransferEntryIsTransferEntry } from '@/utils/journal'
+import { enumerateJournalEntryReservedTag, journalEntryHasUserDefinedTags } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -23,7 +23,7 @@ interface EditJournalEntryModalProps {
 	onClose: () => void
 }
 
-const JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY = 'JOURNAL_ENTRY'
+const JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY = 'entry-editing'
 
 export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	const { snackbar } = useContext(NotificationsContext)
@@ -35,7 +35,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 		if (!journal) {
 			return Promise.resolve()
 		}
-		const formData: NonspecificEntry = journalEntryForm.getValues()
+		const formData: JournalEntry = journalEntryForm.getValues()
 		return updateJournalEntry(formData)
 			.then(() => {
 				console.log('Put journal entry.', formData)
@@ -94,7 +94,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}
 
 	const handleDelete = useCallback(async () => {
-		const formData: NonspecificEntry = journalEntryForm.getValues()
+		const formData: JournalEntry = journalEntryForm.getValues()
 		deleteJournalEntry(formData._id).then(() => {
 			refreshJournalEntriesQuery()
 			refreshTransferEntriesQuery()
@@ -108,11 +108,11 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 	}, [journal])
 
 	const toggleReservedTag = (entryId: string | null, reservedTag: ReservedTagKey) => {
-		const formData: NonspecificEntry = journalEntryForm.getValues()
+		const formData: JournalEntry = journalEntryForm.getValues()
 
 		let name: 'tagIds' | `children.${number}.tagIds`
 		let existingTagIds: string[] = []
-		if (!entryId || entryId === formData._id || journalOrTransferEntryIsTransferEntry(formData)) {
+		if (!entryId || entryId === formData._id) {
 			// If no particular entry/child is targeted, target the root entry
 			entryId = formData._id
 			name = 'tagIds'
