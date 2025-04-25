@@ -8,7 +8,7 @@ import {
 	DocumentMetadata,
 	EntryTag,
 	JournalEntry,
-	JournalMeta,
+	Journal,
 	ZiskDocument,
 	ZiskSettings,
 } from '@/types/schema'
@@ -144,8 +144,8 @@ export const undeleteCategory = async (category: Category) => {
 	await db.put(category)
 }
 
-export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
-	const newJournal: JournalMeta = {
+export const createJournal = async (journal: CreateJournalMeta): Promise<Journal> => {
+	const newJournal: Journal = {
 		...journal,
 		kind: 'zisk:journal',
 		journalVersion: MigrationEngine.latestVersion,
@@ -204,7 +204,7 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 }
 
 export const exportJournal = async (journalId: string, compress: boolean) => {
-	const journal: JournalMeta = await db.get(journalId)
+	const journal: Journal = await db.get(journalId)
 	const journalObjects = [...await getAllJournalObjects(journalId), journal];
 	console.log('Exporting ' + String(journalObjects.length) + ' journal object(s)...')
 
@@ -231,7 +231,7 @@ export const exportJournal = async (journalId: string, compress: boolean) => {
 	FileSaver.saveAs(content, fileName);
 }
 
-export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDocument[]]> => {
+export const importJournal = async (archive: File): Promise<[Journal, ZiskDocument[]]> => {
 	const compressed = archive.name.endsWith('.zip')
 	let journalJsonString: string;
 
@@ -253,7 +253,7 @@ export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDo
 		throw new Error('Failed to parse journal JSON: ' + err)
 	}
 
-	const journal = journalObjects.find((obj: ZiskDocument) => obj.type === 'JOURNAL') as JournalMeta
+	const journal = journalObjects.find((obj: ZiskDocument) => obj.kind === 'zisk:journal') as Journal
 	if (!journal) {
 		throw new Error('No JOURNAL metadata found in the imported file.')
 	}

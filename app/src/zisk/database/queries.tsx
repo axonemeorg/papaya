@@ -5,7 +5,7 @@ import {
 	EntryArtifact,
 	EntryTag,
 	JournalEntry,
-	JournalMeta,
+	Journal,
 	JournalSlice,
 	ZiskMeta,
 } from '@/types/schema'
@@ -157,7 +157,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 	return meta
 }
 
-export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalMeta>> => {
+export const getJournals = async (): Promise<Record<Journal['_id'], Journal>> => {
 	const result = await db.find({
 		selector: {
 			kind: 'zisk:journal',
@@ -165,7 +165,7 @@ export const getJournals = async (): Promise<Record<JournalMeta['_id'], JournalM
 		limit: ARBITRARY_MAX_FIND_LIMIT,
 	})
 
-	return Object.fromEntries((result.docs as unknown as JournalMeta[]).map((journal) => [journal._id, journal]))
+	return Object.fromEntries((result.docs as unknown as Journal[]).map((journal) => [journal._id, journal]))
 }
 
 export const getArtifacts = async (journalId: string): Promise<Record<EntryArtifact['_id'], EntryArtifact>> => {

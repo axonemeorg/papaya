@@ -21,7 +21,6 @@ export type ShapeWithZiskModelKind = {
 export class ModelFactory {
 	protected static intrinsicSchemaShape = {
 		_id: z.string(),
-		createdAt: z.string(),
 	}
 
 	/**
@@ -64,7 +63,6 @@ export class ModelFactory {
 			public static async intrinsics(): Promise<IntrinsicSchemaType> {
 				return {
 					_id: await this.generateId(),
-					createdAt: new Date().toISOString(),
 				}
 			}
 

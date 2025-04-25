@@ -69,6 +69,10 @@ export class DocumentFactory extends ModelFactory {
 				const response = await db.find(id);
 				return response
 			}
+
+			public static async put(props: DerivedSchemaType): Promise<DerivedSchemaType> {
+				return db.put(props); // replace with real DB call
+			}
 		};
 
 		return Document;

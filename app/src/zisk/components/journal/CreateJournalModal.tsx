@@ -1,5 +1,5 @@
 import { JournalContext } from '@/contexts/JournalContext'
-import { CreateJournalMeta, JournalMeta } from '@/types/schema'
+import { CreateJournalMeta, Journal } from '@/types/schema'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
 import { useContext, useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -11,7 +11,7 @@ import ImportJournalForm from '../form/ImportJournalForm'
 interface CreateJournalModalProps {
 	open: boolean
 	onClose: () => void
-	onCreated: (newJournal: JournalMeta) => void
+	onCreated: (newJournal: Journal) => void
 }
 
 const DEFAULT_JOURNAL_AVATAR = {

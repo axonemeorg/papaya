@@ -505,7 +505,7 @@ export enum JournalVersion {
     REPLACE_CATEGORY_IDS = '2025-03-23',
 }
 
-export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
+export const Journal = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	z.object({
 		kind: z.literal('zisk:journal'),
 		journalVersion: z.nativeEnum(JournalVersion),
@@ -514,14 +514,14 @@ export const JournalMeta = IdentifierMetadata.merge(CreateJournalMeta).merge(
 	})
 )
 
-export type JournalMeta = z.output<typeof JournalMeta>
+export type Journal = z.output<typeof Journal>
 
 export const ZiskDocument = z.union([
 	Category,
 	JournalEntry,
 	ChildJournalEntry,
 	EntryTag,
-	JournalMeta,
+	Journal,
 ])
 
 export type ZiskDocument = z.output<typeof ZiskDocument>

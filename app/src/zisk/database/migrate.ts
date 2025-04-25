@@ -1,6 +1,6 @@
-import { JournalMeta, JournalVersion, ZiskDocument } from "@/types/schema";
+import { Journal, JournalVersion, ZiskDocument } from "@/types/schema";
 
-export type MigrationRun = (records: ZiskDocument[]) => Promise<[JournalMeta, ...ZiskDocument[]]>
+export type MigrationRun = (records: ZiskDocument[]) => Promise<[Journal, ...ZiskDocument[]]>
 
 export abstract class Migration {
     public abstract readonly version: JournalVersion
@@ -26,7 +26,7 @@ export class MigrationEngine {
             }
             acc.push(record)
             return acc
-        }, []) as [JournalMeta, ...ZiskDocument[]]
+        }, []) as [Journal, ...ZiskDocument[]]
     }
 
     public static migrate: MigrationRun = async (records) => {
@@ -52,7 +52,7 @@ export class MigrationEngine {
         return [journal, ...rest]
     }
 
-    public static shouldMigrate(journal: JournalMeta): boolean {
+    public static shouldMigrate(journal: Journal): boolean {
         return journal.journalVersion !== this.latestVersion
     }
 }

@@ -1,4 +1,4 @@
-import { JournalMeta } from '@/types/schema'
+import { Journal } from '@/types/schema'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getRelativeTime } from '@/utils/date'
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, Stack, Tab, Tabs, Typography } from '@mui/material'
@@ -12,7 +12,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
 
 interface JournalDetailsAndActivityProps {
-	journal: JournalMeta | null
+	journal: Journal | null
 	size: number | null
 	lastActivity: string | null
 	activity: never[]
@@ -27,8 +27,8 @@ interface ManageJournalModalProps {
 	open: boolean
 	details: JournalDetailsAndActivityProps
 	onClose: () => void
-	onResetJournal: (journal: JournalMeta) => void
-	onDeletedJournal: (journal: JournalMeta) => void
+	onResetJournal: (journal: Journal) => void
+	onDeletedJournal: (journal: Journal) => void
 }
 
 const JOURNAL_TYPE_LABEL_MAP = {
