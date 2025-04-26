@@ -33,7 +33,7 @@ export default function ImageAvatarPicker(props: ImageAvatarPicker) {
 		return [
 			Boolean(props.value),
 			Boolean(props.value?.content),
-			props.value?.variant === AvatarVariant.Enum.IMAGE,
+			props.value?.variant === AvatarVariant.enum.IMAGE,
 		].every(Boolean)
 	}, [props.value])
 

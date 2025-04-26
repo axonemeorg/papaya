@@ -225,7 +225,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 	  
 		const result: Record<DayOfWeek, dayjs.Dayjs> = {} as Record<DayOfWeek, dayjs.Dayjs>
 	  
-		Object.values(DayOfWeek.Enum).forEach((label, index) => {
+		Object.values(DayOfWeek.enum).forEach((label, index) => {
 			result[label] = startOfWeek.add(index, 'day');
 		})
 	  
@@ -233,17 +233,17 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 	  }
 
 	switch (frequency) {
-		case CadenceFrequency.Enum.D:
+		case CadenceFrequency.enum.D:
 			for(;;) {
 				date = date.add(interval, 'days')
 				yield date
 			}
-		case CadenceFrequency.Enum.Y:
+		case CadenceFrequency.enum.Y:
 			for(;;) {
 				date = date.add(interval, 'years')
 				yield date
 			}
-		case CadenceFrequency.Enum.W:
+		case CadenceFrequency.enum.W:
 			for(;;) {
 				const weekDates = getWeekDates(date.add(interval, 'weeks'))
 				for (let i in cadence.days) {
@@ -251,7 +251,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 					yield date
 				}
 			}
-		case CadenceFrequency.Enum.M:
+		case CadenceFrequency.enum.M:
 			if ('day' in cadence.on) {
 				for(;;) {
 					date = date.startOf('month').add(interval, 'months')

@@ -48,14 +48,14 @@ export default function IconPicker(props: IconPickerProps) {
 		props.onChange({
 			...props.value,
 			content: newIcon,
-			variant: AvatarVariant.Enum.PICTORIAL,
+			variant: AvatarVariant.enum.PICTORIAL,
 		})
 	}
 
 	const handleChangeColor = (color: string) => {
 		props.onChange({
 			...props.value,
-			variant: AvatarVariant.Enum.PICTORIAL,
+			variant: AvatarVariant.enum.PICTORIAL,
 			primaryColor: color,
 		})
 	}
@@ -63,7 +63,7 @@ export default function IconPicker(props: IconPickerProps) {
 	const handleChangeIcon = (icon: string) => {
 		props.onChange({
 			...props.value,
-			variant: AvatarVariant.Enum.PICTORIAL,
+			variant: AvatarVariant.enum.PICTORIAL,
 			content: icon,
 		})
 	}

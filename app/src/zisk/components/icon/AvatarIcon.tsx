@@ -14,13 +14,13 @@ export default function AvatarIcon(props: AvatarIconProps) {
 	const avatar = props.avatar ?? DEFAULT_AVATAR
 
 	switch (avatar.variant) {
-		case AvatarVariant.Enum.PICTORIAL:
+		case AvatarVariant.enum.PICTORIAL:
 			return (
 				<Icon className={props.className} fontSize="small" style={{ display: 'block' }} sx={{ color: avatar.primaryColor, ...props.sx }}>
 					{avatar.content}
 				</Icon>
 			)
-		case AvatarVariant.Enum.IMAGE:
+		case AvatarVariant.enum.IMAGE:
 			return <ImageAvatar className={props.className} avatar={avatar} sx={{ width: '28px', height: '28px', ...props.sx }} />
 		default:
 			return null

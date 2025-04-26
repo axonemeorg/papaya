@@ -391,12 +391,8 @@ export const BasicAnalytics = z.object({
 
 export type BasicAnalytics = z.output<typeof BasicAnalytics>
 
-export const EmptyCategoryIdSymbol = z.literal(Symbol("EMPTY_CATEGORY_ID_SYMBOL"))
-
-export type EmptyCategoryIdSymbol = z.output<typeof EmptyCategoryIdSymbol>
-
 export const CategoryAnalytics = z.object({
-	spendByCategoryId: z.record(z.union([Category.shape._id, EmptyCategoryIdSymbol]), z.number())
+	spendByCategoryId: z.record(z.string(), z.number())
 })
 
 export type CategoryAnalytics = z.output<typeof CategoryAnalytics>

@@ -1,7 +1,9 @@
-import { Analytics, BasicAnalytics, Category, DateView, EmptyCategoryIdSymbol, JournalEntry } from "@/types/schema"
+import { Analytics, BasicAnalytics, Category, DateView, JournalEntry } from "@/types/schema"
 import { getAbsoluteDateRangeFromDateView } from "./date"
 import dayjs from "dayjs"
 import { calculateNetAmount, parseJournalEntryAmount } from "./journal"
+
+const EMPTY_CATEGORY_ID_SYMBOL = 'EMPTY_CATEGORY_ID_SYMBOL' as const
 
 export const calculateBasicAnalytics = (journalEntries: JournalEntry[], dateView: DateView): BasicAnalytics => {
     if (!journalEntries.length) {
@@ -71,13 +73,13 @@ export const calculateCategorySums = (journalEntries: JournalEntry[]): Record<st
         })
 
         amounts.forEach(({ categoryId, amount }) => {
-            acc[categoryId ?? EmptyCategoryIdSymbol.value] += amount
+            acc[categoryId ?? EMPTY_CATEGORY_ID_SYMBOL] += amount
         })
 
         return acc
     }, {
         ...Object.fromEntries(Array.from(categoryIds).map((categoryId => [categoryId, 0]))),
-        [EmptyCategoryIdSymbol.value]: 0,
+        [EMPTY_CATEGORY_ID_SYMBOL]: 0,
     })
 }
 

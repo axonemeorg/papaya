@@ -11,15 +11,15 @@ interface AvatarPickerProps {
 
 export const DEFAULT_AVATAR: Avatar = {
 	content: 'layers',
-	variant: AvatarVariant.Enum.PICTORIAL,
+	variant: AvatarVariant.enum.PICTORIAL,
 	primaryColor: colors.grey[500],
 }
 
 const renderAvatarItem = (avatar: Avatar) => {
 	switch (avatar.variant) {
-		case AvatarVariant.Enum.PICTORIAL:
+		case AvatarVariant.enum.PICTORIAL:
 			return <Icon sx={{ color: avatar.primaryColor }}>{avatar.content}</Icon>
-		case AvatarVariant.Enum.IMAGE:
+		case AvatarVariant.enum.IMAGE:
 			return <ImageAvatar avatar={avatar} sx={{ my: -0.5, width: '32px', height: '32px' }} />
 		default:
 			return null

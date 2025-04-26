@@ -279,13 +279,13 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 								const { parent: parentReservedTags, children: childReservedTags }
 									= enumerateJournalEntryReservedTag(entry)
 							
-								const isFlagged = parentReservedTags.has(ReservedTagKey.Enum.FLAGGED)
-								const isApproximate = parentReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
-								const isPending = parentReservedTags.has(ReservedTagKey.Enum.PENDING)
+								const isFlagged = parentReservedTags.has(ReservedTagKey.enum.FLAGGED)
+								const isApproximate = parentReservedTags.has(ReservedTagKey.enum.APPROXIMATE)
+								const isPending = parentReservedTags.has(ReservedTagKey.enum.PENDING)
 							
-								const childIsFlagged = childReservedTags.has(ReservedTagKey.Enum.FLAGGED)
-								const childIsApproximate = childReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
-								const childIsPending = childReservedTags.has(ReservedTagKey.Enum.PENDING)
+								const childIsFlagged = childReservedTags.has(ReservedTagKey.enum.FLAGGED)
+								const childIsApproximate = childReservedTags.has(ReservedTagKey.enum.APPROXIMATE)
+								const childIsPending = childReservedTags.has(ReservedTagKey.enum.PENDING)
 								
 								const hasTasks = journalEntryHasTasks(entry)
 								const tasks: EntryTask[] = entry.tasks ?? []

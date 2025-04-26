@@ -14,23 +14,23 @@ export const generateDeafultRecurringCadences = (date: string): RecurringCadence
     const weekNumber = getWeekOfMonth(date)
     return [
         {
-            frequency: CadenceFrequency.Enum.D,
+            frequency: CadenceFrequency.enum.D,
             interval: 1,
         },
         {
-            frequency: CadenceFrequency.Enum.W,
+            frequency: CadenceFrequency.enum.W,
             interval: 1,
             days: [dayOfWeekFromDate(date)]
         },
         {
-            frequency: CadenceFrequency.Enum.M,
+            frequency: CadenceFrequency.enum.M,
             interval: 1,
             on: {
                 week: WeekNumber.options[weekNumber - 1]
             }
         },
         {
-            frequency: CadenceFrequency.Enum.Y,
+            frequency: CadenceFrequency.enum.Y,
             interval: 1,
         }
     ]
@@ -52,7 +52,7 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
 
     const cadences: MonthlyCadence[] = [
         {
-            frequency: CadenceFrequency.Enum.M,
+            frequency: CadenceFrequency.enum.M,
             on: {
                 day: dayNumber
             }
@@ -61,7 +61,7 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
 
     if (weekNumber <= 3) {
         cadences.push({
-            frequency: CadenceFrequency.Enum.M,
+            frequency: CadenceFrequency.enum.M,
             on: {
                 week: WeekNumber.options[weekNumber - 1]
             }
@@ -69,15 +69,15 @@ export const getMonthlyRecurrencesFromDate = (date: string): MonthlyCadence[] =>
     } else {
         cadences.push(
             {
-                frequency: CadenceFrequency.Enum.M,
+                frequency: CadenceFrequency.enum.M,
                 on: {
-                    week: WeekNumber.Enum.FOURTH
+                    week: WeekNumber.enum.FOURTH
                 }
             },
             {
-                frequency: CadenceFrequency.Enum.M,
+                frequency: CadenceFrequency.enum.M,
                 on: {
-                    week: WeekNumber.Enum.LAST
+                    week: WeekNumber.enum.LAST
                 }
             },
         )
@@ -109,19 +109,19 @@ export const getMonthlyCadenceLabel = (cadence: MonthlyCadence, date: string): s
     } else {
         labelParts.push('the')
         switch (cadence.on.week) {
-            case WeekNumber.Enum.FIRST:
+            case WeekNumber.enum.FIRST:
                 labelParts.push('first')
                 break
-            case WeekNumber.Enum.SECOND:
+            case WeekNumber.enum.SECOND:
                 labelParts.push('second')
                 break
-            case WeekNumber.Enum.THIRD:
+            case WeekNumber.enum.THIRD:
                 labelParts.push('third')
                 break
-            case WeekNumber.Enum.FOURTH:
+            case WeekNumber.enum.FOURTH:
                 labelParts.push('fourth')
                 break
-            case WeekNumber.Enum.LAST:
+            case WeekNumber.enum.LAST:
                 labelParts.push('last')
                 break
         }
@@ -151,7 +151,7 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
     }
 
     switch (cadence.frequency) {
-        case CadenceFrequency.Enum.W:
+        case CadenceFrequency.enum.W:
             cadenceStringParts.push(
                 'on',
                 isSetOfWeekdays(cadence.days)
@@ -161,19 +161,19 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
                         .join(', ')
             )
             break
-        case CadenceFrequency.Enum.M:
+        case CadenceFrequency.enum.M:
             cadenceStringParts.push(
                 'on',
                 getMonthlyCadenceLabel(cadence, date)
             )
             break
-        case CadenceFrequency.Enum.Y:
+        case CadenceFrequency.enum.Y:
             cadenceStringParts.push(
                 'on',
                 dayjs(date).format('MMMM D')
             )
             break
-        case CadenceFrequency.Enum.D:
+        case CadenceFrequency.enum.D:
         default:
             break
     }
@@ -224,7 +224,7 @@ export const updateRecurrencyNewDate = (recurrency: EntryRecurrency | undefined,
     let newCadence: RecurringCadence | undefined = undefined
     const { cadence } = recurrency
 
-    if (cadence.frequency === CadenceFrequency.Enum.W) {
+    if (cadence.frequency === CadenceFrequency.enum.W) {
         const dateWeekday = dayOfWeekFromDate(date)
         if (cadence.days.includes(dateWeekday)) {
             // New date's day of week is already included; no change needed
@@ -236,7 +236,7 @@ export const updateRecurrencyNewDate = (recurrency: EntryRecurrency | undefined,
             // Replace the day of week
             newCadence = { ...cadence, days: [dateWeekday] }
         }
-    } else if (cadence.frequency === CadenceFrequency.Enum.M) {
+    } else if (cadence.frequency === CadenceFrequency.enum.M) {
         if ('day' in cadence.on) {
             newCadence = {
                 ...cadence,
