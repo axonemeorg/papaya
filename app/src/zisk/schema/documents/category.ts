@@ -12,8 +12,7 @@ export const [CreateCategory, Category] = DocumentSchema.new(
         ...Mixin.intrinsic.belongsToJournal(),
     }),
     z.interface({
-        createdAt: z.string(),
-        updatedAt: z.string().nullable().optional(),
+        ...Mixin.derived.timestamps(),
     })
 )
 

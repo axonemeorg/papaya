@@ -10,7 +10,12 @@ class IntrinsicMixin {
 }
 
 class DerivedMixin {
-
+    public static timestamps() {
+        return {
+            createdAt: z.string(),
+            updatedAt: z.string().nullable().optional(),
+        } as const
+    }
 }
 
 export class Mixin {

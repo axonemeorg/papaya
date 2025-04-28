@@ -1,5 +1,6 @@
 import z from "zod"
 import { DocumentSchema } from "@/schema/support/document"
+import { Mixin } from "../support/mixin"
 
 export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
     {
@@ -12,8 +13,7 @@ export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
         description: z.string().optional(),
     }),
     z.interface({
-        createdAt: z.string(),
-        updatedAt: z.string().nullable().optional(),
+        ...Mixin.derived.timestamps(),
     })
 )
 
