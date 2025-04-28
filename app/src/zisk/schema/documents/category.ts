@@ -5,16 +5,16 @@ import { Mixin } from "@/schema/support/mixin"
 
 export const [CreateCategory, Category] = DocumentSchema.new(
     { kind: z.literal('zisk:category') },
-    {
+    z.interface({
         label: z.string(),
         description: z.string(),
         avatar: Avatar,
         ...Mixin.intrinsic.belongsToJournal(),
-    },
-    {
+    }),
+    z.interface({
         createdAt: z.string(),
         updatedAt: z.string().nullable().optional(),
-    }
+    })
 )
 
 export type CreateCategory = z.output<typeof CreateCategory>

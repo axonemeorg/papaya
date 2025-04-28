@@ -15,7 +15,7 @@ type AttachmentMeta = z.output<typeof AttachmentMeta>
 const _Document = _Model
     .extend(IdentifierMetadata)
     .extend(
-        z.object({
+        z.interface({
             _rev: z.string().optional(),
             _deleted: z.boolean().optional(),
             _attachments: z.record(z.string(), AttachmentMeta).optional(),
@@ -26,23 +26,25 @@ type _Document = z.output<typeof _Document>
 export class DocumentSchema {
     static new<
         KindValue extends Kind,
-        Fields extends z.ZodRawShape,
-        MetaFields extends z.ZodRawShape
+        IntrinsicInterface extends z.ZodInterface,
+        DerivedInterface extends z.ZodInterface
     >(
         base: { kind: z.ZodLiteral<KindValue> },
-        fields: Fields,
-        metaFields: MetaFields
+        intriniscInterface: IntrinsicInterface,
+        derivedInterface: DerivedInterface
     ) {
-        const CreateSchema = _Model.extend({
-            kind: base.kind,
-            ...fields,
-        });
+        const CreateSchema = _Model
+            .extend({
+                kind: base.kind,
+            })
+            .extend(intriniscInterface)
 
-        const FullSchema = _Document.extend({
-            kind: base.kind,
-            ...fields,
-            ...metaFields,
-        });
+        const FullSchema = _Document
+            .extend({
+                kind: base.kind,
+            })
+            .extend(intriniscInterface)
+            .extend(derivedInterface)
 
         return [CreateSchema, FullSchema] as const;
     }

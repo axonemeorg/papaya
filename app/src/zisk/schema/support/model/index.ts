@@ -12,15 +12,14 @@ export const _Model = z.interface({
 export type _Model = z.output<typeof _Model>
 
 export class ModelSchema {
-    static from<KindValue extends Kind, Fields extends z.ZodRawShape>(
+    static from<KindValue extends Kind, Interface extends z.ZodInterface>(
         base: { kind: z.ZodLiteral<KindValue> },
-        fields: Fields
+        inter: Interface
     ) {
-        return _Model.extend({
-            kind: base.kind,
-            ...fields,
-        });
+        return _Model
+            .extend({
+                kind: base.kind,
+            })
+            .extend(inter)
     }
 }
-
-

@@ -8,11 +8,11 @@ export const Avatar = ModelSchema.from(
     {
         kind: z.literal('zisk:avatar')
     },
-    {
+    z.interface({
         content: z.string(),
         variant: AvatarVariant,
         primaryColor: z.string(),
         secondaryColor: z.string().optional().nullable(),
-    }
+    })
 )
 export type Avatar = z.output<typeof Avatar>
