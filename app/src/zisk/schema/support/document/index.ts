@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { _Model, Kind } from './model'
+import { _Model, Kind } from '@/schema/support/model'
 
 const IdentifierMetadata = z.object({
 	_id: z.string(),
