@@ -7,18 +7,36 @@ export const _Model = z.interface({
     kind: Kind,
     '_version?': z.union([z.string(), z.number()]),
     '_derived?': z.object(),
-    '_ephemeral?': z.object(),
+    '_ephemeral?': z.object().optional(),
 })
 export type _Model = z.output<typeof _Model>
 
+// Helper functions for creating schema components
+const createVersionSchema = () => z.union([z.string(), z.number()]).optional();
+const createDerivedSchema = (schema = {}) => z.object(schema).optional();
+const createEphemeralSchema = (schema = {}) => z.object(schema).optional();
+
 export class ModelSchema {
-    static from<KindValue extends Kind, Interface extends z.ZodInterface>(
-        base: { kind: z.ZodLiteral<KindValue> },
+    static from<
+        KindValue extends Kind,
+        Interface extends z.ZodInterface
+    >(
+        modelAttrs: {
+            kind: z.ZodLiteral<KindValue>,
+            version?: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>,
+            derived?: z.ZodOptional<z.ZodObject<any>>,
+            ephemeral?: z.ZodOptional<z.ZodObject<any>>
+        },
         inter: Interface
     ) {
+        const { kind, version, derived, ephemeral } = modelAttrs;
+        
         return _Model
             .extend({
-                kind: base.kind,
+                kind,
+                '_version?': version || createVersionSchema(),
+                '_derived?': derived || createDerivedSchema(),
+                '_ephemeral?': ephemeral || createEphemeralSchema()
             })
             .extend(inter)
     }
