@@ -1,19 +1,20 @@
-export const CreateEntryTag = z.object({
-    label: z.string(),
-    description: z.string(),
-})
+import z from "zod"
+import { DocumentSchema } from "../support/document"
+import { Mixin } from "../support/mixin"
 
-export type CreateEntryTag = z.output<typeof CreateEntryTag>
-
-
-
-export const EntryTag = DocumentMetadata.merge(BelongsToJournal).merge(CreateEntryTag).merge(
-    z.object({
+export const [CreateEntryTag, EntryTag] = DocumentSchema.new(
+    { 
         kind: z.literal('zisk:tag'),
-        createdAt: z.string(),
-        updatedAt: z.string().nullable(),
+    },
+    z.interface({
+        label: z.string(),
+        description: z.string(),
+        ...Mixin.intrinsic.belongsToJournal(),
+    }),
+    z.interface({
+        ...Mixin.derived.timestamps(),
     })
 )
 
+export type CreateEntryTag = z.output<typeof CreateEntryTag>
 export type EntryTag = z.output<typeof EntryTag>
-

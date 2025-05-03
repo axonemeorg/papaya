@@ -52,7 +52,7 @@ export type AmountRange = z.output<typeof AmountRange>
 export const JournalSlice = z.object({
 	dateView: DateView,
 	tagIds: z.array(z.string()).optional(),
-	reservedTags: z.array(ReservedTagKey).optional(),
+	statusIds: z.array(z.string()).optional(),
 	categoryIds: z.array(z.string()).optional(),
 	amount: AmountRange.optional(),
 	hasAttachments: z.boolean().optional(),

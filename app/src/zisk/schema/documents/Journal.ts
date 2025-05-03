@@ -1,17 +1,21 @@
+import z from "zod"
+import { DocumentSchema } from "@/schema/support/document"
+import { Avatar } from '@/schema/models/Avatar'
+import { Mixin } from "@/schema/support/mixin"
 
-export const CreateJournalMeta = z.object({
-	journalName: z.string().min(1, 'Journal name must be at least 1 character'),
-	avatar: Avatar,
-})
-
-export type CreateJournalMeta = z.output<typeof CreateJournalMeta>
-
-
-export const Journal = IdentifierMetadata.merge(CreateJournalMeta).merge(
-	z.object({
-		kind: z.literal('zisk:journal'),
-		journalVersion: z.nativeEnum(JournalVersion),
-		createdAt: z.string(),
-		updatedAt: z.string().nullable(),
-	})
+export const [CreateJournal, Journal] = DocumentSchema.new(
+    { 
+        kind: z.literal('zisk:journal'),
+    },
+    z.interface({
+        journalName: z.string(),
+        description: z.string().optional(),
+        avatar: Avatar,
+    }),
+    z.interface({
+        ...Mixin.derived.timestamps(),
+    })
 )
+
+export type CreateJournal = z.output<typeof CreateJournal>
+export type Journal = z.output<typeof Journal>

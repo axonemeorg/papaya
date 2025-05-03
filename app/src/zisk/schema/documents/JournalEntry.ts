@@ -4,6 +4,7 @@ import { Mixin } from "../support/mixin";
 import { EntryTask } from "../models/EntryTask";
 import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";
+import { EntryStatus } from "../models/EntryStatus";
 
 const BaseJournalEntry = z.interface({
     date: z.string(),
@@ -15,7 +16,8 @@ const BaseJournalEntry = z.interface({
         destAccountId: z.string()
     }).optional(),
     notes: z.string().optional(),
-    tasks: z.array(EntryTask).optional(),
+    tasks: z.array(z.string()).optional(),
+    statusIds: z.array(EntryStatus).optional(),
     artifacts: z.array(EntryArtifact).optional(),
     // recurs: EntryRecurrency.optional(),
     // recurrenceOf: z.string().optional(),
