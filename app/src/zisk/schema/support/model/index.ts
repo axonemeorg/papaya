@@ -11,7 +11,6 @@ export const _Model = z.interface({
 })
 export type _Model = z.output<typeof _Model>
 
-// Helper functions for creating schema components
 const createVersionSchema = () => z.union([z.string(), z.number()]).optional();
 const createDerivedSchema = (schema = {}) => z.object(schema).optional();
 const createEphemeralSchema = (schema = {}) => z.object(schema).optional();
@@ -23,46 +22,21 @@ export class ModelSchema {
     >(
         modelAttrs: {
             kind: z.ZodLiteral<KindValue>,
-            version?: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>,
-            derived?: z.ZodOptional<z.ZodObject<any>>,
-            ephemeral?: z.ZodOptional<z.ZodObject<any>>
+            _version?: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>,
+            _derived?: z.ZodOptional<z.ZodObject<any>>,
+            _ephemeral?: z.ZodOptional<z.ZodObject<any>>
         },
         inter: Interface
     ) {
-        const { kind, version, derived, ephemeral } = modelAttrs;
+        const { kind, _version, _derived, _ephemeral } = modelAttrs;
         
         return _Model
             .extend({
                 kind,
-                '_version?': version || createVersionSchema(),
-                '_derived?': derived || createDerivedSchema(),
-                '_ephemeral?': ephemeral || createEphemeralSchema()
+                '_version?': _version || createVersionSchema(),
+                '_derived?': _derived || createDerivedSchema(),
+                '_ephemeral?': _ephemeral || createEphemeralSchema()
             })
             .extend(inter)
     }
 }
-
-// TODO ignore
-// const db: any = {};
-
-// class ModelFacade {
-//     static fromSchemas<Intrinsic extends Array<z.ZodObject>, Derived extends Array<z.ZodObject>>(
-//         intrinicSchemas: Intrinsic,
-//         derivedSchemas: Derived,
-//     ) {
-//         const intrinsic = z.discriminatedUnion('kind', intrinicSchemas)
-//         const derived = z.discriminatedUnion('kind', derivedSchemas)
-
-//         return class ModelFacade {
-//             static make(props: z.infer<typeof intrinsic>) {
-//                 return {
-//                     ...props
-//                 }
-//             }
-
-//             static save(props: z.infer<typeof derived>) {
-//                 db.put(props)
-//             }
-//         }
-//     }
-// }

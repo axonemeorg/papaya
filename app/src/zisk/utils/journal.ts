@@ -184,7 +184,7 @@ export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry =
 }
 
 export const documentIsChildJournalEntry = (doc: ZiskDocument): doc is ChildJournalEntry => {
-	return 'parentEntry' in doc
+	return never
 }
 
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
