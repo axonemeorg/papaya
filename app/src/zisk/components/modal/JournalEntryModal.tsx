@@ -13,7 +13,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
 import { useQueryClient } from '@tanstack/react-query'
 import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
-import { enumerateJournalEntryReservedTag, journalEntryHasUserDefinedTags } from '@/utils/journal'
+import { enumerateJournalEntryStatuses, journalEntryHasUserDefinedTags } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { RESERVED_TAGS } from '@/constants/tags'
@@ -59,7 +59,7 @@ export default function JournalEntryModal(props: EditJournalEntryModalProps) {
 
 	// Reserved Tags
 	const { parent: parentReservedTags, children: childReservedTags }
-		= enumerateJournalEntryReservedTag(currentFormState as JournalEntry)
+		= enumerateJournalEntryStatuses(currentFormState as JournalEntry)
 
 	const isFlagged = parentReservedTags.has(ReservedTagKey.enum.FLAGGED)
 	const isApproximate = parentReservedTags.has(ReservedTagKey.enum.APPROXIMATE)

@@ -10,9 +10,8 @@ export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
         originalFileName: z.string(),
         size: z.number(),
         contentType: z.string(),
-        description: z.string().optional(),
-    })
-        .extend(Mixin.intrinsic.belongsToJournal()),
+        'description?': z.string().optional(),
+    }).extend(Mixin.intrinsic.belongsToJournal()),
     Mixin.derived.timestamps(),
 )
 

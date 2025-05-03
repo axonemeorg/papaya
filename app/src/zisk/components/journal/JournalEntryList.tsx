@@ -28,7 +28,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryReservedTag } from '@/utils/journal'
+import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryStatuses } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
@@ -277,7 +277,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 							
 								// Reserved Tags
 								const { parent: parentReservedTags, children: childReservedTags }
-									= enumerateJournalEntryReservedTag(entry)
+									= enumerateJournalEntryStatuses(entry)
 							
 								const isFlagged = parentReservedTags.has(ReservedTagKey.enum.FLAGGED)
 								const isApproximate = parentReservedTags.has(ReservedTagKey.enum.APPROXIMATE)

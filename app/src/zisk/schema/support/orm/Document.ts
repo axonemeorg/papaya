@@ -1,24 +1,23 @@
 import { z } from 'zod'
 import { _Model, Kind } from '@/schema/support/orm/Model'
 
-const IdentifierMetadata = z.object({
+const IdentifierMetadata = z.interface({
 	_id: z.string(),
 })
 type IdentifierMetadata = z.output<typeof IdentifierMetadata>
 
-const AttachmentMeta = z.object({
+const AttachmentMeta = z.interface({
 	content_type: z.string(),
 	data: z.instanceof(File),
 })
 type AttachmentMeta = z.output<typeof AttachmentMeta>
 
-const _Document = _Model
-    .extend(IdentifierMetadata)
+const _Document = IdentifierMetadata
     .extend(
         z.interface({
-            _rev: z.string().optional(),
-            _deleted: z.boolean().optional(),
-            _attachments: z.record(z.string(), AttachmentMeta).optional(),
+            '_rev?': z.string().optional(),
+            '_deleted?': z.boolean().optional(),
+            '_attachments?': z.record(z.string(), AttachmentMeta).optional(),
         })
     )
 type _Document = z.output<typeof _Document>
@@ -33,7 +32,7 @@ export class DocumentSchema {
             kind: z.ZodLiteral<KindValue>,
         },
         intriniscInterface: IntrinsicInterface,
-        derivedInterface: DerivedInterface
+        derivedInterface: DerivedInterface | null
     ) {
         const { kind } = modelAttrs;
         
@@ -41,15 +40,26 @@ export class DocumentSchema {
             .extend({
                 kind,
             })
+            .extend(_Document.partial())
             .extend(intriniscInterface)
-
-        const FullSchema = _Document
+            
+        const FullIntrinsicSchema = _Model
+            .extend(_Document)
             .extend({
                 kind,
             })
             .extend(intriniscInterface)
-            .extend(derivedInterface)
+                    
+        const FullDerivedSchema = derivedInterface
+            ? FullIntrinsicSchema.extend(derivedInterface)
+            : FullIntrinsicSchema
 
-        return [CreateSchema, FullSchema] as const;
+        return [CreateSchema, FullDerivedSchema] as const;
     }
 }
+
+const x = z.interface({
+    name: z.string()
+})
+
+type X = typeof x

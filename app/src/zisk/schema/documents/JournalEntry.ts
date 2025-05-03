@@ -1,10 +1,10 @@
 import { DocumentSchema } from "@/schema/support/orm/Document";
 import z from "zod";
 import { Mixin } from "../support/orm/Mixin";
-import { EntryTask } from "../models/EntryTask";
+import { EntryTask } from "./EntryTask";
 import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";
-import { EntryStatus } from "../models/EntryStatus";
+import { StatusVariant } from "../models/EntryStatus";
 
 const BaseJournalEntry = z.interface({
     date: z.string(),
@@ -16,10 +16,11 @@ const BaseJournalEntry = z.interface({
         destAccountId: z.string()
     }).optional(),
     notes: z.string().optional(),
-    tasks: z.array(z.string()).optional(),
-    statusIds: z.array(EntryStatus).optional(),
+    tasks: z.array(EntryTask).optional(),
+    statusIds: z.array(StatusVariant).optional(),
     artifacts: z.array(EntryArtifact).optional(),
     relatedEntryIds: z.array(z.string()).optional(),
+
     get children() {
         return z.array(BaseJournalEntry.omit({ children: true }))
     },
@@ -33,20 +34,25 @@ export const [CreateJournalEntry, JournalEntry] = DocumentSchema.new(
     // Intrinsic
     BaseJournalEntry
         .extend(Mixin.intrinsic.belongsToJournal())
-        .extend(Mixin.intrinsic.natural
-            ._ephemeral({ amount: z.string() })
-            .optional()
-        ),
-
+        // .extend(Mixin.intrinsic.natural
+        //     ._ephemeral({ amount: z.string() })
+        //     .optional()
+        // ),
+,
     // Derived
     Mixin.derived.timestamps()
         .extend(
             Mixin.derived.natural
                 ._derived({
                     figure: Figure.optional(),
-                }).optional()
+                })
+                .optional()
         )
 )
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 export type JournalEntry = z.output<typeof JournalEntry>
+
+const x:JournalEntry = {
+    
+}

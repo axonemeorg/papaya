@@ -3,13 +3,19 @@ import { z, ZodRawShape } from 'zod'
 class NaturalMixin {
     public static _ephemeral(_ephemeral: ZodRawShape) {
         return z.interface({
-            _ephemeral,
+            _ephemeral: z.interface(_ephemeral),
         })
     }
 
     public static _derived(_derived: ZodRawShape) {
         return z.interface({
-            _derived,
+            _derived: z.interface(_derived),
+        })
+    }
+
+    private static _id() {
+        return z.interface ({
+            _id: z.string(),
         })
     }
 }
@@ -30,12 +36,13 @@ class DerivedMixin {
     public static timestamps() {
         return z.interface({
             createdAt: z.string(),
-            updatedAt: z.string().nullable().optional(),
+            'updatedAt?': z.string().nullable().optional(),
         })
     }
 
     public static natural = {
-        _derived: NaturalMixin._derived
+        _derived: NaturalMixin._derived,
+        // _id: NaturalMixin._id,
     }
 }
 
