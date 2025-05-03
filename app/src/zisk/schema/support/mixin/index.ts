@@ -1,20 +1,41 @@
-import { z } from 'zod'
+import { z, ZodRawShape } from 'zod'
 
+class NaturalMixin {
+    public static _ephemeral(_ephemeral: ZodRawShape) {
+        return z.interface({
+            _ephemeral,
+        })
+    }
+
+    public static _derived(_derived: ZodRawShape) {
+        return z.interface({
+            _derived,
+        })
+    }
+}
 
 class IntrinsicMixin {
     public static belongsToJournal() {
-        return {
+        return z.interface({
             journalId: z.string(),
-        } as const
+        })
+    }
+
+    public static natural = {
+        _ephemeral: NaturalMixin._ephemeral
     }
 }
 
 class DerivedMixin {
     public static timestamps() {
-        return {
+        return z.interface({
             createdAt: z.string(),
             updatedAt: z.string().nullable().optional(),
-        } as const
+        })
+    }
+
+    public static natural = {
+        _derived: NaturalMixin._derived
     }
 }
 

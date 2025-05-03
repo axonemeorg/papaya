@@ -1,11 +1,6 @@
 import { z } from 'zod'
 import { _Model, Kind } from '@/schema/support/model'
 
-// Helper functions for creating schema components
-const createVersionSchema = () => z.union([z.string(), z.number()]).optional();
-const createDerivedSchema = (schema = {}) => z.object(schema).optional();
-const createEphemeralSchema = (schema = {}) => z.object(schema).optional();
-
 const IdentifierMetadata = z.object({
 	_id: z.string(),
 })
@@ -36,30 +31,21 @@ export class DocumentSchema {
     >(
         modelAttrs: {
             kind: z.ZodLiteral<KindValue>,
-            _version?: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber]>>,
-            _derived?: z.ZodOptional<z.ZodInterface<any>>,
-            _ephemeral?: z.ZodOptional<z.ZodInterface<any>>
         },
         intriniscInterface: IntrinsicInterface,
         derivedInterface: DerivedInterface
     ) {
-        const { kind, _version, _derived, _ephemeral } = modelAttrs;
+        const { kind } = modelAttrs;
         
         const CreateSchema = _Model
             .extend({
                 kind,
-                '_version?': _version || createVersionSchema(),
-                '_derived?': _derived || createDerivedSchema(),
-                '_ephemeral?': _ephemeral || createEphemeralSchema()
             })
             .extend(intriniscInterface)
 
         const FullSchema = _Document
             .extend({
                 kind,
-                '_version?': _version || createVersionSchema(),
-                '_derived?': _derived || createDerivedSchema(),
-                '_ephemeral?': _ephemeral || createEphemeralSchema()
             })
             .extend(intriniscInterface)
             .extend(derivedInterface)

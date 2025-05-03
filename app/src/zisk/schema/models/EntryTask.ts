@@ -9,7 +9,6 @@ export const EntryTask = ModelSchema.from(
     z.interface({
         description: z.string(),
         completedAt: z.string().nullable(),
-        ...Mixin.intrinsic.belongsToJournal(),
     })
 )
 

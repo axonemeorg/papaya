@@ -23,11 +23,11 @@ export const EntryStatus = ModelSchema.from(
         /**
          * The Reserved Tag is not selectable within the app.
          */
-        disabled: z.boolean().optional(),
+        'disabled?': z.boolean().optional(),
         /**
          * The Reserved Tag is no longer used.
          */
-        archived: z.boolean().optional(),
+        'archived?': z.boolean().optional(),
     })
 );
 export type EntryStatus = z.output<typeof EntryStatus>;

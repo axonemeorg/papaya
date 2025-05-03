@@ -12,9 +12,7 @@ export const [CreateJournal, Journal] = DocumentSchema.new(
         description: z.string().optional(),
         avatar: Avatar,
     }),
-    z.interface({
-        ...Mixin.derived.timestamps(),
-    })
+    Mixin.derived.timestamps(),
 )
 
 export type CreateJournal = z.output<typeof CreateJournal>

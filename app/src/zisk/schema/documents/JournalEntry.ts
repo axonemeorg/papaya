@@ -19,31 +19,34 @@ const BaseJournalEntry = z.interface({
     tasks: z.array(z.string()).optional(),
     statusIds: z.array(EntryStatus).optional(),
     artifacts: z.array(EntryArtifact).optional(),
-    // recurs: EntryRecurrency.optional(),
-    // recurrenceOf: z.string().optional(),
     relatedEntryIds: z.array(z.string()).optional(),
     get children() {
-        return z.array(BaseJournalEntry).optional()
+        return z.array(BaseJournalEntry.omit({ children: true }))
     },
 });
 
 export const [CreateJournalEntry, JournalEntry] = DocumentSchema.new(
     {
         kind: z.literal('zisk:entry'),
-        _ephemeral: z.interface({
-            amount: z.string(),
-        }).optional(),
-        _derived: z.interface({
-            figure: Figure.optional(),
-            ...Mixin.derived.timestamps(),
-        }).optional(),
     },
-    BaseJournalEntry.extend(z.interface({
-        ...Mixin.intrinsic.belongsToJournal(),
-    })),
-    z.interface({
-        ...Mixin.derived.timestamps(),
-    })
+
+    // Intrinsic
+    BaseJournalEntry
+        .extend(Mixin.intrinsic.belongsToJournal())
+        .extend(Mixin.intrinsic.natural
+            ._ephemeral({ amount: z.string() })
+            .optional()
+        ),
+
+    // Derived
+    Mixin.derived.timestamps()
+        .extend(
+            Mixin.derived.natural
+                ._derived({
+                    figure: Figure.optional(),
+                }).optional()
+        )
 )
+
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 export type JournalEntry = z.output<typeof JournalEntry>
