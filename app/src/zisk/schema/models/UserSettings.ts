@@ -1,5 +1,5 @@
 
-import { ModelSchema } from "@/schema/support/model";
+import { ModelSchema } from "@/schema/support/orm/Model";
 import { z } from "zod";
 import { SyncingStrategy, ZiskServer } from "../support/server";
 

@@ -1,4 +1,4 @@
-import { ModelSchema } from "@/schema/support/model";
+import { ModelSchema } from "@/schema/support/orm/Model";
 import { RecurringCadence } from "@/schema/support/recurrence";
 import { z } from "zod";
 

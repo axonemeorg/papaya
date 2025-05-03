@@ -1,7 +1,7 @@
 import z from "zod"
-import { DocumentSchema } from "@/schema/support/document"
+import { DocumentSchema } from "@/schema/support/orm/Document"
 import { Avatar } from '@/schema/models/Avatar'
-import { Mixin } from "@/schema/support/mixin"
+import { Mixin } from "@/schema/support/orm/Mixin"
 
 export const [CreateAccount, Account] = DocumentSchema.new(
     { 

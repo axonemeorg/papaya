@@ -1,6 +1,6 @@
 import z from "zod"
-import { DocumentSchema } from "../support/document"
-import { Mixin } from "../support/mixin"
+import { DocumentSchema } from "../support/orm/Document"
+import { Mixin } from "../support/orm/Mixin"
 
 export const [CreateEntryTag, EntryTag] = DocumentSchema.new(
     { 

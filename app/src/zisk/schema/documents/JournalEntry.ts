@@ -1,6 +1,6 @@
-import { DocumentSchema } from "@/schema/support/document";
+import { DocumentSchema } from "@/schema/support/orm/Document";
 import z from "zod";
-import { Mixin } from "../support/mixin";
+import { Mixin } from "../support/orm/Mixin";
 import { EntryTask } from "../models/EntryTask";
 import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";

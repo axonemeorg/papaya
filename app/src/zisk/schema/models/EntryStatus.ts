@@ -1,6 +1,6 @@
 import z from "zod"
 import { CreateEntryTag } from "../documents/EntryTag"
-import { ModelSchema } from "../support/model"
+import { ModelSchema } from "../support/orm/Model"
 
 export const StatusVariant = z.enum([
     'FLAGGED',

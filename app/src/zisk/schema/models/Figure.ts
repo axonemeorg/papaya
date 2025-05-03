@@ -1,5 +1,5 @@
 import { Currency } from "@/schema/support/currency";
-import { ModelSchema } from "@/schema/support/model";
+import { ModelSchema } from "@/schema/support/orm/Model";
 import { z } from "zod";
 
 export const Figure = ModelSchema.from(

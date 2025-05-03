@@ -1,6 +1,6 @@
 import z from "zod"
-import { ModelSchema } from "@/schema/support/model"
-import { Mixin } from "@/schema/support/mixin"
+import { ModelSchema } from "@/schema/support/orm/Model"
+import { Mixin } from "@/schema/support/orm/Mixin"
 
 export const EntryTask = ModelSchema.from(
     {

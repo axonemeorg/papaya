@@ -1,5 +1,5 @@
 import z from "zod";
-import { ModelSchema } from "../support/model";
+import { ModelSchema } from "../support/orm/Model";
 
 export const CreateQuickJournalEntry = ModelSchema.from(
 	{

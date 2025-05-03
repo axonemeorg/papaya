@@ -1,6 +1,6 @@
 import z from "zod"
-import { DocumentSchema } from "@/schema/support/document"
-import { Mixin } from "../support/mixin"
+import { DocumentSchema } from "@/schema/support/orm/Document"
+import { Mixin } from "../support/orm/Mixin"
 
 export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
     {
