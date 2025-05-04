@@ -1,4 +1,3 @@
-import { Journal } from '@/types/schema'
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { getRelativeTime } from '@/utils/date'
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Grid2 as Grid, Stack, Tab, Tabs, Typography } from '@mui/material'
@@ -10,6 +9,7 @@ import JournalActions from './JournalActions'
 import { deleteJournal, exportJournal, resetJournal } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
+import { Journal } from '@/schema/documents/Journal'
 
 interface JournalDetailsAndActivityProps {
 	journal: Journal | null
@@ -50,7 +50,8 @@ function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {
 			},
 			{
 				label: 'Version',
-				value: props.journal ? String(props.journal.journalVersion) : '',
+				value: '', // TODO fix after ZK-132
+				// value: props.journal ? String(props.journal.journalVersion) : '',
 			},
 			{
 				label: 'Size',

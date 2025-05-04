@@ -1,5 +1,4 @@
 import { JournalContext } from '@/contexts/JournalContext'
-import { Journal } from '@/types/schema'
 import { Add, East, InfoOutlined } from '@mui/icons-material'
 import {
 	Avatar,
@@ -22,6 +21,7 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import AvatarIcon from '../icon/AvatarIcon'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import ManageJournalModal from './ManageJournalModal'
+import { Journal } from '@/schema/documents/Journal'
 
 interface SelectJournalModal {
 	open: boolean

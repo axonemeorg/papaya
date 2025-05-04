@@ -8,7 +8,6 @@ export const [CreateZiskMeta, ZiskMeta] = DocumentSchema.new(
 		kind: z.literal('zisk:meta'),
 	},
 	z.interface({
-		label: z.string(),
 		activeJournalId: z.string().nullable(),
 		userSettings: UserSettings,
 	}),

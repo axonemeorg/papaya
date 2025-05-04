@@ -9,9 +9,9 @@ export const [CreateEntryTag, EntryTag] = DocumentSchema.new(
     z.interface({
         label: z.string(),
         description: z.string(),
-    })
-        .extend(Mixin.intrinsic.belongsToJournal()),
-    Mixin.derived.timestamps(),
+    }),
+    Mixin.derived.timestamps()
+        .extend(Mixin.derived.belongsToJournal())
 )
 
 export type CreateEntryTag = z.output<typeof CreateEntryTag>

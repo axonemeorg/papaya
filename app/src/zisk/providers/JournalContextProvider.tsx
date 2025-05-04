@@ -7,9 +7,8 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { ZiskContext } from '@/contexts/ZiskContext'
 import { updateActiveJournal, createJournalEntry, getAllJournalObjects } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
-import { MigrationEngine } from '@/database/migrate'
+// import { MigrationEngine } from '@/database/migrate'
 import { getAccounts, getCategories, getEntryTags, getJournals } from '@/database/queries'
-import { Account, Category, EntryTag, JournalEntry, Journal } from '@/types/schema'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { makeJournalEntry } from '@/utils/journal'
@@ -17,6 +16,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Journal } from '@/schema/documents/Journal'
+import { Category } from '@/schema/documents/Category'
+import { EntryTag } from '@/schema/documents/EntryTag'
+import { Account } from '@/schema/documents/Account'
+import { CreateJournalEntry, JournalEntry } from '@/schema/documents/JournalEntry'
 
 const db = getDatabaseClient()
 
@@ -94,7 +98,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		if (!activeJournal) {
 			return
 		}
-		const entry: JournalEntry = makeJournalEntry(values as Partial<JournalEntry>, activeJournal._id)
+		const entry: JournalEntry = makeJournalEntry(values as CreateJournalEntry, activeJournal._id)
 
 		createJournalEntry(entry)
 
@@ -119,16 +123,20 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	}
 
 	const _migrateJournal = async (journal: Journal): Promise<Journal> => {
-		if (!MigrationEngine.shouldMigrate(journal)) {
-			console.log(`Journal ${journal.journalName}@${journal.journalVersion} is on the latest version.`)
-			return journal
-		} else {
-			console.log('Migrating...')
-		}
-		const journalObjects = await getAllJournalObjects(journal._id)
-		const [updatedJournal, ...rest] = await MigrationEngine.migrate([journal, ...journalObjects])
-		await db.bulkDocs([updatedJournal, ...rest])
-		return updatedJournal
+		// if (!MigrationEngine.shouldMigrate(journal)) {
+		// 	// console.log(`Journal ${journal.journalName}@${journal.journalVersion} is on the latest version.`)
+		// 	return journal
+		// } else {
+		// 	console.log('Migrating...')
+		// }
+		// const journalObjects = await getAllJournalObjects(journal._id)
+		// const [updatedJournal, ...rest] = await MigrationEngine.migrate([journal, ...journalObjects])
+		// await db.bulkDocs([updatedJournal, ...rest])
+		// return updatedJournal
+
+		// TODO fix after ZK-132
+
+		return journal;
 	}
 
 	const loadActiveJournal = async (journal: Journal): Promise<Journal> => {

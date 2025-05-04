@@ -55,7 +55,7 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const calculateNetAmount = (entry: JournalEntry): number => {
+export const calculateNetAmount = (_entry: JournalEntry): number => {
 
 	return 0;
 
@@ -84,7 +84,7 @@ export const makeJournalEntry = (formData: CreateJournalEntry, journalId: string
 		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
 		memo: formData.memo || '',
 		journalId,
-		
+		children: formData.children,
 	}
 
 	return entry
@@ -146,13 +146,25 @@ export const journalEntryHasTasks = (entry: JournalEntry): boolean => {
 	}
 	return entry.tasks.length > 0
 }
-
-export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry => {
-	return 'zisk:entry' === doc.kind
+export const journalEntryHasTags = (entry: JournalEntry): boolean => {
+	if (!entry.tagIds) {
+		return false
+	}
+	return entry.tagIds.length > 0
 }
 
+/**
+ * @deprecated infer directly via `kind` discriminator
+ */
+export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry => {
+	return 'kind' in doc && doc.kind === 'zisk:entry'
+}
+
+/**
+ * @deprecated infer directly via `kind` discriminator
+ */
 export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
-	return doc.kind === 'zisk:category'
+	return 'kind' in doc && doc.kind === 'zisk:category'
 }
 
 export const generateRandomAvatar = (): Avatar => {
@@ -237,7 +249,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
  * Given a set of nonspecific entries that are known to 
  */
 export const getRecurrencesForDateView = (
-	recurringEntries: Record<string, JournalEntry>, dateView: DateView
+	_recurringEntries: Record<string, JournalEntry>, _dateView: DateView
 ): Record<string, Set<string>> => {
 
 	return {};

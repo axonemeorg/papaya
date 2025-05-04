@@ -13,7 +13,6 @@ import { EntryTag, ReservedTag } from "@/types/schema";
 import { JournalContext } from "@/contexts/JournalContext";
 import clsx from "clsx";
 import { EntryTagAutocompleteProps } from "./EntryTagAutocomplete";
-import { RESERVED_TAGS } from "@/constants/tags";
 import { EntryTagPicker } from "../pickers/EntryTagPicker";
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
@@ -21,7 +20,7 @@ type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
-    
+
     const { getEntryTagsQuery } = useContext(JournalContext)
     const value = props.value ?? []
 

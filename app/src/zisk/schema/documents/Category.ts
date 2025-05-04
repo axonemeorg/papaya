@@ -11,9 +11,9 @@ export const [CreateCategory, Category] = DocumentSchema.new(
         label: z.string(),
         description: z.string(),
         avatar: Avatar,
-    })
-        .extend(Mixin.intrinsic.belongsToJournal()),
-    Mixin.derived.timestamps(),
+    }),
+    Mixin.derived.timestamps()
+        .extend(Mixin.derived.belongsToJournal())
 )
 
 export type CreateCategory = z.output<typeof CreateCategory>

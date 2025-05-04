@@ -11,8 +11,9 @@ export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
         size: z.number(),
         contentType: z.string(),
         'description?': z.string().optional(),
-    }).extend(Mixin.intrinsic.belongsToJournal()),
-    Mixin.derived.timestamps(),
+    }),
+    Mixin.derived.timestamps()
+        .extend(Mixin.derived.belongsToJournal())
 )
 
 export type EntryArtifact = z.output<typeof EntryArtifact>

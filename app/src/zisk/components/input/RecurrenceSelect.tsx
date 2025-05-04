@@ -9,7 +9,7 @@ import {
     serializeEntryRecurrency,
     updateRecurrencyNewDate
 } from "@/utils/recurrence"
-import { CadenceFrequency, DayOfWeek, EntryRecurrency, MonthlyCadence, RecurringCadence } from "@/types/schema"
+import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from "@/schema/support/recurrence"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import {
     Button,
@@ -33,6 +33,7 @@ import { ChangeEvent, useEffect, useState } from "react"
 import DaysOfWeekPicker from "../pickers/DaysOfWeekPicker"
 import dayjs from "dayjs"
 import { pluralize, sentenceCase } from "@/utils/string"
+import { EntryRecurrency } from "@/schema/models/EntryRecurrence"
 
 enum RecurrenceDefaultOption {
     NON_RECURRING = 'NON_RECURRING',
@@ -155,6 +156,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
                 break
         }
         onSubmit({
+            kind: 'zisk:recurrence',
             cadence,
             ends,
             exceptions: undefined,
@@ -438,6 +440,7 @@ const getRecurrencySelectOptions = (date: string, additional: (EntryRecurrency |
     ]
     generateDeafultRecurringCadences(date ?? today).forEach((cadence) => {
         options.push(serializeEntryRecurrency({
+            kind: 'zisk:recurrence',
             cadence,
             ends: null,
         }));

@@ -9,7 +9,7 @@ export const [CreateEntryTask, EntryTask] = DocumentSchema.new(
         description: z.string(),
         completedAt: z.string().nullable(),
     }),
-    null
+    z.interface({})
 )
 
 export type CreateEntryTask = z.output<typeof CreateEntryTask>

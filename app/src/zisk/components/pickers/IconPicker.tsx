@@ -7,7 +7,7 @@ import ColorPicker from '../pickers/ColorPicker'
 import { Search, Shuffle } from '@mui/icons-material'
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth'
 import Fuse from 'fuse.js'
-import { Avatar, AvatarVariant } from '@/types/schema'
+import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
 
 // const DEFAULT_ICON = 'home'
 

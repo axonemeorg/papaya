@@ -15,15 +15,15 @@ export const EntryRecurrency = ModelSchema.from(
     cadence: RecurringCadence,
 
     ends: z.union([
-        z.object({
+        z.interface({
             onDate: z.string(),
         }),
-        z.object({
+        z.interface({
             afterNumOccurrences: z.number()
         })
     ]).nullable(),
 
-    exceptions: z.object({
+    'exceptions?': z.interface({
         onDates: z.array(z.string()).optional(),
         afterDate: z.string().optional(),
     }).optional(),

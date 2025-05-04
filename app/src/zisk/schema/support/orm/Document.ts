@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { _Model, Kind } from '@/schema/support/orm/Model'
 
-const IdentifierMetadata = z.interface({
+export const IdentifierMetadata = z.interface({
 	_id: z.string(),
 })
-type IdentifierMetadata = z.output<typeof IdentifierMetadata>
+export type IdentifierMetadata = z.output<typeof IdentifierMetadata>
 
 const AttachmentMeta = z.interface({
 	content_type: z.string(),
@@ -12,7 +12,7 @@ const AttachmentMeta = z.interface({
 })
 type AttachmentMeta = z.output<typeof AttachmentMeta>
 
-const _Document = IdentifierMetadata
+export const _Document = IdentifierMetadata
     .extend(
         z.interface({
             '_rev?': z.string().optional(),
@@ -20,7 +20,7 @@ const _Document = IdentifierMetadata
             '_attachments?': z.record(z.string(), AttachmentMeta).optional(),
         })
     )
-type _Document = z.output<typeof _Document>
+export type _Document = z.output<typeof _Document>
 
 export class DocumentSchema {
     static new<
@@ -32,15 +32,11 @@ export class DocumentSchema {
             kind: z.ZodLiteral<KindValue>,
         },
         intriniscInterface: IntrinsicInterface,
-        derivedInterface: DerivedInterface | null
+        derivedInterface: DerivedInterface
     ) {
         const { kind } = modelAttrs;
         
-        const CreateSchema = _Model
-            .extend({
-                kind,
-            })
-            .extend(_Document.partial())
+        const CreateSchema = _Document.partial()
             .extend(intriniscInterface)
             
         const FullIntrinsicSchema = _Model
@@ -49,10 +45,13 @@ export class DocumentSchema {
                 kind,
             })
             .extend(intriniscInterface)
+            .extend(derivedInterface)
                     
-        const FullDerivedSchema = derivedInterface
-            ? FullIntrinsicSchema.extend(derivedInterface)
-            : FullIntrinsicSchema
+        // const FullDerivedSchema = derivedInterface
+        //     ? FullIntrinsicSchema.extend(derivedInterface)
+        //     : FullIntrinsicSchema
+
+        const FullDerivedSchema = FullIntrinsicSchema
 
         return [CreateSchema, FullDerivedSchema] as const;
     }

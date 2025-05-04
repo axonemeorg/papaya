@@ -21,12 +21,6 @@ class NaturalMixin {
 }
 
 class IntrinsicMixin {
-    public static belongsToJournal() {
-        return z.interface({
-            journalId: z.string(),
-        })
-    }
-
     public static natural = {
         _ephemeral: NaturalMixin._ephemeral
     }
@@ -37,6 +31,12 @@ class DerivedMixin {
         return z.interface({
             createdAt: z.string(),
             'updatedAt?': z.string().nullable().optional(),
+        })
+    }
+
+    public static belongsToJournal() {
+        return z.interface({
+            journalId: z.string(),
         })
     }
 

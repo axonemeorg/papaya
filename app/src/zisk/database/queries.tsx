@@ -1,19 +1,16 @@
-import {
-	Account,
-	AmountRange,
-	Category,
-	EntryArtifact,
-	EntryTag,
-	JournalEntry,
-	Journal,
-	JournalSlice,
-	ZiskMeta,
-} from '@/types/schema'
 import { getDatabaseClient } from './client'
 import { makeDefaultZiskMeta } from '@/utils/database'
 import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
 import { enumerateFilters, transformAmountRange } from '@/utils/filtering'
 import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
+import { Category } from '@/schema/documents/Category'
+import { Account } from '@/schema/documents/Account'
+import { AmountRange, JournalSlice } from '@/schema/support/slice'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { EntryTag } from '@/schema/documents/EntryTag'
+import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { Journal } from '@/schema/documents/Journal'
+import { EntryArtifact } from '@/schema/documents/EntryArtifact'
 
 const db = getDatabaseClient()
 
