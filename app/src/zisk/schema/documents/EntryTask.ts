@@ -6,7 +6,7 @@ export const [CreateEntryTask, EntryTask] = DocumentSchema.new(
         kind: z.literal('zisk:task'),
     },
     z.interface({
-        description: z.string(),
+        memo: z.string(),
         completedAt: z.string().nullable(),
     }),
     z.interface({})

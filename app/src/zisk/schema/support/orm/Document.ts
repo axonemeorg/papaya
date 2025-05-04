@@ -6,11 +6,11 @@ export const IdentifierMetadata = z.interface({
 })
 export type IdentifierMetadata = z.output<typeof IdentifierMetadata>
 
-const AttachmentMeta = z.interface({
+export const AttachmentMeta = z.interface({
 	content_type: z.string(),
 	data: z.instanceof(File),
 })
-type AttachmentMeta = z.output<typeof AttachmentMeta>
+export type AttachmentMeta = z.output<typeof AttachmentMeta>
 
 export const _Document = IdentifierMetadata
     .extend(

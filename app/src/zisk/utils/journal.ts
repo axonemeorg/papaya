@@ -72,7 +72,7 @@ export const calculateNetAmount = (_entry: JournalEntry): number => {
 	// return netAmount
 }
 
-export const makeJournalEntry = (formData: CreateJournalEntry, journalId: string): JournalEntry => {
+export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalId: string): JournalEntry => {
 	const now = new Date().toISOString()
 
 	// TODO fix after ZK-132
@@ -81,10 +81,10 @@ export const makeJournalEntry = (formData: CreateJournalEntry, journalId: string
 		_id: formData._id ?? generateJournalEntryId(),
 		kind: 'zisk:entry',
 		createdAt: now,
-		date: formData.date || dayjs(now).format('YYYY-MM-DD'),
-		memo: formData.memo || '',
+		date: formData.date ?? dayjs(now).format('YYYY-MM-DD'),
+		memo: formData.memo ?? '',
 		journalId,
-		children: formData.children,
+		children: formData.children ?? [],
 	}
 
 	return entry
@@ -129,11 +129,11 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
 	return entryArtifact
 }
 
-export const makeEntryTask = (formData: CreateEntryTask): EntryTask => {
+export const makeEntryTask = (formData: Partial<CreateEntryTask>): EntryTask => {
 	const newTask: EntryTask = {
 		_id: formData._id ?? generateTaskId(),
 		kind: 'zisk:task',
-		description: formData.description ?? '',
+		memo: formData.memo ?? '',
 		completedAt: formData.completedAt ?? null,
 	}
 
