@@ -7,12 +7,14 @@ export const [CreateJournal, Journal] = DocumentSchema.new(
     { 
         kind: z.literal('zisk:journal'),
     },
-    z.interface({
+    z.object({
         journalName: z.string(),
         description: z.string().optional(),
         avatar: Avatar,
     }),
-    Mixin.derived.timestamps(),
+    z.object({
+        ...Mixin.derived.timestamps(),
+    })
 )
 
 export type CreateJournal = z.output<typeof CreateJournal>

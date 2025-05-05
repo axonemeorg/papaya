@@ -6,14 +6,16 @@ export const [CreateEntryArtifact, EntryArtifact] = DocumentSchema.new(
     {
         kind: z.literal('zisk:artifact'),
     },
-    z.interface({
+    z.object({
         originalFileName: z.string(),
         size: z.number(),
         contentType: z.string(),
-        'description?': z.string().optional(),
+        'description': z.string().optional(),
     }),
-    Mixin.derived.timestamps()
-        .extend(Mixin.derived.belongsToJournal())
+    z.object({
+        ...Mixin.derived.timestamps(),
+        ...Mixin.derived.belongsToJournal(),
+    }),
 )
 
 export type EntryArtifact = z.output<typeof EntryArtifact>

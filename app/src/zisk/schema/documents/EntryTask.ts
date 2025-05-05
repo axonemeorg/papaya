@@ -5,11 +5,11 @@ export const [CreateEntryTask, EntryTask] = DocumentSchema.new(
     {
         kind: z.literal('zisk:task'),
     },
-    z.interface({
+    z.object({
         memo: z.string(),
         completedAt: z.string().nullable(),
     }),
-    z.interface({})
+    z.object({}),
 )
 
 export type CreateEntryTask = z.output<typeof CreateEntryTask>

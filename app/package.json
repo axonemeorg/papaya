@@ -46,7 +46,7 @@
     "react-window": "^1.8.11",
     "sharp": "^0.33.5",
     "uuid": "^11.1.0",
-    "zod": "^4.0.0-beta.20250503T014749",
+    "zod": "^4.0.0-beta.20250504T224201",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

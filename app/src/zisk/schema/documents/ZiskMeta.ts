@@ -7,11 +7,13 @@ export const [CreateZiskMeta, ZiskMeta] = DocumentSchema.new(
 	{ 
 		kind: z.literal('zisk:meta'),
 	},
-	z.interface({
+	z.object({
 		activeJournalId: z.string().nullable(),
 		userSettings: UserSettings,
 	}),
-	Mixin.derived.timestamps(),
+	z.object({
+		...Mixin.derived.timestamps(),
+	}),
 )
 
 export type CreateZiskMeta = z.output<typeof CreateZiskMeta>

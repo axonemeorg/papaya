@@ -5,7 +5,7 @@ export const CreateQuickJournalEntry = ModelSchema.from(
 	{
 		kind: z.literal('zisk:quickentry')
 	},
-	z.interface({
+	z.object({
 		amount: z.string(),
 		memo: z.string().optional(),
 		categoryId: z.string().optional(),

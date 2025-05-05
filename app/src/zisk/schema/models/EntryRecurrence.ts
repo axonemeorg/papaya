@@ -6,7 +6,7 @@ export const EntryRecurrency = ModelSchema.from(
   {
       kind: z.literal('zisk:recurrence')
   },
-  z.interface({
+  z.object({
     /**
      * Encodes the cadence of the recurrence, e.g. every four weeks,
      * every month, etc. If this value is undefined, then the it
@@ -15,15 +15,15 @@ export const EntryRecurrency = ModelSchema.from(
     cadence: RecurringCadence,
 
     ends: z.union([
-        z.interface({
+        z.object({
             onDate: z.string(),
         }),
-        z.interface({
+        z.object({
             afterNumOccurrences: z.number()
         })
     ]).nullable(),
 
-    'exceptions?': z.interface({
+    'exceptions': z.object({
         onDates: z.array(z.string()).optional(),
         afterDate: z.string().optional(),
     }).optional(),

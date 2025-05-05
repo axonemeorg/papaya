@@ -7,13 +7,15 @@ export const [CreateAccount, Account] = DocumentSchema.new(
     { 
         kind: z.literal('zisk:account'),
     },
-    z.interface({
+    z.object({
         label: z.string(),
         description: z.string(),
         avatar: Avatar,
     }),
-    Mixin.derived.timestamps()
-        .extend(Mixin.derived.belongsToJournal())
+    z.object({
+        ...Mixin.derived.timestamps(),
+        ...Mixin.derived.belongsToJournal(),
+    }),
 )
 
 export type CreateAccount = z.output<typeof CreateAccount>

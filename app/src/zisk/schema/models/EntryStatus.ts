@@ -18,7 +18,7 @@ export const EntryStatus = ModelSchema.from(
     {
         kind: z.literal('zisk:status')
     },
-    z.interface({
+    z.object({
         _id: StatusVariant,
         label: z.string(),
         description: z.string(),

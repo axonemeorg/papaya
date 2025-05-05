@@ -6,12 +6,14 @@ export const [CreateEntryTag, EntryTag] = DocumentSchema.new(
     { 
         kind: z.literal('zisk:tag'),
     },
-    z.interface({
+    z.object({
         label: z.string(),
         description: z.string(),
     }),
-    Mixin.derived.timestamps()
-        .extend(Mixin.derived.belongsToJournal())
+    z.object({
+        ...Mixin.derived.timestamps(),
+        ...Mixin.derived.belongsToJournal(),
+    }),
 )
 
 export type CreateEntryTag = z.output<typeof CreateEntryTag>

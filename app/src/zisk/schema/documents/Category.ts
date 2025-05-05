@@ -7,13 +7,15 @@ export const [CreateCategory, Category] = DocumentSchema.new(
     { 
         kind: z.literal('zisk:category'),
     },
-    z.interface({
+    z.object({
         label: z.string(),
         description: z.string(),
         avatar: Avatar,
     }),
-    Mixin.derived.timestamps()
-        .extend(Mixin.derived.belongsToJournal())
+    z.object({
+        ...Mixin.derived.timestamps(),
+        ...Mixin.derived.belongsToJournal(),
+    }),
 )
 
 export type CreateCategory = z.output<typeof CreateCategory>

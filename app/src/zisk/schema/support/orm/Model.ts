@@ -3,7 +3,7 @@ import z from "zod";
 export const Kind = z.templateLiteral(['zisk:', z.string()])
 export type Kind = z.output<typeof Kind>
 
-export const _Model = z.interface({
+export const _Model = z.object({
     kind: Kind,
 })
 export type _Model = z.output<typeof _Model>
@@ -11,12 +11,12 @@ export type _Model = z.output<typeof _Model>
 export class ModelSchema {
     static from<
         KindValue extends Kind,
-        Interface extends z.ZodInterface
+        Intrinsic extends z.ZodRawShape
     >(
         modelAttrs: {
             kind: z.ZodLiteral<KindValue>,
         },
-        inter: Interface
+        intrinisc: z.ZodObject<Intrinsic>
     ) {
         const { kind } = modelAttrs;
         
@@ -24,6 +24,6 @@ export class ModelSchema {
             .extend({
                 kind,
             })
-            .extend(inter)
+            .extend(intrinisc.shape as Intrinsic)
     }
 }
