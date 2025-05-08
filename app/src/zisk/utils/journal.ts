@@ -84,7 +84,10 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
 		date: formData.date ?? dayjs(now).format('YYYY-MM-DD'),
 		memo: formData.memo ?? '',
 		journalId,
-		children: formData.children ?? [],
+		children: [],
+		_ephemeral: {
+			
+		}
 	}
 
 	return entry

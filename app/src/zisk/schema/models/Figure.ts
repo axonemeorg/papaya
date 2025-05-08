@@ -6,12 +6,12 @@ export const Figure = ModelSchema.from(
     {
         kind: z.literal('zisk:figure')
     },
-    z.object({
+    {
         currency: Currency,
         amount: z.number(),
-        get empiracle() {
+        get empiracle(): z.ZodObject<Figure> {
             return Figure.omit({ empiracle: true }).optional()
         },
-    }),
+    },
 );
 export type Figure = z.output<typeof Figure>;

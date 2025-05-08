@@ -6,39 +6,39 @@ import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";
 import { StatusVariant } from "../models/EntryStatus";
 
-const BaseJournalEntry = IdentifierMetadata
-    .extend({
-        ...Mixin.intrinsic.natural._ephemeral({
-            amount: z.string()
-        }),
-    })
-    .extend({
-        date: z.string(),
-        memo: z.string(),
-        'tagIds': z.array(z.string()).optional(),
-        'categoryId': z.string().optional(),
-        'sourceAccountId': z.string().optional(),
-        'transfer': z.object({
-            destAccountId: z.string()
-        }).optional(),
-        'notes': z.string().optional(),
-        'tasks': z.array(EntryTask).optional(),
-        'statusIds': z.array(StatusVariant).optional(),
-        'artifacts': z.array(EntryArtifact).optional(),
-        'relatedEntryIds': z.array(z.string()).optional(),
+// const BaseJournalEntry = 
 
-        get children() {
-            return z.array(BaseJournalEntry.omit({ children: true }))
-        },
-    })
-
-export const [CreateJournalEntry, JournalEntry] = DocumentSchema.new(
+const [CreateBaseJournalEntry, BaseJournalEntry] = DocumentSchema.new(
     {
         kind: z.literal('zisk:entry'),
     },
 
     // Intrinsic
-    BaseJournalEntry,
+    IdentifierMetadata
+        .extend({
+            ...Mixin.intrinsic.natural._ephemeral({
+                amount: z.string()
+            }),
+        })
+        .extend({
+            date: z.string(),
+            memo: z.string(),
+            'tagIds': z.array(z.string()).optional(),
+            'categoryId': z.string().optional(),
+            'sourceAccountId': z.string().optional(),
+            'transfer': z.object({
+                destAccountId: z.string()
+            }).optional(),
+            'notes': z.string().optional(),
+            'tasks': z.array(EntryTask).optional(),
+            'statusIds': z.array(StatusVariant).optional(),
+            'artifacts': z.array(EntryArtifact).optional(),
+            'relatedEntryIds': z.array(z.string()).optional(),
+
+            // get children() {
+            //     return z.array(BaseJournalEntry.omit({ children: true }))
+            // },
+        }),
 
     // Derived
     z.object({
@@ -50,6 +50,14 @@ export const [CreateJournalEntry, JournalEntry] = DocumentSchema.new(
             })).partial().shape,
     })
 )
+
+export const CreateJournalEntry = CreateBaseJournalEntry.extend({
+    children: z.array(CreateBaseJournalEntry)
+})
+
+export const JournalEntry = BaseJournalEntry.extend({
+    children: z.array(BaseJournalEntry)
+})
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
 export type JournalEntry = z.output<typeof JournalEntry>

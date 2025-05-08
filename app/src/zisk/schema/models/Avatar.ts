@@ -16,3 +16,5 @@ export const Avatar = ModelSchema.from(
     })
 )
 export type Avatar = z.output<typeof Avatar>
+
+const x = z.object().partial()

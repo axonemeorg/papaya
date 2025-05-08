@@ -16,14 +16,14 @@ export class ModelSchema {
         modelAttrs: {
             kind: z.ZodLiteral<KindValue>,
         },
-        intrinisc: z.ZodObject<Intrinsic>
-    ) {
+        intrinisc: Intrinsic
+    ): z.ZodObject<KindValue & Intrinsic> {
         const { kind } = modelAttrs;
         
         return _Model
             .extend({
                 kind,
             })
-            .extend(intrinisc.shape as Intrinsic)
+            .extend(intrinisc)
     }
 }
