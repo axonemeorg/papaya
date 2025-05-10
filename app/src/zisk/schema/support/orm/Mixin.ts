@@ -1,19 +1,19 @@
-import { z, ZodRawShape } from 'zod'
+import { z } from 'zod'
 
 class NaturalMixin {
-    public static _ephemeral(_ephemeral: ZodRawShape) {
+    public static _ephemeral(_ephemeral: z.ZodRawShape) {
         return {
             _ephemeral: z.object(_ephemeral),
         }
     }
 
-    public static _derived(_derived: ZodRawShape) {
+    public static _derived(_derived: z.ZodRawShape) {
         return {
             _derived: z.object(_derived),
         }
     }
 
-    private static _id() {
+    public static _id() {
         return {
             _id: z.string(),
         }
@@ -42,7 +42,7 @@ class DerivedMixin {
 
     public static natural = {
         _derived: NaturalMixin._derived,
-        // _id: NaturalMixin._id,
+        _id: NaturalMixin._id,
     }
 }
 
