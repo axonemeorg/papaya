@@ -1,12 +1,10 @@
-import { ModelSchema } from "@/schema/support/orm/Model";
+import { Model } from "@/schema/support/orm/Model";
 import { RecurringCadence } from "@/schema/support/recurrence";
 import { z } from "zod";
 
-export const EntryRecurrency = ModelSchema.from(
-  {
-      kind: z.literal('zisk:recurrence')
-  },
-  z.object({
+export const [CreateEntryRecurrency, EntryRecurrency] = Model.fromSchema({
+    kind: z.literal('zisk:recurrence'),
+
     /**
      * Encodes the cadence of the recurrence, e.g. every four weeks,
      * every month, etc. If this value is undefined, then the it
@@ -27,6 +25,6 @@ export const EntryRecurrency = ModelSchema.from(
         onDates: z.array(z.string()).optional(),
         afterDate: z.string().optional(),
     }).optional(),
-  })
-)
+})
+export type CreateEntryRecurrency = z.output<typeof CreateEntryRecurrency>;
 export type EntryRecurrency = z.output<typeof EntryRecurrency>;

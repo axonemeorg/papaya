@@ -1,6 +1,6 @@
 import z from "zod"
-import { ModelSchema } from "../support/orm/Model"
-import { IdentifierMetadata } from "../support/orm/Document";
+import { Model } from "@/schema/support/orm/Model"
+import { Mixin } from "@/schema/support/orm/Mixin"
 
 enum Status {
     FLAGGED = 'zisk.status.flagged',
@@ -14,22 +14,20 @@ export const StatusVariant = z.enum(Status)
 
 export type StatusVariant = z.output<typeof StatusVariant>
 
-export const EntryStatus = ModelSchema.from(
-    {
-        kind: z.literal('zisk:status')
-    },
-    z.object({
-        _id: StatusVariant,
-        label: z.string(),
-        description: z.string(),
-        /**
-         * The Reserved Tag is not selectable within the app.
-         */
-        disabled: z.boolean(),
-        /**
-         * The Reserved Tag is no longer used.
-         */
-        archived: z.boolean(),
-    })
-);
+export const [CreateEntryStatus, EntryStatus] = Model.fromSchema({
+    kind: z.literal('zisk:status'),
+    ...Mixin.derived.natural._id(),
+    label: z.string(),
+    description: z.string(),
+    /**
+     * The Reserved Tag is not selectable within the app.
+     */
+    disabled: z.boolean(),
+    /**
+     * The Reserved Tag is no longer used.
+     */
+    archived: z.boolean(),
+})
+
+export type CreateEntryStatus = z.output<typeof CreateEntryStatus>;
 export type EntryStatus = z.output<typeof EntryStatus>;

@@ -1,17 +1,23 @@
 import { Currency } from "@/schema/support/currency";
-import { ModelSchema } from "@/schema/support/orm/Model";
+import { Model } from "@/schema/support/orm/Model";
 import { z } from "zod";
 
-export const Figure = ModelSchema.from(
-    {
-        kind: z.literal('zisk:figure')
-    },
-    {
-        currency: Currency,
-        amount: z.number(),
-        get empiracle(): z.ZodObject<Figure> {
-            return Figure.omit({ empiracle: true }).optional()
-        },
-    },
-);
+const [CreateBaseFigure, BaseFigure] = Model.fromSchema({
+    kind: z.literal('zisk:figure'),
+    currency: Currency,
+    amount: z.number(),
+})
+
+export const CreateFigure = CreateBaseFigure.extend({
+    get empiracle() {
+        return CreateBaseFigure.optional();
+    }
+})
+export type CreateFigure = z.output<typeof CreateFigure>;
+
+export const Figure = BaseFigure.extend({
+    get empiracle() {
+        return BaseFigure.optional()
+    }
+})
 export type Figure = z.output<typeof Figure>;
