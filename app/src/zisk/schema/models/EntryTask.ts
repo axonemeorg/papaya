@@ -1,16 +1,18 @@
 import z from "zod"
-import { DocumentSchema } from "../support/orm/Document"
+import { Model } from "../support/orm/Model"
+import { Mixin } from "../support/orm/Mixin"
 
-export const [CreateEntryTask, EntryTask] = DocumentSchema.new(
+export const [CreateEntryTask, EntryTask] = Model.fromSchemas([
     {
         kind: z.literal('zisk:task'),
-    },
-    z.object({
         memo: z.string(),
         completedAt: z.string().nullable(),
-    }),
-    z.object({}),
-)
+    },
+    {
+        ...Mixin.derived.natural._id(),
+    }
+])
+
 
 export type CreateEntryTask = z.output<typeof CreateEntryTask>
 export type EntryTask = z.output<typeof EntryTask>

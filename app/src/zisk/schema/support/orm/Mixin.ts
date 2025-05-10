@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
 class NaturalMixin {
-    public static _ephemeral(_ephemeral: z.ZodRawShape) {
+    public static _ephemeral<E extends z.ZodRawShape>(_ephemeral: E) {
         return {
             _ephemeral: z.object(_ephemeral),
         }
     }
 
-    public static _derived(_derived: z.ZodRawShape) {
+    public static _derived<D extends z.ZodRawShape>(_derived: D) {
         return {
             _derived: z.object(_derived),
         }

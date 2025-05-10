@@ -6,7 +6,6 @@ import { EntryTag } from "../documents/EntryTag";
 import { Journal } from "../documents/Journal";
 import { JournalEntry } from "../documents/JournalEntry";
 import { ZiskMeta } from "../documents/ZiskMeta";
-import { EntryTask } from "../documents/EntryTask";
 
 export const ZiskDocument = z.discriminatedUnion(
     'kind',
@@ -15,7 +14,6 @@ export const ZiskDocument = z.discriminatedUnion(
         Category,
         EntryArtifact,
         EntryTag,
-        EntryTask,
         Journal,
         JournalEntry,
         ZiskMeta,

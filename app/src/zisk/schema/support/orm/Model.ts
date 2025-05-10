@@ -13,14 +13,23 @@ export type Optional<S extends z.ZodRawShape> = {
 export class Model {
     public static extend<E extends z.ZodRawShape>(extension: E) {
         class ExtendedModel {
-            public static fromSchema<
+            public static fromSchemas<
                 Kind extends KindTemplate,
                 Intrinsic extends z.ZodRawShape,
                 Derived extends z.ZodRawShape,
             >(
                 [intrinsic, derived]: [KindShape<Kind> & Intrinsic, Derived]
             ) {
-                return Model.fromExtendedSchema<Kind, Intrinsic, Derived, E>([intrinsic, derived, extension])
+                return Model.fromExtendedSchemas<Kind, Intrinsic, Derived, E>([intrinsic, derived, extension])
+            }
+
+            public static fromSchema<
+                Kind extends KindTemplate,
+                Intrinsic extends z.ZodRawShape,
+            >(
+                intrinsic: KindShape<Kind> & Intrinsic
+            ) {
+                return Model.fromExtendedSchemas<Kind, Intrinsic, {}, E>([intrinsic, {}, extension])
             }
         }
         return ExtendedModel;
@@ -32,7 +41,7 @@ export class Model {
     >(
         intrinsic: KindShape<Kind> & Intrinsic
     ) => {
-        return Model.fromExtendedSchema<Kind, Intrinsic, {}, {}>([intrinsic, {}, {}])
+        return Model.fromExtendedSchemas<Kind, Intrinsic, {}, {}>([intrinsic, {}, {}])
     }
 
     public static fromSchemas = <
@@ -42,10 +51,10 @@ export class Model {
     >(
         [intrinsic, derived]: [KindShape<Kind> & Intrinsic, Derived]
     ) => {
-        return Model.fromExtendedSchema<Kind, Intrinsic, Derived, {}>([intrinsic, derived, {}])
+        return Model.fromExtendedSchemas<Kind, Intrinsic, Derived, {}>([intrinsic, derived, {}])
     }
 
-    private static fromExtendedSchema = <
+    private static fromExtendedSchemas = <
         Kind extends KindTemplate,
         Intrinsic extends z.ZodRawShape,
         Derived extends z.ZodRawShape,
@@ -63,6 +72,7 @@ export class Model {
         } as
             & Intrinsic
             & Optional<Derived>
+            & Optional<E>
             & { kind: never }
     
         const derivedShape = {
@@ -72,6 +82,7 @@ export class Model {
         } as 
             & KindShape<Kind>
             & Intrinsic
+            & E
             & Derived;
     
         return [
