@@ -16,4 +16,7 @@ const DocumentShape = {
 }
 type DocumentShape = typeof DocumentShape;
 
+const DocumentObject = z.object(DocumentShape)
+export type DocumentObject = z.infer<typeof DocumentObject>
+
 export const Document = Model.extend(DocumentShape)

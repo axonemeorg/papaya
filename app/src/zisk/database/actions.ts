@@ -8,7 +8,7 @@ import { calculateNetAmount } from '@/utils/journal'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category, CreateCategory } from '@/schema/documents/Category'
 import { Account, CreateAccount } from '@/schema/documents/Account'
-import { _Document, IdentifierMetadata } from '@/schema/support/orm/Document'
+import { DocumentObject } from '@/schema/support/orm/Document'
 import { CreateJournal, Journal } from '@/schema/documents/Journal'
 import { ZiskDocument } from '@/schema/union/ZiskDocument'
 import { CreateEntryTag, EntryTag } from '@/schema/documents/EntryTag'
@@ -109,13 +109,13 @@ export const updateAccount = async (formData: Account) => {
 	})
 }
 
-export const deleteRecord = async <T extends _Document>(record: T): Promise<T> => {
+export const deleteRecord = async <T extends DocumentObject>(record: T): Promise<T> => {
 	const fetchedRecord = await db.get(record._id)
 	await db.remove(fetchedRecord)
 	return fetchedRecord as unknown as T
 }
 
-export const restoreRecord = async <T extends _Document>(record: T): Promise<void> => {
+export const restoreRecord = async <T extends DocumentObject>(record: T): Promise<void> => {
 	const newRecord = { ...record }
 	delete record._rev;
 	await db.put(newRecord)

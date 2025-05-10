@@ -9,7 +9,7 @@ import { CadenceFrequency, DayOfWeek, RecurringCadence } from '@/schema/support/
 import { Avatar } from '@/schema/models/Avatar'
 import { ZiskDocument } from '@/schema/union/ZiskDocument'
 import { Category } from '@/schema/documents/Category'
-import { CreateEntryTask, EntryTask } from '@/schema/documents/EntryTask'
+import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
 import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
 
 /**
@@ -86,7 +86,7 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
 		journalId,
 		children: [],
 		_ephemeral: {
-			
+			amount: '',
 		}
 	}
 

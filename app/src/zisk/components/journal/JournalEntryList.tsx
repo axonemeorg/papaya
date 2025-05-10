@@ -37,7 +37,7 @@ import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Account } from '@/schema/documents/Account'
 import { Category } from '@/schema/documents/Category'
 import { StatusVariant } from '@/schema/models/EntryStatus'
-import { EntryTask } from '@/schema/documents/EntryTask'
+import { EntryTask } from '@/schema/models/EntryTask'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean

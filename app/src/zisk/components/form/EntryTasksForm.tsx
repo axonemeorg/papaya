@@ -4,7 +4,7 @@ import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-
 import { useContext, useRef } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeEntryTask } from "@/utils/journal"
-import { EntryTask } from "@/schema/documents/EntryTask"
+import { EntryTask } from "@/schema/models/EntryTask"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 
 export default function EntryTasksForm() {
