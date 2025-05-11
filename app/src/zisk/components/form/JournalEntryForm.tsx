@@ -142,10 +142,9 @@ export default function JournalEntryForm() {
 							</Stack>
 							<Grid container columns={12} columnSpacing={2}>
 								<Grid size={!isTransferEntry ? 8 : 4}>
-									<div>Amount...</div>
-									{/* <Controller
+									<Controller
 										control={control}
-										name="amount"
+										name="_ephemeral.amount"
 										render={({ field }) => (
 											<AmountField
 												variant='filled'
@@ -156,7 +155,7 @@ export default function JournalEntryForm() {
 												approximate={isApproximate}
 											/>
 										)}
-									/> */}
+									/>
 								</Grid>
 								<Grid size={4}>
 									<Controller

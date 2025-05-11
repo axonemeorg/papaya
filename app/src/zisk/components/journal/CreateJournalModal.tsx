@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createJournal } from '@/database/actions'
 import ImportJournalForm from '../form/ImportJournalForm'
 import { CreateJournal, Journal } from '@/schema/documents/Journal'
+import { useAddJournal } from '@/store/orm/journals'
 
 interface CreateJournalModalProps {
 	open: boolean
@@ -19,7 +20,7 @@ const DEFAULT_JOURNAL_AVATAR = {
 }
 
 export default function CreateJournalModal(props: CreateJournalModalProps) {
-	const journalContext = useContext(JournalContext)
+	const addJournal = useAddJournal();
 
 	const createJournalForm = useForm<CreateJournal>({
 		defaultValues: {
@@ -33,12 +34,12 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
 
 	const handleSubmit = async (formData: CreateJournal) => {
 		// Create a new journal
-		const newJournal = await createJournal({
+		const newJournal: Journal = await createJournal({
 			...formData,
 		})
 
-		// Refetch journals
-		journalContext.getJournalsQuery.refetch()
+		addJournal(newJournal)		
+		props.onClose()
 		props.onCreated(newJournal)
 	}
 

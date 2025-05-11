@@ -129,10 +129,9 @@ export default function ChildJournalEntryForm() {
                             />
                             <Grid container columns={12} spacing={1} sx={{ flex: '1' }}>
                                 <Grid size={4}>
-                                    <div>Amount...</div>
-                                    {/* <Controller
+                                    <Controller
                                         control={control}
-                                        name={`children.${index}.amount`}
+                                        name={`children.${index}._ephemeral.amount`}
                                         render={({ field }) => (
                                             <AmountField
                                                 {...field}
@@ -140,7 +139,7 @@ export default function ChildJournalEntryForm() {
                                                 approximate={isApproximate}
                                             />
                                         )}
-                                    /> */}
+                                    />
                                 </Grid>
                                 <Grid size={'grow'}>
                                     <CategoryAutocomplete

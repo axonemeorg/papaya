@@ -10,6 +10,7 @@ import { deleteJournal, exportJournal, resetJournal } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
 import { Journal } from '@/schema/documents/Journal'
+import { useRemoveJournal } from '@/store/orm/journals'
 
 interface JournalDetailsAndActivityProps {
 	journal: Journal | null
@@ -27,7 +28,7 @@ interface ManageJournalModalProps {
 	open: boolean
 	details: JournalDetailsAndActivityProps
 	onClose: () => void
-	onResetJournal: (journal: Journal) => void
+	onResetJournal?: (journal: Journal) => void
 	onDeletedJournal: (journal: Journal) => void
 }
 
@@ -108,7 +109,8 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 	const [showDeleteMenu, setShowDeleteMenu] = useState(false)
 
 	const { snackbar } = useContext(NotificationsContext)
-	const journalContext = useContext(JournalContext)
+	
+	const removeJournal = useRemoveJournal()
 
 	const handleResetJournal = async () => {
 		if (!props.details.journal) {
@@ -117,7 +119,7 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 		await resetJournal(props.details.journal._id)
 		setShowResetMenu(false)
 		snackbar({ message: 'Journal reset.' })
-		props.onResetJournal(props.details.journal)
+		props.onResetJournal?.(props.details.journal)
 	}
 
 	const handleDeleteJournal = async () => {
@@ -125,7 +127,7 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 			return
 		}
 		await deleteJournal(props.details.journal._id)
-		await journalContext.getJournalsQuery.refetch()
+		removeJournal(props.details.journal)
 		setShowDeleteMenu(false)
 		snackbar({ message: 'Journal deleted.' })
 		props.onDeletedJournal(props.details.journal)

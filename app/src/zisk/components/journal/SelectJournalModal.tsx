@@ -22,37 +22,40 @@ import AvatarIcon from '../icon/AvatarIcon'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import ManageJournalModal from './ManageJournalModal'
 import { Journal } from '@/schema/documents/Journal'
+import { useSetJournalSelectorStatus, useJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
+import CreateJournalModal from './CreateJournalModal'
+import { useJournals } from '@/store/orm/journals'
 
-interface SelectJournalModal {
-	open: boolean
-	initialSelection: Journal | null
-	onClose: () => void
-	onSelect: (journal: Journal) => void
-	onPromptCreate: () => void
-}
-
-export default function SelectJournalModal(props: SelectJournalModal) {
+export default function SelectJournalModal() {
 	const journalContext = useContext(JournalContext)
 	const [showManageJournalModal, setShowManageJournalModal] = useState(false)
-	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(props.initialSelection)
+	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(journalContext.activeJournal)
+
+	const journals = useJournals()
+
+	const [journalSelectorState, setJournalSelectorStatus] = [useJournalSelectorStatus(), useSetJournalSelectorStatus()]
+	const showSelectJournalModal = ['SELECTING', 'CREATING'].includes(journalSelectorState)
 
 	useEffect(() => {
-		setSelectedJournal(journalContext.journal)
-	}, [journalContext.journal])
-
-	useEffect(() => {
-		setSelectedJournal(props.initialSelection)
-	}, [props.initialSelection])
-
-	const journals: Journal[] = useMemo(() => {
-		return Object.values(journalContext.getJournalsQuery.data)
-	}, [journalContext.getJournalsQuery.data])
+		if (showSelectJournalModal) {
+			setSelectedJournal(journalContext.activeJournal)
+		}
+	}, [journalContext.activeJournal, showSelectJournalModal])
 
 	const handleContinue = () => {
 		if (!selectedJournal) {
 			return
 		}
-		props.onSelect(selectedJournal)
+		journalContext.setActiveJournal(selectedJournal)
+		onCloseSelectJournalModal()
+	}
+
+	const onCloseCreateModal = () => {
+		setJournalSelectorStatus('SELECTING')
+	}
+
+	const onCloseSelectJournalModal = () => {
+		setJournalSelectorStatus('CLOSED')
 	}
 
 	const handleManageJournal = (journal: Journal) => {
@@ -62,28 +65,29 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 
 	const handleDeletedJournal = (journal: Journal) => {
 		// If the deleted journal is the active journal, reset the active journal
-		if (journal._id === journalContext.journal?._id) {
-			journalContext.closeActiveJournal()
+		if (journal._id === journalContext.activeJournal?._id) {
+			journalContext.setActiveJournal(null)
 		}
 	}
 
-	const handleResetJournal = () => {
-		// TODO refetch journal details
-	}
-
-	const hasSelectedJournal = Boolean(journalContext.journal)
+	const hasActiveJournal = Boolean(journalContext.activeJournal)
 
 	return (
 		<>
-			<Dialog open={props.open}>
+			<CreateJournalModal
+				open={journalSelectorState === 'CREATING'}
+				onClose={onCloseCreateModal}
+				onCreated={(newJournal) => setSelectedJournal(newJournal)}
+			/>
+			<Dialog open={showSelectJournalModal}>
 				<DialogTitle>Your Journals</DialogTitle>
-				{!hasSelectedJournal && (
+				{!hasActiveJournal && (
 					<DialogContent>
 						<DialogContentText>Please select a journal.</DialogContentText>
 					</DialogContent>
 				)}
 				<List>
-					{journals.map((journal) => {
+					{Object.values(journals).map((journal: Journal) => {
 						const selected = selectedJournal?._id === journal._id
 						return (
 							<ListItem
@@ -111,17 +115,21 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 												{journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
 											</Typography>
 										}
+										secondary={journal._id === journalContext.activeJournal?._id
+											? <Typography variant='overline' color='primary'>Active</Typography>
+											: undefined
+										}
 									/>
 								</ListItemButton>
 							</ListItem>
 						)
 					})}
-					{journals.length > 0 && (
+					{Object.values(journals).length > 0 && (
 						<Divider component="li" />
 					)}
 					<ListItem disablePadding>
 						<ListItemButton
-							onClick={() => props.onPromptCreate()}
+							onClick={() => setJournalSelectorStatus('CREATING')}
 						>
 							<ListItemAvatar>
 								<Avatar>
@@ -133,14 +141,16 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 					</ListItem>
 				</List>
 				<DialogActions>
-					{journalContext.journal && <Button onClick={() => props.onClose()}>Cancel</Button>}
+					{journalContext.activeJournal && (
+						<Button onClick={() => setJournalSelectorStatus('CLOSED')}>Cancel</Button>
+					)}
 					<Button
 						variant="contained"
-						disabled={!selectedJournal || journalContext.journal?._id === selectedJournal._id}
+						disabled={!selectedJournal || journalContext.activeJournal?._id === selectedJournal._id}
 						onClick={() => handleContinue()}
 						startIcon={<East />}
 					>
-						{hasSelectedJournal ? 'Switch Journal' : 'Select Journal'}
+						{hasActiveJournal ? 'Switch Journal' : 'Select Journal'}
 					</Button>
 				</DialogActions>
 			</Dialog>
@@ -154,7 +164,6 @@ export default function SelectJournalModal(props: SelectJournalModal) {
 					lastActivity: null,
 				}}
 				onDeletedJournal={handleDeletedJournal}
-				onResetJournal={handleResetJournal}
 			/>
 		</>
 	)
