@@ -8,7 +8,7 @@ import { getDatabaseClient } from '@/database/client'
 import { getAccounts, getCategories, getEntryTags, getJournals } from '@/database/queries'
 
 import { useQuery } from '@tanstack/react-query'
-import { PropsWithChildren, useContext, useState } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { Journal } from '@/schema/documents/Journal'
 import { Category } from '@/schema/documents/Category'
 import { EntryTag } from '@/schema/documents/EntryTag'
@@ -17,6 +17,8 @@ import { useSetCategories } from '@/store/orm/categories'
 import { useSetEntryTags } from '@/store/orm/tags'
 import { useSetAccounts } from '@/store/orm/accounts'
 import { useSetJournals } from '@/store/orm/journals'
+import { updateActiveJournal } from '@/database/actions'
+import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 
 const db = getDatabaseClient()
 
@@ -43,10 +45,17 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	// The currently active journal
 	const [activeJournal, setActiveJournal] = useState<Journal | null>(null)
 
+	const [journalSelectorState, setJournalSelectorStatus] = [useJournalSelectorStatus(), useSetJournalSelectorStatus()]
+	
+	const [hasLoadedInitialActiveJournal, setHasLoadedInitialActiveJournal] = useState<boolean>(false)
+
 	// const { snackbar } = useContext(NotificationsContext)
 	// const ziskContext = useContext(ZiskContext)
 
+	const ziskContext = useContext(ZiskContext)
+
 	const hasSelectedJournal = Boolean(activeJournal)
+		|| Boolean(ziskContext.queries.ziskMeta.isFetched && ziskContext.queries.ziskMeta.data?.activeJournalId)
 
 	const getJournalsQuery = useQuery<Record<string, Journal>>({
 		queryKey: ['journals'],
@@ -134,7 +143,31 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
 	const handleSelectNewActiveJournal = (journal: Journal | null) => {
 		setActiveJournal(journal)
+		updateActiveJournal(journal)
 	}
+
+	useEffect(() => {
+		if (hasLoadedInitialActiveJournal) {
+			return
+		} if (!ziskContext.queries.ziskMeta.isFetched) {
+			return
+		} if (!ziskContext.queries.ziskMeta.data?.activeJournalId || ziskContext.queries.ziskMeta.data?.activeJournalId !== activeJournal?._id) {
+			// No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one
+			setJournalSelectorStatus('SELECTING')
+			setHasLoadedInitialActiveJournal(true)
+		}
+	}, [getJournalsQuery.isFetched, ziskContext.queries.ziskMeta.isFetched, hasLoadedInitialActiveJournal])
+
+	// useEffect(() => {
+	// 	 else if (!getJournalsQuery.isFetched) {
+	// 		return
+	// 	} else if (journalContext.activeJournal) {
+	// 		setHasLoadedInitialActiveJournal(true)
+	// 		return
+	// 	} else 
+	// 	setJournalSelectorStatus('SELECTING')
+	// }, [hasLoadedInitialActiveJournal, ziskMeta, journalContext.activeJournal])
+
 
 	return (
 		<JournalContext.Provider

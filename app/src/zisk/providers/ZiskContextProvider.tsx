@@ -12,7 +12,6 @@ export default function ZiskContextProvider(props: PropsWithChildren) {
     const getZiskMetaQuery = useQuery<ZiskMeta | null>({
         queryKey: ['ziskMeta'],
         queryFn: getOrCreateZiskMeta,
-        initialData: null,
         enabled: true,
     })
 
@@ -32,12 +31,10 @@ export default function ZiskContextProvider(props: PropsWithChildren) {
         await updateSettings(newSettings)
     }
 
-    useEffect(() => {
-        setZiskMeta(getZiskMetaQuery.data)
-    }, [getZiskMetaQuery.data])
-
     const context: ZiskContext = {
-        data: ziskMeta,
+        queries: {
+            ziskMeta: getZiskMetaQuery,
+        },
         updateSettings: updateZiskSettings,
     }
 

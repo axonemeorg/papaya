@@ -2,10 +2,8 @@ import { Account } from '@/schema/documents/Account'
 import { Category } from '@/schema/documents/Category'
 import { EntryTag } from '@/schema/documents/EntryTag'
 import { Journal } from '@/schema/documents/Journal'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
-import { UseFormReturn } from 'react-hook-form'
 
 export interface JournalContext {
 	activeJournal: Journal | null;

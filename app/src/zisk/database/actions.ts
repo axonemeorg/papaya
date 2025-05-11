@@ -153,11 +153,11 @@ export const createJournal = async (journal: CreateJournal): Promise<Journal> =>
 	return newJournal
 }
 
-export const updateActiveJournal = async (journalId: string) => {
+export const updateActiveJournal = async (journal: Journal | null) => {
 	const meta = await getOrCreateZiskMeta()
 	await db.put({
 		...meta,
-		activeJournalId: journalId,
+		activeJournalId: journal ? journal._id : null,
 	})
 }
 

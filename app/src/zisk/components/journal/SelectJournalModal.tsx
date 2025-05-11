@@ -27,10 +27,10 @@ import { Journal } from '@/schema/documents/Journal'
 import { useSetJournalSelectorStatus, useJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import CreateJournalModal from './CreateJournalModal'
 import { useJournals } from '@/store/orm/journals'
+import { ZiskContext } from '@/contexts/ZiskContext'
 
 export default function SelectJournalModal() {
 	const journalContext = useContext(JournalContext)
-	const [hasLoadedInitialActiveJournal, setHasLoadedInitialActiveJournal] = useState<boolean>(false)
 	const [showManageJournalModal, setShowManageJournalModal] = useState(false)
 	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(journalContext.activeJournal)
 
@@ -72,16 +72,6 @@ export default function SelectJournalModal() {
 			journalContext.setActiveJournal(null)
 		}
 	}
-
-	useEffect(() => {
-		if (hasLoadedInitialActiveJournal) {
-			return
-		} else if (journalContext.activeJournal) {
-			return;
-		}
-		setHasLoadedInitialActiveJournal(true)
-		setJournalSelectorStatus('SELECTING')
-	}, [hasLoadedInitialActiveJournal, ])
 
 	const hasActiveJournal = Boolean(journalContext.activeJournal)
 
