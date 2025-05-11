@@ -3,6 +3,7 @@ import { Add, East, InfoOutlined } from '@mui/icons-material'
 import {
 	Avatar,
 	Button,
+	Chip,
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -15,9 +16,10 @@ import {
 	ListItemAvatar,
 	ListItemButton,
 	ListItemText,
+	Stack,
 	Typography,
 } from '@mui/material'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { use, useContext, useEffect, useMemo, useState } from 'react'
 import AvatarIcon from '../icon/AvatarIcon'
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import ManageJournalModal from './ManageJournalModal'
@@ -28,6 +30,7 @@ import { useJournals } from '@/store/orm/journals'
 
 export default function SelectJournalModal() {
 	const journalContext = useContext(JournalContext)
+	const [hasLoadedInitialActiveJournal, setHasLoadedInitialActiveJournal] = useState<boolean>(false)
 	const [showManageJournalModal, setShowManageJournalModal] = useState(false)
 	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(journalContext.activeJournal)
 
@@ -70,6 +73,16 @@ export default function SelectJournalModal() {
 		}
 	}
 
+	useEffect(() => {
+		if (hasLoadedInitialActiveJournal) {
+			return
+		} else if (journalContext.activeJournal) {
+			return;
+		}
+		setHasLoadedInitialActiveJournal(true)
+		setJournalSelectorStatus('SELECTING')
+	}, [hasLoadedInitialActiveJournal, ])
+
 	const hasActiveJournal = Boolean(journalContext.activeJournal)
 
 	return (
@@ -111,14 +124,27 @@ export default function SelectJournalModal() {
 									</ListItemAvatar>
 									<ListItemText
 										primary={
-											<Typography sx={{ fontStyle: !journal.journalName ? 'italic' : undefined }}>
-												{journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
-											</Typography>
+											<Stack direction="row" spacing={2} alignItems="center">
+												<Typography sx={{ fontStyle: !journal.journalName ? 'italic' : undefined }}>
+													{journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
+												</Typography>
+												{journal._id === journalContext.activeJournal?._id && (
+													<Chip
+														size='small'
+														color='primary'
+														label={<Typography variant='overline'>Active</Typography>}
+													/>
+												)}
+											</Stack>
 										}
-										secondary={journal._id === journalContext.activeJournal?._id
-											? <Typography variant='overline' color='primary'>Active</Typography>
-											: undefined
-										}
+										// secondary={journal._id === journalContext.activeJournal?._id
+										// 	? <Chip
+										// 		size='small'
+										// 		color='primary'
+										// 		label={<Typography variant='overline'>Active</Typography>}
+										// 	/>
+										// 	: undefined
+										// }
 									/>
 								</ListItemButton>
 							</ListItem>

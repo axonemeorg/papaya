@@ -34,11 +34,6 @@ db.createIndex({
 })
 
 export default function JournalContextProvider(props: PropsWithChildren) {
-	// State
-	const [showJournalEntryModal, setShowJournalEntryModal] = useState<boolean>(false)
-	const [showSelectJournalModal, setShowSelectJournalModal] = useState<boolean>(false)
-	const [showCreateJournalModal, setShowCreateJournalModal] = useState(false)
-
 	// Stores
 	const setJournals = useSetJournals()
 	const setCategories = useSetCategories()
@@ -47,22 +42,16 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
 	// The currently active journal
 	const [activeJournal, setActiveJournal] = useState<Journal | null>(null)
-	// The journal selected in the SelectJournalModal
-	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null)
 
-	const { snackbar } = useContext(NotificationsContext)
-	const ziskContext = useContext(ZiskContext)
+	// const { snackbar } = useContext(NotificationsContext)
+	// const ziskContext = useContext(ZiskContext)
 
 	const hasSelectedJournal = Boolean(activeJournal)
 
 	const getJournalsQuery = useQuery<Record<string, Journal>>({
 		queryKey: ['journals'],
 		queryFn: async () => {
-			let response: Record<string, Journal>
-			response = activeJournal
-				? await getJournals()
-				: {}
-
+			const response: Record<string, Journal> = await getJournals()
 			setJournals(response)
 			return response
 		},
@@ -144,7 +133,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	// })
 
 	const handleSelectNewActiveJournal = (journal: Journal | null) => {
-		// TODO
+		setActiveJournal(journal)
 	}
 
 	return (

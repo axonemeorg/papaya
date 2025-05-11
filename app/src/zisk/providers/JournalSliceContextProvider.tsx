@@ -23,7 +23,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 
 	const journalContext = useContext(JournalContext)
 
-	const hasSelectedJournal = Boolean(journalContext.journal)
+	const hasSelectedJournal = Boolean(journalContext.activeJournal)
 
 	const journalSlice: JournalSlice = useMemo(() => {
 		return {
@@ -82,10 +82,10 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
 		queryKey: ['journalEntries', journalSlice],
 		queryFn: async () => {
-			if (!journalContext.journal) {
+			if (!journalContext.activeJournal) {
 				return {}
 			}
-			return getJournalEntries(journalSlice, journalContext.journal._id)
+			return getJournalEntries(journalSlice, journalContext.activeJournal._id)
 		},
 		initialData: {},
 		enabled: hasSelectedJournal,
@@ -193,17 +193,17 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 		})
 	}
 
-	useEffect(() => {
-		if (!journalContext.journal) {
-			return
-		}
+	// useEffect(() => {
+	// 	if (!journalContext.journal) {
+	// 		return
+	// 	}
 
-		refetchAllDependantQueries()
-	}, [
-		journalContext.journal,
-		journalContext.getCategoriesQuery.data,
-		journalContext.getEntryTagsQuery.data,
-	])
+	// 	refetchAllDependantQueries()
+	// }, [
+	// 	journalContext.journal,
+	// 	journalContext.getCategoriesQuery.data,
+	// 	journalContext.getEntryTagsQuery.data,
+	// ])
 
 	useEffect(() => {
 		setSelectedRows({})

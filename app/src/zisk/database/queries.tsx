@@ -52,7 +52,7 @@ export const getJournalEntries = async (
 		{ kind: 'zisk:entry' },
 		{ journalId },
 	]
-	
+
 	// Date Range
 	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
 	if (startDate || endDate) {
@@ -106,9 +106,11 @@ export const getRecurringEntries = async (
 	const selectorClauses: any[] = [
 		{ kind: 'zisk:entry' },
 		{ journalId },
-		{ recurs: {
-			$exists: true,
-		}}
+		{
+			recurs: {
+				$exists: true,
+			}
+		}
 	]
 
 	const selector = {
