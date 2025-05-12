@@ -76,7 +76,7 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 	await db.put(journalEntry)
 }
 
-export const createCategory = async (formData: CreateCategory, journalId: string) => {
+export const createCategory = async (formData: CreateCategory, journalId: string): Promise<Category> => {
 	const category: Category = {
 		...formData,
 		kind: 'zisk:category',
@@ -86,7 +86,8 @@ export const createCategory = async (formData: CreateCategory, journalId: string
 		journalId,
 	}
 
-	return db.put(category)
+	await db.put(category)
+	return category
 }
 
 export const createAccount = async (formData: CreateAccount, journalId: string) => {

@@ -16,6 +16,7 @@ import { EntryTagPicker } from "../pickers/EntryTagPicker";
 import { EntryStatus } from "@/schema/models/EntryStatus";
 import { ZiskEntryStatus } from "@/constants/status";
 import { EntryTag } from "@/schema/documents/EntryTag";
+import { useEntryTags } from "@/store/orm/tags";
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
@@ -23,12 +24,12 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
 
-    const { getEntryTagsQuery } = useContext(JournalContext)
+    const entryTags = useEntryTags()
     const value = props.value ?? []
 
     const options: Record<string, EntryTag | EntryStatus> = {
         ...Object.fromEntries(ZiskEntryStatus.map((status) => [status._id, status])),
-        ...getEntryTagsQuery.data
+        ...entryTags
     }
 
     const selectedTags: (EntryTag | EntryStatus)[] = value

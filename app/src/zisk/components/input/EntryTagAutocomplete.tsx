@@ -6,6 +6,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { ZiskEntryStatus } from '@/constants/status';
 import { EntryTag } from '@/schema/documents/EntryTag';
 import { EntryStatus } from '@/schema/models/EntryStatus';
+import { useEntryTags } from '@/store/orm/tags';
 
 const filteredStatuses = ZiskEntryStatus.filter((status) => {
 	return !status.disabled && !status.archived
@@ -16,18 +17,20 @@ export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, t
 export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 	const { loading, ...rest } = props
 
-	const { getEntryTagsQuery } = useContext(JournalContext)
-	const { data, isLoading } = getEntryTagsQuery
+	const entryTags = useEntryTags()
+
+	const journalContext = useContext(JournalContext)
+	const { isLoading } = journalContext.queries.tags
 
 	const options: Record<string, EntryTag | EntryStatus> = {
 		...Object.fromEntries(filteredStatuses.map((status) => [status._id, status])),
-		...data
+		...entryTags
 	}
 
 	return (
 		<Autocomplete
 			loading={isLoading || loading}
-			options={[...Object.keys(filteredStatuses), ...Object.keys(data)]}
+			options={[...Object.keys(filteredStatuses), ...Object.keys(entryTags)]}
 			renderInput={(params) => <TextField {...params} label={'Tag'} />}
 			getOptionLabel={(option) => options[option]?.label}
 			renderOption={(props, option, { selected }) => {

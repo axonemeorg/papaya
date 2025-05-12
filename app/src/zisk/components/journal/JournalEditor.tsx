@@ -12,7 +12,7 @@ import SpendChart from '../chart/SpendChart'
 import CategorySpreadChart from '../chart/CategorySpreadChart'
 import { useSearch } from '@tanstack/react-router'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { useBeginEditingJournalEntry, useJournalEntryEditModalState } from '@/store/app/useJournalEntryEditModalState'
+import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
