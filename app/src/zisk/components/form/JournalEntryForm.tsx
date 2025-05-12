@@ -66,7 +66,7 @@ export default function JournalEntryForm() {
 
 	return (
 		<>
-			<Box data-journalEntryId={parentEntryId} sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
+			<Box data-journalentryid={parentEntryId} sx={{ position: 'relative' /* Used for attachment drag overlay */ }}>
 				<ToggleButtonGroup exclusive value={entryType} size='small' onChange={(_event, value) => handleChangeEntryType(value)}>
 					<ToggleButton value={''}>
 						<Stack direction='row' gap={0.5} alignItems='center'>

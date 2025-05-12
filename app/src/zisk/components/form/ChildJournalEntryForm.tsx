@@ -121,7 +121,7 @@ export default function ChildJournalEntryForm() {
                             alignItems={'flex-start'}
                             sx={{ width: '100%' }}
                             key={entry._id}
-                            data-journalEntryId={childEntryId}
+                            data-journalentryid={childEntryId}
                         >
                             <Checkbox
                                 checked={selectedRows.includes(entry._id)}

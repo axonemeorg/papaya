@@ -140,10 +140,10 @@ export default function JournalEntryModal() {
 
 	const handleEntryStatusKeyboardAction = (event: KeyboardEvent, status: StatusVariant) => {
 		const target = event.target as HTMLElement
-		const journalEntryIdElement = target.closest("[data-journalEntryId]");
+		const journalEntryIdElement = target.closest("[data-journalentryid]");
 		let journalEntryId: string | null = null
 		if (journalEntryIdElement) {
-			journalEntryId = journalEntryIdElement.getAttribute("data-journalEntryId");
+			journalEntryId = journalEntryIdElement.getAttribute("data-journalentryid");
 		}
 		toggleEntryStatus(journalEntryId, status)
 	}
