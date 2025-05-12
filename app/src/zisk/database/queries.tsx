@@ -11,12 +11,13 @@ import { EntryTag } from '@/schema/documents/EntryTag'
 import { ZiskMeta } from '@/schema/documents/ZiskMeta'
 import { Journal } from '@/schema/documents/Journal'
 import { EntryArtifact } from '@/schema/documents/EntryArtifact'
+import { resolve } from 'path'
 
 const db = getDatabaseClient()
 
 export const ARBITRARY_MAX_FIND_LIMIT = 10000 as const;
 
-export const getCategories = async (journalId: string): Promise<Record<Category['_id'], Category>> => {
+export const getCategories = async (journalId: string): Promise<Record<string, Category>> => {
 	const result = await db.find({
 		selector: {
 			'$and': [
@@ -30,7 +31,7 @@ export const getCategories = async (journalId: string): Promise<Record<Category[
 	return Object.fromEntries((result.docs as Category[]).map((category) => [category._id, category]))
 }
 
-export const getAccounts = async (journalId: string): Promise<Record<Account['_id'], Account>> => {
+export const getAccounts = async (journalId: string): Promise<Record<string, Account>> => {
 	const result = await db.find({
 		selector: {
 			'$and': [
@@ -126,7 +127,7 @@ export const getRecurringEntries = async (
 	return entries
 }
 
-export const getEntryTags = async (journalId: string): Promise<Record<EntryTag['_id'], EntryTag>> => {
+export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {
 	const result = await db.find({
 		selector: {
 			'$and': [
@@ -144,7 +145,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 	// Attempt to fetch the meta document by its key
 	const results = await db.find({
 		selector: {
-			kind: 'ZISK_META',
+			kind: 'zisk:meta',
 		},
 	})
 	if (results.docs.length > 0) {
@@ -156,7 +157,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 	return meta
 }
 
-export const getJournals = async (): Promise<Record<Journal['_id'], Journal>> => {
+export const getJournals = async (): Promise<Record<string, Journal>> => {
 	const result = await db.find({
 		selector: {
 			kind: 'zisk:journal',
@@ -167,7 +168,7 @@ export const getJournals = async (): Promise<Record<Journal['_id'], Journal>> =>
 	return Object.fromEntries((result.docs as unknown as Journal[]).map((journal) => [journal._id, journal]))
 }
 
-export const getArtifacts = async (journalId: string): Promise<Record<EntryArtifact['_id'], EntryArtifact>> => {
+export const getArtifacts = async (journalId: string): Promise<Record<string, EntryArtifact>> => {
 	const result = await db.find({
 		selector: {
 			'$and': [

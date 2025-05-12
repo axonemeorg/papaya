@@ -23,7 +23,7 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 
 	const journalContext = useContext(JournalContext)
 
-	const hasSelectedJournal = Boolean(journalContext.activeJournal)
+	const hasSelectedJournal = Boolean(journalContext.activeJournalId)
 
 	const journalSlice: JournalSlice = useMemo(() => {
 		return {
@@ -82,10 +82,10 @@ export default function JournalSliceContextProvider(props: JournalSliceContextPr
 	const getJournalEntriesQuery = useQuery<Record<JournalEntry['_id'], JournalEntry>>({
 		queryKey: ['journalEntries', journalSlice],
 		queryFn: async () => {
-			if (!journalContext.activeJournal) {
+			if (!journalContext.activeJournalId) {
 				return {}
 			}
-			return getJournalEntries(journalSlice, journalContext.activeJournal._id)
+			return getJournalEntries(journalSlice, journalContext.activeJournalId)
 		},
 		initialData: {},
 		enabled: hasSelectedJournal,

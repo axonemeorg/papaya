@@ -6,13 +6,13 @@ import { DefinedUseQueryResult } from '@tanstack/react-query'
 import { createContext } from 'react'
 
 export interface JournalContext {
-	activeJournal: Journal | null;
-	setActiveJournal: (journal: Journal | null) => void;
+	activeJournalId: string | null;
+	setActiveJournalId: (journalId: string | null) => void;
 	queries: {
-		accounts: DefinedUseQueryResult<Record<Account['_id'], Account>, Error>
+		accounts: DefinedUseQueryResult<Record<string, Account>, Error>
 		categories: DefinedUseQueryResult<Record<string, Category>, Error>
-		journals: DefinedUseQueryResult<Record<Journal['_id'], Journal>, Error>
-		tags: DefinedUseQueryResult<Record<EntryTag['_id'], EntryTag>, Error>
+		journals: DefinedUseQueryResult<Record<string, Journal>, Error>
+		tags: DefinedUseQueryResult<Record<string, EntryTag>, Error>
 	},
 }
 

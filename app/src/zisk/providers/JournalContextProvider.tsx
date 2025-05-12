@@ -43,7 +43,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	const setAccounts = useSetAccounts()
 
 	// The currently active journal
-	const [activeJournal, setActiveJournal] = useState<Journal | null>(null)
+	const [activeJournalId, setActiveJournalId] = useState<string | null>(null)
 
 	const [journalSelectorState, setJournalSelectorStatus] = [useJournalSelectorStatus(), useSetJournalSelectorStatus()]
 	
@@ -54,7 +54,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 
 	const ziskContext = useContext(ZiskContext)
 
-	const hasSelectedJournal = Boolean(activeJournal)
+	const hasSelectedJournal = Boolean(activeJournalId)
 		|| Boolean(ziskContext.queries.ziskMeta.isFetched && ziskContext.queries.ziskMeta.data?.activeJournalId)
 
 	const getJournalsQuery = useQuery<Record<string, Journal>>({
@@ -71,8 +71,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		queryKey: ['categories'],
 		queryFn: async () => {
 			let response: Record<string, Category>
-			response = activeJournal
-				? await getCategories(activeJournal._id)
+			response = activeJournalId
+				? await getCategories(activeJournalId)
 				: {}
 			
 			setCategories(response)
@@ -86,8 +86,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		queryKey: ['tags'],
 		queryFn: async () => {
 			let response: Record<string, EntryTag>
-			response = activeJournal
-				? await getEntryTags(activeJournal._id)
+			response = activeJournalId
+				? await getEntryTags(activeJournalId)
 				: {}
 
 			setEntryTags(response)
@@ -101,8 +101,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 		queryKey: ['accounts'],
 		queryFn: async () => {
 			let response: Record<string, Account>
-			response = activeJournal
-				? await getAccounts(activeJournal._id)
+			response = activeJournalId
+				? await getAccounts(activeJournalId)
 				: {}
 			
 			setAccounts(response)
@@ -113,10 +113,10 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	})
 
 	// const openCreateEntryModal = (values: Partial<JournalEntry> = {}) => {
-	// 	if (!activeJournal) {
+	// 	if (!activeJournalId) {
 	// 		return
 	// 	}
-	// 	const entry: JournalEntry = makeJournalEntry(values as CreateJournalEntry, activeJournal._id)
+	// 	const entry: JournalEntry = makeJournalEntry(values as CreateJournalEntry, activeJournalId)
 
 	// 	createJournalEntry(entry)
 
@@ -141,9 +141,9 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	// 	openCreateEntryModal();
 	// })
 
-	const handleSelectNewActiveJournal = (journal: Journal | null) => {
-		setActiveJournal(journal)
-		updateActiveJournal(journal)
+	const handleSelectNewActiveJournal = (journalId: string | null) => {
+		setActiveJournalId(journalId)
+		updateActiveJournal(journalId)
 	}
 
 	useEffect(() => {
@@ -151,22 +151,27 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 			return
 		} if (!ziskContext.queries.ziskMeta.isFetched) {
 			return
-		} if (!ziskContext.queries.ziskMeta.data?.activeJournalId || ziskContext.queries.ziskMeta.data?.activeJournalId !== activeJournal?._id) {
-			// No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one
-			setJournalSelectorStatus('SELECTING')
-			setHasLoadedInitialActiveJournal(true)
 		}
+		console.log('ziskContext.queries.ziskMeta:', ziskContext.queries.ziskMeta)
+		if (!ziskContext.queries.ziskMeta.data?.activeJournalId) {
+			// No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one
+			console.log('No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one')
+			setJournalSelectorStatus('SELECTING')
+		} else {
+			setActiveJournalId(ziskContext.queries.ziskMeta.data?.activeJournalId)
+		}
+		setHasLoadedInitialActiveJournal(true)
 	}, [getJournalsQuery.isFetched, ziskContext.queries.ziskMeta.isFetched, hasLoadedInitialActiveJournal])
 
 	// useEffect(() => {
 	// 	 else if (!getJournalsQuery.isFetched) {
 	// 		return
-	// 	} else if (journalContext.activeJournal) {
+	// 	} else if (journalContext.activeJournalId) {
 	// 		setHasLoadedInitialActiveJournal(true)
 	// 		return
 	// 	} else 
 	// 	setJournalSelectorStatus('SELECTING')
-	// }, [hasLoadedInitialActiveJournal, ziskMeta, journalContext.activeJournal])
+	// }, [hasLoadedInitialActiveJournal, ziskMeta, journalContext.activeJournalId])
 
 
 	return (
@@ -178,8 +183,8 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 					journals: getJournalsQuery,
 					tags: getEntryTagsQuery,
 				},
-				activeJournal,
-				setActiveJournal: handleSelectNewActiveJournal,
+				activeJournalId,
+				setActiveJournalId: handleSelectNewActiveJournal,
 			}}>
 			<SelectJournalModal />
 			<JournalEntryModal  />

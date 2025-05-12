@@ -32,7 +32,8 @@ import { ZiskContext } from '@/contexts/ZiskContext'
 export default function SelectJournalModal() {
 	const journalContext = useContext(JournalContext)
 	const [showManageJournalModal, setShowManageJournalModal] = useState(false)
-	const [selectedJournal, setSelectedJournal] = useState<Journal | null>(journalContext.activeJournal)
+	const [selectedJournalId, setSelectedJournalId] = useState<string | null>(journalContext.activeJournalId)
+	const [previouslyActiveJournalId, setPreviouslyActiveJournalId] = useState<string | null>(null)
 
 	const journals = useJournals()
 
@@ -41,15 +42,21 @@ export default function SelectJournalModal() {
 
 	useEffect(() => {
 		if (showSelectJournalModal) {
-			setSelectedJournal(journalContext.activeJournal)
+			setSelectedJournalId(journalContext.activeJournalId)
 		}
-	}, [journalContext.activeJournal, showSelectJournalModal])
+	}, [journalContext.activeJournalId, showSelectJournalModal])
+
+	useEffect(() => {
+		if (showSelectJournalModal) {
+			setPreviouslyActiveJournalId(journalContext.activeJournalId)
+		}
+	}, [showSelectJournalModal])
 
 	const handleContinue = () => {
-		if (!selectedJournal) {
+		if (!selectedJournalId) {
 			return
 		}
-		journalContext.setActiveJournal(selectedJournal)
+		journalContext.setActiveJournalId(selectedJournalId)
 		onCloseSelectJournalModal()
 	}
 
@@ -62,25 +69,25 @@ export default function SelectJournalModal() {
 	}
 
 	const handleManageJournal = (journal: Journal) => {
-		setSelectedJournal(journal)
+		setSelectedJournalId(journal._id)
 		setShowManageJournalModal(true)
 	}
 
 	const handleDeletedJournal = (journal: Journal) => {
 		// If the deleted journal is the active journal, reset the active journal
-		if (journal._id === journalContext.activeJournal?._id) {
-			journalContext.setActiveJournal(null)
+		if (journal._id === journalContext.activeJournalId) {
+			journalContext.setActiveJournalId(null)
 		}
 	}
 
-	const hasActiveJournal = Boolean(journalContext.activeJournal)
+	const hasActiveJournal = Boolean(journalContext.activeJournalId)
 
 	return (
 		<>
 			<CreateJournalModal
 				open={journalSelectorState === 'CREATING'}
 				onClose={onCloseCreateModal}
-				onCreated={(newJournal) => setSelectedJournal(newJournal)}
+				onCreated={(newJournal) => setSelectedJournalId(newJournal._id)}
 			/>
 			<Dialog open={showSelectJournalModal}>
 				<DialogTitle>Your Journals</DialogTitle>
@@ -91,7 +98,7 @@ export default function SelectJournalModal() {
 				)}
 				<List>
 					{Object.values(journals).map((journal: Journal) => {
-						const selected = selectedJournal?._id === journal._id
+						const selected = selectedJournalId === journal._id
 						return (
 							<ListItem
 								key={journal._id}
@@ -104,7 +111,7 @@ export default function SelectJournalModal() {
 							>
 								<ListItemButton
 									role={undefined}
-									onClick={() => setSelectedJournal(journal)}
+									onClick={() => setSelectedJournalId(journal._id)}
 									selected={selected}
 								>
 									<ListItemAvatar>
@@ -118,7 +125,7 @@ export default function SelectJournalModal() {
 												<Typography sx={{ fontStyle: !journal.journalName ? 'italic' : undefined }}>
 													{journal.journalName || PLACEHOLDER_UNNAMED_JOURNAL_NAME}
 												</Typography>
-												{journal._id === journalContext.activeJournal?._id && (
+												{journal._id === previouslyActiveJournalId && (
 													<Chip
 														size='small'
 														color='primary'
@@ -127,7 +134,7 @@ export default function SelectJournalModal() {
 												)}
 											</Stack>
 										}
-										// secondary={journal._id === journalContext.activeJournal?._id
+										// secondary={journal._id === journalContext.activeJournalId?._id
 										// 	? <Chip
 										// 		size='small'
 										// 		color='primary'
@@ -157,12 +164,12 @@ export default function SelectJournalModal() {
 					</ListItem>
 				</List>
 				<DialogActions>
-					{journalContext.activeJournal && (
+					{journalContext.activeJournalId && (
 						<Button onClick={() => setJournalSelectorStatus('CLOSED')}>Cancel</Button>
 					)}
 					<Button
 						variant="contained"
-						disabled={!selectedJournal || journalContext.activeJournal?._id === selectedJournal._id}
+						disabled={!selectedJournalId || journalContext.activeJournalId === selectedJournalId}
 						onClick={() => handleContinue()}
 						startIcon={<East />}
 					>
@@ -174,7 +181,7 @@ export default function SelectJournalModal() {
 				open={showManageJournalModal}
 				onClose={() => setShowManageJournalModal(false)}
 				details={{
-					journal: selectedJournal,
+					journal: selectedJournalId ? journals[selectedJournalId] ?? null : null,
 					activity: [],
 					size: null,
 					lastActivity: null,

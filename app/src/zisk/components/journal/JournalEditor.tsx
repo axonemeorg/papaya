@@ -12,6 +12,7 @@ import SpendChart from '../chart/SpendChart'
 import CategorySpreadChart from '../chart/CategorySpreadChart'
 import { useSearch } from '@tanstack/react-router'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { useBeginEditingJournalEntry, useJournalEntryEditModalState } from '@/store/app/useJournalEntryEditModalState'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
@@ -27,6 +28,8 @@ export default function JournalEditor() {
 	const { snackbar } = useContext(NotificationsContext)
 	const journalContext = useContext(JournalContext)
 	const journalSliceContext = useContext(JournalSliceContext)
+
+	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
 	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
 
@@ -65,7 +68,7 @@ export default function JournalEditor() {
 	}
 
 	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
-		journalContext.editJournalEntry(entry)
+		beginEditingJournalEntry(entry)
 	}
 
 	const handleDeselectListItem = () => {
