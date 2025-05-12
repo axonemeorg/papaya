@@ -121,6 +121,7 @@ function JournalPage() {
 	}
 
 	const handleSwitchDateView = (newView: DateViewSymbol) => {
+		console.log('handleSwitchDateView() date=', date)
 		if (newView === view || newView === DateViewSymbol.RANGE) {
 			return
 		}

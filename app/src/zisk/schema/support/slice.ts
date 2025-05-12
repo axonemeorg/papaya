@@ -1,4 +1,5 @@
 import z from "zod"
+import { Currency } from "./currency"
 
 export const AnnualPeriod = z.object({
 	year: z.number().min(1900).max(2999)
@@ -42,6 +43,7 @@ export enum DateViewSymbol {
 }
 
 export const AmountRange = z.object({
+	currency: Currency,
 	gt: z.string().optional(),
 	lt: z.string().optional(),
 	absolute: z.boolean().optional(),
