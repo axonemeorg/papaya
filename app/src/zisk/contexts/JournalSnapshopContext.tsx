@@ -1,9 +1,9 @@
 import { JournalEntry } from "@/schema/documents/JournalEntry";
-import { DateView } from "@/schema/support/slice";
+import { AmountRange, DateView } from "@/schema/support/slice";
 import { getAbsoluteDateRangeFromDateView } from "@/utils/date";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
 import { JournalContext } from "./JournalContext";
 import { getJournalEntries } from "@/database/queries";
 
@@ -20,18 +20,33 @@ interface RouterFilters {
     dateView: DateView
 }
 
+interface MemoryFilters {
+    amount: AmountRange
+}
+
 interface JournalSnapshotContextProviderProps extends PropsWithChildren {
     routerFilters: Partial<RouterFilters>
 }
 
-interface DownstreamFilters {
+type AllFilters = Partial<
+    & RouterFilters
+    & MemoryFilters
+>
 
-}
-
-export default function JournalSnapshotContextProvider(props: PropsWithChildren) {
+export default function JournalSnapshotContextProvider(props: JournalSnapshotContextProviderProps) {
 
     const { activeJournalId } = useContext(JournalContext)
-    const hasMinimalUpstreamFilters = Boolean(activeJournalId)
+
+    const [memoryFilters, setMemoryFilters] = useState<Partial<MemoryFilters>>({})
+
+    const allFilters: AllFilters = {
+        ...props.routerFilters,
+        ...memoryFilters,
+    }
+
+    const hasMinimalUpstreamFilters: boolean = useMemo(() => {
+        return Boolean(activeJournalId)
+    }, [allFilters])
 
     const upstreamJournalEntryQuery = useQuery<JournalEntry[]>({
         queryKey: [],
