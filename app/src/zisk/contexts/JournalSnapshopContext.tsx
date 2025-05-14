@@ -51,7 +51,9 @@ export default function JournalSnapshotContextProvider(props: JournalSnapshotCon
     const upstreamJournalEntryQuery = useQuery<JournalEntry[]>({
         queryKey: [],
         queryFn: async (): Promise<JournalEntry[]> => {
-            return getJournalEntriesByUpstreamFilters()
+            return getJournalEntriesByUpstreamFilters(
+                // TODO
+            )
         },
         initialData: [],
         enabled: hasMinimalUpstreamFilters,
@@ -60,9 +62,12 @@ export default function JournalSnapshotContextProvider(props: JournalSnapshotCon
     const downstreamJournalEntryQuery = useQuery<JournalEntry[]>({
         queryKey: [],
         queryFn: async (): Promise<void> => {
+            // TODO
             return
         },
-        initialData: [],
+        initialData: [
+            // TODO
+        ],
         enabled: todo,
 
     })

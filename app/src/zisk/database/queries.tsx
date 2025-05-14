@@ -12,6 +12,7 @@ import { ZiskMeta } from '@/schema/documents/ZiskMeta'
 import { Journal } from '@/schema/documents/Journal'
 import { EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { resolve } from 'path'
+import { UpstreamAttributeFilter } from '@/filters/support/AttributeFilter'
 
 const db = getDatabaseClient()
 
@@ -45,6 +46,9 @@ export const getAccounts = async (journalId: string): Promise<Record<string, Acc
 	return Object.fromEntries((result.docs as Account[]).map((account) => [account._id, account]))
 }
 
+/**
+ * @deprecated
+ */
 export const getJournalEntries = async (
 	journalSlice: JournalSlice,
 	journalId: string,
@@ -101,30 +105,11 @@ export const getJournalEntries = async (
 	return entries
 }
 
-export const getRecurringEntries = async (
+export const getJournalEntriesByUpstreamFilters = async (
 	journalId: string,
+	filters: UpstreamAttributeFilter[],
 ): Promise<Record<string, JournalEntry>> => {
-	const selectorClauses: any[] = [
-		{ kind: 'zisk:entry' },
-		{ journalId },
-		{
-			recurs: {
-				$exists: true,
-			}
-		}
-	]
-
-	const selector = {
-		'$and': selectorClauses,
-	}
-
-	const result = await db.find({
-		selector,
-		limit: ARBITRARY_MAX_FIND_LIMIT,
-	})
-
-	const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
-	return entries
+	// TODO
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {
