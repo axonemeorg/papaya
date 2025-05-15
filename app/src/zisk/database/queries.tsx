@@ -109,7 +109,31 @@ export const getJournalEntriesByUpstreamFilters = async (
 	journalId: string,
 	filters: UpstreamAttributeFilter[],
 ): Promise<Record<string, JournalEntry>> => {
-	// TODO
+	const selectorClauses: any[] = [
+		{ kind: 'zisk:entry' },
+		{ journalId },
+	];
+
+	// Apply all upstream filters
+	for (const filter of filters) {
+		const filterClauses = filter();
+		if (filterClauses) {
+			selectorClauses.push(...filterClauses);
+		}
+	}
+
+	const selector = {
+		'$and': selectorClauses,
+	};
+
+	const result = await db.find({
+		selector,
+		limit: ARBITRARY_MAX_FIND_LIMIT,
+	});
+
+	const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>;
+
+	return entries;
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {

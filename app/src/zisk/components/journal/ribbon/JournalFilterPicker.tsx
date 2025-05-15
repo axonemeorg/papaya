@@ -2,7 +2,7 @@ import { Attachment, Category, DateRange, Delete, LocalOffer, Paid } from "@mui/
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
-import { JournalSliceContext } from "@/contexts/JournalSliceContext";
+import { JournalSnapshotContext } from "@/contexts/JournalSnapshopContext";
 import AmountFilter from "./filters/AmountFilter";
 
 export enum JournalFilterSlot {
@@ -79,7 +79,7 @@ interface JournalFilterPickerProps {
 export default function JournalFilterPicker(props: JournalFilterPickerProps) {
     const [activeSlot, setActiveSlot] = useState<JournalFilterSlot | null>(null)
 
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalSnapshotContext = useContext(JournalSnapshotContext)
 
     const handleClickSlotButton = (slot: JournalFilterSlot) => {
         setActiveSlot(slot)
@@ -89,7 +89,7 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
         if (!activeSlot) {
             return
         }
-        journalSliceContext.removeFilterBySlot(activeSlot)
+        journalSnapshotContext.clearMemoryFilter(activeSlot)
         setActiveSlot(null)
     }
 

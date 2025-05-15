@@ -1,21 +1,23 @@
 import AmountField from "@/components/input/AmountField";
-import { JournalSliceContext } from "@/contexts/JournalSliceContext";
+import { JournalSnapshotContext } from "@/contexts/JournalSnapshopContext";
 import { AmountRange } from "@/schema/support/slice";
 import { Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { useContext } from "react";
+import { JournalFilterSlot } from "../JournalFilterPicker";
 
 export const DEFAULT_AMOUNT_RANGE: AmountRange = {
-    // absolute: true,
+    currency: 'USD', // Default currency
     gt: '',
     lt: '',
+    // absolute: false,
 }
 
 export default function AmountFilter() {
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalSnapshotContext = useContext(JournalSnapshotContext)
 
     const amountRange: AmountRange = {
         ...DEFAULT_AMOUNT_RANGE,
-        ...journalSliceContext.amount
+        ...(journalSnapshotContext.memoryFilters[JournalFilterSlot.AMOUNT] as AmountRange || {})
     }
 
     return (
@@ -45,10 +47,10 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.gt ?? ''}
                                 onChange={(event) => {
-                                    journalSliceContext.onChangeAmountRange({
+                                    journalSnapshotContext.setMemoryFilter(JournalFilterSlot.AMOUNT, {
                                         ...amountRange,
                                         gt: event.target.value,
-                                    })
+                                    });
                                 }}
                                 label={undefined}
                                 variant='standard'
@@ -68,10 +70,10 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.lt ?? ''}
                                 onChange={(event) => {
-                                    journalSliceContext.onChangeAmountRange({
+                                    journalSnapshotContext.setMemoryFilter(JournalFilterSlot.AMOUNT, {
                                         ...amountRange,
                                         lt: event.target.value,
-                                    })
+                                    });
                                 }}
                                 label={undefined}
                                 variant='standard'
