@@ -1,19 +1,18 @@
+import { AmountRange, SearchFacetKey, SearchFacets } from "@/schema/support/search/facet";
 import { parseJournalEntryAmount } from "./journal";
-import { AmountRange, JournalSlice } from "@/schema/support/slice";
 
-
-export const enumerateFilters = (journalSlice: JournalSlice): Set<JournalFilterSlot> => {
+export const enumerateFilters = (seachFacets: SearchFacets): Set<SearchFacetKey> => {
     const {
-        amount,
-        categoryIds,
-    } = journalSlice
-    const slots: Set<JournalFilterSlot> = new Set<JournalFilterSlot>([])
-    if (categoryIds && categoryIds.length > 0) {
-        slots.add(JournalFilterSlot.CATEGORIES)
+        AMOUNT,
+        CATEGORIES,
+    } = seachFacets
+    const slots: Set<SearchFacetKey> = new Set<SearchFacetKey>([])
+    if (CATEGORIES && CATEGORIES.categoryIds.length > 0) {
+        slots.add(SearchFacetKey.CATEGORIES)
     }
-    if (amount) {
-        if (parseJournalEntryAmount(journalSlice.amount?.gt ?? '') !== undefined || parseJournalEntryAmount(journalSlice.amount?.lt ?? '') !== undefined) {
-            slots.add(JournalFilterSlot.AMOUNT)
+    if (AMOUNT) {
+        if (parseJournalEntryAmount(AMOUNT?.gt ?? '') !== undefined || parseJournalEntryAmount(AMOUNT?.lt ?? '') !== undefined) {
+            slots.add(SearchFacetKey.AMOUNT)
         }
     }
 

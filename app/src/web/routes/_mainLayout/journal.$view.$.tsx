@@ -1,10 +1,10 @@
 import JournalEditor from '@/components/journal/JournalEditor'
-import JournalSliceContextProvider from '@/providers/JournalSliceContextProvider'
 import { DatePeriod, DateView, DateViewSymbol, MonthlyPeriod, WeeklyPeriod } from '@/schema/support/slice'
 import { dateMonthNumberWithLeadingZero, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import dayjs from 'dayjs'
 import { useCallback, useMemo } from 'react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+import JournalSnapshotContextProvider from '@/contexts/JournalSnapshopContext'
 
 export const Route = createFileRoute('/_mainLayout/journal/$view/$')({
 	component: JournalPage,
@@ -175,12 +175,15 @@ function JournalPage() {
 	}, [date, view])
 
 	return (
-		<JournalSliceContextProvider
-			dateView={dateView}
-			onChangeDateView={handleChangeDateView}
-			switchDateView={handleSwitchDateView}
+		<JournalSnapshotContextProvider
+			// dateView={dateView}
+			// onChangeDateView={handleChangeDateView}
+			// switchDateView={handleSwitchDateView}
+			routerFilters={{
+				DATE: dateView,
+			}}
 		>
 			<JournalEditor />
-		</JournalSliceContextProvider>
+		</JournalSnapshotContextProvider>
 	)
 }
