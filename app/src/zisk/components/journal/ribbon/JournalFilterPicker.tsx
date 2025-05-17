@@ -5,15 +5,6 @@ import CategoryFilter from "./filters/CategoryFilter";
 import { JournalSliceContext } from "@/contexts/JournalSliceContext";
 import AmountFilter from "./filters/AmountFilter";
 
-export enum JournalFilterSlot {
-    AMOUNT = 'AMOUNT',
-    ATTACHMENTS = 'ATTACHMENTS',
-    CATEGORIES = 'CATEGORIES',
-    DATE_RANGE = 'DATE_RANGE',
-    // RESERVED_TAGS = 'RESERVED_TAGS',
-    TAGS = 'TAGS',
-}
-
 interface JournalFilterSlotProperties {
     label: string
     title: string

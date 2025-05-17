@@ -1,84 +1,76 @@
 import { JournalEntry } from "@/schema/documents/JournalEntry";
-import { AmountRange, DateView } from "@/schema/support/slice";
-import { getAbsoluteDateRangeFromDateView } from "@/utils/date";
 import { useQuery } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
 import { JournalContext } from "./JournalContext";
-import { getJournalEntries } from "@/database/queries";
+import { getJournalEntriesByUpstreamFilters } from "@/database/queries";
+import { SearchFacetGroups, SearchFacets } from "@/schema/support/search/facet";
+import z from "zod";
 
 
 export interface JournalSnapshotContext {
     isLoading: boolean;
+    filteredJournalEntries: Record<string, JournalEntry>
 }
 
 const JournalSnapshotContext = createContext<JournalSnapshotContext>({
     isLoading: false,
+    filteredJournalEntries: {},
 })
 
-interface RouterFilters {
-    dateView: DateView
-}
-
-interface MemoryFilters {
-    amount: AmountRange
-}
+type RouterFilters = z.infer<typeof SearchFacetGroups.router>
 
 interface JournalSnapshotContextProviderProps extends PropsWithChildren {
-    routerFilters: Partial<RouterFilters>
+    routerFilters: RouterFilters
 }
-
-type AllFilters = Partial<
-    & RouterFilters
-    & MemoryFilters
->
 
 export default function JournalSnapshotContextProvider(props: JournalSnapshotContextProviderProps) {
 
     const { activeJournalId } = useContext(JournalContext)
 
-    const [memoryFilters, setMemoryFilters] = useState<Partial<MemoryFilters>>({})
+    // const [memoryFilters, setMemoryFilters] = useState<Partial<MemoryFilters>>({})
 
-    const allFilters: AllFilters = {
-        ...props.routerFilters,
-        ...memoryFilters,
-    }
+
+    const activeJournalFilters: Partial<SearchFacets> = useMemo(() => {
+        return {
+            ...props.routerFilters,
+        }
+    }, [props.routerFilters])
 
     const hasMinimalUpstreamFilters: boolean = useMemo(() => {
         return Boolean(activeJournalId)
-    }, [allFilters])
+    }, [activeJournalFilters])
 
-    const upstreamJournalEntryQuery = useQuery<JournalEntry[]>({
-        queryKey: [],
-        queryFn: async (): Promise<JournalEntry[]> => {
-            return getJournalEntriesByUpstreamFilters(
-                // TODO
+    const upstreamJournalEntryQuery = useQuery<Record<string, JournalEntry>>({
+        queryKey: ['upstreamJournalEntries'],
+        queryFn: async (): Promise<Record<string, JournalEntry>> => {
+            const response = await getJournalEntriesByUpstreamFilters(
+                activeJournalId!,
+                activeJournalFilters
             )
+
+            return response
         },
-        initialData: [],
+        initialData: {},
         enabled: hasMinimalUpstreamFilters,
     })
 
-    const downstreamJournalEntryQuery = useQuery<JournalEntry[]>({
-        queryKey: [],
-        queryFn: async (): Promise<void> => {
-            // TODO
-            return
-        },
-        initialData: [
-            // TODO
-        ],
-        enabled: todo,
+    // const downstreamJournalEntryQuery = useQuery<JournalEntry[]>({
+    //     queryKey: [],
+    //     queryFn: async (): Promise<void> => {
+    //         // TODO
+    //         return
+    //     },
+    //     initialData: [
+    //         // TODO
+    //     ],
+    //     enabled: todo,
 
-    })
-
-    const filters = useMemo(() => {
-
-    }, [])
+    // })
 
 
     const contextValue: JournalSnapshotContext = {
-
+        isLoading: upstreamJournalEntryQuery.isLoading,
+        filteredJournalEntries: upstreamJournalEntryQuery.data,
     }
     
     return (

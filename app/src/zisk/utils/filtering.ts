@@ -1,4 +1,3 @@
-import { JournalFilterSlot } from "@/components/journal/ribbon/JournalFilterPicker";
 import { parseJournalEntryAmount } from "./journal";
 import { AmountRange, JournalSlice } from "@/schema/support/slice";
 
@@ -50,7 +49,6 @@ export const transformAmountRange = (amountRange: AmountRange): { greaterThan: n
             }
         }
     }
-    
 
     return {
         greaterThan: greaterThan.length > 0 ? Math.max(...greaterThan) : undefined,

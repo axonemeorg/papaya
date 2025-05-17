@@ -1,18 +1,14 @@
 import { getDatabaseClient } from './client'
 import { makeDefaultZiskMeta } from '@/utils/database'
-import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
-import { enumerateFilters, transformAmountRange } from '@/utils/filtering'
-import { JournalFilterSlot } from '@/components/journal/ribbon/JournalFilterPicker'
 import { Category } from '@/schema/documents/Category'
 import { Account } from '@/schema/documents/Account'
-import { AmountRange, JournalSlice } from '@/schema/support/slice'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { EntryTag } from '@/schema/documents/EntryTag'
 import { ZiskMeta } from '@/schema/documents/ZiskMeta'
 import { Journal } from '@/schema/documents/Journal'
 import { EntryArtifact } from '@/schema/documents/EntryArtifact'
-import { resolve } from 'path'
-import { UpstreamAttributeFilter } from '@/filters/support/AttributeFilter'
+import { SearchFacets } from '@/schema/support/search/facet'
+import { FacetedSearchUpstreamFilters } from '@/schema/support/search/filter'
 
 const db = getDatabaseClient()
 
@@ -53,63 +49,91 @@ export const getJournalEntries = async (
 	journalSlice: JournalSlice,
 	journalId: string,
 ): Promise<Record<string, JournalEntry>> => {
+	// const selectorClauses: any[] = [
+	// 	{ kind: 'zisk:entry' },
+	// 	{ journalId },
+	// ]
+
+	// // Date Range
+	// const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
+	// if (startDate || endDate) {
+	// 	selectorClauses.push({
+	// 		date: {
+	// 			$gte: startDate?.format('YYYY-MM-DD'),
+	// 			$lte: endDate?.format('YYYY-MM-DD'),
+	// 		}
+	// 	});
+	// }
+
+	// const filters = enumerateFilters(journalSlice)
+
+	// // Categories
+	// if (filters.has(JournalFilterSlot.CATEGORIES)) {
+	// 	selectorClauses.push({
+	// 		categoryIds: {
+	// 			$in: journalSlice.categoryIds
+	// 		}
+	// 	})
+	// }
+
+	// // Amount range
+	// if (filters.has(JournalFilterSlot.AMOUNT)) {
+	// 	const { greaterThan, lessThan } = transformAmountRange(journalSlice.amount as AmountRange)
+	// 	selectorClauses.push({
+	// 		parsedNetAmount: {
+	// 			$gt: greaterThan,
+	// 			$lt: lessThan,
+	// 		}
+	// 	})
+	// }
+
+	// const selector = {
+	// 	'$and': selectorClauses,
+	// }
+
+	// const result = await db.find({
+	// 	selector,
+	// 	limit: ARBITRARY_MAX_FIND_LIMIT,
+	// })
+
+	// const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
+
+	// return entries
+	return {};
+}
+
+export const getJournalEntriesByUpstreamFilters = async (
+	journalId: string,
+	facets: Partial<SearchFacets>,
+): Promise<Record<string, JournalEntry>> => {
 	const selectorClauses: any[] = [
 		{ kind: 'zisk:entry' },
 		{ journalId },
 	]
 
-	// Date Range
-	const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
-	if (startDate || endDate) {
-		selectorClauses.push({
-			date: {
-				$gte: startDate?.format('YYYY-MM-DD'),
-				$lte: endDate?.format('YYYY-MM-DD'),
+	Object.entries(facets)
+		.filter(([, props]) => Boolean(props))
+		.map(([key, props]) => {
+			const clause = FacetedSearchUpstreamFilters[key](props)
+			if (!clause) {
+				return
 			}
-		});
-	}
 
-	const filters = enumerateFilters(journalSlice)
-
-	// Categories
-	if (filters.has(JournalFilterSlot.CATEGORIES)) {
-		selectorClauses.push({
-			categoryIds: {
-				$in: journalSlice.categoryIds
-			}
+			selectorClauses.push(clause)
 		})
-	}
 
-	// Amount range
-	if (filters.has(JournalFilterSlot.AMOUNT)) {
-		const { greaterThan, lessThan } = transformAmountRange(journalSlice.amount as AmountRange)
-		selectorClauses.push({
-			parsedNetAmount: {
-				$gt: greaterThan,
-				$lt: lessThan,
-			}
+		const selector = {
+			'$and': selectorClauses,
+		}
+
+		const result = await db.find({
+			selector,
+			limit: ARBITRARY_MAX_FIND_LIMIT,
 		})
-	}
 
-	const selector = {
-		'$and': selectorClauses,
-	}
+		const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
 
-	const result = await db.find({
-		selector,
-		limit: ARBITRARY_MAX_FIND_LIMIT,
-	})
-
-	const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
-
-	return entries
-}
-
-export const getJournalEntriesByUpstreamFilters = async (
-	journalId: string,
-	filters: UpstreamAttributeFilter[],
-): Promise<Record<string, JournalEntry>> => {
-	// TODO
+		return entries
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {
