@@ -8,7 +8,7 @@ import { EntryTask } from "@/schema/models/EntryTask"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 
 export default function EntryTasksForm() {
-    const journalContext = useContext(JournalContext)
+    const { activeJournalId } = useContext(JournalContext)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
     const { setValue, control } = useFormContext<JournalEntry>()
@@ -19,11 +19,10 @@ export default function EntryTasksForm() {
     })
 
     const handleAddTask = async (focusInput = true) => {
-        if (!journalContext.journal) {
+        if (!activeJournalId) {
             return
         }
         
-        const journalId = journalContext.journal._id
         const newTask = makeEntryTask({})
         const newIndex = tasks ? tasks.length : 0
 
