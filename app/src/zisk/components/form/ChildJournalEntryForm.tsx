@@ -144,7 +144,7 @@ export default function ChildJournalEntryForm() {
                                 <Grid size={'grow'}>
                                     <CategoryAutocomplete
                                         size='small'
-                                        value={entry.categoryId}
+                                        value={entry.categoryId ? [entry.categoryId] : []}
                                         onChange={(_event, newValue: string | string[] | null) => {
                                             if (!Array.isArray(newValue)) {
                                                 childEntriesFieldArray.update(index, { ...entry, categoryId: newValue ?? undefined })

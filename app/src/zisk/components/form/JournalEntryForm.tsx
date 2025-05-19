@@ -223,11 +223,11 @@ export default function JournalEntryForm() {
 									return (
 										<CategorySelector
 											{...field}
-											value={categoryId}
-											onChange={(_event, newValue: string | string[] | null) => {
+											value={categoryId ? [categoryId] : []}
+											onChange={(_event, newValue: string[]) => {
 												setValue(
 													field.name,
-													!Array.isArray(newValue) && newValue ? newValue : undefined,
+													newValue[1] ?? newValue[0],
 													{ shouldDirty: true }
 												)
 											}}

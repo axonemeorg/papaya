@@ -71,7 +71,7 @@ export default function QuickJournalEntryForm() {
 							<CategoryAutocomplete
 								{...field}
 								ref={null}
-								value={categoryId}
+								value={categoryId ? [categoryId] : []}
 								onChange={(_event, newValue) => {
 									if (!Array.isArray(newValue)) {
 										setValue(field.name, newValue ?? undefined, { shouldDirty: true })

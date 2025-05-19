@@ -20,6 +20,7 @@ export default function AccountAutocomplete(props: AccountAutocompleteProps) {
 			options={Object.keys(accounts)}
 			renderInput={(params) => <TextField {...params} label={'Account'} />}
 			getOptionLabel={(option) => accounts[option]?.label}
+			getOptionKey={(option) => option}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props
 				const account = accounts[option]

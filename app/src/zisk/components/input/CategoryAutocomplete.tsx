@@ -5,7 +5,7 @@ import { JournalContext } from '@/contexts/JournalContext'
 import AvatarIcon from '../icon/AvatarIcon'
 import { useCategories } from '@/hooks/queries/useCategories'
 
-export type CategoryAutocompleteProps = Partial<Omit<AutocompleteProps<string, boolean, false, false>, 'options'>>
+export type CategoryAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 	const { loading, ...rest } = props
@@ -20,6 +20,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 			options={Object.keys(categories)}
 			renderInput={(params) => <TextField {...params} label={'Category'} />}
 			getOptionLabel={(option) => categories[option]?.label}
+			getOptionKey={(option) => option}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props
 				const category = categories[option]
@@ -34,6 +35,7 @@ export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 				)
 			}}
 			{...rest}
+			multiple
 		/>
 	)
 }

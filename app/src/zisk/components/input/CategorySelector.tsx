@@ -37,7 +37,7 @@ export default function CategorySelector(props: CategorySelectorProps) {
     const categories = getCategoriesQuery.data
     const addCategory = useAddCategory()
 
-    const value: string | undefined = !Array.isArray(props.value) && props.value || undefined
+    const value: string | undefined = props.value?.[0]
 
     const selectedCategory: Category | undefined = value ? categories[value] : undefined
 
@@ -49,12 +49,11 @@ export default function CategorySelector(props: CategorySelectorProps) {
         if (!activeJournalId) {
             return
         }
-        const category = await createCategory({
+        await addCategory({
             label: searchValue,
             description: '',
             avatar: generateRandomAvatar(),
-        }, activeJournalId)
-        addCategory(category)
+        })
     }
 
     return (

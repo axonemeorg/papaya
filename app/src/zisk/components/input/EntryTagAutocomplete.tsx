@@ -8,7 +8,7 @@ import { EntryTag } from '@/schema/documents/EntryTag';
 import { EntryStatus } from '@/schema/models/EntryStatus';
 import { useEntryTags } from '@/hooks/queries/useEntryTags';
 
-const filteredStatuses = ZiskEntryStatus.filter((status) => {
+const filteredStatuses: EntryStatus[] = ZiskEntryStatus.filter((status) => {
 	return !status.disabled && !status.archived
 })
 
@@ -22,7 +22,7 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 
 	const { isLoading } = getEntryTagsQuery
 
-	const options: Record<string, EntryTag | EntryStatus> = {
+	const tags: Record<string, EntryTag | EntryStatus> = {
 		...Object.fromEntries(filteredStatuses.map((status) => [status._id, status])),
 		...entryTags
 	}
@@ -30,12 +30,13 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 	return (
 		<Autocomplete
 			loading={isLoading || loading}
-			options={[...Object.keys(filteredStatuses), ...Object.keys(entryTags)]}
+			options={Object.keys(tags)}
 			renderInput={(params) => <TextField {...params} label={'Tag'} />}
-			getOptionLabel={(option) => options[option]?.label}
+			getOptionLabel={(option) => tags[option]?.label}
+			getOptionKey={(option) => option}
 			renderOption={(props, option, { selected }) => {
 				const { key, ...optionProps } = props
-				const entryTag: EntryTag | EntryStatus | undefined = options[option]
+				const entryTag: EntryTag | EntryStatus | undefined = tags[option]
 
 				return (
 					<ListItem key={key} {...optionProps}>

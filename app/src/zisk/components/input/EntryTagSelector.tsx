@@ -28,13 +28,13 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const entryTags = getEntryTagsQuery.data
     const value = props.value ?? []
 
-    const options: Record<string, EntryTag | EntryStatus> = {
+    const tags: Record<string, EntryTag | EntryStatus> = {
         ...Object.fromEntries(ZiskEntryStatus.map((status) => [status._id, status])),
         ...entryTags
     }
 
     const selectedTags: (EntryTag | EntryStatus)[] = value
-        .map((tagId) => options[tagId])
+        .map((tagId) => tags[tagId])
         .filter(Boolean)
 
     const handleClose = () => {
