@@ -29,15 +29,19 @@ import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { calculateNetAmount, journalEntryHasTasks, enumerateJournalEntryStatuses } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
-import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
+import { sortDatesChronologically } from '@/utils/date'
 import CircularProgressWithLabel from '../icon/CircularProgressWithLabel'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Account } from '@/schema/documents/Account'
 import { Category } from '@/schema/documents/Category'
 import { StatusVariant } from '@/schema/models/EntryStatus'
 import { EntryTask } from '@/schema/models/EntryTask'
+import { DateView, DateViewVariant, SearchFacetKey } from '@/schema/support/search/facet'
+import { useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
+import { useAccounts } from '@/hooks/queries/useAccounts'
+import { useCategories } from '@/hooks/queries/useCategories'
+import useDateView from '@/hooks/facets/useDateView'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -208,16 +212,20 @@ interface JournalEntryListProps {
 export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery, getAccountsQuery, createJournalEntry } = useContext(JournalContext)
-	const journalSliceContext = useContext(JournalSliceContext)
+	const getCategoriesQuery = useCategories()
+	const getAccountsQuery = useAccounts()
+
+	const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
+
+	const { dateView } = useDateView()
 	const getPriceStyle = useGetPriceStyle()
 
 	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
 
-	if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
-		const startOfMonth: dayjs.Dayjs = dayjs(`${journalSliceContext.dateView.year}-${journalSliceContext.dateView.month}-01`)
+	if (dateView.view === DateViewVariant.MONTHLY) {
+		const startOfMonth: dayjs.Dayjs = dayjs(`${dateView.year}-${dateView.month}-01`)
 		if (startOfMonth.isSame(currentDayString, 'month')) {
 			displayedJournalDates.add(currentDayString)
 		} else {
@@ -247,7 +255,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										day={day}
 										isToday={isToday}
 										onClick={() => {
-											createJournalEntry({
+											openEntryEditModalForCreate({
 												date: day.format('YYYY-MM-DD'),
 											})
 										}}
@@ -304,7 +312,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-										selected={journalSliceContext.selectedRows[entry._id]}
+										// selected={journalSliceContext.selectedRows[entry._id]}
 										sx={{ opacity: undefined }}
 									>
 										<TableCell
@@ -317,8 +325,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											<Checkbox
 												className='checkbox'
 												sx={{ m: -1 }}
-												checked={journalSliceContext.selectedRows[entry._id] || false}
-												onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
+												// checked={journalSliceContext.selectedRows[entry._id] || false}
+												// onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
 												onClick={(event) => event.stopPropagation()}
 											/>
 											<AvatarIcon

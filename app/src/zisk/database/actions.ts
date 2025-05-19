@@ -5,7 +5,7 @@ import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
 import { calculateNetAmount } from '@/utils/journal'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { CreateJournalEntry, JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category, CreateCategory } from '@/schema/documents/Category'
 import { Account, CreateAccount } from '@/schema/documents/Account'
 import { DocumentObject } from '@/schema/support/orm/Document'
@@ -17,12 +17,12 @@ import { UserSettings } from '@/schema/models/UserSettings'
 
 const db = getDatabaseClient()
 
-export const createJournalEntry = async (formData: JournalEntry): Promise<JournalEntry> => {
+export const createJournalEntry = async (formData: JournalEntry, journalId: string): Promise<JournalEntry> => {
 	const now = new Date().toISOString()
 
 	const newJournalEntry: JournalEntry = {
 		...formData,
-		// parsedNetAmount: calculateNetAmount(formData),
+		journalId,
 		kind: 'zisk:entry',
 		createdAt: now,
 	}
@@ -46,7 +46,8 @@ export const updateJournalEntry = async <T extends JournalEntry>(formData: T) =>
 		},
 	]
 
-	return db.bulkDocs(docs)
+	await db.bulkDocs(docs)
+	return formData
 }
 
 export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
@@ -91,7 +92,7 @@ export const createCategory = async (formData: CreateCategory, journalId: string
 }
 
 export const createAccount = async (formData: CreateAccount, journalId: string) => {
-	const category: Account = {
+	const account: Account = {
 		...formData,
 		kind: 'zisk:account',
 		_id: generateAccountId(),
@@ -100,7 +101,8 @@ export const createAccount = async (formData: CreateAccount, journalId: string) 
 		journalId,
 	}
 
-	return db.put(category)
+	await db.put(account)
+	return account
 }
 
 export const updateAccount = async (formData: Account) => {
@@ -195,7 +197,8 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 		journalId,
 	}
 
-	return db.put(tag)
+	await db.put(tag)
+	return tag
 }
 
 export const exportJournal = async (journalId: string, compress: boolean) => {

@@ -5,14 +5,13 @@ import JournalEntryCard from './JournalEntryCard'
 import { deleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
-import { JournalContext } from '@/contexts/JournalContext'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getDatabaseClient } from '@/database/client'
-import SpendChart from '../chart/SpendChart'
-import CategorySpreadChart from '../chart/CategorySpreadChart'
+// import SpendChart from '../chart/SpendChart'
+// import CategorySpreadChart from '../chart/CategorySpreadChart'
 import { useSearch } from '@tanstack/react-router'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
+import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 
 export interface JournalEntrySelection {
 	entry: JournalEntry | null
@@ -26,8 +25,7 @@ export default function JournalEditor() {
 	})
 
 	const { snackbar } = useContext(NotificationsContext)
-	const journalContext = useContext(JournalContext)
-	const journalSliceContext = useContext(JournalSliceContext)
+	const journalEntriesQuery = useFilteredJournalEntries()
 
 	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
@@ -35,7 +33,7 @@ export default function JournalEditor() {
 
 	const journalGroups: Record<string, JournalEntry[]> = useMemo(() => {
 		const entries: Record<string, JournalEntry> = {
-			...journalSliceContext.getJournalEntriesQuery.data,
+			...journalEntriesQuery.data,
 			// ...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
 		}
 		const groups = Object.values(entries).reduce(
@@ -56,7 +54,7 @@ export default function JournalEditor() {
 
 		return groups
 	}, [
-		journalSliceContext.getJournalEntriesQuery.data,
+		journalEntriesQuery.data,
 		// journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
 	])
 
@@ -82,13 +80,14 @@ export default function JournalEditor() {
 	}
 
 	const handleDeleteEntry = async (entry: JournalEntry | null) => {
+		throw new Error('Not implemented')
 		if (!entry) {
 			return
 		}
 
 		try {
 			await deleteJournalEntry(entry._id)
-			journalSliceContext.refetchAllDependantQueries()
+			// journalSliceContext.refetchAllDependantQueries()
 			handleDeselectListItem()
 			snackbar({
 				message: 'Deleted 1 entry',
@@ -142,8 +141,8 @@ export default function JournalEditor() {
 						<Grid size={4}> */}
 					<Collapse in={false}>
 						<Stack direction='row' gap={2} mb={2}>
-							<SpendChart />
-							<CategorySpreadChart />
+							{/* <SpendChart />
+							<CategorySpreadChart /> */}
 						</Stack>
 					</Collapse>
 						{/* </Grid>

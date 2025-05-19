@@ -3,9 +3,9 @@ import { create } from "zustand";
 
 interface JournalEntryEditModalState {
     open: boolean
-    initialFormValues: JournalEntry | null
+    initialFormValues: Partial<JournalEntry> | null
     edit: (entry: JournalEntry) => void
-    create: () => void
+    create: (initialFormValues?: Partial<JournalEntry>) => void
     close: () => void
 }
 
@@ -13,7 +13,7 @@ export const useJournalEntryEditModalState = create<JournalEntryEditModalState>(
     open: false,
     initialFormValues: null,
     edit: (entry) => set({ initialFormValues: entry, open: true }),
-    create: () => set({ initialFormValues: null, open: true }),
+    create: (initialFormValues?: Partial<JournalEntry>) => set({ initialFormValues: initialFormValues ?? null, open: true }),
     close: () => set({ open: false })
 }))
 

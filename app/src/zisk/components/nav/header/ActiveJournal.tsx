@@ -1,8 +1,8 @@
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { JournalContext } from '@/contexts/JournalContext'
+import { useJournals } from '@/hooks/queries/useJournals'
 import { Journal } from '@/schema/documents/Journal'
 import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
-import { useJournals } from '@/store/orm/journals'
 import { UnfoldMore } from '@mui/icons-material'
 import { Button, Typography, Tooltip } from '@mui/material'
 import { useContext } from 'react'
@@ -14,7 +14,8 @@ export default function ActiveJournal() {
 	const setJournalSelectorStatus = useSetJournalSelectorStatus()
 	const journalSelectorStatus = useJournalSelectorStatus()
 
-	const journals = useJournals()
+	const getJournalsQuery = useJournals()
+	const journals = getJournalsQuery.data
 	const activeJournal: Journal | null = activeJournalId
 		? journals[activeJournalId] ?? null
 		: null

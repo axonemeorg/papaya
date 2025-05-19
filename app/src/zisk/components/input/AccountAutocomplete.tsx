@@ -3,17 +3,16 @@ import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, 
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
 import AvatarIcon from '../icon/AvatarIcon'
-import { useAccounts } from '@/store/orm/accounts'
+import { useAccounts } from '@/hooks/queries/useAccounts'
 
 export type AccountAutocompleteProps = Partial<Omit<AutocompleteProps<string, false, false, false>, 'options'>>
 
 export default function AccountAutocomplete(props: AccountAutocompleteProps) {
 	const { loading, ...rest } = props
 
-	const accounts = useAccounts()
-
-	const journalContext = useContext(JournalContext)
-	const { isLoading } = journalContext.queries.accounts
+	const getAccountsQuery = useAccounts()
+	const accounts = getAccountsQuery.data
+	const { isLoading } = getAccountsQuery
 
 	return (
 		<Autocomplete

@@ -23,7 +23,7 @@ import { createCategory } from "@/database/actions";
 import clsx from "clsx";
 import { generateRandomAvatar } from "@/utils/journal";
 import { Category } from "@/schema/documents/Category";
-import { useAddCategory, useCategories } from "@/store/orm/categories";
+import { useAddCategory, useCategories } from "@/hooks/queries/useCategories";
 
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
 
@@ -33,7 +33,8 @@ export default function CategorySelector(props: CategorySelectorProps) {
     const [searchValue, setSearchValue] = useState<string>('')
     const { activeJournalId } = useContext(JournalContext)
 
-    const categories = useCategories()
+    const getCategoriesQuery = useCategories()
+    const categories = getCategoriesQuery.data
     const addCategory = useAddCategory()
 
     const value: string | undefined = !Array.isArray(props.value) && props.value || undefined

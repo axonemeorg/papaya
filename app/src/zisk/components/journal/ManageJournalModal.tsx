@@ -10,7 +10,6 @@ import { deleteJournal, exportJournal, resetJournal } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
 import { Journal } from '@/schema/documents/Journal'
-import { useRemoveJournal } from '@/store/orm/journals'
 
 interface JournalDetailsAndActivityProps {
 	journal: Journal | null
@@ -110,7 +109,9 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 
 	const { snackbar } = useContext(NotificationsContext)
 	
-	const removeJournal = useRemoveJournal()
+	const removeJournal = (todo: any) => {
+		throw new Error('Not implemented')
+	}
 
 	const handleResetJournal = async () => {
 		if (!props.details.journal) {

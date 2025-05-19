@@ -3,17 +3,16 @@ import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, 
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
 import AvatarIcon from '../icon/AvatarIcon'
-import { useCategories } from '@/store/orm/categories'
+import { useCategories } from '@/hooks/queries/useCategories'
 
 export type CategoryAutocompleteProps = Partial<Omit<AutocompleteProps<string, boolean, false, false>, 'options'>>
 
 export default function CategoryAutocomplete(props: CategoryAutocompleteProps) {
 	const { loading, ...rest } = props
 
-	const categories = useCategories()
-
-	const journalContext = useContext(JournalContext)
-	const { isLoading } = journalContext.queries.categories
+	const getCategoriesQuery = useCategories()
+	const categories = getCategoriesQuery.data
+	const { isLoading } = getCategoriesQuery
 
 	return (
 		<Autocomplete

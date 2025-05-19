@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createJournal } from '@/database/actions'
 import ImportJournalForm from '../form/ImportJournalForm'
 import { CreateJournal, Journal } from '@/schema/documents/Journal'
-import { useAddJournal } from '@/store/orm/journals'
+import { useAddJournal } from '@/hooks/queries/useJournals'
 
 interface CreateJournalModalProps {
 	open: boolean

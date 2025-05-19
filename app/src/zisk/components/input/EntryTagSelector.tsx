@@ -16,7 +16,7 @@ import { EntryTagPicker } from "../pickers/EntryTagPicker";
 import { EntryStatus } from "@/schema/models/EntryStatus";
 import { ZiskEntryStatus } from "@/constants/status";
 import { EntryTag } from "@/schema/documents/EntryTag";
-import { useEntryTags } from "@/store/orm/tags";
+import { useEntryTags } from "@/hooks/queries/useEntryTags";
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
@@ -24,7 +24,8 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
     const anchorRef = useRef<HTMLAnchorElement>(null);
     const [open, setOpen] = useState<boolean>(false)
 
-    const entryTags = useEntryTags()
+    const getEntryTagsQuery = useEntryTags()
+    const entryTags = getEntryTagsQuery.data
     const value = props.value ?? []
 
     const options: Record<string, EntryTag | EntryStatus> = {

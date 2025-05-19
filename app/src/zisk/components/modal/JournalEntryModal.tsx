@@ -6,11 +6,7 @@ import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { JournalContext } from '@/contexts/JournalContext'
 import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
-import { deleteJournalEntry, updateJournalEntry } from '@/database/actions'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { useDebounce } from '@/hooks/useDebounce'
-import useUnsavedChangesWarning from '@/hooks/useUnsavedChangesWarning'
-import { useQueryClient } from '@tanstack/react-query'
 import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { enumerateJournalEntryStatuses, journalEntryHasTags, journalEntryHasTasks } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
@@ -18,9 +14,10 @@ import { KeyboardActionName } from '@/constants/keyboard'
 import { StatusVariant } from '@/schema/models/EntryStatus'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category } from '@/schema/documents/Category'
-import { useCategories } from '@/store/orm/categories'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useBeginEditingJournalEntry, useCloseEntryEditModal, useEntryEditModalInitialValues, useEntryEditModalOpen, useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
+import { useCategories } from '@/hooks/queries/useCategories'
+import { useUpdateJournalEntry } from '@/hooks/queries/useFilteredJournalEntries'
 
 export default function JournalEntryModal() {
 	const { snackbar } = useContext(NotificationsContext)
@@ -31,19 +28,21 @@ export default function JournalEntryModal() {
 	const entryEditModalOpen = useEntryEditModalOpen()
 	const entryEditModalInitialValues = useEntryEditModalInitialValues()
 
-	const categories = useCategories()
+	const getCategoriesQuery = useCategories()
+	const categories = getCategoriesQuery.data
 
-	const { activeJournal } = useContext(JournalContext)
+	const { activeJournalId } = useContext(JournalContext)
+
+	const updateJournalEntry = useUpdateJournalEntry()
 
 	const journalEntryForm = useForm<JournalEntry>({
 		defaultValues: {},
 		resolver: zodResolver(JournalEntry),
 	})
 	
-	const { disableUnsavedChangesWarning, enableUnsavedChangesWarning } = useUnsavedChangesWarning()
-
 	const handleSaveFormWithCurrentValues = useCallback(async () => {
-		if (!activeJournal) {
+		console.log('handleSaveFormWithCurrentValues()')
+		if (!activeJournalId) {
 			return Promise.resolve()
 		}
 		const formData: JournalEntry = journalEntryForm.getValues()
@@ -56,7 +55,7 @@ export default function JournalEntryModal() {
 				console.error(error)
 				snackbar({ message: 'Failed to update journal entry' })
 			})
-	}, [activeJournal]);
+	}, [activeJournalId]);
 
 	const currentFormState = useWatch({ control: journalEntryForm.control })
 
@@ -83,17 +82,14 @@ export default function JournalEntryModal() {
 
 	const handleClose = () => {
 		closeEntryEditModal()
-		// if (!journalEntryForm.formState.isDirty) {
-		// 	return
-		// }
-		// flushSaveFormDebounce()
-		// handleSaveFormWithCurrentValues().then(() => {
-		// 	refreshJournalEntriesQuery()
-		// 	refreshTransferEntriesQuery()
-		// 	snackbar({ message: 'Saved entry.' })
-		// 	disableUnsavedChangesWarning(JOURNAL_ENTRY_UNSAVED_CHANGES_WARNING_KEY)
-		// })
-		throw new Error("Saving journal entries isn't implemented!")
+		console.log('journalEntryForm.getValues():', journalEntryForm.getValues())
+		if (!journalEntryForm.formState.isDirty) {
+			console.log('journalEntryForm values not dirtied; closing without saving.')
+			return
+		}
+		handleSaveFormWithCurrentValues().then(() => {
+			snackbar({ message: 'Saved entry.' })
+		})
 	}
 
 	const handleDelete = useCallback(async () => {
@@ -109,7 +105,7 @@ export default function JournalEntryModal() {
 		// 	snackbar({ message: 'Failed to delete journal entry' })
 		// })
 		throw new Error("Delete journal entires isn't implemented!")
-	}, [activeJournal])
+	}, [activeJournalId])
 
 	const toggleEntryStatus = (entryId: string | null, status: StatusVariant) => {
 		const formData: JournalEntry = journalEntryForm.getValues()

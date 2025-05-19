@@ -4,13 +4,13 @@ import { DEFAULT_AVATAR } from '@/components/pickers/AvatarPicker'
 import { getAbsoluteDateRangeFromDateView, getNthWeekdayOfMonthFromDate } from './date'
 import { StatusVariant } from '@/schema/models/EntryStatus'
 import { CreateJournalEntry, JournalEntry } from '@/schema/documents/JournalEntry'
-import { DateView } from '@/schema/support/slice'
 import { CadenceFrequency, DayOfWeek, RecurringCadence } from '@/schema/support/recurrence'
 import { Avatar } from '@/schema/models/Avatar'
 import { ZiskDocument } from '@/schema/union/ZiskDocument'
 import { Category } from '@/schema/documents/Category'
 import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
 import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
+import { DateView } from '@/schema/support/search/facet'
 
 /**
  * Strips optional fields from a JournalEntry object

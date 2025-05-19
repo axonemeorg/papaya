@@ -1,4 +1,4 @@
-import { DownstreamFilter } from "@/contexts/JournalSnapshopContext"; 
+import { DownstreamFilter } from "@/contexts/JournalFilterContext"; 
 
 self.onmessage = function (e: MessageEvent<DownstreamFilter[]>) {
   const records = e.data;

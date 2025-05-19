@@ -1,6 +1,6 @@
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { WeekNumber } from '@/schema/support/recurrence'
-import { AnnualPeriod, DateRange, DateView, DateViewSymbol, MonthlyPeriod, WeeklyPeriod } from '@/schema/support/slice'
+import { AnnualDateView, DateView, DateViewVariant, MonthlyDateView, WeeklyDateView } from '@/schema/support/search/facet'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
@@ -97,51 +97,26 @@ export const getNthWeekdayOfMonthFromDate = (
     }
 };
 
-export const dateViewIsRange = (dateView: DateView): dateView is DateRange => {
-    return 'before' in dateView || 'after' in dateView
-}
-
-export const dateViewIsWeeklyPeriod = (dateView: DateView): dateView is WeeklyPeriod => {
-    return 'year' in dateView && 'month' in dateView && 'day' in dateView
-}
-
-export const dateViewIsMonthlyPeriod = (dateView: DateView): dateView is MonthlyPeriod => {
-    return 'year' in dateView && 'month' in dateView && !('day' in dateView)
-}
-
-export const dateViewIsAnnualPeriod = (dateView: DateView): dateView is AnnualPeriod => {
-    return 'year' in dateView && !('month' in dateView) && !('day' in dateView)
-}
-
-export const getDateViewSymbol = (dateView: DateView): DateViewSymbol => {
-    if (dateViewIsWeeklyPeriod(dateView)) {
-        return DateViewSymbol.WEEKLY
-    } else if (dateViewIsMonthlyPeriod(dateView)) {
-        return DateViewSymbol.MONTHLY
-    } else if (dateViewIsAnnualPeriod(dateView)) {
-        return DateViewSymbol.YEARLY
-    }
-
-    return DateViewSymbol.RANGE
-}
-
-export const getWeeklyPeriodFromDate = (date: dayjs.Dayjs): WeeklyPeriod => {
+export const getWeeklyDateViewFromDate = (date: dayjs.Dayjs): WeeklyDateView => {
     return {
+        view: DateViewVariant.WEEKLY,
         year: date.year(),
         month: date.month() + 1, // Zero-indexed
         day: date.date(),
     }
 }
 
-export const getMonthlyPeriodFromDate = (date: dayjs.Dayjs): MonthlyPeriod => {
+export const getMonthlyDateViewFromDate = (date: dayjs.Dayjs): MonthlyDateView => {
     return {
+        view: DateViewVariant.MONTHLY,
         year: date.year(),
         month: date.month() + 1, // Zero-indexed
     }
 }
 
-export const getAnnualPeriodFromDate = (date: dayjs.Dayjs): AnnualPeriod => {
+export const getAnnualDateViewFromDate = (date: dayjs.Dayjs): AnnualDateView => {
     return {
+        view: DateViewVariant.ANNUAL,
         year: date.year(),
     }
 }
@@ -150,27 +125,24 @@ export const getAbsoluteDateRangeFromDateView = (dateView: DateView) => {
     let startDate: dayjs.Dayjs | undefined = undefined
     let endDate: dayjs.Dayjs | undefined = undefined
 
-    if (dateViewIsRange(dateView)) {
+    if (dateView.view === DateViewVariant.CUSTOM) {
         endDate = dateView.before ? dayjs(dateView.before).subtract(1, 'day') : undefined
         startDate = dateView.after ? dayjs(dateView.after).add(1, 'day') : undefined
-    } else if (dateViewIsWeeklyPeriod(dateView)) {
-        startDate = dayjs([
-            dateView.year,
-            dateMonthNumberWithLeadingZero(dateView.month),
-            dateMonthNumberWithLeadingZero(dateView.day),
-        ].join('-'))
-            .startOf('week')
+    } else if (dateView.view === DateViewVariant.WEEKLY) {
+        startDate = dayjs()
+            .year(dateView.year)
+            .month(dateView.month - 1)
+            .date(dateView.day)
+
         endDate = startDate.endOf('week')
-    } else if (dateViewIsMonthlyPeriod(dateView)) {
-        startDate = dayjs(`${dateView.year}-${dateView.month}-01`)
-        startDate = dayjs([
-            dateView.year,
-            dateMonthNumberWithLeadingZero(dateView.month),
-            '01',
-        ].join('-'))
-            .startOf('month')
+    } else if (dateView.view === DateViewVariant.MONTHLY) {
+        startDate = dayjs()
+            .year(dateView.year)
+            .month(dateView.month - 1)
+            .date(1)
+
         endDate = startDate.endOf('month')
-    } else if (dateViewIsAnnualPeriod(dateView)) {
+    } else if (dateView.view === DateViewVariant.ANNUAL) {
         startDate = dayjs(`${dateView.year}-01-01`)
         endDate = dayjs(`${dateView.year}-12-31`)
     }
@@ -193,11 +165,4 @@ export const getEmpiracleDateRangeFromJournalEntries = (journalEntries: JournalE
     }
 
     return { startDate: dayjs(sortedDates[0]), endDate: dayjs(sortedDates[sortedDates.length - 1]) }
-}
-
-/**
- * Converts numbers like `1` to '01'.
- */
-export const dateMonthNumberWithLeadingZero = (dateOrMonth: number): string => {
-    return dateOrMonth.toString().padStart(2, '0');
 }

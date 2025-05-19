@@ -26,8 +26,7 @@ import ManageJournalModal from './ManageJournalModal'
 import { Journal } from '@/schema/documents/Journal'
 import { useSetJournalSelectorStatus, useJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import CreateJournalModal from './CreateJournalModal'
-import { useJournals } from '@/store/orm/journals'
-import { ZiskContext } from '@/contexts/ZiskContext'
+import { useJournals } from '@/hooks/queries/useJournals'
 
 export default function SelectJournalModal() {
 	const journalContext = useContext(JournalContext)
@@ -35,7 +34,8 @@ export default function SelectJournalModal() {
 	const [selectedJournalId, setSelectedJournalId] = useState<string | null>(journalContext.activeJournalId)
 	const [previouslyActiveJournalId, setPreviouslyActiveJournalId] = useState<string | null>(null)
 
-	const journals = useJournals()
+	const getJournalsQuery = useJournals()
+	const journals = getJournalsQuery.data
 
 	const [journalSelectorState, setJournalSelectorStatus] = [useJournalSelectorStatus(), useSetJournalSelectorStatus()]
 	const showSelectJournalModal = ['SELECTING', 'CREATING'].includes(journalSelectorState)

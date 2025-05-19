@@ -111,20 +111,24 @@ export const getJournalEntriesByUpstreamFilters = async (
 		{ journalId },
 	]
 
+	console.log('getJournalEntriesByUpstreamFilters()')
+
 	Object.entries(facets)
 		.filter(([, props]) => Boolean(props))
 		.map(([key, props]) => {
-			const clause = FacetedSearchUpstreamFilters[key](props)
-			if (!clause) {
+			const clauses = FacetedSearchUpstreamFilters[key as SearchFacetKey](props)
+			if (!clauses) {
 				return
 			}
 
-			selectorClauses.push(clause)
+			clauses.forEach((clause) => selectorClauses.push(clause))
 		})
 
 		const selector = {
 			'$and': selectorClauses,
 		}
+
+		console.log('selector:', selector)
 
 		const result = await db.find({
 			selector,
@@ -132,6 +136,8 @@ export const getJournalEntriesByUpstreamFilters = async (
 		})
 
 		const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
+
+		console.log('RESULT:', entries)
 
 		return entries
 }
