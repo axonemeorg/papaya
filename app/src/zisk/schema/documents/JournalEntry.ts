@@ -11,7 +11,7 @@ import { EntryTask } from "../models/EntryTask";
 const [CreateJournalEntry, BaseJournalEntry] = Document.fromSchemas([
     {
         kind: z.literal('zisk:entry'),
-        ...Mixin.intrinsic.natural._ephemeral({
+        ...Mixin.intrinsic.natural.$ephemeral({
             amount: z.string()
         }),
         date: z.string(),
@@ -32,7 +32,7 @@ const [CreateJournalEntry, BaseJournalEntry] = Document.fromSchemas([
     ...Mixin.derived.timestamps(),
     ...Mixin.derived.belongsToJournal(),
     ...z.object(
-        Mixin.derived.natural._derived({
+        Mixin.derived.natural.$derived({
             figure: Figure.optional(),
         })).partial().shape,
     }

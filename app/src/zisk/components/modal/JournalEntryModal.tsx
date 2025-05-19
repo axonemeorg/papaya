@@ -8,7 +8,7 @@ import DetailsDrawer from '../layout/DetailsDrawer'
 import AvatarIcon from '../icon/AvatarIcon'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
 import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
-import { enumerateJournalEntryStatuses, journalEntryHasTags, journalEntryHasTasks } from '@/utils/journal'
+import { enumerateJournalEntryStatuses, journalEntryHasTags, journalEntryHasTasks, makeJournalEntry } from '@/utils/journal'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
 import { KeyboardActionName } from '@/constants/keyboard'
 import { StatusVariant } from '@/schema/models/EntryStatus'
@@ -24,7 +24,8 @@ export default function JournalEntryModal() {
 
 	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 	const closeEntryEditModal = useCloseEntryEditModal()
-	const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
+	// const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
+
 	const entryEditModalOpen = useEntryEditModalOpen()
 	const entryEditModalInitialValues = useEntryEditModalInitialValues()
 
@@ -39,9 +40,16 @@ export default function JournalEntryModal() {
 		defaultValues: {},
 		resolver: zodResolver(JournalEntry),
 	})
+
+	useEffect(() => {
+		if (entryEditModalOpen) {
+			journalEntryForm.reset(
+				makeJournalEntry(entryEditModalInitialValues ?? {} as Partial<JournalEntry>, activeJournalId!)
+			)
+		}
+	}, [entryEditModalOpen])
 	
 	const handleSaveFormWithCurrentValues = useCallback(async () => {
-		console.log('handleSaveFormWithCurrentValues()')
 		if (!activeJournalId) {
 			return Promise.resolve()
 		}

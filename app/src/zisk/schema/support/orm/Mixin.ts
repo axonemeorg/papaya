@@ -1,15 +1,15 @@
 import { z } from 'zod'
 
 class NaturalMixin {
-    public static _ephemeral<E extends z.ZodRawShape>(_ephemeral: E) {
+    public static $ephemeral<E extends z.ZodRawShape>($ephemeral: E) {
         return {
-            _ephemeral: z.object(_ephemeral),
+            $ephemeral: z.object($ephemeral),
         }
     }
 
-    public static _derived<D extends z.ZodRawShape>(_derived: D) {
+    public static $derived<D extends z.ZodRawShape>($derived: D) {
         return {
-            _derived: z.object(_derived),
+            $derived: z.object($derived),
         }
     }
 
@@ -22,7 +22,7 @@ class NaturalMixin {
 
 class IntrinsicMixin {
     public static natural = {
-        _ephemeral: NaturalMixin._ephemeral
+        $ephemeral: NaturalMixin.$ephemeral
     }
 }
 
@@ -41,7 +41,7 @@ class DerivedMixin {
     }
 
     public static natural = {
-        _derived: NaturalMixin._derived,
+        $derived: NaturalMixin.$derived,
         _id: NaturalMixin._id,
     }
 }

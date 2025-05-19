@@ -85,7 +85,7 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
 		memo: formData.memo ?? '',
 		journalId,
 		children: [],
-		_ephemeral: {
+		$ephemeral: {
 			amount: '',
 		}
 	}

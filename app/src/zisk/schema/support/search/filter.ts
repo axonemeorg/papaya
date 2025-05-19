@@ -14,7 +14,7 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
 
       return [
           {
-              _derived: {
+              $derived: {
                   figure: {
                       currency: filter.currency,
                       amount: {
@@ -60,7 +60,7 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
     }
 
     return entries.filter((entry) => {
-        const amount = entry._derived?.figure?.amount
+        const amount = entry.$derived?.figure?.amount
         if (amount === undefined) {
             return false
         } else if (greaterThan !== undefined && amount <= greaterThan) {

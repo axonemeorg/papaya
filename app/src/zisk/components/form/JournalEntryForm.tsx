@@ -144,7 +144,7 @@ export default function JournalEntryForm() {
 								<Grid size={!isTransferEntry ? 8 : 4}>
 									<Controller
 										control={control}
-										name="_ephemeral.amount"
+										name="$ephemeral.amount"
 										render={({ field }) => (
 											<AmountField
 												variant='filled'

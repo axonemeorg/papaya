@@ -131,7 +131,7 @@ export default function ChildJournalEntryForm() {
                                 <Grid size={4}>
                                     <Controller
                                         control={control}
-                                        name={`children.${index}._ephemeral.amount`}
+                                        name={`children.${index}.$ephemeral.amount`}
                                         render={({ field }) => (
                                             <AmountField
                                                 {...field}

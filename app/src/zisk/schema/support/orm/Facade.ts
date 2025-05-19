@@ -8,7 +8,7 @@
 //         derivedSchemas: Derived,
 //     ) {
 //         const intrinsic = z.discriminatedUnion('kind', intrinicSchemas)
-//         const _derived = z.discriminatedUnion('kind', derivedSchemas)
+//         const $derived = z.discriminatedUnion('kind', derivedSchemas)
 
 //         return class ModelFacade {
 //             static make(props: z.infer<typeof intrinsic>) {
@@ -17,7 +17,7 @@
 //                 }
 //             }
 
-//             static save(props: z.infer<typeof _derived>) {
+//             static save(props: z.infer<typeof $derived>) {
 //                 db.put(props)
 //             }
 //         }

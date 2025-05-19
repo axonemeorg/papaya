@@ -32,16 +32,12 @@ export const createJournalEntry = async (formData: JournalEntry, journalId: stri
 }
 
 export const updateJournalEntry = async <T extends JournalEntry>(formData: T) => {
-	delete formData._rev
-
-	const existingRecord = await db.get(formData._id)
 	const now = new Date().toISOString()
 
 	const docs: object[] = [
 		{
-			...existingRecord,
 			...formData,
-			parsedNetAmount: calculateNetAmount(formData),
+			// parsedNetAmount: calculateNetAmount(formData),
 			updatedAt: now,
 		},
 	]
