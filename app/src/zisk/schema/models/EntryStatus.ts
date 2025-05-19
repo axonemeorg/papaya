@@ -19,13 +19,6 @@ export const [CreateEntryStatus, EntryStatus] = Model.fromSchema({
     ...Mixin.derived.natural._id(),
     label: z.string(),
     description: z.string(),
-    /**
-     * The Reserved Tag is not selectable within the app.
-     */
-    disabled: z.boolean(),
-    /**
-     * The Reserved Tag is no longer used.
-     */
     archived: z.boolean(),
 })
 

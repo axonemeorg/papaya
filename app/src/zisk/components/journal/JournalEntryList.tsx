@@ -27,7 +27,7 @@ import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetFigures, journalEntryHasTasks, enumerateJournalEntryStatuses } from '@/utils/journal'
+import { calculateNetFigures, journalEntryHasTasks, enumerateJournalEntryStatuses, journalEntryHasTags } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import clsx from 'clsx'
 import { sortDatesChronologically } from '@/utils/date'
@@ -285,13 +285,13 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 								const netFigure: Figure | undefined = calculateNetFigures(entry)['CAD']
 
-								const hasTags = journalEntryHasTasks(entry)
+								const hasTags = journalEntryHasTags(entry)
 								const childHasTags = (entry as JournalEntry).children?.some((child) => journalEntryHasTasks((child as JournalEntry)))
-							
+
 								// Reserved Tags
 								const { parent: parentReservedTags, children: childReservedTags }
 									= enumerateJournalEntryStatuses(entry)
-							
+
 								const isFlagged = parentReservedTags.has(StatusVariant.enum.FLAGGED)
 								const isApproximate = parentReservedTags.has(StatusVariant.enum.APPROXIMATE)
 								const isPending = parentReservedTags.has(StatusVariant.enum.PENDING)
@@ -299,7 +299,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 								const childIsFlagged = childReservedTags.has(StatusVariant.enum.FLAGGED)
 								const childIsApproximate = childReservedTags.has(StatusVariant.enum.APPROXIMATE)
 								const childIsPending = childReservedTags.has(StatusVariant.enum.PENDING)
-								
+
 								const hasTasks = journalEntryHasTasks(entry)
 								const tasks: EntryTask[] = entry.tasks ?? []
 								const numCompletedTasks: number = hasTasks ? tasks.filter((task: EntryTask) => task.completedAt).length : 0

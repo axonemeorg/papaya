@@ -257,6 +257,19 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 	}
 }
 
+export const discriminateEntryTags = (tagIds: string[]) => {
+	const statuses = new Set<StatusVariant>(Object.values(StatusVariant.enum))
+
+	return tagIds.reduce((acc: { statusIds: StatusVariant[], entryTagIds: string[] }, tagId: string) => {
+		if (statuses.has(tagId as StatusVariant)) {
+			acc.statusIds.push(tagId as StatusVariant)
+		} else {
+			acc.entryTagIds.push(tagId)
+		}
+		return acc
+	}, { statusIds: [], entryTagIds: [] })
+}
+
 /**
  * Given a set of nonspecific entries that are known to 
  */

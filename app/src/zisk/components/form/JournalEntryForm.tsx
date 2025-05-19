@@ -28,6 +28,7 @@ import RecurrenceSelect from '../input/RecurrenceSelect'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { EntryStatus, StatusVariant } from '@/schema/models/EntryStatus'
 import { EntryRecurrency } from '@/schema/models/EntryRecurrence'
+import { discriminateEntryTags } from '@/utils/journal'
 
 export default function JournalEntryForm() {
 	const { setValue, control, register } = useFormContext<JournalEntry>()
@@ -243,9 +244,14 @@ export default function JournalEntryForm() {
 									return (
 										<EntryTagSelector
 											{...field}
-											value={entryTagIds}
+											value={[
+												...(entryTagIds ?? []),
+												...(statusIds ?? []),
+											]}
 											onChange={(_event, newValue) => {
-												setValue(field.name, newValue ?? [], { shouldDirty: true })
+												const { entryTagIds, statusIds } = discriminateEntryTags(newValue)
+												setValue(field.name, entryTagIds, { shouldDirty: true })
+												setValue('statusIds', statusIds, { shouldDirty: true })
 											}}
 										/>
 									)

@@ -6,7 +6,7 @@ import { useCallback, useContext, useRef, useState } from "react"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import SelectionActionModal from "../modal/SelectionActionModal"
 import { JournalContext } from "@/contexts/JournalContext"
-import { makeJournalEntry } from "@/utils/journal"
+import { discriminateEntryTags, makeJournalEntry } from "@/utils/journal"
 import { EntryTagPicker } from "../pickers/EntryTagPicker"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 import { StatusVariant } from "@/schema/models/EntryStatus"
@@ -86,14 +86,19 @@ export default function ChildJournalEntryForm() {
                     setChildEntryTaggingIndex(-1)
                 }}
                 value={(childEntryTaggingIndex >= 0 && children[childEntryTaggingIndex])
-                    ? children[childEntryTaggingIndex].tagIds
+                    ? [
+                        ...(children[childEntryTaggingIndex].tagIds ?? []),
+                        ...(children[childEntryTaggingIndex].statusIds ?? []),
+                    ]
                     : undefined
                 }
                 onChange={(_event, newValue) => {
                     if (childEntryTaggingIndex < 0) {
                         return
                     }
-                    setValue(`children.${childEntryTaggingIndex}.tagIds`, newValue ?? [], { shouldDirty: true })
+                    const { entryTagIds, statusIds } = discriminateEntryTags(newValue)
+                    setValue(`children.${childEntryTaggingIndex}.statusIds`, statusIds, { shouldDirty: true })
+                    setValue(`children.${childEntryTaggingIndex}.tagIds`,entryTagIds, { shouldDirty: true })
                 }}
             />
 
@@ -112,6 +117,7 @@ export default function ChildJournalEntryForm() {
                     const childStatusIds = watch(`children.${index}.statusIds`) ?? []
                     const childTagIds = watch(`children.${index}.tagIds`) ?? []
                     const isTagged = childTagIds.length > 0
+                    const hasStatus = childStatusIds.length > 0
                     const isApproximate = childStatusIds.some((status) => status === StatusVariant.enum.APPROXIMATE)
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     
@@ -160,7 +166,7 @@ export default function ChildJournalEntryForm() {
                                                 setChildEntryTaggingAnchorEl(event.currentTarget)
                                             }}
                                         >
-                                            {isTagged ? <LocalOffer /> : <LocalOfferOutlined />}
+                                            {isTagged || hasStatus ? <LocalOffer /> : <LocalOfferOutlined />}
                                         </IconButton>
                                         <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
                                             <DeleteOutline />

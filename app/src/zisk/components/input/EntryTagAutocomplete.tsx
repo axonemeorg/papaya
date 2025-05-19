@@ -1,16 +1,9 @@
 import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
 import { Close, Done } from "@mui/icons-material";
-
-import { useContext } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
 import { ZiskEntryStatus } from '@/constants/status';
 import { EntryTag } from '@/schema/documents/EntryTag';
 import { EntryStatus } from '@/schema/models/EntryStatus';
 import { useEntryTags } from '@/hooks/queries/useEntryTags';
-
-const filteredStatuses: EntryStatus[] = ZiskEntryStatus.filter((status) => {
-	return !status.disabled && !status.archived
-})
 
 export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
@@ -23,7 +16,11 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 	const { isLoading } = getEntryTagsQuery
 
 	const tags: Record<string, EntryTag | EntryStatus> = {
-		...Object.fromEntries(filteredStatuses.map((status) => [status._id, status])),
+		...Object.fromEntries(
+			ZiskEntryStatus
+				.filter((status) => !status.archived || props.value?.includes(status._id))
+				.map((status) => [status._id, status])
+			),
 		...entryTags
 	}
 
