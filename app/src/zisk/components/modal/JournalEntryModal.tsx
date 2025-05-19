@@ -22,10 +22,7 @@ import { useUpdateJournalEntry } from '@/hooks/queries/useFilteredJournalEntries
 export default function JournalEntryModal() {
 	const { snackbar } = useContext(NotificationsContext)
 
-	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 	const closeEntryEditModal = useCloseEntryEditModal()
-	// const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
-
 	const entryEditModalOpen = useEntryEditModalOpen()
 	const entryEditModalInitialValues = useEntryEditModalInitialValues()
 
@@ -44,7 +41,9 @@ export default function JournalEntryModal() {
 	useEffect(() => {
 		if (entryEditModalOpen) {
 			journalEntryForm.reset(
-				makeJournalEntry(entryEditModalInitialValues ?? {} as Partial<JournalEntry>, activeJournalId!)
+				entryEditModalInitialValues?._id
+					? entryEditModalInitialValues
+					: makeJournalEntry(entryEditModalInitialValues ?? {} as Partial<JournalEntry>, activeJournalId!)
 			)
 		}
 	}, [entryEditModalOpen])
@@ -90,8 +89,8 @@ export default function JournalEntryModal() {
 
 	const handleClose = () => {
 		closeEntryEditModal()
-		console.log('journalEntryForm.getValues():', journalEntryForm.getValues())
-		if (!journalEntryForm.formState.isDirty) {
+		const isDirty = Object.values(journalEntryForm.formState.dirtyFields).some(Boolean)
+		if (!isDirty) {
 			console.log('journalEntryForm values not dirtied; closing without saving.')
 			return
 		}

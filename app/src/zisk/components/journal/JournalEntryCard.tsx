@@ -11,6 +11,8 @@ import { calculateNetAmount } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category } from '@/schema/documents/Category'
+import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
+import { useCategories } from '@/hooks/queries/useCategories'
 
 export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
@@ -55,9 +57,12 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 
 export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const { entry, anchorEl } = props
-	const { getCategoriesQuery, editJournalEntry } = useContext(JournalContext)
+
+	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
 	const getPriceStyle = useGetPriceStyle()
+
+	const getCategoriesQuery = useCategories()
 
 	const netAmount = calculateNetAmount(entry)
 	const categoryId: string | undefined = entry?.categoryId
@@ -69,7 +74,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	}
 
 	const handleEditJournalEntry = (entry: JournalEntry) => {
-		editJournalEntry(entry)
+		beginEditingJournalEntry(entry)
 		props.onClose()
 	}
 

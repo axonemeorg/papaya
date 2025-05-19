@@ -21,6 +21,7 @@ import {
 } from '@mui/material'
 import { useContext, useState } from 'react'
 import { Category } from '@/schema/documents/Category'
+import { useCategories } from '@/hooks/queries/useCategories'
 
 export default function ManageCategories() {
 	const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false)
@@ -28,7 +29,7 @@ export default function ManageCategories() {
 	const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
 
 	const { snackbar } = useContext(NotificationsContext)
-	const { getCategoriesQuery } = useContext(JournalContext)
+	const getCategoriesQuery = useCategories()
 
 	const handleSelectCategoryForEdit = (category: Category) => {
 		setSelectedCategory(category)

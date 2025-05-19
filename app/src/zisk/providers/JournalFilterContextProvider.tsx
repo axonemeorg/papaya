@@ -13,11 +13,6 @@ interface JournalFilterContextProviderProps extends PropsWithChildren {
 }
 
 export default function JournalFilterContextProvider(props: JournalFilterContextProviderProps) {
-
-    console.log('JournalFilterContextProvider props:', props)
-
-    const { activeJournalId } = useContext(JournalContext)
-
     const [memoryFilters, setMemoryFilters] = useState<Partial<MemoryFilters>>({})
 
     const updateJournalMemoryFilters = (filters: Partial<MemoryFilters>) => {

@@ -34,8 +34,11 @@ export const useFilteredJournalEntries = () => {
 
 export const useAddJournalEntry: () => (entry: JournalEntry) => Promise<JournalEntry> = () => {
   const journalContext = useContext(JournalContext)
+  const journalFilterContext = useContext(JournalFilterContext)
 
   const activeJournalId = journalContext?.activeJournalId
+  const activeJournalFilters: Partial<SearchFacets> = journalFilterContext?.activeJournalFilters ?? {}
+
 
   const queryClient = useQueryClient()
 
@@ -48,7 +51,7 @@ export const useAddJournalEntry: () => (entry: JournalEntry) => Promise<JournalE
     },
     onSuccess: (newJournalEntry) => {
       queryClient.setQueryData(
-        [activeJournalId, 'journalEntries'],
+        [activeJournalId, 'journalEntries', activeJournalFilters],
         (journalEntries: Record<string, JournalEntry>) => {
           return {
             ...journalEntries,
@@ -63,10 +66,14 @@ export const useAddJournalEntry: () => (entry: JournalEntry) => Promise<JournalE
 }
 export const useUpdateJournalEntry: () => (entry: JournalEntry) => Promise<JournalEntry> = () => {
   const journalContext = useContext(JournalContext)
+  const journalFilterContext = useContext(JournalFilterContext)
 
   const activeJournalId = journalContext?.activeJournalId
+  const activeJournalFilters: Partial<SearchFacets> = journalFilterContext?.activeJournalFilters ?? {}
 
   const queryClient = useQueryClient()
+
+  console.log('update keys:', [activeJournalId, 'journalEntries', activeJournalFilters])
 
   const { mutateAsync } = useMutation({
     mutationFn: async (entry: JournalEntry): Promise<JournalEntry> => {
@@ -77,7 +84,7 @@ export const useUpdateJournalEntry: () => (entry: JournalEntry) => Promise<Journ
     },
     onSuccess: (journalEntry) => {
       queryClient.setQueryData(
-        [activeJournalId, 'journalEntries'],
+        [activeJournalId, 'journalEntries', activeJournalFilters],
         (journalEntries: Record<string, JournalEntry>) => {
           return {
             ...journalEntries,

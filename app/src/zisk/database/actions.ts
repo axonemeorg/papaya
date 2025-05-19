@@ -34,16 +34,13 @@ export const createJournalEntry = async (formData: JournalEntry, journalId: stri
 export const updateJournalEntry = async <T extends JournalEntry>(formData: T) => {
 	const now = new Date().toISOString()
 
-	const docs: object[] = [
-		{
-			...formData,
-			// parsedNetAmount: calculateNetAmount(formData),
-			updatedAt: now,
-		},
-	]
+	const updated = {
+		...formData,
+		updatedAt: now,
+	}
 
-	await db.bulkDocs(docs)
-	return formData
+	await db.put(updated)
+	return updated
 }
 
 export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
