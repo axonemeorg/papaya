@@ -210,6 +210,7 @@ export default function JournalDateActions() {
         }
 
         if (dateView.view === DateViewVariant.MONTHLY) {
+            console.log('current start date:', startDate)
             changeStartDate(startDate.add(1, 'month'))
         } else if (dateView.view === DateViewVariant.WEEKLY) {
             changeStartDate(startDate.add(1, 'week'))

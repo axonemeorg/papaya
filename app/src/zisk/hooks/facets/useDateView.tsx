@@ -56,7 +56,7 @@ export default function useDateView(): UseDateView {
     }
     let year: number | undefined = dateView.year
     let month: number | undefined = dateView.month
-    let day: number | undefined = dateView.year
+    let day: number | undefined = dateView.day
 
     if (!month) {
       month = year ? 1 : now.month() + 1 // Zero-indexed
