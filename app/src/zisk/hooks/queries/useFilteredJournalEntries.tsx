@@ -18,7 +18,7 @@ export const useFilteredJournalEntries = () => {
   return useQuery<Record<string, JournalEntry>>({
 		queryKey: [activeJournalId, 'journalEntries', activeJournalFilters],
 		queryFn: async () => {
-      console.log('useFilteredJournalEntries.queryFn();')
+      console.log('useFilteredJournalEntries.queryFn() - executing with filters:', activeJournalFilters)
 
 			const response = await getJournalEntriesByUpstreamFilters(
           activeJournalId!,
@@ -39,7 +39,6 @@ export const useAddJournalEntry: () => (entry: JournalEntry) => Promise<JournalE
   const activeJournalId = journalContext?.activeJournalId
   const activeJournalFilters: Partial<SearchFacets> = journalFilterContext?.activeJournalFilters ?? {}
 
-
   const queryClient = useQueryClient()
 
   const { mutateAsync } = useMutation({
@@ -49,16 +48,11 @@ export const useAddJournalEntry: () => (entry: JournalEntry) => Promise<JournalE
       }
       return createJournalEntry(entry, activeJournalId)
     },
-    onSuccess: (newJournalEntry) => {
-      queryClient.setQueryData(
-        [activeJournalId, 'journalEntries', activeJournalFilters],
-        (journalEntries: Record<string, JournalEntry>) => {
-          return {
-            ...journalEntries,
-            [newJournalEntry._id]: newJournalEntry,
-          }
-        }
-      )
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [activeJournalId, 'journalEntries'],
+        exact: false
+      });
     },
   })
 
@@ -73,8 +67,6 @@ export const useUpdateJournalEntry: () => (entry: JournalEntry) => Promise<Journ
 
   const queryClient = useQueryClient()
 
-  console.log('update keys:', [activeJournalId, 'journalEntries', activeJournalFilters])
-
   const { mutateAsync } = useMutation({
     mutationFn: async (entry: JournalEntry): Promise<JournalEntry> => {
       if (!activeJournalId) {
@@ -82,16 +74,11 @@ export const useUpdateJournalEntry: () => (entry: JournalEntry) => Promise<Journ
       }
       return updateJournalEntry(entry)
     },
-    onSuccess: (journalEntry) => {
-      queryClient.setQueryData(
-        [activeJournalId, 'journalEntries', activeJournalFilters],
-        (journalEntries: Record<string, JournalEntry>) => {
-          return {
-            ...journalEntries,
-            [journalEntry._id]: journalEntry,
-          }
-        }
-      )
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [activeJournalId, 'journalEntries'],
+        exact: false
+      });
     },
   })
 
