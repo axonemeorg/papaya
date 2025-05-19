@@ -3,16 +3,17 @@ import { Box, ClickAwayListener, Fade, IconButton, Paper, Popper, Stack, Typogra
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { getPriceString } from '@/utils/string'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category } from '@/schema/documents/Category'
 import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
 import { useCategories } from '@/hooks/queries/useCategories'
+import { calculateNetFigures } from '@/utils/journal'
+import { Figure } from '@/schema/models/Figure'
+import { getFigureString } from '@/utils/string'
 
 export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
@@ -64,7 +65,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 
 	const getCategoriesQuery = useCategories()
 
-	const netAmount = calculateNetAmount(entry)
+	const netFigure: Figure | undefined = calculateNetFigures(entry)['CAD']
 	const categoryId: string | undefined = entry?.categoryId
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
@@ -125,10 +126,10 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 										<Typography
 											variant="h3"
 											sx={{
-												...getPriceStyle(netAmount),
+												...getPriceStyle(netFigure?.amount ?? 0),
 												mb: 0.5,
 											}}>
-											{getPriceString(netAmount)}
+											{getFigureString(netFigure)}
 										</Typography>
 										<Stack direction="row" gap={1}>
 											<AvatarIcon avatar={category?.avatar} />

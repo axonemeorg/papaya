@@ -21,13 +21,13 @@ import { useContext, useMemo } from 'react'
 
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
-import { getPriceString } from '@/utils/string'
+import { getFigureString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasTasks, enumerateJournalEntryStatuses } from '@/utils/journal'
+import { calculateNetFigures, journalEntryHasTasks, enumerateJournalEntryStatuses } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
 import clsx from 'clsx'
 import { sortDatesChronologically } from '@/utils/date'
@@ -42,6 +42,7 @@ import { useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditM
 import { useAccounts } from '@/hooks/queries/useAccounts'
 import { useCategories } from '@/hooks/queries/useCategories'
 import useDateView from '@/hooks/facets/useDateView'
+import { Figure } from '@/schema/models/Figure'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -282,7 +283,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									? getCategoriesQuery.data[categoryId]
 									: undefined
 
-								const netAmount = calculateNetAmount(entry)
+								const netFigure: Figure | undefined = calculateNetFigures(entry)['CAD']
 
 								const hasTags = journalEntryHasTasks(entry)
 								const childHasTags = (entry as JournalEntry).children?.some((child) => journalEntryHasTasks((child as JournalEntry)))
@@ -380,8 +381,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											</Stack>
 										</TableCell>
 										<TableCell align="right" sx={{ width: '10%' }}>
-											<Typography sx={{ ...getPriceStyle(netAmount, isApproximate) }}>
-												{getPriceString(netAmount, { isApproximate })}
+											<Typography sx={{ ...getPriceStyle(netFigure?.amount ?? 0, isApproximate) }}>
+												{getFigureString(netFigure, { isApproximate })}
 											</Typography>
 										</TableCell>
 										<TableCell>

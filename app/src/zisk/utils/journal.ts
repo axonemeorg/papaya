@@ -11,6 +11,8 @@ import { Category } from '@/schema/documents/Category'
 import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
 import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { DateView } from '@/schema/support/search/facet'
+import { Figure } from '@/schema/models/Figure'
+import { Currency } from '@/schema/support/currency'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -34,20 +36,30 @@ export const simplifyJournalEntry = (entry: JournalEntry): JournalEntry => {
 	}
 }
 
-export const parseJournalEntryAmount = (amount: string): number | undefined => {
+export const parseJournalEntryAmount = (amount: string | undefined): Figure | undefined => {
+	if (!amount) {
+		return undefined
+	}
 	const sanitizedAmount = String(amount).replace(/[^0-9.-]/g, '');
-	if (!amount || !sanitizedAmount) {
+	if (!sanitizedAmount) {
 		return undefined;
 	}
 
 	const parsedAmount = parseFloat(sanitizedAmount)
 	if (isNaN(parsedAmount)) {
-		return parsedAmount
-	} else if (amount.startsWith('+')) {
-		return parsedAmount
-	} else {
-		return -parsedAmount
+		return undefined
 	}
+
+	const parsedNetAmount = amount.startsWith('+')
+		? parsedAmount
+		: -parsedAmount
+
+	return {
+		kind: 'zisk:figure',
+		amount: parsedNetAmount,
+		currency: 'CAD',
+	}
+
 }
 
 export const serializeJournalEntryAmount = (amount: number): string => {
@@ -55,27 +67,32 @@ export const serializeJournalEntryAmount = (amount: number): string => {
 	return `${leadingSign}${amount.toFixed(2)}`
 }
 
-export const calculateNetAmount = (_entry: JournalEntry): number => {
+/**
+ * Enumerates all Figures into a single Figure that represents the
+ * total sum, grouped by currency
+ */
+export const calculateNetFigures = (entry: JournalEntry): Partial<Record<Currency, Figure>> => {
+	const children = (entry as JournalEntry).children ?? []
+	const figures: Figure[] = [
+		entry.$derived?.figure,
+		...children.map((child) => child.$derived?.figure),
+	].filter((figure): figure is Figure => Boolean(figure))
 
-	return 0;
-
-	// TODO fix after ZK-132
-
-	// const children = (entry as JournalEntry).children ?? []
-	// const netAmount: number = children.reduce(
-	// 	(acc: number, child) => {
-	// 		return acc + (parseJournalEntryAmount(child.amount) ?? 0)
-	// 	},
-	// 	parseJournalEntryAmount(entry.amount) ?? 0
-	// )
-
-	// return netAmount
+	return figures.reduce((acc: Partial<Record<Currency, Figure>>, figure: Figure) => {
+		if (figure.currency in acc) {
+			(acc[figure.currency] as Figure).amount += figure.amount
+		} else {
+			acc[figure.currency] = {
+				...figure,
+				convertedFrom: undefined,
+			}
+		}
+		return acc
+	}, {});
 }
 
 export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalId: string): JournalEntry => {
 	const now = new Date().toISOString()
-
-	// TODO fix after ZK-132
 
 	const entry: JournalEntry = {
 		_id: formData._id ?? generateJournalEntryId(),
@@ -93,28 +110,20 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
 	return entry
 }
 
-// export const makeTentativeJournalEntry = (
-// 	formData: Partial<TentativeJournalEntry>,
-// 	journalId: string,
-// 	date: string,
-// 	recurrenceOf: string
-// ): TentativeJournalEntry => {
-// 	const now = new Date().toISOString()
-
-// 	const entry: TentativeJournalEntry = {
-// 		_id: formData._id ?? generateJournalEntryId(),
-// 		kind: 'TENTATIVE_JOURNAL_ENTRY_RECURRENCE',
-// 		createdAt: now,
-// 		date,
-// 		amount: formData.amount || '',
-// 		memo: formData.memo || '',
-// 		recurrenceOf,
-// 		journalId,
-// 	}
-
-// 	return entry
-// }
-
+export const cementJournalEntry = (formData: JournalEntry): JournalEntry => {
+	return {
+		...formData,
+		$derived: {
+			figure: parseJournalEntryAmount(formData.$ephemeral?.amount)
+		},
+		children: formData.children.map((child) => ({
+			...child,
+			$derived: {
+				figure: parseJournalEntryAmount(child.$ephemeral?.amount)
+			}
+		}))
+	}
+}
 
 export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: string): EntryArtifact => {
 	const now = new Date().toISOString()

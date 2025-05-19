@@ -3,7 +3,7 @@ import { z } from 'zod'
 class NaturalMixin {
     public static $ephemeral<E extends z.ZodRawShape>($ephemeral: E) {
         return {
-            $ephemeral: z.object($ephemeral),
+            $ephemeral: z.object($ephemeral).optional(),
         }
     }
 

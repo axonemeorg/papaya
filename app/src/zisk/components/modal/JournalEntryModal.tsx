@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useBeginEditingJournalEntry, useCloseEntryEditModal, useEntryEditModalInitialValues, useEntryEditModalOpen, useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
 import { useCategories } from '@/hooks/queries/useCategories'
 import { useUpdateJournalEntry } from '@/hooks/queries/useFilteredJournalEntries'
+import { getFigureString } from '@/utils/string'
 
 export default function JournalEntryModal() {
 	const { snackbar } = useContext(NotificationsContext)
@@ -39,13 +40,44 @@ export default function JournalEntryModal() {
 	})
 
 	useEffect(() => {
-		if (entryEditModalOpen) {
-			journalEntryForm.reset(
-				entryEditModalInitialValues?._id
-					? entryEditModalInitialValues
-					: makeJournalEntry(entryEditModalInitialValues ?? {} as Partial<JournalEntry>, activeJournalId!)
+		if (!entryEditModalOpen) {
+			return
+		}
+		const formValues = entryEditModalInitialValues?._id
+			? entryEditModalInitialValues
+			: makeJournalEntry(entryEditModalInitialValues ?? {} as Partial<JournalEntry>, activeJournalId!)
+		
+		if (!formValues.$ephemeral) {
+			formValues.$ephemeral = {
+				amount: '',
+			}
+		}
+		if (formValues.$derived?.figure) {
+			formValues.$ephemeral.amount = getFigureString(
+				formValues.$derived.figure,
+				{ sign: 'whenPositive', symbol: 'none' }
 			)
 		}
+
+		if (formValues.children) {
+			formValues.children.forEach((child, index) => {
+				if (!child.$ephemeral) {
+					formValues.children![index].$ephemeral = {
+						amount: '',
+					}
+				}
+				if (child.$derived?.figure) {
+					formValues.children![index]!.$ephemeral!.amount = getFigureString(
+						child.$derived.figure,
+						{ sign: 'whenPositive', symbol: 'none' }
+					)
+				}
+			})
+		}
+
+		journalEntryForm.reset(
+			formValues
+		)
 	}, [entryEditModalOpen])
 	
 	const handleSaveFormWithCurrentValues = useCallback(async () => {

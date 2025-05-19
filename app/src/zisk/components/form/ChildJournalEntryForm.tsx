@@ -27,10 +27,10 @@ export default function ChildJournalEntryForm() {
     })
 
     const handleAddChildEntry = useCallback(() => {
-        if (!journalContext.journal) {
+        if (!journalContext.activeJournalId) {
             return
         }
-        const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
+        const newEntry: JournalEntry = makeJournalEntry({}, journalContext.activeJournalId)
         childEntriesFieldArray.prepend(newEntry)
     }, [children])
 

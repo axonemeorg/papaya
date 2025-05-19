@@ -4,8 +4,8 @@ import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
-import { calculateNetAmount } from '@/utils/journal'
-import { CreateJournalEntry, JournalEntry } from '@/schema/documents/JournalEntry'
+import { cementJournalEntry } from '@/utils/journal'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { Category, CreateCategory } from '@/schema/documents/Category'
 import { Account, CreateAccount } from '@/schema/documents/Account'
 import { DocumentObject } from '@/schema/support/orm/Document'
@@ -21,9 +21,11 @@ export const createJournalEntry = async (formData: JournalEntry, journalId: stri
 	const now = new Date().toISOString()
 
 	const newJournalEntry: JournalEntry = {
-		...formData,
-		journalId,
-		kind: 'zisk:entry',
+		...cementJournalEntry({
+			...formData,
+			journalId,
+			kind: 'zisk:entry',
+		}),
 		createdAt: now,
 	}
 
@@ -35,9 +37,11 @@ export const updateJournalEntry = async <T extends JournalEntry>(formData: T) =>
 	const now = new Date().toISOString()
 
 	const updated = {
-		...formData,
+		...cementJournalEntry(formData),
 		updatedAt: now,
 	}
+
+	delete (updated as any).$ephemeral
 
 	await db.put(updated)
 	return updated

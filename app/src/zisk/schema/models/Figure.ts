@@ -9,14 +9,14 @@ const [CreateBaseFigure, BaseFigure] = Model.fromSchema({
 })
 
 export const CreateFigure = CreateBaseFigure.extend({
-    get empiracle() {
+    get convertedFrom() {
         return CreateBaseFigure.optional();
     }
 })
 export type CreateFigure = z.output<typeof CreateFigure>;
 
 export const Figure = BaseFigure.extend({
-    get empiracle() {
+    get convertedFrom() {
         return BaseFigure.optional()
     }
 })

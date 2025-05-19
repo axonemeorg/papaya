@@ -1,10 +1,9 @@
 import { getAbsoluteDateRangeFromDateView } from "./date"
 import dayjs from "dayjs"
-import { calculateNetAmount, parseJournalEntryAmount } from "./journal"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 import { Category } from "@/schema/documents/Category"
 import { Analytics, BasicAnalytics } from "@/schema/support/analytics"
-import { DateView } from "@/schema/support/slice"
+import { DateView } from "@/schema/support/search/facet"
 
 const EMPTY_CATEGORY_ID_SYMBOL = 'EMPTY_CATEGORY_ID_SYMBOL' as const
 
