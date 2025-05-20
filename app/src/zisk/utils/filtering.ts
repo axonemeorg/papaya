@@ -1,43 +1,58 @@
 import { AmountRange, SearchFacetKey, SearchFacets } from "@/schema/support/search/facet";
 import { parseJournalEntryAmount } from "./journal";
 import { JournalEntry } from "@/schema/documents/JournalEntry";
-import { FacetedSearchDownstreamFilters } from "@/schema/support/search/filter";
+import { DownstreamQueryFilter, FacetedSearchDownstreamFilters } from "@/schema/support/search/filter";
 
-export const enumerateFilters = (searchFacets: Partial<SearchFacets>): Set<SearchFacetKey> => {
+export type FilterPair<K extends SearchFacetKey> = [K, SearchFacets[K]];
+
+export function enumerateFilters(searchFacets: Partial<SearchFacets>): Set<SearchFacetKey>;
+export function enumerateFilters(searchFacets: Partial<SearchFacets>, returnPairs: true): Array<FilterPair<SearchFacetKey>>;
+export function enumerateFilters(searchFacets: Partial<SearchFacets>, returnPairs?: boolean): Set<SearchFacetKey> | Array<FilterPair<SearchFacetKey>> {
     const {
         AMOUNT,
         CATEGORIES,
-    } = searchFacets
-    const slots: Set<SearchFacetKey> = new Set<SearchFacetKey>([])
-    if (CATEGORIES && CATEGORIES.categoryIds.length > 0) {
-        slots.add(SearchFacetKey.CATEGORIES)
-    }
-    if (AMOUNT) {
-        if (parseJournalEntryAmount(AMOUNT?.gt ?? '') !== undefined || parseJournalEntryAmount(AMOUNT?.lt ?? '') !== undefined) {
-            slots.add(SearchFacetKey.AMOUNT)
-        }
-    }
-
-    return slots
-}
-
-export const enumerateFilterPairs = (searchFacets: Partial<SearchFacets>): Array<[SearchFacetKey, any]> => {
-    const {
-        AMOUNT,
-        CATEGORIES,
-    } = searchFacets
-    const result: Array<[SearchFacetKey, any]> = []
+        TAGS,
+        ATTACHMENTS,
+    } = searchFacets;
     
+    const slots: Set<SearchFacetKey> = new Set<SearchFacetKey>([]);
+    const pairs: Array<FilterPair<SearchFacetKey>> = [];
+    
+    // CATEGORIES facet
     if (CATEGORIES && CATEGORIES.categoryIds.length > 0) {
-        result.push([SearchFacetKey.CATEGORIES, CATEGORIES])
-    }
-    if (AMOUNT) {
-        if (parseJournalEntryAmount(AMOUNT?.gt ?? '') !== undefined || parseJournalEntryAmount(AMOUNT?.lt ?? '') !== undefined) {
-            result.push([SearchFacetKey.AMOUNT, AMOUNT])
+        slots.add(SearchFacetKey.CATEGORIES);
+        if (returnPairs) {
+            pairs.push([SearchFacetKey.CATEGORIES, CATEGORIES]);
         }
     }
-
-    return result
+    
+    // AMOUNT facet
+    if (AMOUNT) {
+        if (parseJournalEntryAmount(AMOUNT?.gt ?? '') !== undefined || parseJournalEntryAmount(AMOUNT?.lt ?? '') !== undefined) {
+            slots.add(SearchFacetKey.AMOUNT);
+            if (returnPairs) {
+                pairs.push([SearchFacetKey.AMOUNT, AMOUNT]);
+            }
+        }
+    }
+    
+    // TAGS facet
+    if (TAGS && TAGS.tagIds.length > 0) {
+        slots.add(SearchFacetKey.TAGS);
+        if (returnPairs) {
+            pairs.push([SearchFacetKey.TAGS, TAGS]);
+        }
+    }
+    
+    // ATTACHMENTS facet
+    if (ATTACHMENTS && ATTACHMENTS.hasAttachments) {
+        slots.add(SearchFacetKey.ATTACHMENTS);
+        if (returnPairs) {
+            pairs.push([SearchFacetKey.ATTACHMENTS, ATTACHMENTS]);
+        }
+    }
+    
+    return returnPairs ? pairs : slots;
 }
 
 export const transformAmountRange = (amountRange: AmountRange): { greaterThan: number | undefined, lessThan: number | undefined } => {
@@ -81,18 +96,20 @@ export const getJournalEntriesByDownstreamFilters = async (
     downstreamFilters: Partial<SearchFacets>
 ): Promise<JournalEntry[]> => {
     return Promise.resolve(
-        Object.entries(FacetedSearchDownstreamFilters)
-            .reduce((acc: JournalEntry[], [key, downstreamQueryFilter]) => {
+        (Object.entries(FacetedSearchDownstreamFilters) as Array<[keyof SearchFacets, DownstreamQueryFilter<any>]>)
+            .reduce((acc: JournalEntry[], [facetKey, downstreamQueryFilter]) => {
                 if (!downstreamQueryFilter) {
-                    return acc
+                    return acc;
                 }
-                const facetKey = key as keyof SearchFacets;
+                
                 const filterValue = downstreamFilters[facetKey];
                 if (filterValue === undefined) {
                     return acc;
                 }
-                const result = downstreamQueryFilter(filterValue as any, acc)
-                return result ?? acc
+
+                type FilterType = Parameters<NonNullable<typeof downstreamQueryFilter>>[0];
+                const result = downstreamQueryFilter(filterValue as FilterType, acc);
+                return result ?? acc;
             }, journalEntries)
-        )
+        );
 }

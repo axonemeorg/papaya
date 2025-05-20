@@ -5,7 +5,7 @@ import { getJournalEntriesByUpstreamFilters } from "@/database/queries"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 import { SearchFacets } from "@/schema/support/search/facet"
 import { FacetedSearchUpstreamFilters } from "@/schema/support/search/filter"
-import { enumerateFilterPairs, getJournalEntriesByDownstreamFilters } from "@/utils/filtering"
+import { enumerateFilters, getJournalEntriesByDownstreamFilters } from "@/utils/filtering"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useContext } from "react"
 
@@ -23,8 +23,8 @@ export const useFilteredJournalEntries = () => {
 		queryFn: async () => {
 
       const downstreamFacets = Object.fromEntries(
-        enumerateFilterPairs(activeJournalMemoryFilters as Partial<SearchFacets>)
-          .filter(([key]) => !FacetedSearchUpstreamFilters[key as keyof SearchFacets])
+        enumerateFilters(activeJournalMemoryFilters as Partial<SearchFacets>, true)
+          .filter(([key]) => !FacetedSearchUpstreamFilters[key])
         ) as Partial<SearchFacets>
       console.log('downstreamFacets:', downstreamFacets)
 

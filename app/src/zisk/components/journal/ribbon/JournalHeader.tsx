@@ -9,13 +9,20 @@ import { Add, FilterAltOff } from '@mui/icons-material'
 import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import { SearchFacetKey } from '@/schema/support/search/facet'
+import { enumerateFilters } from '@/utils/filtering'
 
 export default function JournalHeader() {
 	const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)
 	const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
 	const journalFilterContext = useContext(JournalFilterContext)
-	const numFilters = Object.keys(journalFilterContext?.activeJournalFilters ?? {}).length
+
+	const activeFilterSlots: Set<SearchFacetKey> = journalFilterContext?.activeJournalFilters
+		? enumerateFilters(journalFilterContext.activeJournalFilters)
+		: new Set()
+	
+	const numFilters = activeFilterSlots.size
 
 	const hideFilterButton = false
 
