@@ -10,6 +10,9 @@ import { EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { SearchFacets } from '@/schema/support/search/facet'
 import { FacetedSearchUpstreamFilters } from '@/schema/support/search/filter'
 
+// Type declaration for deprecated function
+type JournalSlice = any;
+
 const db = getDatabaseClient()
 
 export const ARBITRARY_MAX_FIND_LIMIT = 10000 as const;
@@ -113,14 +116,19 @@ export const getJournalEntriesByUpstreamFilters = async (
 
 	Object.entries(facets)
 		.filter(([, props]) => Boolean(props))
-		.map(([key, props]) => {
-			const clauses = FacetedSearchUpstreamFilters[key as SearchFacetKey](props)
+		.forEach(([key, props]) => {
+			const facetKey = key as keyof SearchFacets;
+			const filter = FacetedSearchUpstreamFilters[facetKey];
+			if (!filter) {
+				return;
+			}
+			const clauses = filter(props as any);
 			if (!clauses) {
-				return
+				return;
 			}
 
-			clauses.forEach((clause: any) => selectorClauses.push(clause))
-		})
+			clauses.forEach((clause: any) => selectorClauses.push(clause));
+		});
 
 		const selector = {
 			'$and': selectorClauses,

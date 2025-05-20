@@ -3,11 +3,11 @@ import { parseJournalEntryAmount } from "./journal";
 import { JournalEntry } from "@/schema/documents/JournalEntry";
 import { FacetedSearchDownstreamFilters } from "@/schema/support/search/filter";
 
-export const enumerateFilters = (seachFacets: Partial<SearchFacets>): Set<SearchFacetKey> => {
+export const enumerateFilters = (searchFacets: Partial<SearchFacets>): Set<SearchFacetKey> => {
     const {
         AMOUNT,
         CATEGORIES,
-    } = seachFacets
+    } = searchFacets
     const slots: Set<SearchFacetKey> = new Set<SearchFacetKey>([])
     if (CATEGORIES && CATEGORIES.categoryIds.length > 0) {
         slots.add(SearchFacetKey.CATEGORIES)
@@ -19,6 +19,25 @@ export const enumerateFilters = (seachFacets: Partial<SearchFacets>): Set<Search
     }
 
     return slots
+}
+
+export const enumerateFilterPairs = (searchFacets: Partial<SearchFacets>): Array<[SearchFacetKey, any]> => {
+    const {
+        AMOUNT,
+        CATEGORIES,
+    } = searchFacets
+    const result: Array<[SearchFacetKey, any]> = []
+    
+    if (CATEGORIES && CATEGORIES.categoryIds.length > 0) {
+        result.push([SearchFacetKey.CATEGORIES, CATEGORIES])
+    }
+    if (AMOUNT) {
+        if (parseJournalEntryAmount(AMOUNT?.gt ?? '') !== undefined || parseJournalEntryAmount(AMOUNT?.lt ?? '') !== undefined) {
+            result.push([SearchFacetKey.AMOUNT, AMOUNT])
+        }
+    }
+
+    return result
 }
 
 export const transformAmountRange = (amountRange: AmountRange): { greaterThan: number | undefined, lessThan: number | undefined } => {
@@ -57,7 +76,7 @@ export const transformAmountRange = (amountRange: AmountRange): { greaterThan: n
     }
 }
 
-export const getJournaEntriesByDownstreamFilters = async (
+export const getJournalEntriesByDownstreamFilters = async (
     journalEntries: JournalEntry[],
     downstreamFilters: Partial<SearchFacets>
 ): Promise<JournalEntry[]> => {
@@ -67,7 +86,12 @@ export const getJournaEntriesByDownstreamFilters = async (
                 if (!downstreamQueryFilter) {
                     return acc
                 }
-                const result = downstreamQueryFilter(downstreamFilters[key], acc)
+                const facetKey = key as keyof SearchFacets;
+                const filterValue = downstreamFilters[facetKey];
+                if (filterValue === undefined) {
+                    return acc;
+                }
+                const result = downstreamQueryFilter(filterValue as any, acc)
                 return result ?? acc
             }, journalEntries)
         )

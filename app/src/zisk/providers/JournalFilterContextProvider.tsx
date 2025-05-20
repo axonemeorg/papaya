@@ -11,10 +11,12 @@ export default function JournalFilterContextProvider(props: JournalFilterContext
     const [memoryFilters, setMemoryFilters] = useState<Partial<MemoryFilters>>({})
 
     const activeJournalFilters: Partial<SearchFacets> = useMemo(() => {
-        return {
+        const next = {
             ...props.routerFilters,
             ...memoryFilters,
         }
+        console.log('next activeJournalFilters:', next)
+        return next
     }, [props.routerFilters, memoryFilters])
 
     const contextValue: JournalFilterContext = {

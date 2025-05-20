@@ -5,7 +5,7 @@ import { getJournalEntriesByUpstreamFilters } from "@/database/queries"
 import { JournalEntry } from "@/schema/documents/JournalEntry"
 import { SearchFacets } from "@/schema/support/search/facet"
 import { FacetedSearchUpstreamFilters } from "@/schema/support/search/filter"
-import { enumerateFilters, getJournaEntriesByDownstreamFilters } from "@/utils/filtering"
+import { enumerateFilterPairs, getJournalEntriesByDownstreamFilters } from "@/utils/filtering"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useContext } from "react"
 
@@ -23,10 +23,9 @@ export const useFilteredJournalEntries = () => {
 		queryFn: async () => {
 
       const downstreamFacets = Object.fromEntries(
-        Array.from(enumerateFilters(activeJournalMemoryFilters))
-          .filter(([key]) => !FacetedSearchUpstreamFilters[key])
-          .map((key) => [key, activeJournalMemoryFilters[key]])
-        )
+        enumerateFilterPairs(activeJournalMemoryFilters as Partial<SearchFacets>)
+          .filter(([key]) => !FacetedSearchUpstreamFilters[key as keyof SearchFacets])
+        ) as Partial<SearchFacets>
       console.log('downstreamFacets:', downstreamFacets)
 
 			const entries: JournalEntry[] = await getJournalEntriesByUpstreamFilters(
@@ -35,9 +34,9 @@ export const useFilteredJournalEntries = () => {
       )
 
       console.log('before:', entries)
-      const filteredEntries = await getJournaEntriesByDownstreamFilters(entries, downstreamFacets)
+      const filteredEntries = await getJournalEntriesByDownstreamFilters(entries, downstreamFacets)
       console.log('after:', filteredEntries)
-      return Object.fromEntries(filteredEntries.map((entry) => [entry._id, entry]));
+      return Object.fromEntries(filteredEntries.map((entry: JournalEntry) => [entry._id, entry]));
 		},
 		initialData: {},
 		enabled: Boolean(journalContext.activeJournalId),

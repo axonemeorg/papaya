@@ -74,7 +74,12 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
 
   'ATTACHMENTS': null,
 
-  'CATEGORIES': null,
+  'CATEGORIES': (filter, entries) => {
+    const categoryIds = new Set(filter.categoryIds)
+    return entries.filter((entry) => {
+        return entry.categoryId && categoryIds.has(entry.categoryId)
+    })
+  },
 
   'DATE': (filter, entries) => {
     const { startDate, endDate } = getAbsoluteDateRangeFromDateView(filter)
@@ -85,7 +90,7 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
 
     return entries.filter((entry) => {
         const date = dayjs(entry.date)
-        !date.isBefore(startDate) && !date.isAfter(endDate)
+        return !date.isBefore(startDate) && !date.isAfter(endDate)
     })
   },
 
