@@ -4,9 +4,9 @@ import { getAbsoluteDateRangeFromDateView } from "@/utils/date";
 import { transformAmountRange } from "@/utils/filtering";
 import dayjs from "dayjs";
 
-export type DownstreamQueryFilter<T = unknown> = (filter: T, entries: JournalEntry[]) => null | JournalEntry[]
+export type DownstreamQueryFilter<T = unknown> = null | ((filter: T, entries: JournalEntry[]) => null | JournalEntry[])
 
-export type UpstreamQueryFilter<T = unknown> = (filter: T) => null | Record<string, unknown>[]
+export type UpstreamQueryFilter<T = unknown> = null | ((filter: T) => null | Record<string, unknown>[])
 
 export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: UpstreamQueryFilter<SearchFacets[K]> } = {
   AMOUNT: (filter: AmountRange) => {
@@ -27,9 +27,9 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
       ]
   },
 
-  'ATTACHMENTS': () => null,
+  'ATTACHMENTS': null,
 
-  'CATEGORIES': () => null,
+  'CATEGORIES': null,
 
   'DATE': (filter: DateView) => {
     const { startDate, endDate } = getAbsoluteDateRangeFromDateView(filter)
@@ -48,7 +48,7 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
     ]
   },
 
-  'TAGS': () => null,
+  'TAGS': null,
 }
 
 export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: DownstreamQueryFilter<SearchFacets[K]> } = {
@@ -72,9 +72,9 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
     })
   },
 
-  'ATTACHMENTS': () => null,
+  'ATTACHMENTS': null,
 
-  'CATEGORIES': () => null,
+  'CATEGORIES': null,
 
   'DATE': (filter, entries) => {
     const { startDate, endDate } = getAbsoluteDateRangeFromDateView(filter)
@@ -89,5 +89,5 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
     })
   },
 
-  'TAGS': () => null,
+  'TAGS': null,
 }

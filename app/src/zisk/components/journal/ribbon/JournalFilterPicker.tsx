@@ -77,13 +77,27 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
         setActiveSlot(slot)
     }
 
+    const handleRemoveSlot = (slot: SearchFacetKey | null) => {
+        if (!slot) {
+            return
+        } else if (slot === SearchFacetKey.DATE) {
+            // DATE filter slot should always be present.
+            console.warn('Attempted to remove DATE search facet.')
+            return
+        }
+        journalFilterContext?.updateJournalMemoryFilters((prev) => {
+            const next = { ...prev }
+            delete next[slot];
+            return next
+        })
+    }
+
     const handleRemoveActiveSlotFilters = () => {
         if (!activeSlot) {
             return
         }
-        throw new Error("Not implemented")
-        // journalSliceContext.removeFilterBySlot(activeSlot)
         setActiveSlot(null)
+        handleRemoveSlot(activeSlot)
     }
 
     useEffect(() => {

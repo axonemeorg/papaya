@@ -9,7 +9,7 @@ export type MemoryFilters = z.infer<typeof SearchFacetGroups.memory>
 export interface JournalFilterContext {
     activeJournalFilters: Partial<SearchFacets>;
     activeJournalMemoryFilters: Partial<MemoryFilters>
-    updateJournalMemoryFilters: (filters: Partial<MemoryFilters>) => void,
+    updateJournalMemoryFilters: (predicate: (prev: Partial<MemoryFilters>) => Partial<MemoryFilters>) => void
 }
 
 export const JournalFilterContext = createContext<JournalFilterContext | null>(null)

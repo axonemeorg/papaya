@@ -105,13 +105,11 @@ export const getJournalEntries = async (
 export const getJournalEntriesByUpstreamFilters = async (
 	journalId: string,
 	facets: Partial<SearchFacets>,
-): Promise<Record<string, JournalEntry>> => {
+): Promise<JournalEntry[]> => {
 	const selectorClauses: any[] = [
 		{ kind: 'zisk:entry' },
 		{ journalId },
 	]
-
-	console.log('getJournalEntriesByUpstreamFilters()')
 
 	Object.entries(facets)
 		.filter(([, props]) => Boolean(props))
@@ -121,25 +119,23 @@ export const getJournalEntriesByUpstreamFilters = async (
 				return
 			}
 
-			clauses.forEach((clause) => selectorClauses.push(clause))
+			clauses.forEach((clause: any) => selectorClauses.push(clause))
 		})
 
 		const selector = {
 			'$and': selectorClauses,
 		}
 
-		console.log('selector:', selector)
+		console.log('final selector:', selector)
 
 		const result = await db.find({
 			selector,
 			limit: ARBITRARY_MAX_FIND_LIMIT,
 		})
 
-		const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
+		// const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
 
-		console.log('RESULT:', entries)
-
-		return entries
+		return result.docs as JournalEntry[]
 }
 
 export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {

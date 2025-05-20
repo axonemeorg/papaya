@@ -1,7 +1,9 @@
 import { AmountRange, SearchFacetKey, SearchFacets } from "@/schema/support/search/facet";
 import { parseJournalEntryAmount } from "./journal";
+import { JournalEntry } from "@/schema/documents/JournalEntry";
+import { FacetedSearchDownstreamFilters } from "@/schema/support/search/filter";
 
-export const enumerateFilters = (seachFacets: SearchFacets): Set<SearchFacetKey> => {
+export const enumerateFilters = (seachFacets: Partial<SearchFacets>): Set<SearchFacetKey> => {
     const {
         AMOUNT,
         CATEGORIES,
@@ -20,8 +22,8 @@ export const enumerateFilters = (seachFacets: SearchFacets): Set<SearchFacetKey>
 }
 
 export const transformAmountRange = (amountRange: AmountRange): { greaterThan: number | undefined, lessThan: number | undefined } => {
-    const lt = parseJournalEntryAmount(amountRange.lt ?? '')
-    const gt = parseJournalEntryAmount(amountRange.gt ?? '')
+    const lt: number | undefined = parseJournalEntryAmount(amountRange.lt ?? '')?.amount
+    const gt: number | undefined = parseJournalEntryAmount(amountRange.gt ?? '')?.amount
 
     const greaterThan: number[] = []
     const lessThan: number[] = []
@@ -53,4 +55,20 @@ export const transformAmountRange = (amountRange: AmountRange): { greaterThan: n
         greaterThan: greaterThan.length > 0 ? Math.max(...greaterThan) : undefined,
         lessThan: lessThan.length > 0 ? Math.min(...lessThan) : undefined,
     }
+}
+
+export const getJournaEntriesByDownstreamFilters = async (
+    journalEntries: JournalEntry[],
+    downstreamFilters: Partial<SearchFacets>
+): Promise<JournalEntry[]> => {
+    return Promise.resolve(
+        Object.entries(FacetedSearchDownstreamFilters)
+            .reduce((acc: JournalEntry[], [key, downstreamQueryFilter]) => {
+                if (!downstreamQueryFilter) {
+                    return acc
+                }
+                const result = downstreamQueryFilter(downstreamFilters[key], acc)
+                return result ?? acc
+            }, journalEntries)
+        )
 }
