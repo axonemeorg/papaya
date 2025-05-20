@@ -17,7 +17,7 @@ import {
 	Grow,
 	Checkbox,
 } from '@mui/material'
-import { useContext, useMemo } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
@@ -43,6 +43,7 @@ import { useAccounts } from '@/hooks/queries/useAccounts'
 import { useCategories } from '@/hooks/queries/useCategories'
 import useDateView from '@/hooks/facets/useDateView'
 import { Figure } from '@/schema/models/Figure'
+import { useJournalEntrySelectionState, useSetJournalEntrySelectionState, useToggleJournalEntrySelectionState } from '@/store/app/useJournalEntrySelectionState'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -218,6 +219,14 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 
 	const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
 
+	const journalEntrySelectionState = useJournalEntrySelectionState()
+	const toggleJournalEntrySelectionState = useToggleJournalEntrySelectionState()
+	const setJournalEntrySelectionState = useSetJournalEntrySelectionState()
+
+	useEffect(() => {
+		setJournalEntrySelectionState({})
+	}, [props.journalRecordGroups])
+
 	const { dateView } = useDateView()
 	const getPriceStyle = useGetPriceStyle()
 
@@ -308,13 +317,14 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									: `${numCompletedTasks}/${tasks.length}`
 								const taskProgressPercentage = Math.round(100 * (numCompletedTasks / Math.max(tasks.length, 1)))
 
+								const rowIsSelected: boolean = journalEntrySelectionState[entry._id] ?? false
 								return (
 									<TableRow
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-										// selected={journalSliceContext.selectedRows[entry._id]}
-										sx={{ opacity: undefined }}
+										selected={rowIsSelected}
+										sx={{ opacity: undefined, overflow: 'visible' }}
 									>
 										<TableCell
 											selectCheckbox
@@ -326,8 +336,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											<Checkbox
 												className='checkbox'
 												sx={{ m: -1 }}
-												// checked={journalSliceContext.selectedRows[entry._id] || false}
-												// onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
+												checked={rowIsSelected}
+												onChange={() => toggleJournalEntrySelectionState(entry._id)}
 												onClick={(event) => event.stopPropagation()}
 											/>
 											<AvatarIcon
