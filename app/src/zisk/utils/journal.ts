@@ -12,7 +12,7 @@ import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
 import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { DateView } from '@/schema/support/search/facet'
 import { Figure } from '@/schema/models/Figure'
-import { Currency, FigureEnumeration } from '@/schema/support/currency'
+import { FigureEnumeration } from '@/schema/support/figure'
 
 /**
  * Strips optional fields from a JournalEntry object

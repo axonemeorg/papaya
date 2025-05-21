@@ -292,7 +292,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									? getCategoriesQuery.data[categoryId]
 									: undefined
 
-								const netFigure: Figure | undefined = calculateNetFigures(entry)['CAD']
+								const netFigure: Figure | undefined = entry.$derived?.net?.['CAD']
 
 								const hasTags = journalEntryHasTags(entry)
 								const childHasTags = (entry as JournalEntry).children?.some((child) => journalEntryHasTasks((child as JournalEntry)))

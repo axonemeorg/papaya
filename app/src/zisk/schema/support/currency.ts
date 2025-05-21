@@ -6,6 +6,3 @@ export const Currency = z.enum([
     'CAD',
 ])
 export type Currency = z.output<typeof Currency>
-
-export const FigureEnumeration = z.partialRecord(Currency, Figure)
-export type FigureEnumeration = z.output<typeof FigureEnumeration>

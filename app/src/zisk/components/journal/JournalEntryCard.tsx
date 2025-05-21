@@ -65,7 +65,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 
 	const getCategoriesQuery = useCategories()
 
-	const netFigure: Figure | undefined = calculateNetFigures(entry)['CAD']
+	const netFigure: Figure | undefined = entry.$derived?.net?.['CAD']
 	const categoryId: string | undefined = entry?.categoryId
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO

@@ -5,7 +5,7 @@ import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";
 import { StatusVariant } from "../models/EntryStatus";
 import { EntryTask } from "../models/EntryTask";
-import { Currency, FigureEnumeration } from "../support/currency";
+import { FigureEnumeration } from "../support/figure";
 
 // const BaseJournalEntry = 
 
