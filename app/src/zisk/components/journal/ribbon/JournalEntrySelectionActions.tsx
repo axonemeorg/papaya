@@ -1,6 +1,7 @@
 import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { useJournalEntrySelectionState } from '@/store/app/useJournalEntrySelectionState'
+import { Currency } from '@/schema/support/currency'
+import { useJournalEntrySelectionState, useSetJournalEntrySelectionState } from '@/store/app/useJournalEntrySelectionState'
 import {
 	ArrowDropDown,
 	CheckBox,
@@ -32,9 +33,9 @@ export default function JournalEntrySelectionActions() {
 
 	const selectAllMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
-	const selectedRows = useJournalEntrySelectionState((state) => state.selected)
+	const selectedRows = useJournalEntrySelectionState()
 
-	const setSelectedRows = useJournalEntrySelectionState((state) => state.setSelected)
+	const setSelectedRows = useSetJournalEntrySelectionState()
 
 	const getFilterJournalEntriesQuery = useFilteredJournalEntries()
 
@@ -51,11 +52,63 @@ export default function JournalEntrySelectionActions() {
 	const hideSelectedRowsOptions = numSelectedRows <= 0
 
 	const handleSelectAllAction = (action: SelectAllAction) => {
-		throw new Error("Not implemented")
 		setShowSelectAllMenu(false)
-		setSelectedRows(Object.fromEntries(
-			journalEntries.map((entry) => [entry._id, true])
-		))
+		
+		// Calculate net amount for an entry by looking at the first currency in the net figures
+		const calculateNetAmount = (entry: JournalEntry): number => {
+			if (!entry.$derived?.net) return 0
+			
+			// Get the first currency's figure (usually there's only one)
+			const currencies = Object.keys(entry.$derived.net) as Currency[]
+			if (currencies.length === 0) return 0
+			
+			const figure = entry.$derived.net[currencies[0]]
+			return figure ? figure.amount : 0
+		}
+		
+		const newSelectedRows = (() => {
+			let selected: Set<string>
+			const allRowIds = new Set<string>(Object.keys(getFilterJournalEntriesQuery.data ?? {}))
+			const emptySet = new Set<string>([])
+			const hasSelectedAll = Object.keys(selectedRows).length > 0 && 
+				allRowIds.size > 0 && 
+				Array.from(allRowIds).every(id => selectedRows[id])
+
+			switch (action) {
+				case SelectAllAction.ALL:
+					selected = allRowIds
+					break
+
+				case SelectAllAction.NONE:
+					selected = emptySet
+					break
+
+				case SelectAllAction.CREDIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = getFilterJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) > 0 : false
+					}))
+					break
+
+				case SelectAllAction.DEBIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = getFilterJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) < 0 : false
+					}))
+					break
+
+				case SelectAllAction.TOGGLE:
+				default:
+					selected = hasSelectedAll ? emptySet : allRowIds
+			}
+
+			return Object.fromEntries(Array.from(new Set([...Object.keys(selectedRows), ...selected]))
+				.map((key) => {
+					return [key, selected.has(key)]
+				}))
+		})()
+		
+		setSelectedRows(newSelectedRows)
 	}
 
   return (
