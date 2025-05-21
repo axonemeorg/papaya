@@ -84,7 +84,8 @@ export const SearchFacetGroups = {
   }),
   memory: z.object({
     [SearchFacetKey.TAGS]: z.object({
-      tagIds: z.array(z.string())
+      tagIds: z.array(z.string()),
+      statusIds: z.array(z.string()).optional()
     }),
     [SearchFacetKey.CATEGORIES]: z.object({
       categoryIds: z.array(z.string())

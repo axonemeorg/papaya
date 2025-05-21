@@ -37,7 +37,7 @@ export function enumerateFilters(searchFacets: Partial<SearchFacets>, returnPair
     }
     
     // TAGS facet
-    if (TAGS && TAGS.tagIds.length > 0) {
+    if (TAGS && (TAGS.tagIds.length > 0 || (TAGS.statusIds && TAGS.statusIds.length > 0))) {
         slots.add(SearchFacetKey.TAGS);
         if (returnPairs) {
             pairs.push([SearchFacetKey.TAGS, TAGS]);

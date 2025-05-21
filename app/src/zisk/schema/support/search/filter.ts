@@ -50,18 +50,32 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
 
   'TAGS': (filter) => {
     const tagIds = filter.tagIds
+    const statusIds = filter.statusIds || []
+    const allIds = [...tagIds, ...statusIds]
 
-    if (!tagIds || tagIds.length === 0) {
+    if (!allIds.length) {
         return null
     }
 
-    return [
-        {
+    const conditions = []
+
+    if (tagIds.length > 0) {
+        conditions.push({
             tagIds: {
                 $in: tagIds
             }
-        }
-    ]
+        })
+    }
+
+    if (statusIds.length > 0) {
+        conditions.push({
+            statusIds: {
+                $in: statusIds
+            }
+        })
+    }
+
+    return conditions
   },
 }
 
@@ -108,18 +122,38 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
 
   'TAGS': (filter, entries) => {
     const tagIds = new Set(filter.tagIds)
+    const statusIds = new Set(filter.statusIds || [])
     
-    if (!tagIds.size) {
+    if (!tagIds.size && !statusIds.size) {
         return null
     }
     
     return entries.filter((entry) => {
-        if (!entry.tagIds || entry.tagIds.length === 0) {
-            return false
+        // Check for tag matches if we have tag filters
+        if (tagIds.size > 0) {
+            if (!entry.tagIds || entry.tagIds.length === 0) {
+                return false
+            }
+            
+            // Check if any of the entry's tags are in the filter's tagIds
+            const hasMatchingTag = entry.tagIds.some(tagId => tagIds.has(tagId))
+            if (hasMatchingTag) {
+                return true
+            }
         }
         
-        // Check if any of the entry's tags are in the filter's tagIds
-        return entry.tagIds.some(tagId => tagIds.has(tagId))
+        // Check for status matches if we have status filters
+        if (statusIds.size > 0) {
+            if (!entry.statusIds || entry.statusIds.length === 0) {
+                return false
+            }
+            
+            // Check if any of the entry's statuses are in the filter's statusIds
+            return entry.statusIds.some(statusId => statusIds.has(statusId))
+        }
+        
+        // If we have tag filters but no matches, and no status filters matched either
+        return false
     })
   },
 }
