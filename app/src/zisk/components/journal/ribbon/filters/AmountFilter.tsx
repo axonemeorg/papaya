@@ -16,7 +16,7 @@ export default function AmountFilter() {
 
     const amountRange: AmountRange = {
         ...DEFAULT_AMOUNT_RANGE,
-        // ...journalSliceContext.amount // TODO
+        ...journalFilterContext?.activeJournalMemoryFilters?.AMOUNT
     }
 
     return (
@@ -46,11 +46,13 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.gt ?? ''}
                                 onChange={(event) => {
-                                    throw new Error("Not implemented")
-                                    // journalSliceContext.onChangeAmountRange({
-                                    //     ...amountRange,
-                                    //     gt: event.target.value,
-                                    // })
+                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                                        ...prev,
+                                        AMOUNT: {
+                                            ...amountRange,
+                                            gt: event.target.value,
+                                        }
+                                    }))
                                 }}
                                 label={undefined}
                                 variant='standard'
@@ -70,11 +72,13 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.lt ?? ''}
                                 onChange={(event) => {
-                                    throw new Error("Not implemented")
-                                    // journalSliceContext.onChangeAmountRange({
-                                    //     ...amountRange,
-                                    //     lt: event.target.value,
-                                    // })
+                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                                        ...prev,
+                                        AMOUNT: {
+                                            ...amountRange,
+                                            lt: event.target.value,
+                                        }
+                                    }))
                                 }}
                                 label={undefined}
                                 variant='standard'

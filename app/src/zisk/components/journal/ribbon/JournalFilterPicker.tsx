@@ -3,6 +3,8 @@ import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tex
 import { ReactNode, useContext, useEffect, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
 import AmountFilter from "./filters/AmountFilter";
+import TagsFilter from "./filters/TagsFilter";
+import DateFilter from "./filters/DateFilter";
 import { SearchFacetKey } from "@/schema/support/search/facet";
 import { JournalFilterContext } from "@/contexts/JournalFilterContext";
 
@@ -43,16 +45,14 @@ const journalFilterSlots: Record<SearchFacetKey, JournalFilterSlotProperties> = 
         label: 'Date Range',
         icon: <DateRange />,
         title: 'Date',
-        component: <div />
+        component: <DateFilter />
     },
 
     [SearchFacetKey.TAGS]: {
         label: 'Tags',
         icon: <LocalOffer />,
         title: 'Tags include',
-        component: (
-            <div />
-        ),
+        component: <TagsFilter />,
     },
 }
 

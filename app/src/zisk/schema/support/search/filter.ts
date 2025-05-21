@@ -48,7 +48,21 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
     ]
   },
 
-  'TAGS': null,
+  'TAGS': (filter) => {
+    const tagIds = filter.tagIds
+
+    if (!tagIds || tagIds.length === 0) {
+        return null
+    }
+
+    return [
+        {
+            tagIds: {
+                $in: tagIds
+            }
+        }
+    ]
+  },
 }
 
 export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: DownstreamQueryFilter<SearchFacets[K]> } = {
@@ -92,5 +106,20 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
     })
   },
 
-  'TAGS': null,
+  'TAGS': (filter, entries) => {
+    const tagIds = new Set(filter.tagIds)
+    
+    if (!tagIds.size) {
+        return null
+    }
+    
+    return entries.filter((entry) => {
+        if (!entry.tagIds || entry.tagIds.length === 0) {
+            return false
+        }
+        
+        // Check if any of the entry's tags are in the filter's tagIds
+        return entry.tagIds.some(tagId => tagIds.has(tagId))
+    })
+  },
 }
