@@ -15,19 +15,19 @@ export const FacetedSearchUpstreamFilters: { [K in keyof SearchFacets]: Upstream
       return [
           {
               $derived: {
-                  figure: {
+                  net: {
+                    [filter.currency]: {
                       currency: filter.currency,
                       amount: {
                           $gt: greaterThan,
                           $lt: lessThan,
                       }
+                    },
                   },
               }
           },
       ]
   },
-
-  'ATTACHMENTS': null,
 
   'CATEGORIES': null,
 
@@ -60,7 +60,7 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
     }
 
     return entries.filter((entry) => {
-        const amount = entry.$derived?.figure?.amount
+        const amount = entry.$derived?.net?.[filter.currency]?.amount
         if (amount === undefined) {
             return false
         } else if (greaterThan !== undefined && amount <= greaterThan) {
@@ -71,8 +71,6 @@ export const FacetedSearchDownstreamFilters: { [K in keyof SearchFacets]: Downst
         return true
     })
   },
-
-  'ATTACHMENTS': null,
 
   'CATEGORIES': (filter, entries) => {
     const categoryIds = new Set(filter.categoryIds)

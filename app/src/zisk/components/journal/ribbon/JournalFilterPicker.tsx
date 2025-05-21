@@ -23,14 +23,14 @@ const journalFilterSlots: Record<SearchFacetKey, JournalFilterSlotProperties> = 
         ),
     },
     
-    [SearchFacetKey.ATTACHMENTS]: {
-        label: 'Attachments',
-        icon: <Attachment />,
-        title: 'Attachments are',
-        component: (
-            <div />
-        ),
-    },
+    // [SearchFacetKey.ATTACHMENTS]: {
+    //     label: 'Attachments',
+    //     icon: <Attachment />,
+    //     title: 'Attachments are',
+    //     component: (
+    //         <div />
+    //     ),
+    // },
 
     [SearchFacetKey.CATEGORIES]: {
         label: 'Categories',
@@ -55,12 +55,6 @@ const journalFilterSlots: Record<SearchFacetKey, JournalFilterSlotProperties> = 
         ),
     },
 }
-
-const NON_IMPELEMENTED_FILTERS: Set<SearchFacetKey> = new Set([
-    SearchFacetKey.ATTACHMENTS,
-    SearchFacetKey.DATE,
-    SearchFacetKey.TAGS,
-])
 
 interface JournalFilterPickerProps {
     open: boolean
@@ -151,12 +145,10 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
                             sx={{ m: 1, mt: 0 }}
                         />
                         {Object.entries(journalFilterSlots).map(([key, properties]) => {
-                            const disabled = NON_IMPELEMENTED_FILTERS.has(key as SearchFacetKey)
                             return (
                                 <MenuItem
                                     key={key}
-                                    disabled={disabled}
-                                    onClick={disabled ? undefined : () => handleClickSlotButton(key as SearchFacetKey)}
+                                    onClick={() => handleClickSlotButton(key as SearchFacetKey)}
                                     dense
                                 >
                                     <ListItemIcon sx={(theme) => ({ color: theme.palette.text.secondary })}>{properties.icon}</ListItemIcon>

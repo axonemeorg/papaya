@@ -12,7 +12,7 @@ export function enumerateFilters(searchFacets: Partial<SearchFacets>, returnPair
         AMOUNT,
         CATEGORIES,
         TAGS,
-        ATTACHMENTS,
+        // ATTACHMENTS,
     } = searchFacets;
     
     const slots: Set<SearchFacetKey> = new Set<SearchFacetKey>([]);
@@ -44,13 +44,13 @@ export function enumerateFilters(searchFacets: Partial<SearchFacets>, returnPair
         }
     }
     
-    // ATTACHMENTS facet
-    if (ATTACHMENTS && ATTACHMENTS.hasAttachments) {
-        slots.add(SearchFacetKey.ATTACHMENTS);
-        if (returnPairs) {
-            pairs.push([SearchFacetKey.ATTACHMENTS, ATTACHMENTS]);
-        }
-    }
+    // // ATTACHMENTS facet
+    // if (ATTACHMENTS && ATTACHMENTS.hasAttachments) {
+    //     slots.add(SearchFacetKey.ATTACHMENTS);
+    //     if (returnPairs) {
+    //         pairs.push([SearchFacetKey.ATTACHMENTS, ATTACHMENTS]);
+    //     }
+    // }
     
     return returnPairs ? pairs : slots;
 }

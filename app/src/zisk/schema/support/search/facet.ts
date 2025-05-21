@@ -72,7 +72,7 @@ export type AmountRange = z.output<typeof AmountRange>
 
 export enum SearchFacetKey {
   'AMOUNT' = 'AMOUNT',
-  'ATTACHMENTS' = 'ATTACHMENTS',
+  // 'ATTACHMENTS' = 'ATTACHMENTS',
   'CATEGORIES' = 'CATEGORIES',
   'DATE' = 'DATE',
   'TAGS' = 'TAGS',
@@ -90,9 +90,9 @@ export const SearchFacetGroups = {
       categoryIds: z.array(z.string())
     }),
     [SearchFacetKey.AMOUNT]: AmountRange,
-    [SearchFacetKey.ATTACHMENTS]: z.object({
-      hasAttachments: z.boolean()
-    })
+    // [SearchFacetKey.ATTACHMENTS]: z.object({
+    //   hasAttachments: z.boolean()
+    // })
   }) 
 } as const
 
