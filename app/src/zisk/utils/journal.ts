@@ -12,7 +12,7 @@ import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
 import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { DateView } from '@/schema/support/search/facet'
 import { Figure } from '@/schema/models/Figure'
-import { Currency } from '@/schema/support/currency'
+import { Currency, FigureEnumeration } from '@/schema/support/currency'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -71,14 +71,14 @@ export const serializeJournalEntryAmount = (amount: number): string => {
  * Enumerates all Figures into a single Figure that represents the
  * total sum, grouped by currency
  */
-export const calculateNetFigures = (entry: JournalEntry): Partial<Record<Currency, Figure>> => {
+export const calculateNetFigures = (entry: JournalEntry): FigureEnumeration => {
 	const children = (entry as JournalEntry).children ?? []
 	const figures: Figure[] = [
 		entry.$derived?.figure,
 		...children.map((child) => child.$derived?.figure),
 	].filter((figure): figure is Figure => Boolean(figure))
 
-	return figures.reduce((acc: Partial<Record<Currency, Figure>>, figure: Figure) => {
+	return figures.reduce((acc: FigureEnumeration, figure: Figure) => {
 		if (figure.currency in acc) {
 			(acc[figure.currency] as Figure).amount += figure.amount
 		} else {
@@ -111,7 +111,7 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
 }
 
 export const cementJournalEntry = (formData: JournalEntry): JournalEntry => {
-	return {
+	const cementedFormData: JournalEntry = {
 		...formData,
 		$derived: {
 			figure: parseJournalEntryAmount(formData.$ephemeral?.amount)
@@ -123,6 +123,13 @@ export const cementJournalEntry = (formData: JournalEntry): JournalEntry => {
 			}
 		}))
 	}
+
+	const netFigure = calculateNetFigures(cementedFormData)
+	if (!cementedFormData.$derived) {
+		return cementedFormData
+	}
+	cementedFormData.$derived.net = netFigure
+	return cementedFormData
 }
 
 export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: string): EntryArtifact => {

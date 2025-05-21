@@ -5,6 +5,7 @@ import { EntryArtifact } from "./EntryArtifact";
 import { Figure } from "../models/Figure";
 import { StatusVariant } from "../models/EntryStatus";
 import { EntryTask } from "../models/EntryTask";
+import { Currency, FigureEnumeration } from "../support/currency";
 
 // const BaseJournalEntry = 
 
@@ -39,7 +40,19 @@ const [CreateJournalEntry, BaseJournalEntry] = Document.fromSchemas([
 ])
 
 export const JournalEntry = BaseJournalEntry.extend({
-    children: z.array(BaseJournalEntry)
+    children: z.array(BaseJournalEntry),
+
+    ...z.object(
+        Mixin.derived.natural.$derived({
+            figure: Figure.optional(),
+            net: FigureEnumeration.optional(),
+        })).partial().shape,
+
+    // $derived: z.object(BaseJournalEntry.shape.$derived)
+    //     .extend({
+    //         net: Figure.optional(),
+    //     }).partial()
+
 })
 
 export type CreateJournalEntry = z.output<typeof CreateJournalEntry>
