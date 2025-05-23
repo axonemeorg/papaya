@@ -1,11 +1,12 @@
 import { RemoteContext, SyncErrorEnum, SyncStatusEnum } from "@/contexts/RemoteContext";
-import { ZiskSettings } from "@/types/schema";
 import { PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from "react";
 import PouchDB from 'pouchdb'
 import { ZiskContext } from "@/contexts/ZiskContext";
 import { getServerDatabaseUrl } from "@/utils/server";
 import { usernameToDbName } from "@/utils/database";
 import { getDatabaseClient } from "@/database/client";
+import { UserSettings } from "@/schema/models/UserSettings";
+import { useZiskMeta } from "@/hooks/queries/useZiskMeta";
 
 const ZISK_CLOUD_HOST = '' // process.env.NEXT_PUBLIC_ZISK_CLOUD_HOST
 const ENABLE_ZISK_CLOUD = false // process.env.NEXT_PUBLIC_F_ENABLE_ZISK_CLOUD === 'true'
@@ -22,8 +23,9 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
 
     const remoteDb = useRef<PouchDB.Database | null>(null)
 
-    const ziskContext = useContext(ZiskContext)
-    const settings: ZiskSettings | null = ziskContext?.data?.settings ?? null
+    const getZiskMetaQuery = useZiskMeta()
+    
+    const settings: UserSettings | null = getZiskMetaQuery.data?.userSettings ?? null
 
     const sync = async () => {
         if (!remoteDb.current) {
@@ -75,7 +77,7 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
         return true
     }
 
-    const initRemoteConnectionFromConfig = async (settings: ZiskSettings)  => {
+    const initRemoteConnectionFromConfig = async (settings: UserSettings)  => {
         console.log('Initializing remote connection from config')
 
         const { syncingStrategy, server } = settings

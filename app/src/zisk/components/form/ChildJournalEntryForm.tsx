@@ -3,13 +3,13 @@ import AmountField from "../input/AmountField"
 import CategoryAutocomplete from "../input/CategoryAutocomplete"
 import { Add, DeleteOutline, EditNote, LocalOffer, LocalOfferOutlined } from "@mui/icons-material"
 import { useCallback, useContext, useRef, useState } from "react"
-import { JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import SelectionActionModal from "../modal/SelectionActionModal"
 import { JournalContext } from "@/contexts/JournalContext"
-import { makeJournalEntry } from "@/utils/journal"
+import { discriminateEntryTags, makeJournalEntry } from "@/utils/journal"
 import { EntryTagPicker } from "../pickers/EntryTagPicker"
-import { RESERVED_TAGS } from "@/constants/tags"
+import { JournalEntry } from "@/schema/documents/JournalEntry"
+import { StatusVariant } from "@/schema/models/EntryStatus"
 
 export default function ChildJournalEntryForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
@@ -27,10 +27,10 @@ export default function ChildJournalEntryForm() {
     })
 
     const handleAddChildEntry = useCallback(() => {
-        if (!journalContext.journal) {
+        if (!journalContext.activeJournalId) {
             return
         }
-        const newEntry: JournalEntry = makeJournalEntry({}, journalContext.journal._id)
+        const newEntry: JournalEntry = makeJournalEntry({}, journalContext.activeJournalId)
         childEntriesFieldArray.prepend(newEntry)
     }, [children])
 
@@ -86,14 +86,19 @@ export default function ChildJournalEntryForm() {
                     setChildEntryTaggingIndex(-1)
                 }}
                 value={(childEntryTaggingIndex >= 0 && children[childEntryTaggingIndex])
-                    ? children[childEntryTaggingIndex].tagIds
+                    ? [
+                        ...(children[childEntryTaggingIndex].tagIds ?? []),
+                        ...(children[childEntryTaggingIndex].statusIds ?? []),
+                    ]
                     : undefined
                 }
                 onChange={(_event, newValue) => {
                     if (childEntryTaggingIndex < 0) {
                         return
                     }
-                    setValue(`children.${childEntryTaggingIndex}.tagIds`, newValue ?? [], { shouldDirty: true })
+                    const { entryTagIds, statusIds } = discriminateEntryTags(newValue)
+                    setValue(`children.${childEntryTaggingIndex}.statusIds`, statusIds, { shouldDirty: true })
+                    setValue(`children.${childEntryTaggingIndex}.tagIds`,entryTagIds, { shouldDirty: true })
                 }}
             />
 
@@ -109,9 +114,11 @@ export default function ChildJournalEntryForm() {
             <Stack mt={2} mx={-1} gap={2}>
                 {childEntriesFieldArray.fields.map((entry, index) => {
                     const childEntryId: string = watch(`children.${index}._id`)
-                    const childTags = watch(`children.${index}.tagIds`) ?? []
-                    const isTagged = childTags.length > 0
-                    const isApproximate = childTags.some((tagId) => tagId === RESERVED_TAGS.APPROXIMATE._id)
+                    const childStatusIds = watch(`children.${index}.statusIds`) ?? []
+                    const childTagIds = watch(`children.${index}.tagIds`) ?? []
+                    const isTagged = childTagIds.length > 0
+                    const hasStatus = childStatusIds.length > 0
+                    const isApproximate = childStatusIds.some((status) => status === StatusVariant.enum.APPROXIMATE)
                     const hasMemo = journalEntriesWithMemos.includes(entry._id) || Boolean(entry.memo)
                     
                     return (
@@ -120,7 +127,7 @@ export default function ChildJournalEntryForm() {
                             alignItems={'flex-start'}
                             sx={{ width: '100%' }}
                             key={entry._id}
-                            data-journalEntryId={childEntryId}
+                            data-journalentryid={childEntryId}
                         >
                             <Checkbox
                                 checked={selectedRows.includes(entry._id)}
@@ -130,7 +137,7 @@ export default function ChildJournalEntryForm() {
                                 <Grid size={4}>
                                     <Controller
                                         control={control}
-                                        name={`children.${index}.amount`}
+                                        name={`children.${index}.$ephemeral.amount`}
                                         render={({ field }) => (
                                             <AmountField
                                                 {...field}
@@ -143,7 +150,7 @@ export default function ChildJournalEntryForm() {
                                 <Grid size={'grow'}>
                                     <CategoryAutocomplete
                                         size='small'
-                                        value={entry.categoryId}
+                                        value={entry.categoryId ? [entry.categoryId] : []}
                                         onChange={(_event, newValue: string | string[] | null) => {
                                             if (!Array.isArray(newValue)) {
                                                 childEntriesFieldArray.update(index, { ...entry, categoryId: newValue ?? undefined })
@@ -159,7 +166,7 @@ export default function ChildJournalEntryForm() {
                                                 setChildEntryTaggingAnchorEl(event.currentTarget)
                                             }}
                                         >
-                                            {isTagged ? <LocalOffer /> : <LocalOfferOutlined />}
+                                            {isTagged || hasStatus ? <LocalOffer /> : <LocalOfferOutlined />}
                                         </IconButton>
                                         <IconButton onClick={() => handleRemoveChildEntries([entry._id])}>
                                             <DeleteOutline />

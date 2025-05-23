@@ -1,17 +1,19 @@
 import CategoryAutocomplete from "@/components/input/CategoryAutocomplete";
-import { JournalSliceContext } from "@/contexts/JournalSliceContext";
+import { JournalFilterContext } from "@/contexts/JournalFilterContext";
 import { useContext } from "react";
 
 export default function CategoryFilter() {
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalFilterContext = useContext(JournalFilterContext)
 
-    const categoryIds = journalSliceContext.categoryIds ?? []
+    const categoryIds = journalFilterContext?.activeJournalMemoryFilters?.CATEGORIES?.categoryIds ?? []
 
-    const handleChangeCategoryIds = (ids: string | string[] | null) => {
-        if (!Array.isArray(ids) || !ids) {
-            return
-        }
-        journalSliceContext.onChangeCategoryIds(ids.length === 0 ? undefined : ids)
+    const handleChangeCategoryIds = (ids: string[]) => {
+        journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+            ...prev,
+            CATEGORIES: {
+                categoryIds: ids,
+            }
+        }))
     }
 
     return (

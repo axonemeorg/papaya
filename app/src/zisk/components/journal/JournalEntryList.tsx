@@ -17,23 +17,33 @@ import {
 	Grow,
 	Checkbox,
 } from '@mui/material'
-import { useContext, useMemo } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 
-import { Account, Category, EntryTask, JournalEntry, ReservedTagKey } from '@/types/schema'
 import dayjs from 'dayjs'
 import AvatarIcon from '@/components/icon/AvatarIcon'
-import { getPriceString } from '@/utils/string'
+import { getFigureString } from '@/utils/string'
 import AvatarChip from '../icon/AvatarChip'
 import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount, journalEntryHasUserDefinedTags, journalEntryHasTasks, enumerateJournalEntryReservedTag } from '@/utils/journal'
+import { calculateNetFigures, journalEntryHasTasks, enumerateJournalEntryStatuses, journalEntryHasTags } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import clsx from 'clsx'
-import { dateViewIsMonthlyPeriod, sortDatesChronologically } from '@/utils/date'
+import { sortDatesChronologically } from '@/utils/date'
 import CircularProgressWithLabel from '../icon/CircularProgressWithLabel'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { Account } from '@/schema/documents/Account'
+import { Category } from '@/schema/documents/Category'
+import { StatusVariant } from '@/schema/models/EntryStatus'
+import { EntryTask } from '@/schema/models/EntryTask'
+import { DateView, DateViewVariant, SearchFacetKey } from '@/schema/support/search/facet'
+import { useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
+import { useAccounts } from '@/hooks/queries/useAccounts'
+import { useCategories } from '@/hooks/queries/useCategories'
+import useDateView from '@/hooks/facets/useDateView'
+import { Figure } from '@/schema/models/Figure'
+import { useJournalEntrySelectionState, useSetJournalEntrySelectionState, useToggleJournalEntrySelectionState } from '@/store/app/useJournalEntrySelectionState'
 
 interface JournalTableRowProps extends TableRowProps {
 	dateRow?: boolean
@@ -204,16 +214,28 @@ interface JournalEntryListProps {
 export default function JournalEntryList(props: JournalEntryListProps) {
 	const theme = useTheme()
 	const isSmall = useMediaQuery(theme.breakpoints.down('sm'))
-	const { getCategoriesQuery, getAccountsQuery, createJournalEntry } = useContext(JournalContext)
-	const journalSliceContext = useContext(JournalSliceContext)
+	const getCategoriesQuery = useCategories()
+	const getAccountsQuery = useAccounts()
+
+	const openEntryEditModalForCreate = useOpenEntryEditModalForCreate()
+
+	const journalEntrySelectionState = useJournalEntrySelectionState()
+	const toggleJournalEntrySelectionState = useToggleJournalEntrySelectionState()
+	const setJournalEntrySelectionState = useSetJournalEntrySelectionState()
+
+	useEffect(() => {
+		setJournalEntrySelectionState({})
+	}, [props.journalRecordGroups])
+
+	const { dateView } = useDateView()
 	const getPriceStyle = useGetPriceStyle()
 
 	const currentDayString = useMemo(() => dayjs().format('YYYY-MM-DD'), [])
 
 	const displayedJournalDates: Set<string> = new Set(Object.keys(props.journalRecordGroups))
 
-	if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
-		const startOfMonth: dayjs.Dayjs = dayjs(`${journalSliceContext.dateView.year}-${journalSliceContext.dateView.month}-01`)
+	if (dateView.view === DateViewVariant.MONTHLY) {
+		const startOfMonth: dayjs.Dayjs = dayjs(`${dateView.year}-${dateView.month}-01`)
 		if (startOfMonth.isSame(currentDayString, 'month')) {
 			displayedJournalDates.add(currentDayString)
 		} else {
@@ -243,7 +265,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 										day={day}
 										isToday={isToday}
 										onClick={() => {
-											createJournalEntry({
+											openEntryEditModalForCreate({
 												date: day.format('YYYY-MM-DD'),
 											})
 										}}
@@ -270,38 +292,39 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 									? getCategoriesQuery.data[categoryId]
 									: undefined
 
-								const netAmount = calculateNetAmount(entry)
-								
-								const hasTags = journalEntryHasUserDefinedTags(entry)
-								const childHasTags = (entry as JournalEntry).children?.some(journalEntryHasUserDefinedTags)
-							
+								const netFigure: Figure | undefined = entry.$derived?.net?.['CAD']
+
+								const hasTags = journalEntryHasTags(entry)
+								const childHasTags = (entry as JournalEntry).children?.some((child) => journalEntryHasTasks((child as JournalEntry)))
+
 								// Reserved Tags
 								const { parent: parentReservedTags, children: childReservedTags }
-									= enumerateJournalEntryReservedTag(entry)
+									= enumerateJournalEntryStatuses(entry)
+
+								const isFlagged = parentReservedTags.has(StatusVariant.enum.FLAGGED)
+								const isApproximate = parentReservedTags.has(StatusVariant.enum.APPROXIMATE)
+								const isPending = parentReservedTags.has(StatusVariant.enum.PENDING)
 							
-								const isFlagged = parentReservedTags.has(ReservedTagKey.Enum.FLAGGED)
-								const isApproximate = parentReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
-								const isPending = parentReservedTags.has(ReservedTagKey.Enum.PENDING)
-							
-								const childIsFlagged = childReservedTags.has(ReservedTagKey.Enum.FLAGGED)
-								const childIsApproximate = childReservedTags.has(ReservedTagKey.Enum.APPROXIMATE)
-								const childIsPending = childReservedTags.has(ReservedTagKey.Enum.PENDING)
-								
+								const childIsFlagged = childReservedTags.has(StatusVariant.enum.FLAGGED)
+								const childIsApproximate = childReservedTags.has(StatusVariant.enum.APPROXIMATE)
+								const childIsPending = childReservedTags.has(StatusVariant.enum.PENDING)
+
 								const hasTasks = journalEntryHasTasks(entry)
 								const tasks: EntryTask[] = entry.tasks ?? []
-								const numCompletedTasks: number = hasTasks ? tasks.filter((task) => task.completedAt).length : 0
+								const numCompletedTasks: number = hasTasks ? tasks.filter((task: EntryTask) => task.completedAt).length : 0
 								const taskProgressString = Math.max(numCompletedTasks, tasks.length) > 9
 									? '9+'
 									: `${numCompletedTasks}/${tasks.length}`
 								const taskProgressPercentage = Math.round(100 * (numCompletedTasks / Math.max(tasks.length, 1)))
 
+								const rowIsSelected: boolean = journalEntrySelectionState[entry._id] ?? false
 								return (
 									<TableRow
 										key={entry._id}
 										onClick={(event) => props.onClickListItem(event, entry)}
 										onDoubleClick={(event) => props.onDoubleClickListItem(event, entry)}
-										selected={journalSliceContext.selectedRows[entry._id]}
-										sx={{ opacity: undefined }}
+										selected={rowIsSelected}
+										sx={{ opacity: undefined, overflow: 'visible' }}
 									>
 										<TableCell
 											selectCheckbox
@@ -313,8 +336,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											<Checkbox
 												className='checkbox'
 												sx={{ m: -1 }}
-												checked={journalSliceContext.selectedRows[entry._id] || false}
-												onChange={() => journalSliceContext.toggleSelectedRow(entry._id)}
+												checked={rowIsSelected}
+												onChange={() => toggleJournalEntrySelectionState(entry._id)}
 												onClick={(event) => event.stopPropagation()}
 											/>
 											<AvatarIcon
@@ -368,8 +391,8 @@ export default function JournalEntryList(props: JournalEntryListProps) {
 											</Stack>
 										</TableCell>
 										<TableCell align="right" sx={{ width: '10%' }}>
-											<Typography sx={{ ...getPriceStyle(netAmount, isApproximate) }}>
-												{getPriceString(netAmount, { isApproximate })}
+											<Typography sx={{ ...getPriceStyle(netFigure?.amount ?? 0, isApproximate) }}>
+												{getFigureString(netFigure, { isApproximate })}
 											</Typography>
 										</TableCell>
 										<TableCell>

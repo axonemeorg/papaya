@@ -1,53 +1,88 @@
 import AvatarChip from "@/components/icon/AvatarChip"
 import { JournalContext } from "@/contexts/JournalContext"
-import { JournalSliceContext } from "@/contexts/JournalSliceContext"
-import { Category } from "@/types/schema"
 import { Add, MonetizationOn, Savings } from "@mui/icons-material"
 import { Chip, Collapse, IconButton, Stack, Typography } from "@mui/material"
 import { useContext, useRef, useState } from "react"
 import JournalFilterPicker from "./JournalFilterPicker"
-import { getPriceString } from "@/utils/string"
 import { parseJournalEntryAmount } from "@/utils/journal"
 import { useGetPriceStyle } from "@/hooks/useGetPriceStyle"
+import { Category } from "@/schema/documents/Category"
+import { useCategories } from "@/hooks/queries/useCategories"
+import { JournalFilterContext } from "@/contexts/JournalFilterContext"
+import { AmountRange, SearchFacetKey, SearchFacets } from "@/schema/support/search/facet"
+import { enumerateFilters } from "@/utils/filtering"
+import { Figure } from "@/schema/models/Figure"
+import { getFigureString } from "@/utils/string"
 
 
 export default function JournalFilterRibbon() {
     const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)
     const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalFilterContext = useContext(JournalFilterContext)
 
     const getPriceStyle = useGetPriceStyle()
 
-    const numFilters: number = journalSliceContext.getActiveFilterSet().size
+    const activeFilterSlots: Set<SearchFacetKey> = journalFilterContext?.activeJournalFilters
+        ? enumerateFilters(journalFilterContext.activeJournalFilters)
+        : new Set()
 
-    const { getCategoriesQuery } = useContext(JournalContext)
+    const numFilters = activeFilterSlots.size
 
-    const categoies: Category[] = !journalSliceContext.categoryIds
+    const getCategoriesQuery = useCategories()
+    const categoryIds = journalFilterContext?.activeJournalMemoryFilters?.CATEGORIES?.categoryIds
+
+    const categories: Category[] = !categoryIds
         ? []
-        : journalSliceContext.categoryIds
+        : categoryIds
             .filter(Boolean)
             .map((categoryId) => getCategoriesQuery.data[categoryId])
             .filter(Boolean)
 
     const handleRemoveCategory = (categoryId: string) => {
-        const newCategoryIds = (journalSliceContext.categoryIds ?? [])
+        const newCategoryIds = (categoryIds ?? [])
             .filter((id) => id !== categoryId)
 
-        journalSliceContext.onChangeCategoryIds(newCategoryIds.length > 0 ? newCategoryIds : undefined)
+        journalFilterContext?.updateJournalMemoryFilters((prev) => {
+            const next = {
+                ...prev,
+                CATEGORIES: { categoryIds: newCategoryIds }
+            }
+            return next
+        })
     }
 
     const handleRemoveMinimumAmount = () => {
-        journalSliceContext.onChangeAmountRange({ ...journalSliceContext.amount, gt: undefined })
+        journalFilterContext?.updateJournalMemoryFilters((prev) => {
+            const next: Partial<SearchFacets> = {
+                ...prev,
+                AMOUNT: prev.AMOUNT
+                    ? { ...prev.AMOUNT, gt: undefined }
+                    : undefined,
+            }
+            return next
+        })
     }
 
     const handleRemoveMaximumAmount = () => {
-        journalSliceContext.onChangeAmountRange({ ...journalSliceContext.amount, lt: undefined })
+        journalFilterContext?.updateJournalMemoryFilters((prev) => {
+            const next: Partial<SearchFacets> = {
+                ...prev,
+                AMOUNT: prev.AMOUNT
+                    ? { ...prev.AMOUNT, lt: undefined }
+                    : undefined,
+            }
+            return next
+        })
     }
 
-    const amountRange = journalSliceContext.amount
-    const parsedMinimumAmount = amountRange && amountRange.gt ? parseJournalEntryAmount(amountRange.gt) : undefined
-    const parsedMaximumAmount = amountRange && amountRange.lt ? parseJournalEntryAmount(amountRange.lt) : undefined
+    const amountRange: AmountRange | undefined = journalFilterContext?.activeJournalFilters.AMOUNT
+    const parsedMinimumFigure: Figure | undefined = amountRange && amountRange.gt
+        ? parseJournalEntryAmount(amountRange.gt)
+        : undefined
+    const parsedMaximumFigure: Figure | undefined = amountRange && amountRange.lt
+        ? parseJournalEntryAmount(amountRange.lt)
+        : undefined
 
     return (
         <>
@@ -58,7 +93,7 @@ export default function JournalFilterRibbon() {
             />
             <Collapse in={numFilters > 0}>
                 <Stack direction='row' sx={{ flexFlow: 'row wrap', px: 2, py: 1 }} gap={0.5}>
-                    {categoies.map((category) => {
+                    {categories.map((category) => {
                         return (
                             <AvatarChip
                                 key={category._id}
@@ -70,36 +105,42 @@ export default function JournalFilterRibbon() {
                             />
                         )
                     })}
-                    {parsedMinimumAmount !== undefined && (
+                    {parsedMinimumFigure && (
                         <Chip
-                            icon={parsedMinimumAmount > 0 ? <Savings fontSize="small" /> : <MonetizationOn fontSize="small" />}
+                            icon={parsedMinimumFigure.amount > 0
+                                    ? <Savings fontSize="small" />
+                                    : <MonetizationOn fontSize="small" />
+                            }
                             label={
                                 <Typography variant="inherit">
                                     More than&nbsp;
                                     <Typography
                                         variant="inherit"
                                         component='span'
-                                        sx={{ ...getPriceStyle(parsedMinimumAmount), fontWeight: '600' }}
+                                        sx={{ ...getPriceStyle(parsedMinimumFigure.amount), fontWeight: '600' }}
                                     >
-                                        {getPriceString(parsedMinimumAmount)}
+                                        {getFigureString(parsedMinimumFigure)}
                                     </Typography>
                                 </Typography>
                             }
                             onDelete={() => handleRemoveMinimumAmount()}
                         />
                     )}
-                    {parsedMaximumAmount !== undefined && (
+                    {parsedMaximumFigure && (
                         <Chip
-                            icon={parsedMaximumAmount > 0 ? <Savings fontSize="small" /> : <MonetizationOn fontSize="small" />}
+                            icon={parsedMaximumFigure.amount > 0
+                                ? <Savings fontSize="small" />
+                                : <MonetizationOn fontSize="small" />
+                            }
                             label={
                                 <Typography variant="inherit">
                                     Less than&nbsp;
                                     <Typography
                                         variant="inherit"
                                         component='span'
-                                        sx={{ ...getPriceStyle(parsedMaximumAmount), fontWeight: '600' }}
+                                        sx={{ ...getPriceStyle(parsedMaximumFigure.amount), fontWeight: '600' }}
                                     >
-                                        {getPriceString(parsedMaximumAmount)}
+                                        {getFigureString(parsedMaximumFigure)}
                                     </Typography>
                                 </Typography>
                             }

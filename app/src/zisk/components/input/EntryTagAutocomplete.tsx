@@ -1,39 +1,39 @@
 import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
 import { Close, Done } from "@mui/icons-material";
-
-import { useContext } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
-import { RESERVED_TAGS } from '@/constants/tags'
-import { EntryTag, ReservedTag, ReservedTagKey } from '@/types/schema'
-
-const filteredReservedTags: Partial<Record<ReservedTagKey, ReservedTag>> = Object.fromEntries(
-	Object.entries(RESERVED_TAGS).filter(([, tag]) => {
-		return !tag.disabled && !tag.archived
-	})
-)
+import { ZiskEntryStatus } from '@/constants/status';
+import { EntryTag } from '@/schema/documents/EntryTag';
+import { EntryStatus } from '@/schema/models/EntryStatus';
+import { useEntryTags } from '@/hooks/queries/useEntryTags';
 
 export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
 export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 	const { loading, ...rest } = props
 
-	const { getEntryTagsQuery } = useContext(JournalContext)
-	const { data, isLoading } = getEntryTagsQuery
+	const getEntryTagsQuery = useEntryTags()
+	const entryTags = getEntryTagsQuery.data
 
-	const options: Record<string, EntryTag | ReservedTag> = {
-		...filteredReservedTags,
-		...data,
+	const { isLoading } = getEntryTagsQuery
+
+	const tags: Record<string, EntryTag | EntryStatus> = {
+		...Object.fromEntries(
+			ZiskEntryStatus
+				.filter((status) => !status.archived || props.value?.includes(status._id))
+				.map((status) => [status._id, status])
+			),
+		...entryTags
 	}
 
 	return (
 		<Autocomplete
 			loading={isLoading || loading}
-			options={[...Object.keys(filteredReservedTags), ...Object.keys(data)]}
+			options={Object.keys(tags)}
 			renderInput={(params) => <TextField {...params} label={'Tag'} />}
-			getOptionLabel={(option) => options[option]?.label}
+			getOptionLabel={(option) => tags[option]?.label}
+			getOptionKey={(option) => option}
 			renderOption={(props, option, { selected }) => {
 				const { key, ...optionProps } = props
-				const entryTag: EntryTag | ReservedTag | undefined = options[option]
+				const entryTag: EntryTag | EntryStatus | undefined = tags[option]
 
 				return (
 					<ListItem key={key} {...optionProps}>

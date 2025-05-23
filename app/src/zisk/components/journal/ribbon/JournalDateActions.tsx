@@ -1,5 +1,3 @@
-import { DateViewSymbol, JournalEntry } from '@/types/schema'
-import { dateViewIsAnnualPeriod, dateViewIsMonthlyPeriod, dateViewIsRange, dateViewIsWeeklyPeriod, getAbsoluteDateRangeFromDateView, getAnnualPeriodFromDate, getDateViewSymbol, getEmpiracleDateRangeFromJournalEntries, getMonthlyPeriodFromDate, getWeeklyPeriodFromDate } from '@/utils/date'
 import {
 	ArrowBack,
 	ArrowDropDown,
@@ -13,22 +11,38 @@ import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo, useRef, useState } from 'react'
 import KeyboardShortcut from '../../text/KeyboardShortcut'
 import useKeyboardAction from '@/hooks/useKeyboardAction'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { KeyboardActionName } from '@/constants/keyboard'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { DateView, DateViewVariant } from '@/schema/support/search/facet'
+import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import useDateView from '@/hooks/facets/useDateView'
+import { getAbsoluteDateRangeFromDateView, getEmpiracleDateRangeFromJournalEntries } from '@/utils/date'
+import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 
-const dateViewMenuOptionLabels: Record<DateViewSymbol, string> = {
-    [DateViewSymbol.WEEKLY]: 'Week',
-    [DateViewSymbol.MONTHLY]: 'Month',
-    [DateViewSymbol.YEARLY]: 'Year',
-    [DateViewSymbol.RANGE]: 'Date Range',
+const SELECTABLE_DATE_VIEWS = [
+    DateViewVariant.WEEKLY,
+    DateViewVariant.MONTHLY,
+    DateViewVariant.ANNUAL,
+]
+
+const dateViewMenuOptionLabels: Partial<Record<DateViewVariant, string>> = {
+    [DateViewVariant.WEEKLY]: 'Week',
+    [DateViewVariant.MONTHLY]: 'Month',
+    [DateViewVariant.ANNUAL]: 'Year',
+    [DateViewVariant.CUSTOM]: 'Date Range',
 }
 
-type JournalEditorDateViewSymbolWithKeystroke = Exclude<DateViewSymbol, DateViewSymbol.RANGE>;
+type JournalEditorDateViewVariantWithKeystroke = Exclude<
+    DateViewVariant,
+    | DateViewVariant.DAILY
+    | DateViewVariant.FISCAL
+    | DateViewVariant.CUSTOM
+>;
 
-const dateViewKeystrokes: Record<JournalEditorDateViewSymbolWithKeystroke, KeyboardActionName> = {
-    [DateViewSymbol.WEEKLY]: KeyboardActionName.DATE_VIEW_WEEKLY,
-    [DateViewSymbol.MONTHLY]: KeyboardActionName.DATE_VIEW_MONTHLY,
-    [DateViewSymbol.YEARLY]: KeyboardActionName.DATE_VIEW_ANNUALLY,
+const dateViewKeystrokes: Record<JournalEditorDateViewVariantWithKeystroke, KeyboardActionName> = {
+    [DateViewVariant.WEEKLY]: KeyboardActionName.DATE_VIEW_WEEKLY,
+    [DateViewVariant.MONTHLY]: KeyboardActionName.DATE_VIEW_MONTHLY,
+    [DateViewVariant.ANNUAL]: KeyboardActionName.DATE_VIEW_ANNUALLY,
 }
 
 const DATE_RANGE_SEPERATOR = '\u00A0\u2013\u00A0'
@@ -37,11 +51,13 @@ export default function JournalDateActions() {
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
     const [showDateViewPicker, setShowDateViewPicker] = useState<boolean>(false)
 
-    const journalSliceContext = useContext(JournalSliceContext)
+    const { dateView, startDate, changeDateView, changeStartDate } = useDateView()
     
     const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
     const dateViewPickerButtonRef = useRef<HTMLButtonElement | null>(null);
-	const hideTodayButton = dateViewIsRange(journalSliceContext.dateView)
+	const hideTodayButton = dateView.view === DateViewVariant.CUSTOM
+
+    const getJournalEntriesQuery = useFilteredJournalEntries()
 
     const theme = useTheme()
 
@@ -52,29 +68,29 @@ export default function JournalDateActions() {
     const now = useMemo(() => dayjs(), [])
 
     useKeyboardAction(KeyboardActionName.DATE_VIEW_ANNUALLY, () => {
-        journalSliceContext.switchDateView(DateViewSymbol.YEARLY)
+        changeDateView(DateViewVariant.ANNUAL)
     })
     useKeyboardAction(KeyboardActionName.DATE_VIEW_MONTHLY, () => {
-        journalSliceContext.switchDateView(DateViewSymbol.MONTHLY)
+        changeDateView(DateViewVariant.MONTHLY)
     })
     useKeyboardAction(KeyboardActionName.DATE_VIEW_WEEKLY, () => {
-        journalSliceContext.switchDateView(DateViewSymbol.WEEKLY)
+        changeDateView(DateViewVariant.WEEKLY)
     })
     useKeyboardAction(KeyboardActionName.JUMP_TO_TODAY_VIEW, () => {
         jumpToToday()
     })
 
     const [prevButtonTooltip, nextButtonTooltip] = useMemo(() => {
-        if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
+        if (dateView.view === DateViewVariant.MONTHLY) {
             return ['Previous month', 'Next month']
-        } else if (dateViewIsAnnualPeriod(journalSliceContext.dateView)) {
+        } else if (dateView.view === DateViewVariant.ANNUAL) {
             return ['Previous year', 'Next year']
-        } else if (dateViewIsWeeklyPeriod(journalSliceContext.dateView)) {
+        } else if (dateView.view === DateViewVariant.WEEKLY) {
             return ['Previous week', 'Next week']
         } else {
             return [undefined, undefined]
         }
-    }, [journalSliceContext.dateView])
+    }, [dateView])
 
     /**
      * Supported formats include:
@@ -90,12 +106,11 @@ export default function JournalDateActions() {
      * @example "Nov 2020 - Feb 2021" // Date range spanning multiple years
      */
     const formattedDateString = useMemo(() => {
-        const { dateView } = journalSliceContext
         let { startDate, endDate } = getAbsoluteDateRangeFromDateView(dateView)
 
         // Handle case where an incomplete range is given
         if (!startDate || !endDate) {
-            const journalEntries: JournalEntry[] = Object.values(journalSliceContext.getJournalEntriesQuery.data ?? {})
+            const journalEntries: JournalEntry[] = Object.values(getJournalEntriesQuery.data ?? {})
             const { startDate: empiracleStartDate, endDate: empiracleEndDate } = getEmpiracleDateRangeFromJournalEntries(journalEntries)
             if (empiracleStartDate && empiracleEndDate) {
                 startDate = empiracleStartDate
@@ -115,7 +130,7 @@ export default function JournalDateActions() {
             }
         }
 
-        if (dateViewIsAnnualPeriod(dateView)) {
+        if (dateView.view === DateViewVariant.ANNUAL) {
             return String(dateView.year)
         }
 
@@ -123,7 +138,7 @@ export default function JournalDateActions() {
         const spansSingleYear = startDate.isSame(endDate, 'year')
         const spansSingleMonth = startDate.isSame(endDate, 'month')
 
-        if (dateViewIsMonthlyPeriod(dateView)) {
+        if (dateView.view === DateViewVariant.MONTHLY) {
             if (spansCurrentYear) {
                 return startDate.format('MMMM')
             }
@@ -146,12 +161,14 @@ export default function JournalDateActions() {
             ].join(DATE_RANGE_SEPERATOR)
         }
 
-        const format = dateViewIsWeeklyPeriod(dateView) ? 'MMM D, YYYY' : 'MMM YYYY'
+        const format = dateView.view === DateViewVariant.WEEKLY
+            ? 'MMM D, YYYY'
+            : 'MMM YYYY'
         return [
             startDate.format(format),
             endDate.format(format),
         ].join(DATE_RANGE_SEPERATOR)
-    }, [journalSliceContext.dateView, journalSliceContext.getJournalEntriesQuery.data])
+    }, [dateView, getJournalEntriesQuery.data])
 
     // const calendarAvailableViews = useMemo((): DateView[] => {
     // 	switch (journalSliceContext.view) {
@@ -169,96 +186,47 @@ export default function JournalDateActions() {
         return now.format('dddd, MMMM D')
     }, [])
 
-    const currentDateViewSymbol: DateViewSymbol = useMemo(() => {
-        return getDateViewSymbol(journalSliceContext.dateView)
-    }, [journalSliceContext.dateView])
-
     // const handleChangeDatePickerDate = (value: dayjs.Dayjs) => {
     // 	journalSliceContext.setDate(value.format('YYYY-MM-DD'))
     // }
 
     const handlePrevPage = () => {
-        if (dateViewIsRange(journalSliceContext.dateView)) {
+        if (dateView.view === DateViewVariant.CUSTOM) {
             return
         }
 
-        const absoluteDateRange = getAbsoluteDateRangeFromDateView(journalSliceContext.dateView)
-        if (!absoluteDateRange.startDate) {
-            return
-        }
-
-        const currentDate = dayjs(absoluteDateRange.startDate)
-        let newDate: dayjs.Dayjs
-
-        if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.subtract(1, 'month')
-            journalSliceContext.onChangeDateView({
-                year: newDate.year(),
-                month: newDate.month() + 1, // Zero-indexed
-            })
-        } else if (dateViewIsWeeklyPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.subtract(1, 'week')
-            journalSliceContext.onChangeDateView({
-                year: newDate.year(),
-                month: newDate.month() + 1, // Zero-indexed
-                day: newDate.date(),
-            })
-        } else if (dateViewIsAnnualPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.subtract(1, 'year')
-            journalSliceContext.onChangeDateView({
-                year: newDate.year()
-            })
+        if (dateView.view === DateViewVariant.MONTHLY) {
+            changeStartDate(startDate.subtract(1, 'month'))
+        } else if (dateView.view === DateViewVariant.WEEKLY) {
+            changeStartDate(startDate.subtract(1, 'week'))
+        } else if (dateView.view === DateViewVariant.ANNUAL) {
+            changeStartDate(startDate.subtract(1, 'year'))
         }
     }
 
     const handleNextPage = () => {
-        if (dateViewIsRange(journalSliceContext.dateView)) {
+        if (dateView.view === DateViewVariant.CUSTOM) {
             return
         }
 
-        const absoluteDateRange = getAbsoluteDateRangeFromDateView(journalSliceContext.dateView)
-        if (!absoluteDateRange.startDate) {
-            return
-        }
-
-        const currentDate = dayjs(absoluteDateRange.startDate)
-        let newDate: dayjs.Dayjs
-
-        if (dateViewIsMonthlyPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.add(1, 'month')
-            journalSliceContext.onChangeDateView(getMonthlyPeriodFromDate(newDate))
-        } else if (dateViewIsWeeklyPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.add(1, 'week')
-            journalSliceContext.onChangeDateView(getWeeklyPeriodFromDate(newDate))
-        } else if (dateViewIsAnnualPeriod(journalSliceContext.dateView)) {
-            newDate = currentDate.add(1, 'year')
-            journalSliceContext.onChangeDateView(getAnnualPeriodFromDate(newDate))
+        if (dateView.view === DateViewVariant.MONTHLY) {
+            console.log('current start date:', startDate)
+            changeStartDate(startDate.add(1, 'month'))
+        } else if (dateView.view === DateViewVariant.WEEKLY) {
+            changeStartDate(startDate.add(1, 'week'))
+        } else if (dateView.view === DateViewVariant.ANNUAL) {
+            changeStartDate(startDate.add(1, 'year'))
         }
     }
 
-    const handleChangeDateView = (view: DateViewSymbol) => {
+    const handleChangeDateView = (view: DateViewVariant) => {
 		setShowDateViewPicker(false)
-		journalSliceContext.switchDateView(view)
+		changeDateView(view)
 	}
 
     const jumpToToday = useCallback(() => {
-        if (dateViewIsRange(journalSliceContext.dateView)) {
-            return
-        }
-
-        const newDateView = { ...journalSliceContext.dateView, year: now.year() }
-
-        if (dateViewIsMonthlyPeriod(newDateView)) {
-            newDateView.month = now.month() + 1 // Zero-indexed
-        } else if (dateViewIsWeeklyPeriod(newDateView)) {
-            newDateView.month = now.month() + 1 // Zero-indexed
-            newDateView.day = now.date()
-        } else if (!dateViewIsAnnualPeriod(newDateView)) {
-            return
-        }
-
-        journalSliceContext.onChangeDateView(newDateView)
-    }, [journalSliceContext.dateView])
+        changeStartDate(null)
+    }, [dateView])
 
     return (
         <>
@@ -269,20 +237,20 @@ export default function JournalDateActions() {
             >
                 {Object.entries(dateViewMenuOptionLabels)
                     .filter(([key]) => {
-                        return !(key === DateViewSymbol.RANGE && !(currentDateViewSymbol === key))
+                        return dateView.view === key || SELECTABLE_DATE_VIEWS.includes(key as DateViewVariant)
                     })
                     .map(([key, label]) => {
                         return (
                             <MenuItem
                                 key={key}
-                                onClick={() => handleChangeDateView(key as DateViewSymbol)}
+                                onClick={() => handleChangeDateView(key as DateViewVariant)}
                                 aria-label={`View by ${label}`}
-                                selected={key === currentDateViewSymbol}
+                                selected={key === dateView.view}
                             >
                                 <ListItemText>{label}</ListItemText>
-                                {dateViewKeystrokes[key as JournalEditorDateViewSymbolWithKeystroke] && (
+                                {dateViewKeystrokes[key as JournalEditorDateViewVariantWithKeystroke] && (
                                     <KeyboardShortcut
-                                        name={dateViewKeystrokes[key as JournalEditorDateViewSymbolWithKeystroke]}
+                                        name={dateViewKeystrokes[key as JournalEditorDateViewVariantWithKeystroke]}
                                         sx={{ ml: 2 }}
                                     />
                                 )}
@@ -317,7 +285,7 @@ export default function JournalDateActions() {
                         endIcon={<ArrowDropDown />}
                     >
                         <Typography>
-                            {dateViewMenuOptionLabels[currentDateViewSymbol]}
+                            {dateViewMenuOptionLabels[dateView.view]}
                         </Typography>
                     </Button>
                 )}

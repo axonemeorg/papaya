@@ -3,13 +3,17 @@ import { Box, ClickAwayListener, Fade, IconButton, Paper, Popper, Stack, Typogra
 import AvatarIcon from '@/components/icon/AvatarIcon'
 import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { getPriceString } from '@/utils/string'
-import { Category, JournalEntry } from '@/types/schema'
 import { JournalEntrySelection } from './JournalEditor'
 import { JournalContext } from '@/contexts/JournalContext'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import { calculateNetAmount } from '@/utils/journal'
 import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { Category } from '@/schema/documents/Category'
+import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
+import { useCategories } from '@/hooks/queries/useCategories'
+import { calculateNetFigures } from '@/utils/journal'
+import { Figure } from '@/schema/models/Figure'
+import { getFigureString } from '@/utils/string'
 
 export const JOURNAL_ENTRY_LOUPE_SEARCH_PARAM_KEY = 'z'
 
@@ -54,11 +58,14 @@ const JournalEntryNumber = (props: { value: string | number | null | undefined }
 
 export default function JournalEntryCard(props: JournalEntryCardProps) {
 	const { entry, anchorEl } = props
-	const { getCategoriesQuery, editJournalEntry } = useContext(JournalContext)
+
+	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
 	const getPriceStyle = useGetPriceStyle()
 
-	const netAmount = calculateNetAmount(entry)
+	const getCategoriesQuery = useCategories()
+
+	const netFigure: Figure | undefined = entry.$derived?.net?.['CAD']
 	const categoryId: string | undefined = entry?.categoryId
 	const category: Category | undefined = categoryId ? getCategoriesQuery.data[categoryId] : undefined
 	const memo = entry?.memo || PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
@@ -68,7 +75,7 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 	}
 
 	const handleEditJournalEntry = (entry: JournalEntry) => {
-		editJournalEntry(entry)
+		beginEditingJournalEntry(entry)
 		props.onClose()
 	}
 
@@ -119,10 +126,10 @@ export default function JournalEntryCard(props: JournalEntryCardProps) {
 										<Typography
 											variant="h3"
 											sx={{
-												...getPriceStyle(netAmount),
+												...getPriceStyle(netFigure?.amount ?? 0),
 												mb: 0.5,
 											}}>
-											{getPriceString(netAmount)}
+											{getFigureString(netFigure)}
 										</Typography>
 										<Stack direction="row" gap={1}>
 											<AvatarIcon avatar={category?.avatar} />

@@ -15,6 +15,7 @@ import EntryTagAutocomplete, { EntryTagAutocompleteProps } from "../input/EntryT
 
 import { JournalContext } from "@/contexts/JournalContext";
 import { createEntryTag } from "@/database/actions";
+import { useAddEntryTag, useEntryTags } from "@/hooks/queries/useEntryTags";
 
 interface EntryTagPickerProps extends Omit<EntryTagAutocompleteProps, 'renderInput'> {
 	anchorEl: HTMLElement | null
@@ -25,19 +26,14 @@ interface EntryTagPickerProps extends Omit<EntryTagAutocompleteProps, 'renderInp
 export const EntryTagPicker = (props: EntryTagPickerProps) => {
 	const [searchValue, setSearchValue] = useState<string>('')
 
-	const { getEntryTagsQuery, journal } = useContext(JournalContext)
+	const addEntryTag = useAddEntryTag()
 
 	const handleCreateEntryTagWithValue = async (value: string) => {
-        if (!journal) {
-            return
-        }
-        const journalId = journal._id
-        await createEntryTag({
-            label: value,
-            description: '',
-        }, journalId)
-        getEntryTagsQuery.refetch()
-    }
+		await addEntryTag({
+				label: value,
+				description: '',
+		})
+	}
 
 	const {
 		anchorEl,

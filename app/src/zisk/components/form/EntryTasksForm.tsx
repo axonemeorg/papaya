@@ -1,13 +1,14 @@
 import { Button, Checkbox, IconButton, InputBase, Link, Stack, Typography } from "@mui/material"
 import { AddTask, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material"
-import { EntryTask, JournalEntry } from "@/types/schema"
 import { Controller, useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { useContext, useRef } from "react"
 import { JournalContext } from "@/contexts/JournalContext"
 import { makeEntryTask } from "@/utils/journal"
+import { EntryTask } from "@/schema/models/EntryTask"
+import { JournalEntry } from "@/schema/documents/JournalEntry"
 
 export default function EntryTasksForm() {
-    const journalContext = useContext(JournalContext)
+    const { activeJournalId } = useContext(JournalContext)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
     const { setValue, control } = useFormContext<JournalEntry>()
@@ -18,12 +19,11 @@ export default function EntryTasksForm() {
     })
 
     const handleAddTask = async (focusInput = true) => {
-        if (!journalContext.journal) {
+        if (!activeJournalId) {
             return
         }
         
-        const journalId = journalContext.journal._id
-        const newTask = makeEntryTask({}, journalId)
+        const newTask = makeEntryTask({})
         const newIndex = tasks ? tasks.length : 0
 
         if (tasks) {
@@ -122,7 +122,7 @@ export default function EntryTasksForm() {
                             />
                             <Controller
                                 control={control}
-                                name={`tasks.${index}.description`}
+                                name={`tasks.${index}.memo`}
                                 render={({ field: { value, onChange, ...rest } }) => (
                                     <InputBase
                                         value={value}

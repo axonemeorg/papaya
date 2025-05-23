@@ -3,24 +3,27 @@ import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, 
 import { useContext } from 'react'
 import { JournalContext } from '@/contexts/JournalContext'
 import AvatarIcon from '../icon/AvatarIcon'
+import { useAccounts } from '@/hooks/queries/useAccounts'
 
 export type AccountAutocompleteProps = Partial<Omit<AutocompleteProps<string, false, false, false>, 'options'>>
 
 export default function AccountAutocomplete(props: AccountAutocompleteProps) {
 	const { loading, ...rest } = props
 
-	const { getAccountsQuery } = useContext(JournalContext)
-	const { data, isLoading } = getAccountsQuery
+	const getAccountsQuery = useAccounts()
+	const accounts = getAccountsQuery.data
+	const { isLoading } = getAccountsQuery
 
 	return (
 		<Autocomplete
 			loading={isLoading || loading}
-			options={Object.keys(data)}
+			options={Object.keys(accounts)}
 			renderInput={(params) => <TextField {...params} label={'Account'} />}
-			getOptionLabel={(option) => data[option]?.label}
+			getOptionLabel={(option) => accounts[option]?.label}
+			getOptionKey={(option) => option}
 			renderOption={(props, option) => {
 				const { key, ...optionProps } = props
-				const account = data[option]
+				const account = accounts[option]
 
 				return (
 					<ListItem dense key={key} {...optionProps}>

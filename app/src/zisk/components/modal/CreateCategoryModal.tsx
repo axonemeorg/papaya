@@ -7,8 +7,8 @@ import { useContext } from 'react'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { createCategory } from '@/database/actions'
 import { JournalContext } from '@/contexts/JournalContext'
-import { CreateCategory } from '@/types/schema'
 import { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
+import { CreateCategory } from '@/schema/documents/Category'
 
 interface CreateCategoryModalProps {
 	open: boolean
@@ -30,7 +30,7 @@ export default function CreateCategoryModal(props: CreateCategoryModalProps) {
 	const theme = useTheme()
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const { journal } = useContext(JournalContext)
+	const { activeJournalId } = useContext(JournalContext)
 
 	const createCategoryForm = useForm<CreateCategory>({
 		defaultValues: CATEGORY_FORM_CREATE_VALUES,
@@ -38,11 +38,11 @@ export default function CreateCategoryModal(props: CreateCategoryModalProps) {
 	})
 
 	const handleCreateCategory = async (formData: CreateCategory) => {
-		if (!journal) {
+		if (!activeJournalId) {
 			return
 		}
 		try {
-			await createCategory(formData, journal._id)
+			await createCategory(formData, activeJournalId)
 			snackbar({ message: 'Created category' })
 			props.onClose()
 			props.onSaved()

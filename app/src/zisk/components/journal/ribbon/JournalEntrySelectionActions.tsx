@@ -1,3 +1,7 @@
+import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { Currency } from '@/schema/support/currency'
+import { useJournalEntrySelectionState, useSetJournalEntrySelectionState } from '@/store/app/useJournalEntrySelectionState'
 import {
 	ArrowDropDown,
 	CheckBox,
@@ -8,7 +12,6 @@ import {
 } from '@mui/icons-material'
 import { Button, Fade, IconButton, ListItemText, Menu, MenuItem, Stack } from '@mui/material'
 import { useContext, useRef, useState } from 'react'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 
 export enum SelectAllAction {
 	TOGGLE = 'TOGGLE',
@@ -27,20 +30,88 @@ const selectAllMenuOptionLabels: Omit<Record<SelectAllAction, string>, 'TOGGLE'>
 
 export default function JournalEntrySelectionActions() {
 	const [showSelectAllMenu, setShowSelectAllMenu] = useState<boolean>(false)
+
 	const selectAllMenuButtonRef = useRef<HTMLButtonElement | null>(null);
 
-	const journalSliceContext = useContext(JournalSliceContext)
-	const numSelectedRows = Object.values(journalSliceContext.selectedRows).filter(Boolean).length
+	const selectedRows = useJournalEntrySelectionState()
 
+	const setSelectedRows = useSetJournalEntrySelectionState()
+
+	const getFilterJournalEntriesQuery = useFilteredJournalEntries()
+
+	const journalEntries: JournalEntry[] = Object.values(getFilterJournalEntriesQuery.data)
+	const numTotalRows = journalEntries.length
+
+	const selectedRowIds = Object.entries(selectedRows)
+		.filter(([, value]) => value)
+		.map(([key]) => key)
+
+	const hasSelectedAll = journalEntries.every((entry) => selectedRows[entry._id])
+
+	const numSelectedRows = selectedRowIds.length
 	const hideSelectedRowsOptions = numSelectedRows <= 0
 
-
-	const handleSelectAll = (action: SelectAllAction) => {
+	const handleSelectAllAction = (action: SelectAllAction) => {
 		setShowSelectAllMenu(false)
-		journalSliceContext.onSelectAll(action)
+		
+		// Calculate net amount for an entry by looking at the first currency in the net figures
+		const calculateNetAmount = (entry: JournalEntry): number => {
+			if (!entry.$derived?.net) return 0
+			
+			// Get the first currency's figure (usually there's only one)
+			const currencies = Object.keys(entry.$derived.net) as Currency[]
+			if (currencies.length === 0) return 0
+			
+			const figure = entry.$derived.net[currencies[0]]
+			return figure ? figure.amount : 0
+		}
+		
+		const newSelectedRows = (() => {
+			let selected: Set<string>
+			const allRowIds = new Set<string>(Object.keys(getFilterJournalEntriesQuery.data ?? {}))
+			const emptySet = new Set<string>([])
+			const hasSelectedAll = Object.keys(selectedRows).length > 0 && 
+				allRowIds.size > 0 && 
+				Array.from(allRowIds).every(id => selectedRows[id])
+
+			switch (action) {
+				case SelectAllAction.ALL:
+					selected = allRowIds
+					break
+
+				case SelectAllAction.NONE:
+					selected = emptySet
+					break
+
+				case SelectAllAction.CREDIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = getFilterJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) > 0 : false
+					}))
+					break
+
+				case SelectAllAction.DEBIT:
+					selected = new Set<string>(Array.from(allRowIds).filter((id: string) => {
+						const entry = getFilterJournalEntriesQuery.data[id]
+						return entry ? calculateNetAmount(entry) < 0 : false
+					}))
+					break
+
+				case SelectAllAction.TOGGLE:
+				default:
+					selected = hasSelectedAll ? emptySet : allRowIds
+			}
+
+			return Object.fromEntries(Array.from(new Set([...Object.keys(selectedRows), ...selected]))
+				.map((key) => {
+					return [key, selected.has(key)]
+				}))
+		})()
+		
+		setSelectedRows(newSelectedRows)
 	}
 
-    return (
+  return (
 		<>
 			<Menu
 				open={showSelectAllMenu}
@@ -49,7 +120,7 @@ export default function JournalEntrySelectionActions() {
 			>
 				{Object.entries(selectAllMenuOptionLabels).map(([key, label]) => {
 					return (
-						<MenuItem key={key} onClick={() => handleSelectAll(key as SelectAllAction)} aria-label={`Select ${label}`}>
+						<MenuItem key={key} onClick={() => handleSelectAllAction(key as SelectAllAction)} aria-label={`Select ${label}`}>
 							<ListItemText>{label}</ListItemText>
 						</MenuItem>
 					)
@@ -60,14 +131,14 @@ export default function JournalEntrySelectionActions() {
 					<Button
 						sx={{ minWidth: 'unset', pr: 0.5, ml: -1 }}
 						color='inherit'
-						onClick={() => journalSliceContext.onSelectAll(SelectAllAction.TOGGLE)}
+						onClick={() => handleSelectAllAction(SelectAllAction.TOGGLE)}
 						ref={selectAllMenuButtonRef}
-						disabled={journalSliceContext.numRows === 0}
+						disabled={numTotalRows === 0}
 					>
-						{(journalSliceContext.numRows === numSelectedRows) && journalSliceContext.numRows > 0 ? (
+						{(hasSelectedAll) && numTotalRows > 0 ? (
 							<CheckBox color='primary' />
 						) : <>
-							{(numSelectedRows < journalSliceContext.numRows) && numSelectedRows > 0 ? (
+							{numSelectedRows > 0 ? (
 								<IndeterminateCheckBox color='inherit' />	
 							) : (
 								<CheckBoxOutlineBlank color='inherit' />
@@ -82,7 +153,7 @@ export default function JournalEntrySelectionActions() {
 							px: 0,
 							ml: -0.5
 						}}
-						disabled={journalSliceContext.numRows === 0}
+						disabled={numTotalRows === 0}
 					>
 						<ArrowDropDown />
 					</Button>
