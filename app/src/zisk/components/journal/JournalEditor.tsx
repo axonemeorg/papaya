@@ -1,20 +1,20 @@
 import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
 import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
 import JournalHeader from './ribbon/JournalHeader'
-import { JOURNAL_ENTRY, JournalEntry, NonspecificEntry, TentativeJournalEntry, TentativeTransferEntry, TRANSFER_ENTRY, TransferEntry } from '@/types/schema'
 import JournalEntryCard from './JournalEntryCard'
-import { deleteNonspecificEntry } from '@/database/actions'
+import { deleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
 import JournalEntryList from './JournalEntryList'
-import { JournalContext } from '@/contexts/JournalContext'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { getDatabaseClient } from '@/database/client'
-import SpendChart from '../chart/SpendChart'
-import CategorySpreadChart from '../chart/CategorySpreadChart'
+// import SpendChart from '../chart/SpendChart'
+// import CategorySpreadChart from '../chart/CategorySpreadChart'
 import { useSearch } from '@tanstack/react-router'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
+import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 
 export interface JournalEntrySelection {
-	entry: NonspecificEntry | null
+	entry: JournalEntry | null
 	anchorEl: HTMLElement | null
 }
 
@@ -25,18 +25,19 @@ export default function JournalEditor() {
 	})
 
 	const { snackbar } = useContext(NotificationsContext)
-	const journalContext = useContext(JournalContext)
-	const journalSliceContext = useContext(JournalSliceContext)
+	const journalEntriesQuery = useFilteredJournalEntries()
+
+	const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
 	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
 
-	const journalGroups: Record<string, (JournalEntry | TentativeJournalEntry)[]> = useMemo(() => {
-		const entries: Record<string, JournalEntry | TentativeJournalEntry> = {
-			...journalSliceContext.getJournalEntriesQuery.data,
-			...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
+	const journalGroups: Record<string, JournalEntry[]> = useMemo(() => {
+		const entries: Record<string, JournalEntry> = {
+			...journalEntriesQuery.data,
+			// ...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
 		}
 		const groups = Object.values(entries).reduce(
-			(acc: Record<JournalEntry['_id'], (JournalEntry | TentativeJournalEntry)[]>, entry: JournalEntry | TentativeJournalEntry) => {
+			(acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
 				const { date } = entry
 				if (!date) {
 					return acc
@@ -52,45 +53,20 @@ export default function JournalEditor() {
 		)
 
 		return groups
-	}, [journalSliceContext.getJournalEntriesQuery.data, journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data])
+	}, [
+		journalEntriesQuery.data,
+		// journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
+	])
 
-	const transferGroups: Record<string, (TransferEntry | TentativeTransferEntry)[]> = useMemo(() => {
-		const entries: Record<string, TransferEntry | TentativeTransferEntry> = {
-			...journalSliceContext.getTransferEntriesQuery.data,
-			...journalSliceContext.getTentativeTransferEntryRecurrencesQuery.data,
-		}
-		const groups = Object.values(entries).reduce(
-			(acc: Record<TransferEntry['_id'], (TransferEntry | TentativeTransferEntry)[]>, entry: TransferEntry | TentativeTransferEntry) => {
-				const { date } = entry
-				if (!date) {
-					return acc
-				}
-				if (acc[date]) {
-					acc[date].push(entry)
-				} else {
-					acc[date] = [entry]
-				}
-
-				return acc
-			}, {}
-		)
-
-		return groups
-	}, [journalSliceContext.getTransferEntriesQuery.data, journalSliceContext.getTentativeTransferEntryRecurrencesQuery.data])
-
-	const handleClickListItem = (event: MouseEvent<any>, entry: NonspecificEntry) => {
+	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
 		setSelectedEntry({
 			anchorEl: event.currentTarget,
 			entry: entry,
 		})
 	}
 
-	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: NonspecificEntry) => {
-		if (entry.type === JOURNAL_ENTRY.value || entry.type === TRANSFER_ENTRY.value) {
-			journalContext.editJournalEntry(entry)
-		} else {
-			// TODO could add logic for double-clicking a tentative entry?
-		}
+	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
+		beginEditingJournalEntry(entry)
 	}
 
 	const handleDeselectListItem = () => {
@@ -103,14 +79,14 @@ export default function JournalEditor() {
 		})
 	}
 
-	const handleDeleteEntry = async (entry: NonspecificEntry | null) => {
+	const handleDeleteEntry = async (entry: JournalEntry | null) => {
 		if (!entry) {
 			return
 		}
 
 		try {
-			await deleteNonspecificEntry(entry._id)
-			journalSliceContext.refetchAllDependantQueries()
+			await deleteJournalEntry(entry._id)
+			journalEntriesQuery.refetch()
 			handleDeselectListItem()
 			snackbar({
 				message: 'Deleted 1 entry',
@@ -164,8 +140,8 @@ export default function JournalEditor() {
 						<Grid size={4}> */}
 					<Collapse in={false}>
 						<Stack direction='row' gap={2} mb={2}>
-							<SpendChart />
-							<CategorySpreadChart />
+							{/* <SpendChart />
+							<CategorySpreadChart /> */}
 						</Stack>
 					</Collapse>
 						{/* </Grid>
@@ -189,8 +165,7 @@ export default function JournalEditor() {
 							overflowY: 'auto',
 						}}>
 							<JournalEntryList
-								type={tab === 'journal' ? 'JOURNAL_ENTRY' : 'TRANSFER_ENTRY'}
-								journalRecordGroups={tab === 'journal' ? journalGroups : transferGroups}
+								journalRecordGroups={tab === 'journal' ? journalGroups : {}}
 								onClickListItem={handleClickListItem}
 								onDoubleClickListItem={handleDoubleClickListItem}
 							/>

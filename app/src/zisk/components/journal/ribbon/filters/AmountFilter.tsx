@@ -1,6 +1,6 @@
 import AmountField from "@/components/input/AmountField";
-import { JournalSliceContext } from "@/contexts/JournalSliceContext";
-import { AmountRange } from "@/types/schema";
+import { JournalFilterContext } from "@/contexts/JournalFilterContext";
+import { AmountRange } from "@/schema/support/search/facet";
 import { Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import { useContext } from "react";
 
@@ -8,14 +8,15 @@ export const DEFAULT_AMOUNT_RANGE: AmountRange = {
     // absolute: true,
     gt: '',
     lt: '',
+    currency: 'CAD',
 }
 
 export default function AmountFilter() {
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalFilterContext = useContext(JournalFilterContext)
 
     const amountRange: AmountRange = {
         ...DEFAULT_AMOUNT_RANGE,
-        ...journalSliceContext.amount
+        ...journalFilterContext?.activeJournalMemoryFilters?.AMOUNT
     }
 
     return (
@@ -45,10 +46,13 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.gt ?? ''}
                                 onChange={(event) => {
-                                    journalSliceContext.onChangeAmountRange({
-                                        ...amountRange,
-                                        gt: event.target.value,
-                                    })
+                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                                        ...prev,
+                                        AMOUNT: {
+                                            ...amountRange,
+                                            gt: event.target.value,
+                                        }
+                                    }))
                                 }}
                                 label={undefined}
                                 variant='standard'
@@ -68,10 +72,13 @@ export default function AmountFilter() {
                                 disableSignChange={false}
                                 value={amountRange?.lt ?? ''}
                                 onChange={(event) => {
-                                    journalSliceContext.onChangeAmountRange({
-                                        ...amountRange,
-                                        lt: event.target.value,
-                                    })
+                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                                        ...prev,
+                                        AMOUNT: {
+                                            ...amountRange,
+                                            lt: event.target.value,
+                                        }
+                                    }))
                                 }}
                                 label={undefined}
                                 variant='standard'

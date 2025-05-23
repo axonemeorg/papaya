@@ -6,16 +6,23 @@ import JournalEntrySelectionActions from './JournalEntrySelectionActions'
 import JournalFilterRibbon from './JournalFilterRibbon'
 import { useContext, useRef, useState } from 'react'
 import { Add, FilterAltOff } from '@mui/icons-material'
-import { JournalSliceContext } from '@/contexts/JournalSliceContext'
 import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import { SearchFacetKey } from '@/schema/support/search/facet'
+import { enumerateFilters } from '@/utils/filtering'
 
 export default function JournalHeader() {
 	const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)
-    const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
+	const filtersMenuButtonRef = useRef<HTMLButtonElement | null>(null)
 
-	const journalSliceContext = useContext(JournalSliceContext)
-    const numFilters = journalSliceContext.getActiveFilterSet().size
+	const journalFilterContext = useContext(JournalFilterContext)
+
+	const activeFilterSlots: Set<SearchFacetKey> = journalFilterContext?.activeJournalFilters
+		? enumerateFilters(journalFilterContext.activeJournalFilters)
+		: new Set()
+	
+	const numFilters = activeFilterSlots.size
 
 	const hideFilterButton = false
 
@@ -28,12 +35,16 @@ export default function JournalHeader() {
 		})
 	}
 
+	const clearAllFilters = () => {
+		journalFilterContext?.updateJournalMemoryFilters(() => ({}))
+	}
+
 	return (
 		<>
 			<JournalFilterPicker
 				anchorEl={filtersMenuButtonRef.current}
-                open={showFiltersMenu}
-                onClose={() => setShowFiltersMenu(false)}
+				open={showFiltersMenu}
+				onClose={() => setShowFiltersMenu(false)}
 			/>
 			<Stack component='header'>
 				<Stack
@@ -79,7 +90,7 @@ export default function JournalHeader() {
 									</Badge>
 									<Fade in={numFilters > 0}>
 										<Tooltip title='Clear filters'>
-											<IconButton onClick={() => journalSliceContext.clearAllSliceFilters()}>
+											<IconButton onClick={() => clearAllFilters()}>
 												<FilterAltOff fontSize='small' />
 											</IconButton>
 										</Tooltip>

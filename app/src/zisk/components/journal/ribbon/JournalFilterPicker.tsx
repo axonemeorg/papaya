@@ -2,17 +2,11 @@ import { Attachment, Category, DateRange, Delete, LocalOffer, Paid } from "@mui/
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import CategoryFilter from "./filters/CategoryFilter";
-import { JournalSliceContext } from "@/contexts/JournalSliceContext";
 import AmountFilter from "./filters/AmountFilter";
-
-export enum JournalFilterSlot {
-    AMOUNT = 'AMOUNT',
-    ATTACHMENTS = 'ATTACHMENTS',
-    CATEGORIES = 'CATEGORIES',
-    DATE_RANGE = 'DATE_RANGE',
-    // RESERVED_TAGS = 'RESERVED_TAGS',
-    TAGS = 'TAGS',
-}
+import TagsFilter from "./filters/TagsFilter";
+import DateFilter from "./filters/DateFilter";
+import { SearchFacetKey } from "@/schema/support/search/facet";
+import { JournalFilterContext } from "@/contexts/JournalFilterContext";
 
 interface JournalFilterSlotProperties {
     label: string
@@ -21,8 +15,8 @@ interface JournalFilterSlotProperties {
     component: ReactNode
 }
 
-const journalFilterSlots: Record<JournalFilterSlot, JournalFilterSlotProperties> = {
-    [JournalFilterSlot.AMOUNT]: {
+const journalFilterSlots: Record<SearchFacetKey, JournalFilterSlotProperties> = {
+    [SearchFacetKey.AMOUNT]: {
         label: 'Amount',
         icon: <Paid />,
         title: 'Amount is',
@@ -31,44 +25,36 @@ const journalFilterSlots: Record<JournalFilterSlot, JournalFilterSlotProperties>
         ),
     },
     
-    [JournalFilterSlot.ATTACHMENTS]: {
-        label: 'Attachments',
-        icon: <Attachment />,
-        title: 'Attachments are',
-        component: (
-            <div />
-        ),
-    },
+    // [SearchFacetKey.ATTACHMENTS]: {
+    //     label: 'Attachments',
+    //     icon: <Attachment />,
+    //     title: 'Attachments are',
+    //     component: (
+    //         <div />
+    //     ),
+    // },
 
-    [JournalFilterSlot.CATEGORIES]: {
+    [SearchFacetKey.CATEGORIES]: {
         label: 'Categories',
         icon: <Category />,
         title: 'Categories include',
         component: <CategoryFilter />
     },
 
-    [JournalFilterSlot.DATE_RANGE]: {
+    [SearchFacetKey.DATE]: {
         label: 'Date Range',
         icon: <DateRange />,
         title: 'Date',
-        component: <div />
+        component: <DateFilter />
     },
 
-    [JournalFilterSlot.TAGS]: {
+    [SearchFacetKey.TAGS]: {
         label: 'Tags',
         icon: <LocalOffer />,
         title: 'Tags include',
-        component: (
-            <div />
-        ),
+        component: <TagsFilter />,
     },
 }
-
-const NON_IMPELEMENTED_FILTERS: Set<JournalFilterSlot> = new Set([
-    JournalFilterSlot.ATTACHMENTS,
-    JournalFilterSlot.DATE_RANGE,
-    JournalFilterSlot.TAGS,
-])
 
 interface JournalFilterPickerProps {
     open: boolean
@@ -77,20 +63,35 @@ interface JournalFilterPickerProps {
 }
 
 export default function JournalFilterPicker(props: JournalFilterPickerProps) {
-    const [activeSlot, setActiveSlot] = useState<JournalFilterSlot | null>(null)
+    const [activeSlot, setActiveSlot] = useState<SearchFacetKey | null>(null)
 
-    const journalSliceContext = useContext(JournalSliceContext)
+    const journalFilterContext = useContext(JournalFilterContext)
 
-    const handleClickSlotButton = (slot: JournalFilterSlot) => {
+    const handleClickSlotButton = (slot: SearchFacetKey) => {
         setActiveSlot(slot)
+    }
+
+    const handleRemoveSlot = (slot: SearchFacetKey | null) => {
+        if (!slot) {
+            return
+        } else if (slot === SearchFacetKey.DATE) {
+            // DATE filter slot should always be present.
+            console.warn('Attempted to remove DATE search facet.')
+            return
+        }
+        journalFilterContext?.updateJournalMemoryFilters((prev) => {
+            const next = { ...prev }
+            delete next[slot];
+            return next
+        })
     }
 
     const handleRemoveActiveSlotFilters = () => {
         if (!activeSlot) {
             return
         }
-        journalSliceContext.removeFilterBySlot(activeSlot)
         setActiveSlot(null)
+        handleRemoveSlot(activeSlot)
     }
 
     useEffect(() => {
@@ -144,12 +145,10 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
                             sx={{ m: 1, mt: 0 }}
                         />
                         {Object.entries(journalFilterSlots).map(([key, properties]) => {
-                            const disabled = NON_IMPELEMENTED_FILTERS.has(key as JournalFilterSlot)
                             return (
                                 <MenuItem
                                     key={key}
-                                    disabled={disabled}
-                                    onClick={disabled ? undefined : () => handleClickSlotButton(key as JournalFilterSlot)}
+                                    onClick={() => handleClickSlotButton(key as SearchFacetKey)}
                                     dense
                                 >
                                     <ListItemIcon sx={(theme) => ({ color: theme.palette.text.secondary })}>{properties.icon}</ListItemIcon>

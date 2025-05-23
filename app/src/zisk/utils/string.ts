@@ -1,49 +1,92 @@
 import { SyncStatusEnum } from "@/contexts/RemoteContext"
+import { Figure } from "@/schema/models/Figure"
+import { Currency } from "@/schema/support/currency"
 
 export interface FormatCurrencyAmountOptions {
 	minimumFractionDigits: number
 	maximumFractionDigits: number
+	currency: Currency
 }
 
+/**
+ * Formats an amount string that excludes the currency symbol.
+ */
 const formatCurrencyAmount = (amount: number, options: Partial<FormatCurrencyAmountOptions> = {}): string => {
 	const combinedOptions: FormatCurrencyAmountOptions = {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
+		currency: 'USD',
 		...options,
 	}
+
+	// TODO should factor in combinedOptions.currency into chosing which toLocaleString params to provide.
 	return amount.toLocaleString('en-US', combinedOptions);
+}
+
+type SymbolRendering = 'simplified' | 'full'
+
+const SYMBOLS_BY_CURRENCY: Record<`${Currency}.${SymbolRendering}`, string> = {
+	'CAD.full': 'C$',
+	'CAD.simplified': '$',
+	'USD.full': 'US$',
+	'USD.simplified': '$',
+}
+
+const getSymbolFromCurrency = (currency: Currency, symbol: SymbolRendering | 'none') => {
+	if (symbol === 'none') {
+		return ''
+	}
+
+	return SYMBOLS_BY_CURRENCY[`${currency}.${symbol}`]
 }
 
 export interface PriceStringOptions {
 	sign: 'never' | 'whenPositive' | 'always'
+	symbol: SymbolRendering | 'none'
 	isApproximate: boolean
 	round: boolean
 }
 
-export const getPriceString = (price: number, options: Partial<PriceStringOptions> = {}): string => {
+export const getFigureString = (figure: Figure | undefined, options: Partial<PriceStringOptions> = {}): string => {
 	const combinedOptions: PriceStringOptions = {
 		sign: 'whenPositive',
+		symbol: 'full',
 		isApproximate: false,
 		round: false,
 		...options,
 	}
+	const price = figure?.amount ?? 0
 	const formatOptions: Partial<FormatCurrencyAmountOptions> = combinedOptions.round ? {
 		maximumFractionDigits: 0,
 		minimumFractionDigits: 0,
 	} : {}
-	let priceString: string
-	if (price === 0) {
-		priceString = '$0.00'
-	} else if (price > 0) {
-		priceString = `${['always', 'whenPositive'].includes(combinedOptions.sign) ? '+' : ''}$${formatCurrencyAmount(price, formatOptions)}`
-	} else {
-		priceString = `${options.sign === 'always' ? '-' : ''}$${formatCurrencyAmount(-price)}`
-	}
+	let priceStringParts: string[] = []
+	
 	if (combinedOptions.isApproximate) {
-		return `~${priceString}`
-	} else {
-		return priceString
+		priceStringParts.push('~')
 	}
+
+	if (price !== 0 && combinedOptions.sign !== 'never') {
+		if (combinedOptions.sign === 'whenPositive' && price > 0) {
+			priceStringParts.push('+')
+		} else if (combinedOptions.sign === 'always' && price < 0) {
+			priceStringParts.push('-')
+		}
+	}
+
+	if (figure?.currency) {
+		priceStringParts.push(getSymbolFromCurrency(figure.currency, combinedOptions.symbol))
+	}
+
+	if (price === 0) {
+		priceStringParts.push('0.00')
+	} else {
+		priceStringParts.push(
+			formatCurrencyAmount(Math.abs(price), formatOptions)
+		)
+	}
+
+	return priceStringParts.join('')
 }
 
 export const formatBasisPointsDiff = (basisPoints: number) => {

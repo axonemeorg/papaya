@@ -1,74 +1,50 @@
-import {
-	Account,
-	Category,
-	CreateAccount,
-	CreateCategory,
-	CreateEntryTag,
-	CreateJournalMeta,
-	DocumentMetadata,
-	EntryTag,
-	JournalEntry,
-	JournalMeta,
-	NonspecificEntry,
-	TransferEntry,
-	ZiskDocument,
-	ZiskSettings,
-} from '@/types/schema'
 import { getDatabaseClient, initializeDatabaseClient } from './client'
 import { generateAccountId, generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
 import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 import dayjs from 'dayjs'
-import { calculateNetAmount } from '@/utils/journal'
-import { MigrationEngine } from './migrate'
+import { cementJournalEntry } from '@/utils/journal'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { Category, CreateCategory } from '@/schema/documents/Category'
+import { Account, CreateAccount } from '@/schema/documents/Account'
+import { DocumentObject } from '@/schema/support/orm/Document'
+import { CreateJournal, Journal } from '@/schema/documents/Journal'
+import { ZiskDocument } from '@/schema/union/ZiskDocument'
+import { CreateEntryTag, EntryTag } from '@/schema/documents/EntryTag'
+import { UserSettings } from '@/schema/models/UserSettings'
+// import { MigrationEngine } from './migrate'
 
 const db = getDatabaseClient()
 
-export const createJournalEntry = async (formData: JournalEntry): Promise<JournalEntry> => {
+export const createJournalEntry = async (formData: JournalEntry, journalId: string): Promise<JournalEntry> => {
 	const now = new Date().toISOString()
 
 	const newJournalEntry: JournalEntry = {
-		...formData,
-		parsedNetAmount: calculateNetAmount(formData),
-		type: 'JOURNAL_ENTRY',
-		createdAt: now,
-	}
-
-	await db.put(newJournalEntry)
-	return newJournalEntry
-}
-
-export const createTransferEntry = async (formData: TransferEntry): Promise<TransferEntry> => {
-	const now = new Date().toISOString()
-
-	const newJournalEntry: TransferEntry = {
-		...formData,
-		parsedNetAmount: calculateNetAmount(formData),
-		type: 'TRANSFER_ENTRY',
-		createdAt: now,
-	}
-
-	await db.put(newJournalEntry)
-	return newJournalEntry
-}
-
-export const updateJournalOrTransferEntry = async <T extends JournalEntry | TransferEntry>(formData: T) => {
-	delete formData._rev
-
-	const existingRecord = await db.get(formData._id)
-	const now = new Date().toISOString()
-
-	const docs: object[] = [
-		{
-			...existingRecord,
+		...cementJournalEntry({
 			...formData,
-			parsedNetAmount: calculateNetAmount(formData),
-			updatedAt: now,
-		},
-	]
+			journalId,
+			kind: 'zisk:entry',
+		}),
+		createdAt: now,
+	}
 
-	return db.bulkDocs(docs)
+	await db.put(newJournalEntry)
+	return newJournalEntry
+}
+
+export const updateJournalEntry = async <T extends JournalEntry>(formData: T) => {
+	const now = new Date().toISOString()
+
+	const updated = {
+		...cementJournalEntry(formData),
+		updatedAt: now,
+	}
+
+	delete (updated as any).$ephemeral
+
+	await db.put(updated)
+	return updated
 }
 
 export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
@@ -85,7 +61,7 @@ export const updateJournalEntryChildren = async (children: JournalEntry[]) => {
 	return db.bulkDocs(updatedChildren)
 }
 
-export const deleteNonspecificEntry = async <T extends NonspecificEntry>(entryId: string): Promise<T> => {
+export const deleteJournalEntry = async <T extends JournalEntry>(entryId: string): Promise<T> => {
 
 	// TODO check if it's a tentative entry; If so, add an exception in the recurring entry's exception field.
 
@@ -98,30 +74,32 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 	await db.put(journalEntry)
 }
 
-export const createCategory = async (formData: CreateCategory, journalId: string) => {
+export const createCategory = async (formData: CreateCategory, journalId: string): Promise<Category> => {
 	const category: Category = {
 		...formData,
-		type: 'CATEGORY',
+		kind: 'zisk:category',
 		_id: generateCategoryId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
 		journalId,
 	}
 
-	return db.put(category)
+	await db.put(category)
+	return category
 }
 
 export const createAccount = async (formData: CreateAccount, journalId: string) => {
-	const category: Account = {
+	const account: Account = {
 		...formData,
-		type: 'ACCOUNT',
+		kind: 'zisk:account',
 		_id: generateAccountId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
 		journalId,
 	}
 
-	return db.put(category)
+	await db.put(account)
+	return account
 }
 
 export const updateAccount = async (formData: Account) => {
@@ -131,13 +109,13 @@ export const updateAccount = async (formData: Account) => {
 	})
 }
 
-export const deleteRecord = async <T extends DocumentMetadata>(record: T): Promise<T> => {
+export const deleteRecord = async <T extends DocumentObject>(record: T): Promise<T> => {
 	const fetchedRecord = await db.get(record._id)
 	await db.remove(fetchedRecord)
 	return fetchedRecord as unknown as T
 }
 
-export const restoreRecord = async <T extends DocumentMetadata>(record: T): Promise<void> => {
+export const restoreRecord = async <T extends DocumentObject>(record: T): Promise<void> => {
 	const newRecord = { ...record }
 	delete record._rev;
 	await db.put(newRecord)
@@ -160,11 +138,11 @@ export const undeleteCategory = async (category: Category) => {
 	await db.put(category)
 }
 
-export const createJournal = async (journal: CreateJournalMeta): Promise<JournalMeta> => {
-	const newJournal: JournalMeta = {
+export const createJournal = async (journal: CreateJournal): Promise<Journal> => {
+	const newJournal: Journal = {
 		...journal,
-		type: 'JOURNAL',
-		journalVersion: MigrationEngine.latestVersion,
+		kind: 'zisk:journal',
+		// journalVersion: MigrationEngine.latestVersion,
 		_id: generateJournalId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
@@ -175,11 +153,11 @@ export const createJournal = async (journal: CreateJournalMeta): Promise<Journal
 	return newJournal
 }
 
-export const updateActiveJournal = async (journalId: string) => {
+export const updateActiveJournal = async (activeJournalId: string | null) => {
 	const meta = await getOrCreateZiskMeta()
 	await db.put({
 		...meta,
-		activeJournalId: journalId,
+		activeJournalId,
 	})
 }
 
@@ -209,18 +187,19 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
 	const tag: EntryTag = {
 		label:  formData.label,
 		description: formData.description,
-		type: 'ENTRY_TAG',
+		kind: 'zisk:tag',
 		_id: generateEntryTagId(),
 		createdAt: new Date().toISOString(),
 		updatedAt: null,
 		journalId,
 	}
 
-	return db.put(tag)
+	await db.put(tag)
+	return tag
 }
 
 export const exportJournal = async (journalId: string, compress: boolean) => {
-	const journal: JournalMeta = await db.get(journalId)
+	const journal: Journal = await db.get(journalId)
 	const journalObjects = [...await getAllJournalObjects(journalId), journal];
 	console.log('Exporting ' + String(journalObjects.length) + ' journal object(s)...')
 
@@ -247,7 +226,7 @@ export const exportJournal = async (journalId: string, compress: boolean) => {
 	FileSaver.saveAs(content, fileName);
 }
 
-export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDocument[]]> => {
+export const importJournal = async (archive: File): Promise<[Journal, ZiskDocument[]]> => {
 	const compressed = archive.name.endsWith('.zip')
 	let journalJsonString: string;
 
@@ -269,7 +248,7 @@ export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDo
 		throw new Error('Failed to parse journal JSON: ' + err)
 	}
 
-	const journal = journalObjects.find((obj: ZiskDocument) => obj.type === 'JOURNAL') as JournalMeta
+	const journal = journalObjects.find((obj: ZiskDocument) => 'kind' in obj && obj.kind === 'zisk:journal') as Journal | undefined
 	if (!journal) {
 		throw new Error('No JOURNAL metadata found in the imported file.')
 	}
@@ -286,13 +265,13 @@ export const importJournal = async (archive: File): Promise<[JournalMeta, ZiskDo
 	return [journal, documents]
 }
 
-export const updateSettings = async (settings: Partial<ZiskSettings>) => {
+export const updateSettings = async (newSettings: Partial<UserSettings>) => {
 	return getOrCreateZiskMeta().then((meta) => {
 		return db.put({
 			...meta,
-			settings: {
-				...meta.settings,
-				...settings,
+			userSettings: {
+				...meta.userSettings,
+				...newSettings,
 			},
 		})
 	})

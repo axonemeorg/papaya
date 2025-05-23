@@ -1,8 +1,8 @@
 import { Grid2 as Grid, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
-import { CreateQuickJournalEntry } from '@/types/schema'
 import CategoryAutocomplete from '../input/CategoryAutocomplete'
 import AmountField from '../input/AmountField'
+import { CreateQuickJournalEntry } from '@/schema/models/QuickJournalEntry'
 
 export default function QuickJournalEntryForm() {
 	// const [manuallySetCategory, setManuallySetCategory] = useState<boolean>(false);
@@ -71,7 +71,7 @@ export default function QuickJournalEntryForm() {
 							<CategoryAutocomplete
 								{...field}
 								ref={null}
-								value={categoryId}
+								value={categoryId ? [categoryId] : []}
 								onChange={(_event, newValue) => {
 									if (!Array.isArray(newValue)) {
 										setValue(field.name, newValue ?? undefined, { shouldDirty: true })
