@@ -17,7 +17,7 @@ export const calculateBasicAnalytics = (journalEntries: JournalEntry[], dateView
     const dateSums: Record<string, number> = {}
 
     journalEntries.forEach((entry) => {
-        const netAmount = calculateNetAmount(entry)
+        const netAmount = 0 // calculateNetAmount(entry)
         if (netAmount > 0) {
             sumGain += netAmount
         } else {

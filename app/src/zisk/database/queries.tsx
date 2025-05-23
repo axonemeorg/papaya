@@ -45,66 +45,6 @@ export const getAccounts = async (journalId: string): Promise<Record<string, Acc
 	return Object.fromEntries((result.docs as Account[]).map((account) => [account._id, account]))
 }
 
-/**
- * @deprecated
- */
-export const getJournalEntries = async (
-	journalSlice: JournalSlice,
-	journalId: string,
-): Promise<Record<string, JournalEntry>> => {
-	// const selectorClauses: any[] = [
-	// 	{ kind: 'zisk:entry' },
-	// 	{ journalId },
-	// ]
-
-	// // Date Range
-	// const { startDate, endDate } = getAbsoluteDateRangeFromDateView(journalSlice.dateView)
-	// if (startDate || endDate) {
-	// 	selectorClauses.push({
-	// 		date: {
-	// 			$gte: startDate?.format('YYYY-MM-DD'),
-	// 			$lte: endDate?.format('YYYY-MM-DD'),
-	// 		}
-	// 	});
-	// }
-
-	// const filters = enumerateFilters(journalSlice)
-
-	// // Categories
-	// if (filters.has(JournalFilterSlot.CATEGORIES)) {
-	// 	selectorClauses.push({
-	// 		categoryIds: {
-	// 			$in: journalSlice.categoryIds
-	// 		}
-	// 	})
-	// }
-
-	// // Amount range
-	// if (filters.has(JournalFilterSlot.AMOUNT)) {
-	// 	const { greaterThan, lessThan } = transformAmountRange(journalSlice.amount as AmountRange)
-	// 	selectorClauses.push({
-	// 		parsedNetAmount: {
-	// 			$gt: greaterThan,
-	// 			$lt: lessThan,
-	// 		}
-	// 	})
-	// }
-
-	// const selector = {
-	// 	'$and': selectorClauses,
-	// }
-
-	// const result = await db.find({
-	// 	selector,
-	// 	limit: ARBITRARY_MAX_FIND_LIMIT,
-	// })
-
-	// const entries = Object.fromEntries((result.docs as JournalEntry[]).map((entry) => [entry._id, entry])) as Record<string, JournalEntry>
-
-	// return entries
-	return {};
-}
-
 export const getJournalEntriesByUpstreamFilters = async (
 	journalId: string,
 	facets: Partial<SearchFacets>,

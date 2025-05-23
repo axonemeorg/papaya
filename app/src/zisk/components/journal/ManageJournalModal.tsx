@@ -109,7 +109,7 @@ export default function ManageJournalModal(props: ManageJournalModalProps) {
 
 	const { snackbar } = useContext(NotificationsContext)
 	
-	const removeJournal = (todo: any) => {
+	const removeJournal = (_journal: Journal) => {
 		throw new Error('Not implemented')
 	}
 

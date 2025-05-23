@@ -1,6 +1,7 @@
 import { ZiskContext } from "@/contexts/ZiskContext"
 import { updateSettings } from "@/database/actions"
 import { getOrCreateZiskMeta } from "@/database/queries"
+import { useZiskMeta } from "@/hooks/queries/useZiskMeta"
 import { ZiskMeta } from "@/schema/documents/ZiskMeta"
 import { UserSettings } from "@/schema/models/UserSettings"
 import { useQuery } from "@tanstack/react-query"
@@ -9,11 +10,7 @@ import { PropsWithChildren, useEffect, useState } from "react"
 export default function ZiskContextProvider(props: PropsWithChildren) {
     const [ziskMeta, setZiskMeta] = useState<ZiskMeta | null>(null)
 
-    const getZiskMetaQuery = useQuery<ZiskMeta | null>({
-        queryKey: ['ziskMeta'],
-        queryFn: getOrCreateZiskMeta,
-        enabled: true,
-    })
+    const getZiskMetaQuery = useZiskMeta()
 
     const updateZiskSettings = async (newSettings: Partial<UserSettings>): Promise<void> => {
         setZiskMeta((prev) => {
@@ -32,9 +29,7 @@ export default function ZiskContextProvider(props: PropsWithChildren) {
     }
 
     const context: ZiskContext = {
-        queries: {
-            ziskMeta: getZiskMetaQuery,
-        },
+        ziskMeta: getZiskMetaQuery.data,
         updateSettings: updateZiskSettings,
     }
 

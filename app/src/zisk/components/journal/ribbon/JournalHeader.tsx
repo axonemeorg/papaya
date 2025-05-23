@@ -36,7 +36,7 @@ export default function JournalHeader() {
 	}
 
 	const clearAllFilters = () => {
-		journalFilterContext?.updateJournalMemoryFilters({})
+		journalFilterContext?.updateJournalMemoryFilters(() => ({}))
 	}
 
 	return (

@@ -139,7 +139,7 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
 		_id: formData._id ?? generateTaskId(),
 		kind: 'zisk:artifact',
 		originalFileName: formData.originalFileName ?? '',
-    	contentType: formData.contentType ?? '',
+		contentType: formData.contentType ?? '',
 		size: formData.size ?? 0,
 		createdAt: now,
 		journalId,

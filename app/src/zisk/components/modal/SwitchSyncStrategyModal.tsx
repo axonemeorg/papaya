@@ -8,6 +8,7 @@ import { LoadingButton } from "@mui/lab";
 import { isValidUrl } from "@/utils/server";
 import { testCouchDbConnection } from "@/utils/database";
 import { UserSettings } from "@/schema/models/UserSettings";
+import { useZiskMeta } from "@/hooks/queries/useZiskMeta";
 
 type SyncStrategyType = 'LOCAL' | 'CUSTOM_SERVER_OR_ZISK_CLOUD' | 'COUCH_DB'
 
@@ -18,7 +19,8 @@ interface SwitchSyncStrategyModalProps {
 
 export default function SwitchSyncStrategyModal(props: SwitchSyncStrategyModalProps) {
     const ziskContext = useContext(ZiskContext)
-    const settings: UserSettings | undefined = ziskContext.data?.userSettings
+    const getZiskMetaQuery = useZiskMeta()
+    const settings: UserSettings | undefined = getZiskMetaQuery.data?.userSettings
     const currentServer = settings?.server
     const currentSyncStrategy = settings?.syncingStrategy
     

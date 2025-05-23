@@ -5,12 +5,27 @@ import { JournalContext } from "@/contexts/JournalContext"
 import AvatarIcon from "../icon/AvatarIcon"
 import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from "@/constants/journal"
 import { Edit, SwapHoriz } from "@mui/icons-material"
+import { useQuery } from "@tanstack/react-query"
+import { getDatabaseClient } from "@/database/client"
+import { Journal } from "@/schema/documents/Journal"
 
+const db = getDatabaseClient()
 
 export default function JournalSettings() {
     const journalContext = useContext(JournalContext)
 
-    const journal = journalContext.journal
+    const { activeJournalId } = journalContext
+
+    const getJournalMetaQuery = useQuery<Journal | null>({
+        queryKey: ['journal', activeJournalId],
+        queryFn: async (): Promise<Journal | null> => {
+            return db.get(activeJournalId!) ?? null as Journal | null
+        },
+        enabled: Boolean(activeJournalId),
+        initialData: null,
+    })
+
+    const journal: Journal | null = getJournalMetaQuery.data
 
     if (!journal) {
         return (
@@ -36,7 +51,9 @@ export default function JournalSettings() {
                                     startIcon={<SwapHoriz />}
                                     sx={{ my: -0.25, py: 0.25 }}
                                     size="small"
-                                    onClick={() => journalContext.openJournalManager()}
+                                    onClick={() => {
+                                        throw new Error("Not implemented")
+                                    }}
                                 >
                                     Switch journals
                                 </Button>

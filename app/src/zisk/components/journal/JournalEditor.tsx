@@ -80,14 +80,13 @@ export default function JournalEditor() {
 	}
 
 	const handleDeleteEntry = async (entry: JournalEntry | null) => {
-		throw new Error('Not implemented')
 		if (!entry) {
 			return
 		}
 
 		try {
 			await deleteJournalEntry(entry._id)
-			// journalSliceContext.refetchAllDependantQueries()
+			journalEntriesQuery.refetch()
 			handleDeselectListItem()
 			snackbar({
 				message: 'Deleted 1 entry',

@@ -8,6 +8,7 @@ import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { updateActiveJournal } from '@/database/actions'
 import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import { useJournals } from '@/hooks/queries/useJournals'
+import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
 
 const db = getDatabaseClient()
 
@@ -32,31 +33,29 @@ export default function JournalContextProvider(props: PropsWithChildren) {
 	
 	const [hasLoadedInitialActiveJournal, setHasLoadedInitialActiveJournal] = useState<boolean>(false)
 
-	const ziskContext = useContext(ZiskContext)
-
 	const handleSelectNewActiveJournal = (journalId: string | null) => {
 		setActiveJournalId(journalId)
 		updateActiveJournal(journalId)
 	}
 
 	const getJournalsQuery = useJournals()
+	const getZiskMetaQuery = useZiskMeta()
 
 	useEffect(() => {
 		if (hasLoadedInitialActiveJournal) {
 			return
-		} if (!ziskContext.queries.ziskMeta.isFetched) {
+		} if (!getZiskMetaQuery.isFetched) {
 			return
 		}
-		console.log('ziskContext.queries.ziskMeta:', ziskContext.queries.ziskMeta)
-		if (!ziskContext.queries.ziskMeta.data?.activeJournalId) {
+		if (!getZiskMetaQuery.data?.activeJournalId) {
 			// No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one
 			console.log('No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one')
 			setJournalSelectorStatus('SELECTING')
 		} else {
-			setActiveJournalId(ziskContext.queries.ziskMeta.data?.activeJournalId)
+			setActiveJournalId(getZiskMetaQuery.data?.activeJournalId)
 		}
 		setHasLoadedInitialActiveJournal(true)
-	}, [getJournalsQuery.isFetched, ziskContext.queries.ziskMeta.isFetched, hasLoadedInitialActiveJournal])
+	}, [getJournalsQuery.isFetched, getZiskMetaQuery.isFetched, hasLoadedInitialActiveJournal])
 
 	// useEffect(() => {
 	// 	 else if (!getJournalsQuery.isFetched) {

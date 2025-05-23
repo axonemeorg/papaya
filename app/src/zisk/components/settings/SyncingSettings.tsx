@@ -10,6 +10,7 @@ import SyncWidget from "../widget/SyncWidget"
 import SwitchSyncStrategyModal from "../modal/SwitchSyncStrategyModal"
 import { __purgeAllLocalDatabases } from "@/database/actions"
 import { SyncingStrategy } from "@/schema/support/server"
+import { useZiskMeta } from "@/hooks/queries/useZiskMeta"
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
 // const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
@@ -19,16 +20,17 @@ export default function SyncingSettings() {
     const [showChangeSyncStrategyModal, setShowChangeSyncStrategyModal] = useState<boolean>(false)
 
     const ziskContext = useContext(ZiskContext)
+    const getZiskMetaQuery = useZiskMeta()
     // const { snackbar } = useContext(NotificationsContext)
 
-    if (!ziskContext.data) {
+    if (!getZiskMetaQuery.data) {
         return (
             <></>
         )
     }
     
-    const ziskServer = ziskContext.data.userSettings.server
-    const syncStrategy: SyncingStrategy = ziskContext.data.userSettings.syncingStrategy
+    const ziskServer = getZiskMetaQuery.data.userSettings.server
+    const syncStrategy: SyncingStrategy = getZiskMetaQuery.data.userSettings.syncingStrategy
 
     const handleDisconnectFromServer = async () => {
         const confirmDisconnect = window.confirm(

@@ -14,7 +14,7 @@ import { AttachmentMeta } from "@/schema/support/orm/Document"
 export default function EntryArtifactsForm() {
     const [selectedRows, setSelectedRows] = useState<string[]>([])
     const selectionMenuAnchorRef = useRef<HTMLDivElement>(null);
-    const journalContext = useContext(JournalContext)
+    const { activeJournalId } = useContext(JournalContext)
     
 	const promptForFiles = useFilePrompt()
     
@@ -27,7 +27,7 @@ export default function EntryArtifactsForm() {
 	})
 
     const handleAddArtifact = async () => {
-		if (!journalContext.journal) {
+		if (!activeJournalId) {
 			return
 		}
 
@@ -36,7 +36,6 @@ export default function EntryArtifactsForm() {
             return
 		}
         
-        const journalId = journalContext.journal._id
 		const newArtifacts: EntryArtifact[] = [];
 		const newAttachments: Record<string, AttachmentMeta> = {}
 
@@ -46,7 +45,7 @@ export default function EntryArtifactsForm() {
 				size: file.size,
 				originalFileName: file.name,
 				description: '',
-			}, journalId)
+			}, activeJournalId)
 
 			newArtifacts.push(artifact)
 			newAttachments[artifact._id] = {

@@ -30,7 +30,7 @@ export default function CreateAccountModal(props: CreateAccountModalProps) {
 	const theme = useTheme()
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const { journal } = useContext(JournalContext)
+	const { activeJournalId } = useContext(JournalContext)
 
 	const createAccountForm = useForm<CreateAccount>({
 		defaultValues: ACCOUNT_FORM_CREATE_VALUES,
@@ -38,11 +38,11 @@ export default function CreateAccountModal(props: CreateAccountModalProps) {
 	})
 
 	const handleCreateAccount = async (formData: CreateAccount) => {
-		if (!journal) {
+		if (!activeJournalId) {
 			return
 		}
 		try {
-			await createAccount(formData, journal._id)
+			await createAccount(formData, activeJournalId)
 			snackbar({ message: 'Created account' })
 			props.onClose()
 			props.onSaved()

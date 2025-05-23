@@ -21,6 +21,7 @@ import {
 	Typography,
 } from '@mui/material'
 import { useContext, useState } from 'react'
+import { useAccounts } from '@/hooks/queries/useAccounts'
 
 export default function ManageAccounts() {
 	const [showCreateAccountModal, setShowCreateAccountModal] = useState(false)
@@ -28,7 +29,7 @@ export default function ManageAccounts() {
 	const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
 
 	const { snackbar } = useContext(NotificationsContext)
-	const { getAccountsQuery } = useContext(JournalContext)
+	const getAccountsQuery = useAccounts()
 
 	const handleSelectAccountForEdit = (account: Account) => {
 		setSelectedAccount(account)
