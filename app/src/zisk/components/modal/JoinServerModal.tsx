@@ -29,8 +29,6 @@
 //     onClose: () => void
 // }
 
-
-
 // export default function JoinServerModal(props: JoinServerModalProps) {
 //     const [serverUrl, setServerUrl] = useState<string>('http://localhost:6006/')
 //     const [serverHealthCheckOk, setServerHealthCheckOk] = useState<boolean>(false)
@@ -95,7 +93,7 @@
 
 //         // Send username and password as form parameters
 //         let response
-        
+
 //         try {
 //             response = await fetch(couchDbLoginUrl, {
 //                 method: 'POST',

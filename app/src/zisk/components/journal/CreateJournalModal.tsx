@@ -10,69 +10,69 @@ import { CreateJournal, Journal } from '@/schema/documents/Journal'
 import { useAddJournal } from '@/hooks/queries/useJournals'
 
 interface CreateJournalModalProps {
-	open: boolean
-	onClose: () => void
-	onCreated: (newJournal: Journal) => void
+  open: boolean
+  onClose: () => void
+  onCreated: (newJournal: Journal) => void
 }
 
 const DEFAULT_JOURNAL_AVATAR = {
-	...DEFAULT_AVATAR,
+  ...DEFAULT_AVATAR,
 }
 
 export default function CreateJournalModal(props: CreateJournalModalProps) {
-	const addJournal = useAddJournal();
+  const addJournal = useAddJournal()
 
-	const createJournalForm = useForm<CreateJournal>({
-		defaultValues: {
-			avatar: {
-				...DEFAULT_JOURNAL_AVATAR,
-			},
-			journalName: '',
-		},
-		resolver: zodResolver(CreateJournal),
-	})
+  const createJournalForm = useForm<CreateJournal>({
+    defaultValues: {
+      avatar: {
+        ...DEFAULT_JOURNAL_AVATAR,
+      },
+      journalName: '',
+    },
+    resolver: zodResolver(CreateJournal),
+  })
 
-	const handleSubmit = async (formData: CreateJournal) => {
-		// Create a new journal
-		const newJournal: Journal = await createJournal({
-			...formData,
-		})
+  const handleSubmit = async (formData: CreateJournal) => {
+    // Create a new journal
+    const newJournal: Journal = await createJournal({
+      ...formData,
+    })
 
-		addJournal(newJournal)		
-		props.onClose()
-		props.onCreated(newJournal)
-	}
+    addJournal(newJournal)
+    props.onClose()
+    props.onCreated(newJournal)
+  }
 
-	useEffect(() => {
-		if (!props.open) {
-			createJournalForm.reset()
-		}
-	}, [props.open])
+  useEffect(() => {
+    if (!props.open) {
+      createJournalForm.reset()
+    }
+  }, [props.open])
 
-	return (
-		<Dialog open={props.open} onClose={props.onClose}>
-			<FormProvider {...createJournalForm}>
-				<form onSubmit={createJournalForm.handleSubmit(handleSubmit)}>
-					<DialogTitle>Create a Journal</DialogTitle>
-					<DialogContent sx={{ overflow: "initial" }}>
-						<Stack direction="row" spacing={1} mb={2}>
-							<Controller
-								name="avatar"
-								render={({ field }) => <AvatarPicker value={field.value} onChange={field.onChange} />}
-								control={createJournalForm.control}
-							/>
-							<TextField {...createJournalForm.register('journalName')} fullWidth label="Journal name" />
-						</Stack>
-						<ImportJournalForm />
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={props.onClose}>Cancel</Button>
-						<Button variant="contained" type="submit">
-							Create Journal
-						</Button>
-					</DialogActions>
-				</form>
-			</FormProvider>
-		</Dialog>
-	)
+  return (
+    <Dialog open={props.open} onClose={props.onClose}>
+      <FormProvider {...createJournalForm}>
+        <form onSubmit={createJournalForm.handleSubmit(handleSubmit)}>
+          <DialogTitle>Create a Journal</DialogTitle>
+          <DialogContent sx={{ overflow: 'initial' }}>
+            <Stack direction="row" spacing={1} mb={2}>
+              <Controller
+                name="avatar"
+                render={({ field }) => <AvatarPicker value={field.value} onChange={field.onChange} />}
+                control={createJournalForm.control}
+              />
+              <TextField {...createJournalForm.register('journalName')} fullWidth label="Journal name" />
+            </Stack>
+            <ImportJournalForm />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={props.onClose}>Cancel</Button>
+            <Button variant="contained" type="submit">
+              Create Journal
+            </Button>
+          </DialogActions>
+        </form>
+      </FormProvider>
+    </Dialog>
+  )
 }

@@ -71,7 +71,7 @@
 
 //     const renderResult = useCallback((result: FuseResult<ZiskDocument>, index: number) => {
 //         const key = [result.item['_id'], index].filter(Boolean).join('-')
-    
+
 //         let primaryTextFirstPart: ReactNode | undefined = undefined
 //         let primaryTextSecondPart: ReactNode | undefined = undefined
 //         let secondaryTextFirstPart: ReactNode | undefined = undefined
@@ -79,7 +79,7 @@
 //         let icon: ReactNode | undefined = undefined
 //         // let link: string | undefined = undefined
 //         let onClickHandler: (() => void) | undefined = undefined
-    
+
 //         // Journal Entry or Child Journal Entry
 //         if (documentIsJournalEntry(result.item)) {
 //             const netAmount = calculateNetAmount(result.item as JournalEntry)
@@ -88,7 +88,7 @@
 //             const category: Category | undefined = categoryId
 //                 ? journalContext.getCategoriesQuery.data[categoryId]
 //                 : undefined
-    
+
 //             primaryTextFirstPart = <span>{result.item.memo}</span>
 //             primaryTextSecondPart = (
 //                 <Typography
@@ -107,7 +107,7 @@
 //             onClickHandler = () => {
 //                 journalContext.editJournalEntry(result.item as JournalEntry)
 //             }
-            
+
 //         }
 
 //         // Category
@@ -115,7 +115,7 @@
 //             primaryTextFirstPart = <AvatarChip avatar={result.item.avatar} label={result.item.label} icon contrast />
 //             // link = generateCategoryLink(result.item)
 //         }
-    
+
 //         // Child Journal Entry
 //         if (documentIsChildJournalEntry(result.item)) {
 //             const parentJournalEntryMemo = result.item.parentEntry.memo ?? PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO
@@ -241,7 +241,7 @@
 //                                 }
 //                             }
 //                         }}
-                        
+
 //                     />
 //                     <Grow in={query.length > 0}>
 //                         <InputAdornment position='end'>

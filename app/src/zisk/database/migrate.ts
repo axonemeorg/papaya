@@ -38,7 +38,7 @@
 //     public static migrate: MigrationRun = async (records) => {
 //         let [journal, ...rest] = await this.initialMigration(records)
 //         const versionsRun: JournalVersion[] = []
-    
+
 //         while (journal.journalVersion !== this.latestVersion) {
 //             let migration: Migration = this.VERSION_STRATEGY[journal.journalVersion as keyof typeof this.VERSION_STRATEGY];
 //             if (migration === undefined) {

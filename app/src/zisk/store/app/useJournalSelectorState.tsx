@@ -1,15 +1,15 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 type JournalSelectorStatus = 'CLOSED' | 'SELECTING' | 'CREATING'
 
 interface JournalSelectorState {
-    status: JournalSelectorStatus
-    setStatus: (status: JournalSelectorStatus) => void
+  status: JournalSelectorStatus
+  setStatus: (status: JournalSelectorStatus) => void
 }
 
 const useJournalSelectorState = create<JournalSelectorState>((set) => ({
-    status: 'CLOSED',
-    setStatus: (status) => set({ status }),
+  status: 'CLOSED',
+  setStatus: (status) => set({ status }),
 }))
 
 export const useSetJournalSelectorStatus = () => useJournalSelectorState((state) => state.setStatus)

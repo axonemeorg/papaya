@@ -8,33 +8,33 @@ import { useAccounts } from '@/hooks/queries/useAccounts'
 export type AccountAutocompleteProps = Partial<Omit<AutocompleteProps<string, false, false, false>, 'options'>>
 
 export default function AccountAutocomplete(props: AccountAutocompleteProps) {
-	const { loading, ...rest } = props
+  const { loading, ...rest } = props
 
-	const getAccountsQuery = useAccounts()
-	const accounts = getAccountsQuery.data
-	const { isLoading } = getAccountsQuery
+  const getAccountsQuery = useAccounts()
+  const accounts = getAccountsQuery.data
+  const { isLoading } = getAccountsQuery
 
-	return (
-		<Autocomplete
-			loading={isLoading || loading}
-			options={Object.keys(accounts)}
-			renderInput={(params) => <TextField {...params} label={'Account'} />}
-			getOptionLabel={(option) => accounts[option]?.label}
-			getOptionKey={(option) => option}
-			renderOption={(props, option) => {
-				const { key, ...optionProps } = props
-				const account = accounts[option]
+  return (
+    <Autocomplete
+      loading={isLoading || loading}
+      options={Object.keys(accounts)}
+      renderInput={(params) => <TextField {...params} label={'Account'} />}
+      getOptionLabel={(option) => accounts[option]?.label}
+      getOptionKey={(option) => option}
+      renderOption={(props, option) => {
+        const { key, ...optionProps } = props
+        const account = accounts[option]
 
-				return (
-					<ListItem dense key={key} {...optionProps}>
-						<ListItemIcon>
-							<AvatarIcon avatar={account?.avatar} />
-						</ListItemIcon>
-						<ListItemText primary={account?.label} />
-					</ListItem>
-				)
-			}}
-			{...rest}
-		/>
-	)
+        return (
+          <ListItem dense key={key} {...optionProps}>
+            <ListItemIcon>
+              <AvatarIcon avatar={account?.avatar} />
+            </ListItemIcon>
+            <ListItemText primary={account?.label} />
+          </ListItem>
+        )
+      }}
+      {...rest}
+    />
+  )
 }

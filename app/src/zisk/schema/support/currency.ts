@@ -1,8 +1,4 @@
-import { z } from "zod";
-import { Figure } from "../models/Figure";
+import { z } from 'zod'
 
-export const Currency = z.enum([
-    'USD',
-    'CAD',
-])
+export const Currency = z.enum(['USD', 'CAD'])
 export type Currency = z.output<typeof Currency>

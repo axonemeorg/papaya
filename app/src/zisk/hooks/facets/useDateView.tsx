@@ -1,13 +1,13 @@
-import { JournalFilterContext } from "@/contexts/JournalFilterContext";
-import { DailyDateView, DateView, DateViewVariant, SearchFacetKey } from "@/schema/support/search/facet";
-import { getAnnualDateViewFromDate, getMonthlyDateViewFromDate, getWeeklyDateViewFromDate } from "@/utils/date";
-import { useNavigate } from "@tanstack/react-router";
-import dayjs from "dayjs";
-import { useCallback, useContext, useMemo } from "react";
+import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import { DailyDateView, DateView, DateViewVariant, SearchFacetKey } from '@/schema/support/search/facet'
+import { getAnnualDateViewFromDate, getMonthlyDateViewFromDate, getWeeklyDateViewFromDate } from '@/utils/date'
+import { useNavigate } from '@tanstack/react-router'
+import dayjs from 'dayjs'
+import { useCallback, useContext, useMemo } from 'react'
 
 interface UseDateView {
   dateView: DateView
-  startDate: dayjs.Dayjs,
+  startDate: dayjs.Dayjs
   changeDateView: (view: DateViewVariant) => void
   changeStartDate: (startDate: dayjs.Dayjs | null) => void
 }
@@ -25,27 +25,30 @@ export default function useDateView(): UseDateView {
   }, [])
 
   const navigate = useNavigate()
-  const pushToRouter = useCallback((dateView: DateView) => {
-    if (dateView.view === DateViewVariant.CUSTOM) {
-      return
-    }
-    let year: string | undefined = dateView.year ? String(dateView.year) : undefined
-    let month: string | undefined = dateView.month ? String(dateView.month) : undefined
-    let day: string | undefined = dateView.day ? String(dateView.day) : undefined
+  const pushToRouter = useCallback(
+    (dateView: DateView) => {
+      if (dateView.view === DateViewVariant.CUSTOM) {
+        return
+      }
+      const year: string | undefined = dateView.year ? String(dateView.year) : undefined
+      let month: string | undefined = dateView.month ? String(dateView.month) : undefined
+      let day: string | undefined = dateView.day ? String(dateView.day) : undefined
 
-    if (dateView.view === DateViewVariant.ANNUAL) {
-      month = undefined
-      day = undefined
-    } else if (dateView.view === DateViewVariant.MONTHLY) {
-      day = undefined
-    }
+      if (dateView.view === DateViewVariant.ANNUAL) {
+        month = undefined
+        day = undefined
+      } else if (dateView.view === DateViewVariant.MONTHLY) {
+        day = undefined
+      }
 
-    navigate({
-      to: '/journal/$view/$',
-      params: { view: dateView.view, y: year, m: month, d: day },
-      search: { tab: 'journal' },
-    })
-  }, [navigate])
+      navigate({
+        to: '/journal/$view/$',
+        params: { view: dateView.view, y: year, m: month, d: day },
+        search: { tab: 'journal' },
+      })
+    },
+    [navigate],
+  )
 
   const journalFilterContext = useContext(JournalFilterContext)
   const dateView: DateView = journalFilterContext?.activeJournalFilters?.[SearchFacetKey.DATE] ?? defaultDateView
@@ -74,7 +77,6 @@ export default function useDateView(): UseDateView {
       .year(year)
       .month(month - 1)
       .date(day)
-
   }, [dateView])
 
   const changeDateView = (view: DateViewVariant) => {
