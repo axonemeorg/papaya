@@ -11,62 +11,62 @@ import { CreateAccount } from '@/schema/documents/Account'
 import { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 
 interface CreateAccountModalProps {
-	open: boolean
-	onClose: () => void
-	onSaved: () => void
+  open: boolean
+  onClose: () => void
+  onSaved: () => void
 }
 
 export const ACCOUNT_FORM_CREATE_VALUES: CreateAccount = {
-	label: '',
-	description: '',
-	avatar: {
-		...DEFAULT_AVATAR,
-	},
+  label: '',
+  description: '',
+  avatar: {
+    ...DEFAULT_AVATAR,
+  },
 }
 
 export default function CreateAccountModal(props: CreateAccountModalProps) {
-	const { snackbar } = useContext(NotificationsContext)
+  const { snackbar } = useContext(NotificationsContext)
 
-	const theme = useTheme()
-	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const { activeJournalId } = useContext(JournalContext)
+  const { activeJournalId } = useContext(JournalContext)
 
-	const createAccountForm = useForm<CreateAccount>({
-		defaultValues: ACCOUNT_FORM_CREATE_VALUES,
-		resolver: zodResolver(CreateAccount),
-	})
+  const createAccountForm = useForm<CreateAccount>({
+    defaultValues: ACCOUNT_FORM_CREATE_VALUES,
+    resolver: zodResolver(CreateAccount),
+  })
 
-	const handleCreateAccount = async (formData: CreateAccount) => {
-		if (!activeJournalId) {
-			return
-		}
-		try {
-			await createAccount(formData, activeJournalId)
-			snackbar({ message: 'Created account' })
-			props.onClose()
-			props.onSaved()
-		} catch {
-			snackbar({ message: 'Failed to create account' })
-		}
-	}
+  const handleCreateAccount = async (formData: CreateAccount) => {
+    if (!activeJournalId) {
+      return
+    }
+    try {
+      await createAccount(formData, activeJournalId)
+      snackbar({ message: 'Created account' })
+      props.onClose()
+      props.onSaved()
+    } catch {
+      snackbar({ message: 'Failed to create account' })
+    }
+  }
 
-	return (
-		<FormProvider {...createAccountForm}>
-			<Dialog open={props.open} fullWidth fullScreen={fullScreen} onClose={props.onClose} maxWidth="md">
-				<form onSubmit={createAccountForm.handleSubmit(handleCreateAccount)}>
-					<DialogTitle>Add Account</DialogTitle>
-					<DialogContent sx={{ overflow: 'initial' }}>
-						<AccountForm />
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={() => props.onClose()}>Cancel</Button>
-						<Button type="submit" variant="contained" startIcon={<Add />}>
-							Add
-						</Button>
-					</DialogActions>
-				</form>
-			</Dialog>
-		</FormProvider>
-	)
+  return (
+    <FormProvider {...createAccountForm}>
+      <Dialog open={props.open} fullWidth fullScreen={fullScreen} onClose={props.onClose} maxWidth="md">
+        <form onSubmit={createAccountForm.handleSubmit(handleCreateAccount)}>
+          <DialogTitle>Add Account</DialogTitle>
+          <DialogContent sx={{ overflow: 'initial' }}>
+            <AccountForm />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => props.onClose()}>Cancel</Button>
+            <Button type="submit" variant="contained" startIcon={<Add />}>
+              Add
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </FormProvider>
+  )
 }

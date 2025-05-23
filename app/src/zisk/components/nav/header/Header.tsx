@@ -8,59 +8,59 @@ import UserWidget from './UserWidget'
 import SyncHeaderWidget from './SyncHeaderWidget'
 
 interface HeaderProps {
-	view: 'desktop' | 'mobile'
+  view: 'desktop' | 'mobile'
 }
 
 export default function Header(props: HeaderProps) {
-	const theme = useTheme()
-	const showLogo = !useMediaQuery(theme.breakpoints.down('md'))
+  const theme = useTheme()
+  const showLogo = !useMediaQuery(theme.breakpoints.down('md'))
 
-	// Get toggle menu function from zustand store
-	const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded)
-	const openDrawer = useAppMenuStateStore((state) => state.openDrawer)
-	const isExpanded = useAppMenuStateStore((state) => state.isExpanded)
+  // Get toggle menu function from zustand store
+  const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded)
+  const openDrawer = useAppMenuStateStore((state) => state.openDrawer)
+  const isExpanded = useAppMenuStateStore((state) => state.isExpanded)
 
-	const handleClickMenuButton = () => {
-		// If the screen is small, open the drawer. Otherwise, toggle the menu
-		if (props.view === 'mobile') {
-			openDrawer()
-		} else {
-			toggleExpanded()
-		}
-	}
+  const handleClickMenuButton = () => {
+    // If the screen is small, open the drawer. Otherwise, toggle the menu
+    if (props.view === 'mobile') {
+      openDrawer()
+    } else {
+      toggleExpanded()
+    }
+  }
 
-	return (
-		<Stack
-			component="header"
-			direction="row"
-			gap={1}
-			alignItems="center"
-			justifyContent={'space-between'}
-			sx={{
-				py: 1,
-				px: 1.5,
-				color: 'inherit',
-				textDecoration: 'none',
-			}}>
-			<Stack direction="row" gap={1} alignItems={'center'}>
-				<IconButton onClick={() => handleClickMenuButton()} size="large">
-					{isExpanded ? <MenuOpen /> : <Menu />}
-				</IconButton>
-				{showLogo && <AppLogo />}
-				<Stack direction="row" alignItems="center" gap={1} ml={showLogo ? 2 : undefined}>
-					<ActiveJournal />
-					<SyncHeaderWidget />
-				</Stack>
-			</Stack>
-			<Stack direction="row" gap={1} alignItems={'center'} sx={{ flex: 1, justifyContent: 'flex-end' }}>
-				<SearchWidget />
-				<IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
-					<Settings />
-				</IconButton>
-				<UserWidget />
-			</Stack>
-		</Stack>
-	)
+  return (
+    <Stack
+      component="header"
+      direction="row"
+      gap={1}
+      alignItems="center"
+      justifyContent={'space-between'}
+      sx={{
+        py: 1,
+        px: 1.5,
+        color: 'inherit',
+        textDecoration: 'none',
+      }}>
+      <Stack direction="row" gap={1} alignItems={'center'}>
+        <IconButton onClick={() => handleClickMenuButton()} size="large">
+          {isExpanded ? <MenuOpen /> : <Menu />}
+        </IconButton>
+        {showLogo && <AppLogo />}
+        <Stack direction="row" alignItems="center" gap={1} ml={showLogo ? 2 : undefined}>
+          <ActiveJournal />
+          <SyncHeaderWidget />
+        </Stack>
+      </Stack>
+      <Stack direction="row" gap={1} alignItems={'center'} sx={{ flex: 1, justifyContent: 'flex-end' }}>
+        <SearchWidget />
+        <IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
+          <Settings />
+        </IconButton>
+        <UserWidget />
+      </Stack>
+    </Stack>
+  )
 }
 
 // const Shortcut = (props: PropsWithChildren) => {

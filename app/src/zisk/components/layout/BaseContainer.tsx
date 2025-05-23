@@ -8,22 +8,22 @@ type IBaseContainerProps = PropsWithChildren<ContainerProps>
  * enforces the max-width for all content in the app.
  */
 export default function BaseContainer(props: IBaseContainerProps) {
-	const { children, sx, ...rest } = props
+  const { children, sx, ...rest } = props
 
-	return (
-		<Container
-			{...rest}
-			maxWidth="xl"
-			disableGutters
-			sx={{
-				px: {
-					xs: 1,
-					sm: 4,
-					md: 6,
-				},
-				...sx,
-			}}>
-			{children}
-		</Container>
-	)
+  return (
+    <Container
+      {...rest}
+      maxWidth="xl"
+      disableGutters
+      sx={{
+        px: {
+          xs: 1,
+          sm: 4,
+          md: 6,
+        },
+        ...sx,
+      }}>
+      {children}
+    </Container>
+  )
 }

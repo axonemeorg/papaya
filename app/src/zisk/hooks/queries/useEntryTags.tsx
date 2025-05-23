@@ -1,24 +1,23 @@
-import { JournalContext } from "@/contexts/JournalContext"
-import { createEntryTag } from "@/database/actions"
-import { getEntryTags } from "@/database/queries"
-import { EntryTag, CreateEntryTag } from "@/schema/documents/EntryTag"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useContext } from "react"
+import { JournalContext } from '@/contexts/JournalContext'
+import { createEntryTag } from '@/database/actions'
+import { getEntryTags } from '@/database/queries'
+import { EntryTag, CreateEntryTag } from '@/schema/documents/EntryTag'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useContext } from 'react'
 
 export const useEntryTags = () => {
-
   const journalContext = useContext(JournalContext)
 
   const activeJournalId = journalContext?.activeJournalId
 
   return useQuery<Record<string, EntryTag>>({
-		queryKey: [activeJournalId, 'entryTags'],
-		queryFn: async () => {
-			return getEntryTags(activeJournalId!)
-		},
-		initialData: {},
-		enabled: Boolean(journalContext.activeJournalId),
-	})
+    queryKey: [activeJournalId, 'entryTags'],
+    queryFn: async () => {
+      return getEntryTags(activeJournalId!)
+    },
+    initialData: {},
+    enabled: Boolean(journalContext.activeJournalId),
+  })
 }
 
 export const useAddEntryTag: () => (entryTag: CreateEntryTag) => Promise<EntryTag> = () => {
@@ -37,15 +36,12 @@ export const useAddEntryTag: () => (entryTag: CreateEntryTag) => Promise<EntryTa
       return createEntryTag(entryTag, activeJournalId)
     },
     onSuccess: (newEntryTag) => {
-      queryClient.setQueryData(
-        [activeJournalId, 'entryTags'],
-        (entryTags: Record<string, EntryTag>) => {
-          return {
-            ...entryTags,
-            [newEntryTag._id]: newEntryTag,
-          }
+      queryClient.setQueryData([activeJournalId, 'entryTags'], (entryTags: Record<string, EntryTag>) => {
+        return {
+          ...entryTags,
+          [newEntryTag._id]: newEntryTag,
         }
-      )
+      })
     },
   })
 

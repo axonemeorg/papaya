@@ -9,58 +9,58 @@ import { updateCategory } from '@/database/actions'
 import { Category } from '@/schema/documents/Category'
 
 interface EditCategoryModalProps {
-	open: boolean
-	initialValues: Category
-	onClose: () => void
-	onSaved: () => void
+  open: boolean
+  initialValues: Category
+  onClose: () => void
+  onSaved: () => void
 }
 
 export default function EditCategoryModal(props: EditCategoryModalProps) {
-	const { snackbar } = useContext(NotificationsContext)
+  const { snackbar } = useContext(NotificationsContext)
 
-	const theme = useTheme()
-	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-	
-	const updateCategoryForm = useForm<Category>({
-		defaultValues: {
-			...props.initialValues,
-		},
-		resolver: zodResolver(Category),
-	})	
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-	const handleUpdateCategory = async (formData: Category) => {
-		await updateCategory(formData)
-		snackbar({ message: 'Updated category' })
-		props.onClose()
-		props.onSaved()
-	}
+  const updateCategoryForm = useForm<Category>({
+    defaultValues: {
+      ...props.initialValues,
+    },
+    resolver: zodResolver(Category),
+  })
 
-	useEffect(() => {
-		updateCategoryForm.reset({ ...props.initialValues })
-	}, [props.initialValues])
+  const handleUpdateCategory = async (formData: Category) => {
+    await updateCategory(formData)
+    snackbar({ message: 'Updated category' })
+    props.onClose()
+    props.onSaved()
+  }
 
-	useEffect(() => {
-		if (props.open) {
-			updateCategoryForm.reset()
-		}
-	}, [props.open])
+  useEffect(() => {
+    updateCategoryForm.reset({ ...props.initialValues })
+  }, [props.initialValues])
 
-	return (
-		<FormProvider {...updateCategoryForm}>
-			<Dialog open={props.open} fullWidth fullScreen={fullScreen} onClose={props.onClose} maxWidth="md">
-				<form onSubmit={updateCategoryForm.handleSubmit(handleUpdateCategory)}>
-					<DialogTitle>Edit Category</DialogTitle>
-					<DialogContent sx={{ overflow: 'initial' }}>
-						<CategoryForm />
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={() => props.onClose()}>Cancel</Button>
-						<Button type="submit" variant="contained" startIcon={<Save />}>
-							Save
-						</Button>
-					</DialogActions>
-				</form>
-			</Dialog>
-		</FormProvider>
-	)
+  useEffect(() => {
+    if (props.open) {
+      updateCategoryForm.reset()
+    }
+  }, [props.open])
+
+  return (
+    <FormProvider {...updateCategoryForm}>
+      <Dialog open={props.open} fullWidth fullScreen={fullScreen} onClose={props.onClose} maxWidth="md">
+        <form onSubmit={updateCategoryForm.handleSubmit(handleUpdateCategory)}>
+          <DialogTitle>Edit Category</DialogTitle>
+          <DialogContent sx={{ overflow: 'initial' }}>
+            <CategoryForm />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => props.onClose()}>Cancel</Button>
+            <Button type="submit" variant="contained" startIcon={<Save />}>
+              Save
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </FormProvider>
+  )
 }

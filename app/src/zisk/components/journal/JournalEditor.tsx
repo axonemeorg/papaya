@@ -14,166 +14,166 @@ import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModa
 import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 
 export interface JournalEntrySelection {
-	entry: JournalEntry | null
-	anchorEl: HTMLElement | null
+  entry: JournalEntry | null
+  anchorEl: HTMLElement | null
 }
 
 export default function JournalEditor() {
-	const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
-		entry: null,
-		anchorEl: null,
-	})
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntrySelection>({
+    entry: null,
+    anchorEl: null,
+  })
 
-	const { snackbar } = useContext(NotificationsContext)
-	const journalEntriesQuery = useFilteredJournalEntries()
+  const { snackbar } = useContext(NotificationsContext)
+  const journalEntriesQuery = useFilteredJournalEntries()
 
-	const beginEditingJournalEntry = useBeginEditingJournalEntry()
+  const beginEditingJournalEntry = useBeginEditingJournalEntry()
 
-	const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
+  const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
 
-	const journalGroups: Record<string, JournalEntry[]> = useMemo(() => {
-		const entries: Record<string, JournalEntry> = {
-			...journalEntriesQuery.data,
-			// ...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
-		}
-		const groups = Object.values(entries).reduce(
-			(acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
-				const { date } = entry
-				if (!date) {
-					return acc
-				}
-				if (acc[date]) {
-					acc[date].push(entry)
-				} else {
-					acc[date] = [entry]
-				}
+  const journalGroups: Record<string, JournalEntry[]> = useMemo(() => {
+    const entries: Record<string, JournalEntry> = {
+      ...journalEntriesQuery.data,
+      // ...journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
+    }
+    const groups = Object.values(entries).reduce(
+      (acc: Record<JournalEntry['_id'], JournalEntry[]>, entry: JournalEntry) => {
+        const { date } = entry
+        if (!date) {
+          return acc
+        }
+        if (acc[date]) {
+          acc[date].push(entry)
+        } else {
+          acc[date] = [entry]
+        }
 
-				return acc
-			}, {}
-		)
+        return acc
+      },
+      {},
+    )
 
-		return groups
-	}, [
-		journalEntriesQuery.data,
-		// journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
-	])
+    return groups
+  }, [
+    journalEntriesQuery.data,
+    // journalSliceContext.getTentativeJournalEntryRecurrencesQuery.data,
+  ])
 
-	const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
-		setSelectedEntry({
-			anchorEl: event.currentTarget,
-			entry: entry,
-		})
-	}
+  const handleClickListItem = (event: MouseEvent<any>, entry: JournalEntry) => {
+    setSelectedEntry({
+      anchorEl: event.currentTarget,
+      entry: entry,
+    })
+  }
 
-	const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
-		beginEditingJournalEntry(entry)
-	}
+  const handleDoubleClickListItem = (_event: MouseEvent<any>, entry: JournalEntry) => {
+    beginEditingJournalEntry(entry)
+  }
 
-	const handleDeselectListItem = () => {
-		setSelectedEntry((prev) => {
-			const next = {
-				...prev,
-				anchorEl: null,
-			}
-			return next
-		})
-	}
+  const handleDeselectListItem = () => {
+    setSelectedEntry((prev) => {
+      const next = {
+        ...prev,
+        anchorEl: null,
+      }
+      return next
+    })
+  }
 
-	const handleDeleteEntry = async (entry: JournalEntry | null) => {
-		if (!entry) {
-			return
-		}
+  const handleDeleteEntry = async (entry: JournalEntry | null) => {
+    if (!entry) {
+      return
+    }
 
-		try {
-			await deleteJournalEntry(entry._id)
-			journalEntriesQuery.refetch()
-			handleDeselectListItem()
-			snackbar({
-				message: 'Deleted 1 entry',
-				action: {
-					label: 'Undo',
-					onClick: async () => {
-						// undeleteJournalEntry(record)
-						// 	.then(() => {
-						// 		journalContext.getCategoriesQuery.refetch()
-						// 		snackbar({ message: 'Category restored' })
-						// 	})
-						// 	.catch((error) => {
-						// 		console.error(error)
-						// 		snackbar({ message: 'Failed to restore category: ' + error.message })
-						// 	})
-					},
-				},
-			})
-		} catch {
-			snackbar({ message: 'Failed to delete entry' })
-		}
-	}
+    try {
+      await deleteJournalEntry(entry._id)
+      journalEntriesQuery.refetch()
+      handleDeselectListItem()
+      snackbar({
+        message: 'Deleted 1 entry',
+        action: {
+          label: 'Undo',
+          onClick: async () => {
+            // undeleteJournalEntry(record)
+            // 	.then(() => {
+            // 		journalContext.getCategoriesQuery.refetch()
+            // 		snackbar({ message: 'Category restored' })
+            // 	})
+            // 	.catch((error) => {
+            // 		console.error(error)
+            // 		snackbar({ message: 'Failed to restore category: ' + error.message })
+            // 	})
+          },
+        },
+      })
+    } catch {
+      snackbar({ message: 'Failed to delete entry' })
+    }
+  }
 
-	// show all docs
-	useEffect(() => {
-		const db = getDatabaseClient()
-	    db.allDocs({ include_docs: true }).then((result) => {
-	        console.log('all docs', result);
-	    })
-	}, []);
+  // show all docs
+  useEffect(() => {
+    const db = getDatabaseClient()
+    db.allDocs({ include_docs: true }).then((result) => {
+      console.log('all docs', result)
+    })
+  }, [])
 
-	return (
-		<>
-			{selectedEntry.entry && (
-				<JournalEntryCard
-					entry={selectedEntry.entry}
-					anchorEl={selectedEntry.anchorEl}
-					onClose={() => handleDeselectListItem()}
-					onDelete={() => handleDeleteEntry(selectedEntry.entry)}
-				/>
-			)}
-			<Stack direction="row" sx={{ gap: 2, overflow: 'hidden', flex: 1, pr: 2, pb: { sm: 0, md: 2 } }}>
-				<Stack
-					sx={{
-						overflow: 'hidden',
-						flex: 2,
-						gap: 0,
-					}}
-				>
-					{/* <Grid columns={12} container>
+  return (
+    <>
+      {selectedEntry.entry && (
+        <JournalEntryCard
+          entry={selectedEntry.entry}
+          anchorEl={selectedEntry.anchorEl}
+          onClose={() => handleDeselectListItem()}
+          onDelete={() => handleDeleteEntry(selectedEntry.entry)}
+        />
+      )}
+      <Stack direction="row" sx={{ gap: 2, overflow: 'hidden', flex: 1, pr: 2, pb: { sm: 0, md: 2 } }}>
+        <Stack
+          sx={{
+            overflow: 'hidden',
+            flex: 2,
+            gap: 0,
+          }}>
+          {/* <Grid columns={12} container>
 						<Grid size={4}> */}
-					<Collapse in={false}>
-						<Stack direction='row' gap={2} mb={2}>
-							{/* <SpendChart />
+          <Collapse in={false}>
+            <Stack direction="row" gap={2} mb={2}>
+              {/* <SpendChart />
 							<CategorySpreadChart /> */}
-						</Stack>
-					</Collapse>
-						{/* </Grid>
+            </Stack>
+          </Collapse>
+          {/* </Grid>
 					</Grid> */}
-					
-					<Stack
-						component={Paper}
-						sx={(theme) => ({
-							flex: 1,
-							borderTopLeftRadius: theme.spacing(2),
-							borderTopRightRadius: theme.spacing(2),
-							borderBottomLeftRadius: { sm: 0, md: theme.spacing(2) },
-							borderBottomRightRadius: { sm: 0, md: theme.spacing(2) },
-							overflow: 'hidden',
-						})}
-					>
-						<JournalHeader />
-						<Divider />
-						<Box sx={{
-							flex: 1,
-							overflowY: 'auto',
-						}}>
-							<JournalEntryList
-								journalRecordGroups={tab === 'journal' ? journalGroups : {}}
-								onClickListItem={handleClickListItem}
-								onDoubleClickListItem={handleDoubleClickListItem}
-							/>
-							<Stack component='footer'></Stack>
-						</Box>
-					</Stack>
-				</Stack>
-				{/* <Stack
+
+          <Stack
+            component={Paper}
+            sx={(theme) => ({
+              flex: 1,
+              borderTopLeftRadius: theme.spacing(2),
+              borderTopRightRadius: theme.spacing(2),
+              borderBottomLeftRadius: { sm: 0, md: theme.spacing(2) },
+              borderBottomRightRadius: { sm: 0, md: theme.spacing(2) },
+              overflow: 'hidden',
+            })}>
+            <JournalHeader />
+            <Divider />
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+              }}>
+              <JournalEntryList
+                journalRecordGroups={tab === 'journal' ? journalGroups : {}}
+                onClickListItem={handleClickListItem}
+                onDoubleClickListItem={handleDoubleClickListItem}
+              />
+              <Stack component="footer"></Stack>
+            </Box>
+          </Stack>
+        </Stack>
+        {/* <Stack
 					component={Paper}
 					sx={(theme) => ({
 						borderTopLeftRadius: theme.spacing(2),
@@ -201,8 +201,7 @@ export default function JournalEditor() {
 						
 					</Box>
 				</Stack> */}
-				
-			</Stack>
-		</>
-	)
+      </Stack>
+    </>
+  )
 }

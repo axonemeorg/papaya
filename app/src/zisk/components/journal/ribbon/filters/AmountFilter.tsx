@@ -1,93 +1,94 @@
-import AmountField from "@/components/input/AmountField";
-import { JournalFilterContext } from "@/contexts/JournalFilterContext";
-import { AmountRange } from "@/schema/support/search/facet";
-import { Stack, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
-import { useContext } from "react";
+import AmountField from '@/components/input/AmountField'
+import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import { AmountRange } from '@/schema/support/search/facet'
+import { Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { useContext } from 'react'
 
 export const DEFAULT_AMOUNT_RANGE: AmountRange = {
-    // absolute: true,
-    gt: '',
-    lt: '',
-    currency: 'CAD',
+  // absolute: true,
+  gt: '',
+  lt: '',
+  currency: 'CAD',
 }
 
 export default function AmountFilter() {
-    const journalFilterContext = useContext(JournalFilterContext)
+  const journalFilterContext = useContext(JournalFilterContext)
 
-    const amountRange: AmountRange = {
-        ...DEFAULT_AMOUNT_RANGE,
-        ...journalFilterContext?.activeJournalMemoryFilters?.AMOUNT
-    }
+  const amountRange: AmountRange = {
+    ...DEFAULT_AMOUNT_RANGE,
+    ...journalFilterContext?.activeJournalMemoryFilters?.AMOUNT,
+  }
 
-    return (
-        <Stack gap={1}>
-            <Table sx={{
-                '& td': {
-                    px: 0,
-                    py: 1,
-                    border: 0,
+  return (
+    <Stack gap={1}>
+      <Table
+        sx={{
+          '& td': {
+            px: 0,
+            py: 1,
+            border: 0,
 
-                    '& input': {
-                        // padding: 0,
-                    }
-                }
-            }}>
-                <TableBody>
-                    <TableRow>
-                        <TableCell>
-                            <Typography variant='body2' color='textSecondary'>
-                                More than
-                            </Typography>
-                        </TableCell>
-                        <TableCell>
-                            <AmountField
-                                size='small'
-                                fullWidth={false}
-                                disableSignChange={false}
-                                value={amountRange?.gt ?? ''}
-                                onChange={(event) => {
-                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
-                                        ...prev,
-                                        AMOUNT: {
-                                            ...amountRange,
-                                            gt: event.target.value,
-                                        }
-                                    }))
-                                }}
-                                label={undefined}
-                                variant='standard'
-                            />
-                        </TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell>
-                            <Typography variant='body2' color='textSecondary'>
-                                Less than
-                            </Typography>
-                        </TableCell>
-                        <TableCell>
-                            <AmountField
-                                size='small'
-                                fullWidth={false}
-                                disableSignChange={false}
-                                value={amountRange?.lt ?? ''}
-                                onChange={(event) => {
-                                    journalFilterContext?.updateJournalMemoryFilters((prev) => ({
-                                        ...prev,
-                                        AMOUNT: {
-                                            ...amountRange,
-                                            lt: event.target.value,
-                                        }
-                                    }))
-                                }}
-                                label={undefined}
-                                variant='standard'
-                            />
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-            {/* <ToggleButtonGroup
+            '& input': {
+              // padding: 0,
+            },
+          },
+        }}>
+        <TableBody>
+          <TableRow>
+            <TableCell>
+              <Typography variant="body2" color="textSecondary">
+                More than
+              </Typography>
+            </TableCell>
+            <TableCell>
+              <AmountField
+                size="small"
+                fullWidth={false}
+                disableSignChange={false}
+                value={amountRange?.gt ?? ''}
+                onChange={(event) => {
+                  journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                    ...prev,
+                    AMOUNT: {
+                      ...amountRange,
+                      gt: event.target.value,
+                    },
+                  }))
+                }}
+                label={undefined}
+                variant="standard"
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              <Typography variant="body2" color="textSecondary">
+                Less than
+              </Typography>
+            </TableCell>
+            <TableCell>
+              <AmountField
+                size="small"
+                fullWidth={false}
+                disableSignChange={false}
+                value={amountRange?.lt ?? ''}
+                onChange={(event) => {
+                  journalFilterContext?.updateJournalMemoryFilters((prev) => ({
+                    ...prev,
+                    AMOUNT: {
+                      ...amountRange,
+                      lt: event.target.value,
+                    },
+                  }))
+                }}
+                label={undefined}
+                variant="standard"
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      {/* <ToggleButtonGroup
                 exclusive
                 value={amountRange.absolute ? 'ABSOLUTE' : 'SIGNED'}
                 onChange={(_event, newValue: 'ABSOLUTE' | 'SIGNED') => {
@@ -104,6 +105,6 @@ export default function AmountFilter() {
                     Signed
                 </ToggleButton>
             </ToggleButtonGroup> */}
-        </Stack>
-    )
+    </Stack>
+  )
 }
