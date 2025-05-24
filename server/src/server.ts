@@ -1,123 +1,139 @@
-import cors from 'cors';
-import express, { NextFunction, Request, Response } from 'express';
-import { db } from './db.js';
-import { createSession, generateSessionToken, invalidateAllSessions, invalidateSession, Session, User, validateSessionToken } from './session.js';
+import axios from 'axios'
+import bcrypt from 'bcrypt'
+import cors from 'cors'
+import express, { Request, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
-// Extend Express Request type to include user and session
-declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-      session?: Session;
-    }
-  }
-}
+const PORT = process.env.PORT || 9000;
+const SERVER_NAME = process.env.SERVER_NAME || '';
+const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
+
+// New
+const COUCHDB_URL = process.env.COUCHDB_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRATION = "1h";
+const REFRESH_EXPIRATION = "7d";
+const ADMIN_ROLE_NAME = "_admin"
+
+// const initializationContext = new InitializationContext()
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Allow requests from specific origins
 
-// Simple authentication middleware
-const authenticate = (req: Request, res: Response, next: NextFunction): void => {
-  const token = req.headers.authorization?.split(' ')[1];
+app.use(cors({
+  origin: (origin, callback) => {
+    callback(null, true); // For now, allow all origins.
 
-  if (!token) {
-    res.status(401).json({ error: 'Authentication token required' });
-    return;
-  }
+    // if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+    // 	callback(null, true);
+    // } else {
+    // 	callback(new Error('Not allowed by CORS'));
+    // }
+  },
+  credentials: true, // Allow cookies and other credentials
+}));
 
-  const { session, user } = validateSessionToken(token);
 
-  if (!session || !user) {
-    res.status(401).json({ error: 'Invalid or expired session' });
-    return;
-  }
-
-  // Attach user and session to request object
-  req.user = user;
-  req.session = session;
-  next();
-};
-
-// Routes
-
-// Create a test user
-app.post('/api/users/test', (req: Request, res: Response): void => {
-  try {
-    const result = db.execute('INSERT INTO user DEFAULT VALUES');
-    const userId = Number(result.lastInsertRowid);
-    res.status(201).json({ userId });
-  } catch (error) {
-    console.error('Error creating test user:', error);
-    res.status(500).json({ error: 'Failed to create test user' });
-  }
-});
-
-// Login route (simplified for demonstration)
-app.post('/api/login', (req: Request, res: Response): void => {
-  try {
-    const { userId } = req.body;
-
-    if (!userId) {
-      res.status(400).json({ error: 'User ID is required' });
-      return;
-    }
-
-    // Check if user exists
-    const user = db.queryOne('SELECT id FROM user WHERE id = ?', userId);
-    if (!user) {
-      res.status(404).json({ error: 'User not found' });
-      return;
-    }
-
-    // Generate session token and create session
-    const token = generateSessionToken();
-    const session = createSession(token, userId);
-
-    res.status(200).json({ token, userId, expiresAt: session.expiresAt });
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ error: 'Login failed' });
-  }
-});
-
-// Protected route example
-app.get('/api/protected', authenticate, (req: Request, res: Response): void => {
+// Health check endpoint
+app.get('/', (req, res) => {
   res.json({
-    message: 'You have access to this protected resource',
-    userId: req.user!.id,
-    sessionExpiresAt: req.session!.expiresAt
+    zisk: 'Welcome',
+    version: '0.3.0',
+    serverName: SERVER_NAME,
+    status: 'ok',
+    initialized: true,
   });
 });
 
-// Logout route
-app.post('/api/logout', authenticate, (req: Request, res: Response): void => {
+// // Middleware to check admin role
+// function verifyAdmin(req, res, next) {
+//     const authHeader = req.headers.authorization;
+//     if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
+
+//     const token = authHeader.split(" ")[1];
+//     try {
+//         const decoded = jwt.verify(token, JWT_SECRET);
+//         if (decoded.role !== ADMIN_ROLE_NAME) return res.status(403).json({ error: "Forbidden" });
+//         next();
+//     } catch (err) {
+//         res.status(401).json({ error: "Invalid token" });
+//     }
+// }
+
+// // Add a new user (admin only)
+// app.post("/add-user", verifyAdmin, async (req, res) => {
+//     const { name, password, role } = req.body;
+
+//     if (!name || !password || !role) return res.status(400).json({ error: "Invalid input" });
+
+//     try {
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
+
+//         const userDoc = {
+//             _id: `org.couchdb.user:${name}`,
+//             name: name,
+//             roles: [],
+//             type: "user",
+//             password: hashedPassword,
+//             salt,
+//         };
+
+//         await axios.put(`${COUCHDB_URL}/_users/org.couchdb.user:${name}`, userDoc, {
+//             auth: {
+//                 name: ADMIN_ROLE_NAME,
+//                 password: "admin_password",
+//             },
+//         });
+
+//         res.status(201).json({ message: "User created" });
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+// Login endpoint
+app.post("/login", async (req: Request, res: Response) => {
+  const { name, password } = req.body;
+
+  if (!name || !password) return res.status(400).json({ error: "Invalid input" });
+
   try {
-    invalidateSession(req.session!.id);
-    res.status(200).json({ message: 'Logged out successfully' });
-  } catch (error) {
-    console.error('Error during logout:', error);
-    res.status(500).json({ error: 'Logout failed' });
+    const { data: userDoc } = await axios.get(`${COUCHDB_URL}/_users/org.couchdb.user:${name}`, {
+      auth: {
+        name: ADMIN_ROLE_NAME,
+        password: "admin_password",
+      },
+    });
+
+    const isValid = await bcrypt.compare(password, userDoc.password);
+    if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
+
+    const token = jwt.sign({ id: userDoc._id, role: userDoc.roles[0] }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRATION,
+    });
+
+    const refreshToken = jwt.sign({ id: userDoc._id }, JWT_SECRET, {
+      expiresIn: REFRESH_EXPIRATION,
+    });
+
+    res.cookie("auth_token", token, { httpOnly: true });
+    res.cookie("refresh_token", refreshToken, { httpOnly: true });
+
+    res.json({ message: "Logged in" });
+  } catch (err) {
+    res.status(401).json({ error: "Invalid credentials" });
   }
 });
 
-// Logout from all devices
-app.post('/api/logout-all', authenticate, (req: Request, res: Response): void => {
-  try {
-    invalidateAllSessions(req.user!.id);
-    res.status(200).json({ message: 'Logged out from all devices' });
-  } catch (error) {
-    console.error('Error during logout from all devices:', error);
-    res.status(500).json({ error: 'Logout from all devices failed' });
-  }
+// Logout endpoint
+app.post("/logout", (req, res) => {
+  res.clearCookie("auth_token");
+  res.clearCookie("refresh_token");
+  res.json({ message: "Logged out" });
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Session management system initialized`);
-  console.log(`Hot reload is working!`);
 });

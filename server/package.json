@@ -20,7 +20,6 @@
     "cors": "^2.8.5",
     "express": "^4.21.2"
   },
-  "type": "module",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.18",
