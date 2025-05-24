@@ -1,6 +1,6 @@
 import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
-import { db } from "./db";
+import { db } from "./db.js";
 
 /**
  * Generates a secure random session token

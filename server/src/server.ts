@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
-import { db } from './db';
-import { createSession, generateSessionToken, invalidateAllSessions, invalidateSession, Session, User, validateSessionToken } from './session';
+import { db } from './db.js';
+import { createSession, generateSessionToken, invalidateAllSessions, invalidateSession, Session, User, validateSessionToken } from './session.js';
 
 // Extend Express Request type to include user and session
 declare global {
@@ -119,4 +119,5 @@ app.post('/api/logout-all', authenticate, (req: Request, res: Response): void =>
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Session management system initialized`);
+  console.log(`Hot reload is working!`);
 });
