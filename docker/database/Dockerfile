@@ -1,4 +1,3 @@
-
 FROM couchdb:latest
 
 # Expose CouchDB port
@@ -11,8 +10,7 @@ COPY couchdb.ini /opt/couchdb/etc/local.d/couchdb.ini
 COPY setup.sh /usr/local/bin/setup.sh
 RUN --mount=type=secret,id=env_file \
     chmod +x /usr/local/bin/setup.sh && \
-    export $(grep -E "^(AUTH_ACCESS_TOKEN_SECRET|AUTH_ACCESS_TOKEN_HMAC_KID|ZISK_COUCHDB_ADMIN_USER|ZISK_COUCHDB_ADMIN_PASS)" /run/secrets/env_file | xargs) && \
-    COUCHDB_USER="$ZISK_COUCHDB_ADMIN_USER" COUCHDB_PASSWORD="$ZISK_COUCHDB_ADMIN_PASS" /usr/local/bin/setup.sh
+    /usr/local/bin/setup.sh
 
 # Use default CouchDB entrypoint and command
 CMD ["couchdb"]
