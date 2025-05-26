@@ -1,12 +1,15 @@
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express, { type Request, type Response } from 'express'
+import { createProxyMiddleware } from 'http-proxy-middleware'
+import nano from 'nano'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 
+// Load environment variables from .env file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const PORT = process.env.PORT || 9000;
@@ -27,16 +30,20 @@ const ENABLE_CORS = false
 const JWT_EXPIRATION = "1h";
 const REFRESH_EXPIRATION = "7d";
 
+// Cookies
+const AUTH_TOKEN_COOKIE = 'AuthToken'
+const REFRESH_TOKEN_COOKIE = 'RefreshToken'
+
+// Roles
 const ADMIN_ROLE_NAME = "_admin"
 
 const app = express();
 
+const couch = nano(`http://${ZISK_COUCHDB_ADMIN_USER}:${ZISK_COUCHDB_ADMIN_PASS}@${ZISK_COUCHDB_URL.split('//')[1]}`);
 
 if (ENABLE_CORS) {
   app.use(cors({
     origin: (origin, callback) => {
-      callback(null, true); // For now, allow all origins.
-
       if (!origin || ALLOWED_ORIGINS.includes(origin)) {
         callback(null, true);
       } else {
@@ -47,8 +54,52 @@ if (ENABLE_CORS) {
   }));
 }
 
+// Use cookie-parser middleware to parse cookies
+app.use(cookieParser());
+
+// Use body-parser for JSON and URL-encoded bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+const proxyMiddleware = createProxyMiddleware({
+  target: ZISK_COUCHDB_URL, // e.g. 'http://localhost:5984'
+  changeOrigin: true,
+  pathRewrite: {
+    '^/proxy': '', // Remove the 'proxy' prefix when forwarding
+  },
+  on: {
+    proxyReq: (proxyReq, req: Request, res: Response) => {
+      // Get the AuthToken from cookies
+      const authToken = req.cookies.AuthToken;
+
+      if (authToken) {
+        // Remove existing authorization header if present
+        proxyReq.removeHeader('Authorization');
+
+        // Add Bearer token
+        proxyReq.setHeader('Authorization', `Bearer ${authToken}`);
+      }
+
+      // If it's a POST/PUT/PATCH request with a body, we need to restream the body
+      if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+        const bodyData = JSON.stringify(req.body);
+        proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+        proxyReq.write(bodyData);
+      }
+    },
+    error: (err, req: Request, res: Response) => {
+      res.status(500).send('Proxy Error');
+    }
+  }
+});
+
+
+// Apply the proxy middleware to all routes under /couchdb
+app.use('/proxy', proxyMiddleware);
+
 // Health check endpoint
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.json({
     zisk: 'Welcome',
     version: '0.3.0',
@@ -58,12 +109,29 @@ app.get('/', (req, res) => {
   });
 });
 
+// app.all('proxy/*', async (req: Request, res: Response) => {
+//   const authToken = req.cookies[AUTH_TOKEN_COOKIE];
+
+//   // Get the path after '/couchdb'
+//   const path = req.url.replace('/couchdb', '');
+
+//   const options = {
+//     url: `${ZISK_COUCHDB_URL}${path}`,
+//     headers: {
+//       'Authorization': `Bearer ${authToken}`,
+//       ...req.headers
+//     }
+//   };
+
+//   request(options).pipe(res);
+// });
+
 app.post("/login", async (req: Request, res: Response) => {
 
 });
 
 // Logout endpoint
-app.post("/logout", (req, res) => {
+app.post("/logout", (req: Request, res: Response) => {
 
 });
 
