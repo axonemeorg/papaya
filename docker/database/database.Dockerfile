@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:experimental
+
 FROM couchdb:latest
 
 # Expose CouchDB port

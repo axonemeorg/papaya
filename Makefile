@@ -1,6 +1,6 @@
 # Database
 db-build:
-	docker build \
+	DOCKER_BUILDKIT=1 docker build \
 		--secret id=env_file,src=.env \
 		-t zisk-couchdb \
 		-f docker/database/database.Dockerfile \
