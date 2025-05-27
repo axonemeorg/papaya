@@ -1,8 +1,10 @@
+import axios from 'axios'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express, { type Request, type Response } from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
+import jwt from 'jsonwebtoken'
 import nano from 'nano'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -74,7 +76,7 @@ const proxyMiddleware = createProxyMiddleware({
   on: {
     proxyReq: (proxyReq, req: Request, res: Response) => {
       // Get the AuthToken from cookies
-      const authToken = req.cookies.AuthToken;
+      const authToken = req.cookies[AUTH_TOKEN_COOKIE];
 
       if (authToken) {
         // Remove existing authorization header if present
@@ -111,8 +113,88 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
+// @ts-ignore
 app.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
 
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    // Create Basic Authentication credentials
+    const credentials = Buffer.from(`${username}:${password}`).toString('base64');
+
+    try {
+      // Make request to CouchDB _session endpoint
+      const response = await axios.post(`${ZISK_COUCHDB_URL}/_session`, {
+        name: username,
+        password: password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${credentials}`
+        }
+      });
+
+      // If successful, extract user claims from CouchDB response
+      if (response.data && response.data.ok) {
+        const userClaims = {
+          name: response.data.name,
+          roles: response.data.roles,
+          // Add any additional claims you want to include in the JWT
+        };
+
+        // Create JWT token
+        const accessToken = jwt.sign(
+          userClaims,
+          AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
+          {
+            expiresIn: JWT_EXPIRATION,
+            subject: username,
+            algorithm: 'HS256',
+            keyid: AUTH_ACCESS_TOKEN_HMAC_KID
+          }
+        );
+
+        // Create refresh token
+        const refreshToken = jwt.sign(
+          { name: userClaims.name },
+          AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
+          { expiresIn: REFRESH_EXPIRATION }
+        );
+
+        // Set cookies
+        res.cookie(AUTH_TOKEN_COOKIE, accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
+        });
+
+        res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+        });
+
+        // Return success response
+        return res.status(200).json({
+          ok: true,
+          name: userClaims.name,
+          roles: userClaims.roles,
+          isAdmin: userClaims.roles.includes(ADMIN_ROLE_NAME)
+        });
+      } else {
+        return res.status(401).json({ error: 'Authentication failed' });
+      }
+    } catch (error) {
+      console.error('CouchDB authentication error:', error);
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 app.post("/logout", (req: Request, res: Response) => {
