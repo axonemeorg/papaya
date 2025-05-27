@@ -2,7 +2,7 @@ import axios from 'axios'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import express, { type Request, type Response } from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
 import nano from 'nano'
@@ -32,8 +32,9 @@ const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'ht
 const ENABLE_CORS = false
 
 // Token expiration times
-const JWT_EXPIRATION = "1h";
-const REFRESH_EXPIRATION = "7d";
+const JWT_EXPIRATION_SECONDS = 5; // 5 seconds
+const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
+const ENABLE_ISSUE_AUTH_TOKEN_VIA_REFRESH_TOKEN = true
 
 // Cookies
 const AUTH_TOKEN_COOKIE = 'AuthToken'
@@ -66,6 +67,82 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Helper function to check if a token is expired
+const isTokenExpired = (token: string, secret: string): boolean => {
+  try {
+    jwt.verify(token, secret);
+    return false;
+  } catch (error) {
+    return error instanceof jwt.TokenExpiredError;
+  }
+};
+
+// Middleware to handle token refresh
+const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction) => {
+  const accessToken = req.cookies[AUTH_TOKEN_COOKIE];
+  const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
+
+  // If refresh token is absent, continue normally
+  if (!refreshToken) {
+    return next();
+  }
+
+  try {
+    // Check if refresh token is valid (not expired)
+    const decoded = jwt.verify(refreshToken, AUTH_REFRESH_TOKEN_SECRET as jwt.Secret) as jwt.JwtPayload;
+
+    // Always create a new refresh token (sliding window)
+    const newRefreshToken = jwt.sign(
+      { name: decoded.name },
+      AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
+      { expiresIn: REFRESH_EXPIRATION_SECONDS }
+    );
+
+    // Set the new refresh token cookie
+    res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
+    });
+
+    if (!ENABLE_ISSUE_AUTH_TOKEN_VIA_REFRESH_TOKEN) {
+      throw new Error('Issuing auth tokens via refresh token is disabled.')
+    }
+    // Check if access token is expired or absent
+    if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET as string)) {
+      console.log("Minting new auth token")
+      // Create new access token
+      const userClaims = {
+        name: decoded.name,
+        roles: decoded.roles || [],
+      };
+
+      const newAccessToken = jwt.sign(
+        userClaims,
+        AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
+        {
+          expiresIn: JWT_EXPIRATION_SECONDS,
+          subject: decoded.name,
+          algorithm: 'HS256',
+          keyid: AUTH_ACCESS_TOKEN_HMAC_KID
+        }
+      );
+
+      // Set the new access token cookie
+      res.cookie(AUTH_TOKEN_COOKIE, newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: JWT_EXPIRATION_SECONDS * 1000,
+      });
+    }
+  } catch (error) {
+    console.error(error)
+    // If refresh token is expired or invalid, just continue
+  }
+
+  // Continue with the request
+  next();
+};
 
 const proxyMiddleware = createProxyMiddleware({
   target: ZISK_COUCHDB_URL, // e.g. 'http://localhost:5984'
@@ -99,8 +176,9 @@ const proxyMiddleware = createProxyMiddleware({
   }
 });
 
-// Apply the proxy middleware to all routes under /couchdb
-app.use('/proxy', proxyMiddleware);
+// Apply the token handling middleware and proxy middleware to all routes under /proxy
+// @ts-ignore - Express middleware typing issue
+app.use('/proxy', tokenMiddlewareHandler, proxyMiddleware);
 
 // Health check endpoint
 app.get('/', (req: Request, res: Response) => {
@@ -150,7 +228,7 @@ app.post("/login", async (req: Request, res: Response) => {
           userClaims,
           AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
           {
-            expiresIn: JWT_EXPIRATION,
+            expiresIn: JWT_EXPIRATION_SECONDS,
             subject: username,
             algorithm: 'HS256',
             keyid: AUTH_ACCESS_TOKEN_HMAC_KID
@@ -161,20 +239,22 @@ app.post("/login", async (req: Request, res: Response) => {
         const refreshToken = jwt.sign(
           { name: userClaims.name },
           AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
-          { expiresIn: REFRESH_EXPIRATION }
+          {
+            expiresIn: REFRESH_EXPIRATION_SECONDS
+          }
         );
 
         // Set cookies
         res.cookie(AUTH_TOKEN_COOKIE, accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          maxAge: 60 * 60 * 1000, // 1 hour in milliseconds
+          maxAge: JWT_EXPIRATION_SECONDS * 1000,
         });
 
         res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+          maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
         });
 
         // Return success response
@@ -197,8 +277,24 @@ app.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/logout", (req: Request, res: Response) => {
+// Logout endpoint
+// @ts-ignore
+app.post("/logout", async (req: Request, res: Response) => {
+  // Clear auth token cookie
+  res.cookie(AUTH_TOKEN_COOKIE, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 0,
+  });
 
+  // Clear refresh token cookie
+  res.cookie(REFRESH_TOKEN_COOKIE, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 0,
+  });
+
+  return res.status(200).json({ ok: true });
 });
 
 app.listen(PORT, () => {
