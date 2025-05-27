@@ -10,7 +10,10 @@ import { fileURLToPath } from 'url'
 // Load environment variables from .env file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+dotenv.config({
+  path: path.resolve(__dirname, '../../.env')
+});
 
 const PORT = process.env.PORT || 9000;
 const SERVER_NAME = process.env.SERVER_NAME || '';
@@ -20,7 +23,7 @@ const ZISK_COUCHDB_ADMIN_PASS = process.env.ZISK_COUCHDB_ADMIN_PASS
 const AUTH_ACCESS_TOKEN_SECRET = process.env.AUTH_ACCESS_TOKEN_SECRET
 const AUTH_REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET
 const AUTH_ACCESS_TOKEN_HMAC_KID = process.env.AUTH_ACCESS_TOKEN_HMAC_KID
-const ZISK_COUCHDB_URL = process.env.ZISK_COUCHDB_URL
+const ZISK_COUCHDB_URL = process.env.ZISK_COUCHDB_URL ?? 'http://localhost:5984'
 
 // CORS
 const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
@@ -94,7 +97,6 @@ const proxyMiddleware = createProxyMiddleware({
   }
 });
 
-
 // Apply the proxy middleware to all routes under /couchdb
 app.use('/proxy', proxyMiddleware);
 
@@ -109,28 +111,10 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// app.all('proxy/*', async (req: Request, res: Response) => {
-//   const authToken = req.cookies[AUTH_TOKEN_COOKIE];
-
-//   // Get the path after '/couchdb'
-//   const path = req.url.replace('/couchdb', '');
-
-//   const options = {
-//     url: `${ZISK_COUCHDB_URL}${path}`,
-//     headers: {
-//       'Authorization': `Bearer ${authToken}`,
-//       ...req.headers
-//     }
-//   };
-
-//   request(options).pipe(res);
-// });
-
 app.post("/login", async (req: Request, res: Response) => {
 
 });
 
-// Logout endpoint
 app.post("/logout", (req: Request, res: Response) => {
 
 });
