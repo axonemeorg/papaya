@@ -2,8 +2,8 @@ import axios from 'axios'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import express, { type NextFunction, type Request, type Response } from 'express'
-import { createProxyMiddleware } from 'http-proxy-middleware'
+import express, { type Request, type RequestHandler, type Response } from 'express'
+import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
 import nano from 'nano'
 import path, { dirname } from 'path'
@@ -67,7 +67,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Helper function to check if a token is expired
 const isTokenExpired = (token: string, secret: string): boolean => {
   try {
     jwt.verify(token, secret);
@@ -77,7 +76,7 @@ const isTokenExpired = (token: string, secret: string): boolean => {
   }
 };
 
-const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction) => {
+const tokenMiddlewareHandler: RequestHandler = (req, res, next) => {
   const accessToken = req.cookies[AUTH_TOKEN_COOKIE];
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
 
@@ -139,11 +138,11 @@ const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction)
     console.error(error)
   }
 
-  // Continue with the request
   next();
 };
 
-const proxyMiddleware = createProxyMiddleware({
+// Create the proxy middleware with proper typing
+const proxyMiddlewareOptions: Options = {
   target: ZISK_COUCHDB_URL, // e.g. 'http://localhost:5984'
   changeOrigin: true,
   pathRewrite: {
@@ -173,11 +172,9 @@ const proxyMiddleware = createProxyMiddleware({
       res.status(500).send('Proxy Error');
     }
   }
-});
+};
 
-// Apply the token handling middleware and proxy middleware to all routes under /proxy
-// @ts-ignore - Express middleware typing issue
-app.use('/proxy', tokenMiddlewareHandler, proxyMiddleware);
+app.use('/proxy', tokenMiddlewareHandler, createProxyMiddleware(proxyMiddlewareOptions));
 
 // Health check endpoint
 app.get('/', (req: Request, res: Response) => {
@@ -190,13 +187,13 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-// @ts-ignore
-app.post("/login", async (req: Request, res: Response) => {
+app.post("/login", async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+      res.status(400).json({ error: 'Username and password are required' });
+      return
     }
 
     // Create Basic Authentication credentials
@@ -219,7 +216,6 @@ app.post("/login", async (req: Request, res: Response) => {
         const userClaims = {
           name: response.data.name,
           roles: response.data.roles,
-          // Add any additional claims you want to include in the JWT
         };
 
         // Create JWT token
@@ -257,28 +253,28 @@ app.post("/login", async (req: Request, res: Response) => {
         });
 
         // Return success response
-        return res.status(200).json({
+        res.status(200).json({
           ok: true,
           name: userClaims.name,
           roles: userClaims.roles,
           isAdmin: userClaims.roles.includes(ADMIN_ROLE_NAME)
         });
       } else {
-        return res.status(401).json({ error: 'Authentication failed' });
+        res.status(401).json({ error: 'Authentication failed' });
       }
     } catch (error) {
       console.error('CouchDB authentication error:', error);
-      return res.status(401).json({ error: 'Authentication failed' });
+      res.status(401).json({ error: 'Authentication failed' });
+    } finally {
+      return
     }
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Logout endpoint
-// @ts-ignore
-app.post("/logout", async (req: Request, res: Response) => {
+app.post("/logout", async (req: Request, res: Response, next): Promise<void> => {
   // Clear auth token cookie
   res.cookie(AUTH_TOKEN_COOKIE, '', {
     httpOnly: true,
@@ -293,7 +289,7 @@ app.post("/logout", async (req: Request, res: Response) => {
     maxAge: 0,
   });
 
-  return res.status(200).json({ ok: true });
+  res.status(200).json({ ok: true });
 });
 
 app.listen(PORT, () => {
