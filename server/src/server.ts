@@ -77,12 +77,10 @@ const isTokenExpired = (token: string, secret: string): boolean => {
   }
 };
 
-// Middleware to handle token refresh
 const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction) => {
   const accessToken = req.cookies[AUTH_TOKEN_COOKIE];
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
 
-  // If refresh token is absent, continue normally
   if (!refreshToken) {
     return next();
   }
@@ -128,7 +126,9 @@ const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction)
         }
       );
 
-      // Set the new access token cookie
+      // Store the new token in res.locals for immediate use
+      res.locals.authToken = newAccessToken;
+
       res.cookie(AUTH_TOKEN_COOKIE, newAccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -137,7 +137,6 @@ const tokenMiddlewareHandler = (req: Request, res: Response, next: NextFunction)
     }
   } catch (error) {
     console.error(error)
-    // If refresh token is expired or invalid, just continue
   }
 
   // Continue with the request
@@ -152,8 +151,8 @@ const proxyMiddleware = createProxyMiddleware({
   },
   on: {
     proxyReq: (proxyReq, req: Request, res: Response) => {
-      // Get the AuthToken from cookies
-      const authToken = req.cookies[AUTH_TOKEN_COOKIE];
+      // Use the newly generated token if available, otherwise use the cookie
+      const authToken = res.locals.authToken ?? req.cookies[AUTH_TOKEN_COOKIE];
 
       if (authToken) {
         // Remove existing authorization header if present
