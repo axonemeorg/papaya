@@ -12,7 +12,7 @@ export interface SessionResponse {
 
 export interface UserClaims {
   name: string
-  '_couchdb.roles': string[]
+  roles: string[]
 }
 
 export interface RefreshTokenClaims {

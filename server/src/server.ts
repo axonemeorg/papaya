@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 import express, { type Request, type RequestHandler, type Response } from 'express'
 import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
-import nano from 'nano'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import AuthController from './controllers/AuthController'
@@ -33,7 +32,7 @@ const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'ht
 const ENABLE_CORS = false
 
 // Token expiration times
-const JWT_EXPIRATION_SECONDS = 5;
+const JWT_EXPIRATION_SECONDS = 15;
 const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 // Cookies
@@ -44,9 +43,8 @@ const REFRESH_TOKEN_COOKIE = 'RefreshToken'
 const ADMIN_ROLE_NAME = "_admin"
 
 
-const couch = nano(`http://${ZISK_COUCHDB_ADMIN_USER}:${ZISK_COUCHDB_ADMIN_PASS}@${ZISK_COUCHDB_URL.split('//')[1]}`);
-
-const authController = new AuthController(couch)
+// Initialize the AuthController
+const authController = new AuthController()
 
 const app = express();
 
@@ -191,7 +189,7 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
       // Create user claims for the access token
       const userClaims: UserClaims = {
         name: sessionResponse.userCtx.name,
-        "_couchdb.roles": [...sessionResponse.userCtx.roles],
+        roles: [...sessionResponse.userCtx.roles],
       };
 
       // Create access token

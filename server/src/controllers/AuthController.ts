@@ -1,6 +1,5 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import nano from "nano";
 import Controller from "../support/Controller";
 import { CouchDBUserDocument, Credentials, RefreshTokenClaims, SessionResponse, UserClaims } from "../support/types";
 import UserController from "./UserController";
@@ -14,12 +13,7 @@ const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 export default class AuthController extends Controller {
 
-  private userController: UserController;
-
-  constructor(couch: nano.ServerScope) {
-    super(couch)
-    this.userController = new UserController(couch)
-  }
+  private userController: UserController = new UserController();
 
   /**
    * Authenticates a user with the provided credentials and returns the session response.
@@ -97,17 +91,18 @@ export default class AuthController extends Controller {
    */
   public async invalidateAllRefreshTokensForUser(name: string): Promise<void> {
     try {
-      const userId = `org.couchdb.user:${name}`;
-      const userDb = this.couch.db.use('_users');
+      // Get the user document using UserController
+      const user = await this.userController.getUserByName(name);
 
-      // Get the user document
-      const user = await userDb.get(userId);
+      if (!user) {
+        throw new Error(`User ${name} not found`);
+      }
 
       // Update the user document to clear all refresh tokens
-      await userDb.insert({
+      await this.couch.db.use('_users').insert({
         ...user,
         refreshTokens: []
-      } as CouchDBUserDocument, userId);
+      } as CouchDBUserDocument, user._id);
     } catch (error) {
       console.error(`Failed to invalidate tokens for user ${name}:`, error);
       throw error;
@@ -131,21 +126,22 @@ export default class AuthController extends Controller {
     );
 
     try {
-      const userId = `org.couchdb.user:${name}`;
-      const userDb = this.couch.db.use('_users');
+      // Get the user document using UserController
+      const user = await this.userController.getUserByName(name);
 
-      // Get the user document
-      const user = await userDb.get(userId) as CouchDBUserDocument;
+      if (!user) {
+        throw new Error(`User ${name} not found`);
+      }
 
       // Add the new refresh token to the user's refreshTokens array
       const refreshTokens = user.refreshTokens || [];
       refreshTokens.push(refreshToken);
 
       // Update the user document
-      await userDb.insert({
+      await this.couch.db.use('_users').insert({
         ...user,
         refreshTokens: refreshTokens
-      } as CouchDBUserDocument, userId);
+      } as CouchDBUserDocument, user._id);
 
       return refreshToken;
     } catch (error) {
@@ -206,15 +202,17 @@ export default class AuthController extends Controller {
       // Decode the refresh token to get the user's name
       const refreshTokenClaims = await this.decodeRefreshToken(refreshToken);
 
-      // Find the user to get their roles
-      const userId = `org.couchdb.user:${refreshTokenClaims.name}`;
-      const userDb = this.couch.db.use('_users');
-      const user = await userDb.get(userId) as CouchDBUserDocument;
+      // Find the user to get their roles using UserController
+      const user = await this.userController.getUserByName(refreshTokenClaims.name);
+
+      if (!user) {
+        throw new Error(`User ${refreshTokenClaims.name} not found`);
+      }
 
       // Create user claims for the access token
       const userClaims: UserClaims = {
         name: refreshTokenClaims.name,
-        '_couchdb.roles': user.roles || []
+        roles: user.roles || []
       };
 
       // Sign and return the access token

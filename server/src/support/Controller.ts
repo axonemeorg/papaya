@@ -1,10 +1,8 @@
-import nano from "nano"
-
+import nano from "nano";
+import CouchDbConnection from "./CouchDbConnection";
 
 export default class Controller {
-  protected couch: nano.ServerScope
-
-  constructor(couch: nano.ServerScope) {
-    this.couch = couch
+  protected get couch(): nano.ServerScope {
+    return CouchDbConnection.getInstance().couch;
   }
 }
