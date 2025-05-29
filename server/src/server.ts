@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 import nano from 'nano'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { RefreshTokenClaims, SessionResponse, UserClaims } from './types'
 
 // Load environment variables from .env file
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +33,7 @@ const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'ht
 const ENABLE_CORS = false
 
 // Token expiration times
-const JWT_EXPIRATION_SECONDS = 5; // 5 seconds
+const JWT_EXPIRATION_SECONDS = 5;
 const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 const ENABLE_ISSUE_AUTH_TOKEN_VIA_REFRESH_TOKEN = true
 
@@ -43,9 +44,14 @@ const REFRESH_TOKEN_COOKIE = 'RefreshToken'
 // Roles
 const ADMIN_ROLE_NAME = "_admin"
 
-const app = express();
 
 const couch = nano(`http://${ZISK_COUCHDB_ADMIN_USER}:${ZISK_COUCHDB_ADMIN_PASS}@${ZISK_COUCHDB_URL.split('//')[1]}`);
+
+const app = express();
+
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (ENABLE_CORS) {
   app.use(cors({
@@ -59,13 +65,6 @@ if (ENABLE_CORS) {
     credentials: true, // Allow cookies and other credentials
   }));
 }
-
-// Use cookie-parser middleware to parse cookies
-app.use(cookieParser());
-
-// Use body-parser for JSON and URL-encoded bodies
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 const isTokenExpired = (token: string, secret: string): boolean => {
   try {
@@ -87,10 +86,13 @@ const tokenMiddlewareHandler: RequestHandler = (req, res, next) => {
   try {
     // Check if refresh token is valid (not expired)
     const decoded = jwt.verify(refreshToken, AUTH_REFRESH_TOKEN_SECRET as jwt.Secret) as jwt.JwtPayload;
+    const refreshClaims: RefreshTokenClaims = {
+      name: decoded.name,
+    };
 
     // Always create a new refresh token (sliding window)
     const newRefreshToken = jwt.sign(
-      { name: decoded.name },
+      refreshClaims,
       AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
       { expiresIn: REFRESH_EXPIRATION_SECONDS }
     );
@@ -109,9 +111,9 @@ const tokenMiddlewareHandler: RequestHandler = (req, res, next) => {
     if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET as string)) {
       console.log("Minting new auth token")
       // Create new access token
-      const userClaims = {
+      const userClaims: UserClaims = {
         name: decoded.name,
-        roles: decoded.roles || [],
+        '_couchdb.roles': decoded.roles || [],
       };
 
       const newAccessToken = jwt.sign(
@@ -196,32 +198,25 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    // Create Basic Authentication credentials
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
 
     try {
-      // Make request to CouchDB _session endpoint
-      const response = await axios.post(`${ZISK_COUCHDB_URL}/_session`, {
-        name: username,
-        password: password
-      }, {
+      const response = await axios.get<SessionResponse>(`${ZISK_COUCHDB_URL}/_session`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Basic ${credentials}`
         }
       });
 
-      // If successful, extract user claims from CouchDB response
       if (response.data && response.data.ok) {
-        const userClaims = {
-          name: response.data.name,
-          roles: response.data.roles,
+        const userClaims: UserClaims = {
+          name: response.data.userCtx.name,
+          "_couchdb.roles": [...response.data.userCtx.roles],
         };
 
-        // Create JWT token
         const accessToken = jwt.sign(
           userClaims,
-          AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
+          AUTH_ACCESS_TOKEN_SECRET,
           {
             expiresIn: JWT_EXPIRATION_SECONDS,
             subject: username,
@@ -230,16 +225,18 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
           }
         );
 
-        // Create refresh token
+        const refreshClaims: RefreshTokenClaims = {
+          name: userClaims.name,
+        };
+
         const refreshToken = jwt.sign(
-          { name: userClaims.name },
-          AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
+          refreshClaims,
+          AUTH_REFRESH_TOKEN_SECRET,
           {
             expiresIn: REFRESH_EXPIRATION_SECONDS
           }
         );
 
-        // Set cookies
         res.cookie(AUTH_TOKEN_COOKIE, accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -253,12 +250,7 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
         });
 
         // Return success response
-        res.status(200).json({
-          ok: true,
-          name: userClaims.name,
-          roles: userClaims.roles,
-          isAdmin: userClaims.roles.includes(ADMIN_ROLE_NAME)
-        });
+        res.status(200).json(response.data);
       } else {
         res.status(401).json({ error: 'Authentication failed' });
       }
