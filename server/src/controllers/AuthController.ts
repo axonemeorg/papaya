@@ -1,14 +1,11 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import Controller from "../support/Controller";
+import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, ZISK_COUCHDB_URL } from "../support/env";
 import { CouchDBUserDocument, Credentials, RefreshTokenClaims, SessionResponse, UserClaims } from "../support/types";
 import UserController from "./UserController";
 
-const ZISK_COUCHDB_URL = process.env.ZISK_COUCHDB_URL ?? 'http://localhost:5984';
-const AUTH_REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET;
-const AUTH_ACCESS_TOKEN_SECRET = process.env.AUTH_ACCESS_TOKEN_SECRET;
-const AUTH_ACCESS_TOKEN_HMAC_KID = process.env.AUTH_ACCESS_TOKEN_HMAC_KID;
-const JWT_EXPIRATION_SECONDS = 5;
+const JWT_EXPIRATION_SECONDS = 15;
 const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 export default class AuthController extends Controller {

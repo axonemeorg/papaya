@@ -1,31 +1,18 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import express, { type Request, type RequestHandler, type Response } from 'express'
 import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
-import path, { dirname } from 'path'
-import { fileURLToPath } from 'url'
 import AuthController from './controllers/AuthController'
+import {
+  AUTH_ACCESS_TOKEN_HMAC_KID,
+  AUTH_ACCESS_TOKEN_SECRET,
+  NODE_ENV,
+  PORT,
+  SERVER_NAME,
+  ZISK_COUCHDB_URL
+} from './support/env'
 import { UserClaims } from './support/types'
-
-// Load environment variables from .env file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-dotenv.config({
-  path: path.resolve(__dirname, '../../.env')
-});
-
-const PORT = process.env.PORT || 9000;
-const SERVER_NAME = process.env.SERVER_NAME || '';
-
-const ZISK_COUCHDB_ADMIN_USER = process.env.ZISK_COUCHDB_ADMIN_USER
-const ZISK_COUCHDB_ADMIN_PASS = process.env.ZISK_COUCHDB_ADMIN_PASS
-const AUTH_ACCESS_TOKEN_SECRET = process.env.AUTH_ACCESS_TOKEN_SECRET
-const AUTH_REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET
-const AUTH_ACCESS_TOKEN_HMAC_KID = process.env.AUTH_ACCESS_TOKEN_HMAC_KID
-const ZISK_COUCHDB_URL = process.env.ZISK_COUCHDB_URL ?? 'http://localhost:5984'
 
 // CORS
 const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
@@ -38,10 +25,6 @@ const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 // Cookies
 const ACCESS_TOKEN_COOKIE = 'AccessToken'
 const REFRESH_TOKEN_COOKIE = 'RefreshToken'
-
-// Roles
-const ADMIN_ROLE_NAME = "_admin"
-
 
 // Initialize the AuthController
 const authController = new AuthController()
@@ -83,11 +66,8 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    // Check if refresh token is valid by decoding it
-    const refreshTokenClaims = await authController.decodeRefreshToken(refreshToken);
-
     // Rotate the refresh token (sliding window)
-    const newRefreshToken = await authController.rotateRefreshToken(refreshToken);
+    const newRefreshToken: string | null = await authController.rotateRefreshToken(refreshToken);
 
     if (!newRefreshToken) {
       // Token reuse detected, invalidation already happened in rotateRefreshToken
@@ -97,14 +77,12 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
     // Set the new refresh token cookie
     res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
     });
 
     // Check if access token is expired or absent
     if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET as string)) {
-      console.log("Minting new auth token");
-
       // Create new access token using the refresh token
       const newAccessToken = await authController.createAccessTokenFromRefreshToken(newRefreshToken);
 
@@ -113,7 +91,7 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
 
       res.cookie(ACCESS_TOKEN_COOKIE, newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: JWT_EXPIRATION_SECONDS * 1000,
       });
     }
@@ -210,13 +188,13 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
       // Set cookies
       res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: JWT_EXPIRATION_SECONDS * 1000,
       });
 
       res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: NODE_ENV === 'production',
         maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
       });
 
@@ -236,14 +214,14 @@ app.post("/logout", async (req: Request, res: Response, next): Promise<void> => 
   // Clear auth token cookie
   res.cookie(ACCESS_TOKEN_COOKIE, '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
     maxAge: 0,
   });
 
   // Clear refresh token cookie
   res.cookie(REFRESH_TOKEN_COOKIE, '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: NODE_ENV === 'production',
     maxAge: 0,
   });
 
