@@ -1,4 +1,4 @@
-import Controller from "../support/Controller";
+import Controller from "../support/Controller.js";
 import { CouchDBUserDocument } from "../support/types";
 
 export default class UserController extends Controller {

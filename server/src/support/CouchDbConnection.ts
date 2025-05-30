@@ -1,5 +1,5 @@
 import nano from "nano";
-import { ZISK_COUCHDB_ADMIN_PASS, ZISK_COUCHDB_ADMIN_USER, ZISK_COUCHDB_URL } from "./env";
+import { ZISK_COUCHDB_ADMIN_PASS, ZISK_COUCHDB_ADMIN_USER, ZISK_COUCHDB_URL } from "./env.js";
 
 /**
  * Singleton class for managing CouchDB connection

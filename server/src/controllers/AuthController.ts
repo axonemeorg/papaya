@@ -1,9 +1,9 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import Controller from "../support/Controller";
-import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, ZISK_COUCHDB_URL } from "../support/env";
+import Controller from "../support/Controller.js";
+import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, ZISK_COUCHDB_URL } from "../support/env.js";
 import { CouchDBUserDocument, Credentials, RefreshTokenClaims, SessionResponse, UserClaims } from "../support/types";
-import UserController from "./UserController";
+import UserController from "./UserController.js";
 
 const JWT_EXPIRATION_SECONDS = 15;
 const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days

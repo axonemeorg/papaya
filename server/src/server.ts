@@ -5,15 +5,15 @@ import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import AuthController from './controllers/AuthController'
+import AuthController from './controllers/AuthController.js'
 import {
   AUTH_ACCESS_TOKEN_HMAC_KID,
   AUTH_ACCESS_TOKEN_SECRET,
   NODE_ENV,
-  PORT,
   SERVER_NAME,
-  ZISK_COUCHDB_URL
-} from './support/env'
+  ZISK_COUCHDB_URL,
+  ZISK_SERVER_PORT
+} from './support/env.js'
 import { UserClaims } from './support/types'
 
 // CORS
@@ -256,6 +256,6 @@ app.get('*', (req: Request, res: Response, next) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(ZISK_SERVER_PORT, () => {
+  console.log(`Server running on port ${ZISK_SERVER_PORT}`);
 });

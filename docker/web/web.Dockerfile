@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy app package files
 COPY app/package*.json ./
-RUN npm ci
+RUN npm ci --force
 
 # Copy app source files
 COPY app/ ./
@@ -46,4 +46,4 @@ RUN npm ci --omit=dev
 EXPOSE 9475
 
 # Start the server
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
