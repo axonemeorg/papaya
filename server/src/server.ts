@@ -142,8 +142,11 @@ const proxyMiddlewareOptions: Options = {
 
 app.use('/proxy', tokenMiddlewareHandler, createProxyMiddleware(proxyMiddlewareOptions));
 
+// API routes
+const apiRouter = express.Router();
+
 // Health check endpoint
-app.get('/', (req: Request, res: Response) => {
+apiRouter.get('/', (req: Request, res: Response) => {
   res.json({
     zisk: 'Welcome',
     version: '0.3.0',
@@ -153,7 +156,7 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
-app.post("/login", async (req: Request, res: Response): Promise<void> => {
+apiRouter.post("/login", async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
 
@@ -212,7 +215,7 @@ app.post("/login", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post("/logout", async (req: Request, res: Response, next): Promise<void> => {
+apiRouter.post("/logout", async (req: Request, res: Response, next): Promise<void> => {
   // Clear auth token cookie
   res.cookie(ACCESS_TOKEN_COOKIE, '', {
     httpOnly: true,
@@ -237,6 +240,9 @@ app.post("/logout", async (req: Request, res: Response, next): Promise<void> => 
   res.status(200).json({ ok: true });
 });
 
+// Mount the API router
+app.use('/api', apiRouter);
+
 // Serve static files from the built Vite app
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -246,12 +252,7 @@ const distPath = path.resolve(__dirname, '../../app/dist');
 app.use(express.static(distPath));
 
 // Catch-all route to serve index.html for client-side routing with Tanstack Router
-app.use((req: Request, res: Response, next) => {
-  // Skip if the request is already handled or is for API routes
-  if (req.path.startsWith('/proxy') || req.path === '/' || req.path === '/login' || req.path === '/logout') {
-    return next();
-  }
-
+app.get('*', (req: Request, res: Response, next) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
