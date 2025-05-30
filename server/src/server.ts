@@ -3,6 +3,8 @@ import cors from 'cors'
 import express, { type Request, type RequestHandler, type Response } from 'express'
 import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import AuthController from './controllers/AuthController'
 import {
   AUTH_ACCESS_TOKEN_HMAC_KID,
@@ -233,6 +235,24 @@ app.post("/logout", async (req: Request, res: Response, next): Promise<void> => 
   }
 
   res.status(200).json({ ok: true });
+});
+
+// Serve static files from the built Vite app
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, '../../app/dist');
+
+// Serve static files from the Vite build output
+app.use(express.static(distPath));
+
+// Catch-all route to serve index.html for client-side routing with Tanstack Router
+app.use((req: Request, res: Response, next) => {
+  // Skip if the request is already handled or is for API routes
+  if (req.path.startsWith('/proxy') || req.path === '/' || req.path === '/login' || req.path === '/logout') {
+    return next();
+  }
+
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
