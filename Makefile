@@ -11,6 +11,7 @@ db-run:
 		-d \
 		--name zisk-couchdb \
 		-p 5984:5984 \
+		-v zisk-couchdb-data:/opt/couchdb/data \
 		zisk-couchdb
 
 db-stop:
@@ -34,6 +35,7 @@ web-run:
 	docker run \
 		-d \
 		--name zisk-web \
+		--env-file .env \
 		-p 9475:9475 \
 		zisk-web
 
@@ -46,10 +48,18 @@ web-clean: web-stop
 
 web: web-build web-run
 
+# View logs
+logs-db:
+	docker logs -f zisk-couchdb
+
+logs-web:
+	docker logs -f zisk-web
+
 # Clean
-clean: db-clean web-clean
+clean: web-clean db-clean
+	docker volume rm zisk-couchdb-data || true
 
 .PHONY: \
 	db-build db-run db db-stop db-clean \
 	web-build web-run web web-stop web-clean \
-	clean
+	logs-db logs-web clean
