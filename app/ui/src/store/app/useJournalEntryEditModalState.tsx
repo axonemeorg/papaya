@@ -1,4 +1,4 @@
-import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
 import { create } from 'zustand'
 
 interface JournalEntryEditModalState {

@@ -1,6 +1,6 @@
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { ZiskMeta } from '@ui/schema/documents/ZiskMeta'
+import { UserSettings } from '@ui/schema/models/UserSettings'
 import { generateGenericUniqueId } from './id'
-import { UserSettings } from '@/schema/models/UserSettings'
 
 export const makeDefaultUserSettings = (): UserSettings => {
   return {

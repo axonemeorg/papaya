@@ -1,8 +1,8 @@
-import { AmountRange, DateView, SearchFacetKey, SearchFacets } from './facet'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { getAbsoluteDateRangeFromDateView } from '@/utils/date'
-import { transformAmountRange } from '@/utils/filtering'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { getAbsoluteDateRangeFromDateView } from '@ui/utils/date'
+import { transformAmountRange } from '@ui/utils/filtering'
 import dayjs from 'dayjs'
+import { AmountRange, DateView, SearchFacets } from './facet'
 
 export type DownstreamQueryFilter<T = unknown> = null | ((filter: T, entries: JournalEntry[]) => null | JournalEntry[])
 

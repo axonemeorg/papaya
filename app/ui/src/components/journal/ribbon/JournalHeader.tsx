@@ -1,16 +1,16 @@
 import { Badge, Button, Fade, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
 
-import JournalDateActions from './JournalDateActions'
-import JournalFilterPicker from './JournalFilterPicker'
-import JournalEntrySelectionActions from './JournalEntrySelectionActions'
-import JournalFilterRibbon from './JournalFilterRibbon'
-import { useContext, useRef, useState } from 'react'
 import { Add, FilterAltOff } from '@mui/icons-material'
-import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { SearchFacetKey } from '@/schema/support/search/facet'
-import { enumerateFilters } from '@/utils/filtering'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { SearchFacetKey } from '@ui/schema/support/search/facet'
+import { enumerateFilters } from '@ui/utils/filtering'
+import { useContext, useRef, useState } from 'react'
+import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
+import JournalDateActions from './JournalDateActions'
+import JournalEntrySelectionActions from './JournalEntrySelectionActions'
+import JournalFilterPicker from './JournalFilterPicker'
+import JournalFilterRibbon from './JournalFilterRibbon'
 
 export default function JournalHeader() {
   const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)

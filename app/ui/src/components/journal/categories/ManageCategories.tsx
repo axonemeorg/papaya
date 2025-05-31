@@ -1,27 +1,26 @@
-import AvatarIcon from '@/components/icon/AvatarIcon'
-import AvatarChip from '@/components/icon/AvatarChip'
-import CreateCategoryModal from '@/components/modal/CreateCategoryModal'
-import EditCategoryModal from '@/components/modal/EditCategoryModal'
-import { JournalContext } from '@/contexts/JournalContext'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { deleteCategory, undeleteCategory } from '@/database/actions'
-import { pluralize as p } from '@/utils/string'
 import { Add, Search } from '@mui/icons-material'
 import {
   Button,
   Divider,
-  Link as MuiLink,
   ListItem,
   ListItemIcon,
   MenuList,
+  Link as MuiLink,
   Paper,
   Stack,
   TextField,
   Typography,
 } from '@mui/material'
+import AvatarChip from '@ui/components/icon/AvatarChip'
+import AvatarIcon from '@ui/components/icon/AvatarIcon'
+import CreateCategoryModal from '@ui/components/modal/CreateCategoryModal'
+import EditCategoryModal from '@ui/components/modal/EditCategoryModal'
+import { NotificationsContext } from '@ui/contexts/NotificationsContext'
+import { deleteCategory, undeleteCategory } from '@ui/database/actions'
+import { useCategories } from '@ui/hooks/queries/useCategories'
+import { Category } from '@ui/schema/documents/Category'
+import { pluralize as p } from '@ui/utils/string'
 import { useContext, useState } from 'react'
-import { Category } from '@/schema/documents/Category'
-import { useCategories } from '@/hooks/queries/useCategories'
 
 export default function ManageCategories() {
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false)

@@ -1,6 +1,6 @@
-import Header from '@/components/nav/header/Header'
-import AppMenu from '@/components/nav/menu/AppMenu'
 import { Stack, useMediaQuery, useTheme } from '@mui/material'
+import Header from '@ui/components/nav/header/Header'
+import AppMenu from '@ui/components/nav/menu/AppMenu'
 import { PropsWithChildren } from 'react'
 
 export default function MainLayout(props: PropsWithChildren) {

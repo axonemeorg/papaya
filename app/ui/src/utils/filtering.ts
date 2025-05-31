@@ -1,7 +1,7 @@
-import { AmountRange, SearchFacetKey, SearchFacets } from '@/schema/support/search/facet'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { AmountRange, SearchFacetKey, SearchFacets } from '@ui/schema/support/search/facet'
+import { DownstreamQueryFilter, FacetedSearchDownstreamFilters } from '@ui/schema/support/search/filter'
 import { parseJournalEntryAmount } from './journal'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { DownstreamQueryFilter, FacetedSearchDownstreamFilters } from '@/schema/support/search/filter'
 
 export type FilterPair<K extends SearchFacetKey> = [K, SearchFacets[K]]
 

@@ -1,5 +1,5 @@
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
-import { UserSettings } from '@/schema/models/UserSettings'
+import { ZiskMeta } from '@ui/schema/documents/ZiskMeta'
+import { UserSettings } from '@ui/schema/models/UserSettings'
 import { createContext } from 'react'
 
 export interface ZiskContext {

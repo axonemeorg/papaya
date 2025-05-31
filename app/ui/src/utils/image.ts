@@ -1,4 +1,4 @@
-import { Avatar } from '@/schema/models/Avatar'
+import { Avatar } from '@ui/schema/models/Avatar'
 import { Vibrant } from 'node-vibrant/browser'
 
 export async function createImageAvatar(file: File): Promise<Avatar> {

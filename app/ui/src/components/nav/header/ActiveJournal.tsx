@@ -1,10 +1,10 @@
-import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
-import { JournalContext } from '@/contexts/JournalContext'
-import { useJournals } from '@/hooks/queries/useJournals'
-import { Journal } from '@/schema/documents/Journal'
-import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import { UnfoldMore } from '@mui/icons-material'
-import { Button, Typography, Tooltip } from '@mui/material'
+import { Button, Tooltip, Typography } from '@mui/material'
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@ui/constants/journal'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { useJournals } from '@ui/hooks/queries/useJournals'
+import { Journal } from '@ui/schema/documents/Journal'
+import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@ui/store/app/useJournalSelectorState'
 import { useContext } from 'react'
 
 export default function ActiveJournal() {

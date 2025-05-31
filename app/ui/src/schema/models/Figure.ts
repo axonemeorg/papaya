@@ -1,5 +1,5 @@
-import { Currency } from '@/schema/support/currency'
-import { Model } from '@/schema/support/orm/Model'
+import { Currency } from '@ui/schema/support/currency'
+import { Model } from '@ui/schema/support/orm/Model'
 import { z } from 'zod'
 
 const [CreateBaseFigure, BaseFigure] = Model.fromSchema({

@@ -2,57 +2,55 @@ import {
   alpha,
   Avatar,
   Button,
+  Checkbox,
   Chip,
-  Stack,
-  Table,
+  Grow,
   TableBody as MuiTableBody,
   TableCell as MuiTableCell,
   TableRow as MuiTableRow,
+  Stack,
+  Table,
+  TableBodyProps,
+  TableCellProps,
+  TableRowProps,
   Typography,
   useMediaQuery,
   useTheme,
-  TableRowProps,
-  TableCellProps,
-  TableBodyProps,
-  Grow,
-  Checkbox,
 } from '@mui/material'
-import { useContext, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
-import dayjs from 'dayjs'
-import AvatarIcon from '@/components/icon/AvatarIcon'
-import { getFigureString } from '@/utils/string'
-import AvatarChip from '../icon/AvatarChip'
-import QuickJournalEditor from './QuickJournalEditor'
 import { Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
-import { JournalContext } from '@/contexts/JournalContext'
-import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@/constants/journal'
-import {
-  calculateNetFigures,
-  journalEntryHasTasks,
-  enumerateJournalEntryStatuses,
-  journalEntryHasTags,
-} from '@/utils/journal'
-import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import clsx from 'clsx'
-import { sortDatesChronologically } from '@/utils/date'
-import CircularProgressWithLabel from '../icon/CircularProgressWithLabel'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { Account } from '@/schema/documents/Account'
-import { Category } from '@/schema/documents/Category'
-import { StatusVariant } from '@/schema/models/EntryStatus'
-import { EntryTask } from '@/schema/models/EntryTask'
-import { DateView, DateViewVariant, SearchFacetKey } from '@/schema/support/search/facet'
-import { useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
-import { useAccounts } from '@/hooks/queries/useAccounts'
-import { useCategories } from '@/hooks/queries/useCategories'
-import useDateView from '@/hooks/facets/useDateView'
-import { Figure } from '@/schema/models/Figure'
+import AvatarIcon from '@ui/components/icon/AvatarIcon'
+import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@ui/constants/journal'
+import useDateView from '@ui/hooks/facets/useDateView'
+import { useAccounts } from '@ui/hooks/queries/useAccounts'
+import { useCategories } from '@ui/hooks/queries/useCategories'
+import { useGetPriceStyle } from '@ui/hooks/useGetPriceStyle'
+import { Account } from '@ui/schema/documents/Account'
+import { Category } from '@ui/schema/documents/Category'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { StatusVariant } from '@ui/schema/models/EntryStatus'
+import { EntryTask } from '@ui/schema/models/EntryTask'
+import { Figure } from '@ui/schema/models/Figure'
+import { DateViewVariant } from '@ui/schema/support/search/facet'
+import { useOpenEntryEditModalForCreate } from '@ui/store/app/useJournalEntryEditModalState'
 import {
   useJournalEntrySelectionState,
   useSetJournalEntrySelectionState,
   useToggleJournalEntrySelectionState,
-} from '@/store/app/useJournalEntrySelectionState'
+} from '@ui/store/app/useJournalEntrySelectionState'
+import { sortDatesChronologically } from '@ui/utils/date'
+import {
+  enumerateJournalEntryStatuses,
+  journalEntryHasTags,
+  journalEntryHasTasks
+} from '@ui/utils/journal'
+import { getFigureString } from '@ui/utils/string'
+import clsx from 'clsx'
+import dayjs from 'dayjs'
+import AvatarChip from '../icon/AvatarChip'
+import CircularProgressWithLabel from '../icon/CircularProgressWithLabel'
+import QuickJournalEditor from './QuickJournalEditor'
 
 interface JournalTableRowProps extends TableRowProps {
   dateRow?: boolean
@@ -80,13 +78,13 @@ const TableRow = ({ sx, dateRow, selected, buttonRow, ...rest }: JournalTableRow
         '& td': {
           ...(dateRow || buttonRow
             ? {
-                cursor: 'default',
-              }
+              cursor: 'default',
+            }
             : {}),
           ...(dateRow
             ? {
-                width: '0%',
-              }
+              width: '0%',
+            }
             : {}),
         },
         ...(selected ? hoverStyles : {}),
@@ -415,7 +413,7 @@ export default function JournalEntryList(props: JournalEntryListProps) {
             {showQuckEditor && (
               <TableRow buttonRow>
                 <TableCell colSpan="100%">
-                  <QuickJournalEditor onAdd={isSmall ? () => {} : undefined} />
+                  <QuickJournalEditor onAdd={isSmall ? () => { } : undefined} />
                 </TableCell>
               </TableRow>
             )}

@@ -1,4 +1,3 @@
-import { JournalContext } from '@/contexts/JournalContext'
 import { Add, East, InfoOutlined } from '@mui/icons-material'
 import {
   Avatar,
@@ -19,14 +18,15 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { use, useContext, useEffect, useMemo, useState } from 'react'
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@ui/constants/journal'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { useJournals } from '@ui/hooks/queries/useJournals'
+import { Journal } from '@ui/schema/documents/Journal'
+import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@ui/store/app/useJournalSelectorState'
+import { useContext, useEffect, useState } from 'react'
 import AvatarIcon from '../icon/AvatarIcon'
-import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
-import ManageJournalModal from './ManageJournalModal'
-import { Journal } from '@/schema/documents/Journal'
-import { useSetJournalSelectorStatus, useJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import CreateJournalModal from './CreateJournalModal'
-import { useJournals } from '@/hooks/queries/useJournals'
+import ManageJournalModal from './ManageJournalModal'
 
 export default function SelectJournalModal() {
   const journalContext = useContext(JournalContext)
@@ -129,14 +129,14 @@ export default function SelectJournalModal() {
                         )}
                       </Stack>
                     }
-                    // secondary={journal._id === journalContext.activeJournalId?._id
-                    // 	? <Chip
-                    // 		size='small'
-                    // 		color='primary'
-                    // 		label={<Typography variant='overline'>Active</Typography>}
-                    // 	/>
-                    // 	: undefined
-                    // }
+                  // secondary={journal._id === journalContext.activeJournalId?._id
+                  // 	? <Chip
+                  // 		size='small'
+                  // 		color='primary'
+                  // 		label={<Typography variant='overline'>Active</Typography>}
+                  // 	/>
+                  // 	: undefined
+                  // }
                   />
                 </ListItemButton>
               </ListItem>

@@ -1,4 +1,4 @@
-import { KEYBOARD_ACTIONS, KeyboardActionName } from '@/constants/keyboard'
+import { KEYBOARD_ACTIONS, KeyboardActionName } from '@ui/constants/keyboard'
 import { useEffect } from 'react'
 import useBrowserPlatform from './useBrowserPlatform'
 

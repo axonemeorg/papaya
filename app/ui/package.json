@@ -4,6 +4,15 @@
   "author": "Curtis Upshall <curtisupshall@gmail.com>",
   "license": "ISC",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*",
+    "./contexts/*": "./src/contexts/*",
+    "./hooks/*": "./src/hooks/*",
+    "./utils/*": "./src/utils/*"
+  },
+  "types": "./src/index.ts",
   "scripts": {
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",

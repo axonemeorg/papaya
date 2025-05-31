@@ -1,5 +1,5 @@
-import { Model } from '@/schema/support/orm/Model'
-import { RecurringCadence } from '@/schema/support/recurrence'
+import { Model } from '@ui/schema/support/orm/Model'
+import { RecurringCadence } from '@ui/schema/support/recurrence'
 import { z } from 'zod'
 
 export const [CreateEntryRecurrency, EntryRecurrency] = Model.fromSchema({

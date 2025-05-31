@@ -1,6 +1,6 @@
-import { importJournal } from '@/database/actions'
-import { useFilePrompt } from '@/hooks/useFilePrompt'
 import { Button } from '@mui/material'
+import { importJournal } from '@ui/database/actions'
+import { useFilePrompt } from '@ui/hooks/useFilePrompt'
 
 export default function ImportJournalForm() {
   const promptForFiles = useFilePrompt()

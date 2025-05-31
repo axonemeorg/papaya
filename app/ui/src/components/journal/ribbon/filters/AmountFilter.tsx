@@ -1,7 +1,7 @@
-import AmountField from '@/components/input/AmountField'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { AmountRange } from '@/schema/support/search/facet'
 import { Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import AmountField from '@ui/components/input/AmountField'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { AmountRange } from '@ui/schema/support/search/facet'
 import { useContext } from 'react'
 
 export const DEFAULT_AMOUNT_RANGE: AmountRange = {

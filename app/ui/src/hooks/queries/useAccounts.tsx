@@ -1,8 +1,8 @@
-import { JournalContext } from '@/contexts/JournalContext'
-import { createAccount } from '@/database/actions'
-import { getAccounts } from '@/database/queries'
-import { Account, CreateAccount } from '@/schema/documents/Account'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { createAccount } from '@ui/database/actions'
+import { getAccounts } from '@ui/database/queries'
+import { Account, CreateAccount } from '@ui/schema/documents/Account'
 import { useContext } from 'react'
 
 export const useAccounts = () => {

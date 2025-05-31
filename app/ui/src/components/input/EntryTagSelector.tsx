@@ -1,14 +1,13 @@
-import { useContext, useRef, useState } from 'react'
-import { Button, ButtonBase, Chip, IconButton, Link, Stack, Typography } from '@mui/material'
 import { Settings } from '@mui/icons-material'
-import { JournalContext } from '@/contexts/JournalContext'
+import { Button, ButtonBase, Chip, IconButton, Link, Stack, Typography } from '@mui/material'
+import { ZiskEntryStatus } from '@ui/constants/status'
+import { useEntryTags } from '@ui/hooks/queries/useEntryTags'
+import { EntryTag } from '@ui/schema/documents/EntryTag'
+import { EntryStatus } from '@ui/schema/models/EntryStatus'
 import clsx from 'clsx'
-import { EntryTagAutocompleteProps } from './EntryTagAutocomplete'
+import { useRef, useState } from 'react'
 import { EntryTagPicker } from '../pickers/EntryTagPicker'
-import { EntryStatus } from '@/schema/models/EntryStatus'
-import { ZiskEntryStatus } from '@/constants/status'
-import { EntryTag } from '@/schema/documents/EntryTag'
-import { useEntryTags } from '@/hooks/queries/useEntryTags'
+import { EntryTagAutocompleteProps } from './EntryTagAutocomplete'
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 

@@ -1,6 +1,6 @@
 import { alpha, Chip, SxProps, Theme, Typography } from '@mui/material'
-import { KEYBOARD_ACTIONS, KeyboardActionName } from '@/constants/keyboard'
-import { getKeystrokeLabel } from '@/utils/keyboard'
+import { KEYBOARD_ACTIONS, KeyboardActionName } from '@ui/constants/keyboard'
+import { getKeystrokeLabel } from '@ui/utils/keyboard'
 
 interface KeyboardShortcutProps {
   name: KeyboardActionName

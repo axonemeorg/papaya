@@ -1,7 +1,7 @@
 import { alpha, Chip, Icon, useTheme } from '@mui/material'
-import AvatarIcon from './AvatarIcon'
+import { Avatar } from '@ui/schema/models/Avatar'
 import { ReactElement } from 'react'
-import { Avatar } from '@/schema/models/Avatar'
+import AvatarIcon from './AvatarIcon'
 
 interface AvatarChipProps {
   avatar?: Avatar

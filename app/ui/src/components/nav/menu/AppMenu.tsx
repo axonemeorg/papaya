@@ -1,6 +1,3 @@
-import { APP_MENU } from '@/constants/menu'
-import { useOpenEntryEditModalForCreate } from '@/store/app/useJournalEntryEditModalState'
-import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
 import { Add, Create, Menu } from '@mui/icons-material'
 import {
   Box,
@@ -16,6 +13,9 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
+import { APP_MENU } from '@ui/constants/menu'
+import { useOpenEntryEditModalForCreate } from '@ui/store/app/useJournalEntryEditModalState'
+import { useAppMenuStateStore } from '@ui/store/useAppMenuStateStore'
 import { ReactNode, useEffect } from 'react'
 import AppLogo from '../header/AppLogo'
 

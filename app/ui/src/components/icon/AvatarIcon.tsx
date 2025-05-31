@@ -1,7 +1,7 @@
 import { Icon, SxProps, Theme } from '@mui/material'
+import { Avatar, AvatarVariant } from '@ui/schema/models/Avatar'
 import { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 import { ImageAvatar } from '../pickers/ImageAvatarPicker'
-import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
 
 interface AvatarIconProps {
   avatar?: Avatar

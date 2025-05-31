@@ -1,9 +1,3 @@
-import {
-  DialogNotification,
-  NotificationsContext,
-  SnackbarAction,
-  SnackbarNotification,
-} from '@/contexts/NotificationsContext'
 import { Close } from '@mui/icons-material'
 import {
   Button,
@@ -15,6 +9,12 @@ import {
   IconButton,
   Snackbar,
 } from '@mui/material'
+import {
+  DialogNotification,
+  NotificationsContext,
+  SnackbarAction,
+  SnackbarNotification,
+} from '@ui/contexts/NotificationsContext'
 import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 
 const renderAction = (action: SnackbarAction) => {

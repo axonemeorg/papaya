@@ -1,7 +1,7 @@
 import { useState } from 'react'
 // import SearchModal from './SearchModal'
-import { KeyboardActionName } from '@/constants/keyboard'
-import useKeyboardAction from '@/hooks/useKeyboardAction'
+import { KeyboardActionName } from '@ui/constants/keyboard'
+import useKeyboardAction from '@ui/hooks/useKeyboardAction'
 import SearchLaunchButton from './SearchLaunchButton'
 
 export default function SearchWidget() {

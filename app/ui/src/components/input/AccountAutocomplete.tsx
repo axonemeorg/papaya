@@ -1,9 +1,7 @@
 import { Autocomplete, AutocompleteProps, ListItem, ListItemIcon, ListItemText, TextField } from '@mui/material'
 
-import { useContext } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
+import { useAccounts } from '@ui/hooks/queries/useAccounts'
 import AvatarIcon from '../icon/AvatarIcon'
-import { useAccounts } from '@/hooks/queries/useAccounts'
 
 export type AccountAutocompleteProps = Partial<Omit<AutocompleteProps<string, false, false, false>, 'options'>>
 

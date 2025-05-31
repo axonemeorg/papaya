@@ -1,13 +1,12 @@
-import { JournalContext } from '@/contexts/JournalContext'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
-import { useContext, useEffect } from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
-import AvatarPicker, { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createJournal } from '@/database/actions'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
+import { createJournal } from '@ui/database/actions'
+import { useAddJournal } from '@ui/hooks/queries/useJournals'
+import { CreateJournal, Journal } from '@ui/schema/documents/Journal'
+import { useEffect } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import ImportJournalForm from '../form/ImportJournalForm'
-import { CreateJournal, Journal } from '@/schema/documents/Journal'
-import { useAddJournal } from '@/hooks/queries/useJournals'
+import AvatarPicker, { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
 
 interface CreateJournalModalProps {
   open: boolean

@@ -1,3 +1,5 @@
+import { Shuffle } from '@mui/icons-material'
+import { LoadingButton } from '@mui/lab'
 import {
   Alert,
   Button,
@@ -11,16 +13,14 @@ import {
   TextField,
   ToggleButtonGroup,
 } from '@mui/material'
-import RadioToggleButton from '../input/RadioToggleButton'
+import { ZiskContext } from '@ui/contexts/ZiskContext'
+import { useZiskMeta } from '@ui/hooks/queries/useZiskMeta'
+import { UserSettings } from '@ui/schema/models/UserSettings'
+import { testCouchDbConnection } from '@ui/utils/database'
+import { isValidUrl } from '@ui/utils/server'
 import { useContext, useEffect, useMemo, useState } from 'react'
+import RadioToggleButton from '../input/RadioToggleButton'
 import ServerWidget from '../widget/ServerWidget'
-import { Shuffle } from '@mui/icons-material'
-import { ZiskContext } from '@/contexts/ZiskContext'
-import { LoadingButton } from '@mui/lab'
-import { isValidUrl } from '@/utils/server'
-import { testCouchDbConnection } from '@/utils/database'
-import { UserSettings } from '@/schema/models/UserSettings'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
 
 type SyncStrategyType = 'LOCAL' | 'CUSTOM_SERVER_OR_ZISK_CLOUD' | 'COUCH_DB'
 

@@ -1,7 +1,7 @@
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { DailyDateView, DateView, DateViewVariant, SearchFacetKey } from '@/schema/support/search/facet'
-import { getAnnualDateViewFromDate, getMonthlyDateViewFromDate, getWeeklyDateViewFromDate } from '@/utils/date'
 import { useNavigate } from '@tanstack/react-router'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { DailyDateView, DateView, DateViewVariant, SearchFacetKey } from '@ui/schema/support/search/facet'
+import { getAnnualDateViewFromDate, getMonthlyDateViewFromDate, getWeeklyDateViewFromDate } from '@ui/utils/date'
 import dayjs from 'dayjs'
 import { useCallback, useContext, useMemo } from 'react'
 

@@ -1,4 +1,4 @@
-import { Keystroke } from '@/constants/keyboard'
+import { Keystroke } from '@ui/constants/keyboard'
 
 export const getKeystrokeLabel = (keystroke: Keystroke): string => {
   return [

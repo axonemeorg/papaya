@@ -1,27 +1,26 @@
-import AvatarIcon from '@/components/icon/AvatarIcon'
-import AvatarChip from '@/components/icon/AvatarChip'
-import CreateAccountModal from '@/components/modal/CreateAccountModal'
-import EditAccountModal from '@/components/modal/EditAccountModal'
-import { JournalContext } from '@/contexts/JournalContext'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { deleteRecord, restoreRecord } from '@/database/actions'
-import { Account } from '@/schema/documents/Account'
-import { pluralize as p } from '@/utils/string'
 import { Add, Search } from '@mui/icons-material'
 import {
   Button,
   Divider,
-  Link as MuiLink,
   ListItem,
   ListItemIcon,
   MenuList,
+  Link as MuiLink,
   Paper,
   Stack,
   TextField,
   Typography,
 } from '@mui/material'
+import AvatarChip from '@ui/components/icon/AvatarChip'
+import AvatarIcon from '@ui/components/icon/AvatarIcon'
+import CreateAccountModal from '@ui/components/modal/CreateAccountModal'
+import EditAccountModal from '@ui/components/modal/EditAccountModal'
+import { NotificationsContext } from '@ui/contexts/NotificationsContext'
+import { deleteRecord, restoreRecord } from '@ui/database/actions'
+import { useAccounts } from '@ui/hooks/queries/useAccounts'
+import { Account } from '@ui/schema/documents/Account'
+import { pluralize as p } from '@ui/utils/string'
 import { useContext, useState } from 'react'
-import { useAccounts } from '@/hooks/queries/useAccounts'
 
 export default function ManageAccounts() {
   const [showCreateAccountModal, setShowCreateAccountModal] = useState(false)

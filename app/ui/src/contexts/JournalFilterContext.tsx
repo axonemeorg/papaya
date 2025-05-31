@@ -1,4 +1,4 @@
-import { SearchFacetGroups, SearchFacets } from '@/schema/support/search/facet'
+import { SearchFacetGroups, SearchFacets } from '@ui/schema/support/search/facet'
 import { createContext } from 'react'
 import z from 'zod'
 

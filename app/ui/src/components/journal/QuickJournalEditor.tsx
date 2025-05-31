@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Add, Save } from '@mui/icons-material'
+import { Box, Button, Stack } from '@mui/material'
+import { NotificationsContext } from '@ui/contexts/NotificationsContext'
+import { CreateQuickJournalEntry } from '@ui/schema/models/QuickJournalEntry'
+import { useContext, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import QuickJournalEntryForm from '../form/QuickJournalEntryForm'
-import { Box, Button, Stack } from '@mui/material'
-import { Add, Save } from '@mui/icons-material'
-import { useContext, useState } from 'react'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { CreateQuickJournalEntry } from '@/schema/models/QuickJournalEntry'
 
 interface QuickJournalEditorProps {
   onAdd?: () => void

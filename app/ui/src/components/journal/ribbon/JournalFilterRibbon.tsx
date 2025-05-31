@@ -1,18 +1,17 @@
-import AvatarChip from '@/components/icon/AvatarChip'
-import { JournalContext } from '@/contexts/JournalContext'
 import { Add, MonetizationOn, Savings } from '@mui/icons-material'
 import { Chip, Collapse, IconButton, Stack, Typography } from '@mui/material'
+import AvatarChip from '@ui/components/icon/AvatarChip'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { useCategories } from '@ui/hooks/queries/useCategories'
+import { useGetPriceStyle } from '@ui/hooks/useGetPriceStyle'
+import { Category } from '@ui/schema/documents/Category'
+import { Figure } from '@ui/schema/models/Figure'
+import { AmountRange, SearchFacetKey, SearchFacets } from '@ui/schema/support/search/facet'
+import { enumerateFilters } from '@ui/utils/filtering'
+import { parseJournalEntryAmount } from '@ui/utils/journal'
+import { getFigureString } from '@ui/utils/string'
 import { useContext, useRef, useState } from 'react'
 import JournalFilterPicker from './JournalFilterPicker'
-import { parseJournalEntryAmount } from '@/utils/journal'
-import { useGetPriceStyle } from '@/hooks/useGetPriceStyle'
-import { Category } from '@/schema/documents/Category'
-import { useCategories } from '@/hooks/queries/useCategories'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { AmountRange, SearchFacetKey, SearchFacets } from '@/schema/support/search/facet'
-import { enumerateFilters } from '@/utils/filtering'
-import { Figure } from '@/schema/models/Figure'
-import { getFigureString } from '@/utils/string'
 
 export default function JournalFilterRibbon() {
   const [showFiltersMenu, setShowFiltersMenu] = useState<boolean>(false)
@@ -34,9 +33,9 @@ export default function JournalFilterRibbon() {
   const categories: Category[] = !categoryIds
     ? []
     : categoryIds
-        .filter(Boolean)
-        .map((categoryId) => getCategoriesQuery.data[categoryId])
-        .filter(Boolean)
+      .filter(Boolean)
+      .map((categoryId) => getCategoriesQuery.data[categoryId])
+      .filter(Boolean)
 
   const handleRemoveCategory = (categoryId: string) => {
     const newCategoryIds = (categoryIds ?? []).filter((id) => id !== categoryId)

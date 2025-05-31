@@ -1,13 +1,13 @@
-import { Alert, Avatar, Button, Stack, Typography } from '@mui/material'
-import SettingsSectionHeader from './SettingsSectionHeader'
-import { useContext } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
-import AvatarIcon from '../icon/AvatarIcon'
-import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import { Edit, SwapHoriz } from '@mui/icons-material'
+import { Alert, Avatar, Button, Stack, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { getDatabaseClient } from '@/database/client'
-import { Journal } from '@/schema/documents/Journal'
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@ui/constants/journal'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { getDatabaseClient } from '@ui/database/client'
+import { Journal } from '@ui/schema/documents/Journal'
+import { useContext } from 'react'
+import AvatarIcon from '../icon/AvatarIcon'
+import SettingsSectionHeader from './SettingsSectionHeader'
 
 const db = getDatabaseClient()
 

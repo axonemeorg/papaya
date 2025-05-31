@@ -1,10 +1,10 @@
 import { Box, Button, Icon, InputAdornment, Stack, TextField } from '@mui/material'
 import { FixedSizeGrid } from 'react-window'
 
-import icons from '@/constants/icons'
-import { useScrollbarWidth } from '@/hooks/useScrollbarWidth'
-import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
 import { Search, Shuffle } from '@mui/icons-material'
+import icons from '@ui/constants/icons'
+import { useScrollbarWidth } from '@ui/hooks/useScrollbarWidth'
+import { Avatar, AvatarVariant } from '@ui/schema/models/Avatar'
 import Fuse from 'fuse.js'
 import { useMemo, useState } from 'react'
 import ColorPicker from './ColorPicker'

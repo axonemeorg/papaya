@@ -1,4 +1,4 @@
-import { Attachment, Category, DateRange, Delete, LocalOffer, Paid } from '@mui/icons-material'
+import { Category, DateRange, Delete, LocalOffer, Paid } from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -10,13 +10,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { SearchFacetKey } from '@ui/schema/support/search/facet'
 import { ReactNode, useContext, useEffect, useState } from 'react'
-import CategoryFilter from './filters/CategoryFilter'
 import AmountFilter from './filters/AmountFilter'
-import TagsFilter from './filters/TagsFilter'
+import CategoryFilter from './filters/CategoryFilter'
 import DateFilter from './filters/DateFilter'
-import { SearchFacetKey } from '@/schema/support/search/facet'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import TagsFilter from './filters/TagsFilter'
 
 interface JournalFilterSlotProperties {
   label: string
@@ -119,9 +119,9 @@ export default function JournalFilterPicker(props: JournalFilterPickerProps) {
           paper: {
             sx: activeSlot
               ? (theme) => ({
-                  width: '100%',
-                  maxWidth: theme.spacing(60),
-                })
+                width: '100%',
+                maxWidth: theme.spacing(60),
+              })
               : undefined,
           },
         }}>

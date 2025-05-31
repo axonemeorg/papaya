@@ -1,12 +1,12 @@
-import SelectJournalModal from '@/components/journal/SelectJournalModal'
-import JournalEntryModal from '@/components/modal/JournalEntryModal'
-import { JournalContext } from '@/contexts/JournalContext'
-import { getDatabaseClient } from '@/database/client'
+import SelectJournalModal from '@ui/components/journal/SelectJournalModal'
+import JournalEntryModal from '@ui/components/modal/JournalEntryModal'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { getDatabaseClient } from '@ui/database/client'
 
-import { updateActiveJournal } from '@/database/actions'
-import { useJournals } from '@/hooks/queries/useJournals'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
-import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
+import { updateActiveJournal } from '@ui/database/actions'
+import { useJournals } from '@ui/hooks/queries/useJournals'
+import { useZiskMeta } from '@ui/hooks/queries/useZiskMeta'
+import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@ui/store/app/useJournalSelectorState'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 const db = getDatabaseClient()

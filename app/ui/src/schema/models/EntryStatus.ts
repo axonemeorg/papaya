@@ -1,6 +1,6 @@
+import { Mixin } from '@ui/schema/support/orm/Mixin'
+import { Model } from '@ui/schema/support/orm/Model'
 import z from 'zod'
-import { Model } from '@/schema/support/orm/Model'
-import { Mixin } from '@/schema/support/orm/Mixin'
 
 enum Status {
   FLAGGED = 'zisk.status.flagged',

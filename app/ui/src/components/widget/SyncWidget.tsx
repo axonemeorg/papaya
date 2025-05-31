@@ -1,8 +1,8 @@
-import { RemoteContext, SyncStatusEnum } from '@/contexts/RemoteContext'
 import { Box, Button, CardActions, CardHeader, Divider, LinearProgress } from '@mui/material'
+import { RemoteContext, SyncStatusEnum } from '@ui/contexts/RemoteContext'
+import { getSyncStatusTitles } from '@ui/utils/string'
 import { useContext, useMemo } from 'react'
 import SyncIcon from '../icon/SyncIcon'
-import { getSyncStatusTitles } from '@/utils/string'
 
 const ENABLE_SYNC_DEBUGGING = false
 

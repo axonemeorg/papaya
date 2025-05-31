@@ -1,7 +1,7 @@
-import KeyboardShortcut from '@/components/text/KeyboardShortcut'
-import { KeyboardActionName } from '@/constants/keyboard'
 import { Search } from '@mui/icons-material'
 import { Button, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import KeyboardShortcut from '@ui/components/text/KeyboardShortcut'
+import { KeyboardActionName } from '@ui/constants/keyboard'
 
 export interface SearchLaunchButtonProps {
   placeholderText?: string

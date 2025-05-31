@@ -1,10 +1,3 @@
-import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { Currency } from '@/schema/support/currency'
-import {
-  useJournalEntrySelectionState,
-  useSetJournalEntrySelectionState,
-} from '@/store/app/useJournalEntrySelectionState'
 import {
   ArrowDropDown,
   CheckBox,
@@ -14,7 +7,14 @@ import {
   MoreVert,
 } from '@mui/icons-material'
 import { Button, Fade, IconButton, ListItemText, Menu, MenuItem, Stack } from '@mui/material'
-import { useContext, useRef, useState } from 'react'
+import { useFilteredJournalEntries } from '@ui/hooks/queries/useFilteredJournalEntries'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { Currency } from '@ui/schema/support/currency'
+import {
+  useJournalEntrySelectionState,
+  useSetJournalEntrySelectionState,
+} from '@ui/store/app/useJournalEntrySelectionState'
+import { useRef, useState } from 'react'
 
 export enum SelectAllAction {
   TOGGLE = 'TOGGLE',

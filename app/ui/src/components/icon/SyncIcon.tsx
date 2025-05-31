@@ -1,6 +1,6 @@
-import { SyncStatusEnum } from '@/contexts/RemoteContext'
 import { Bedtime, CloudDone, CloudOff, Computer, Sync, SyncProblem } from '@mui/icons-material'
 import { CircularProgress } from '@mui/material'
+import { SyncStatusEnum } from '@ui/contexts/RemoteContext'
 
 interface SyncIconProps extends Record<any, any> {
   syncStatus: SyncStatusEnum

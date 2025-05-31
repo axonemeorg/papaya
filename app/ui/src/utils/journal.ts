@@ -1,15 +1,15 @@
-import { DEFAULT_AVATAR } from '@/components/pickers/AvatarPicker'
-import { Category } from '@/schema/documents/Category'
-import { CreateEntryArtifact, EntryArtifact } from '@/schema/documents/EntryArtifact'
-import { CreateJournalEntry, JournalEntry } from '@/schema/documents/JournalEntry'
-import { Avatar } from '@/schema/models/Avatar'
-import { StatusVariant } from '@/schema/models/EntryStatus'
-import { CreateEntryTask, EntryTask } from '@/schema/models/EntryTask'
-import { Figure } from '@/schema/models/Figure'
-import { FigureEnumeration } from '@/schema/support/figure'
-import { CadenceFrequency, DayOfWeek, RecurringCadence } from '@/schema/support/recurrence'
-import { DateView } from '@/schema/support/search/facet'
-import { ZiskDocument } from '@/schema/union/ZiskDocument'
+import { DEFAULT_AVATAR } from '@ui/components/pickers/AvatarPicker'
+import { Category } from '@ui/schema/documents/Category'
+import { CreateEntryArtifact, EntryArtifact } from '@ui/schema/documents/EntryArtifact'
+import { CreateJournalEntry, JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { Avatar } from '@ui/schema/models/Avatar'
+import { StatusVariant } from '@ui/schema/models/EntryStatus'
+import { CreateEntryTask, EntryTask } from '@ui/schema/models/EntryTask'
+import { Figure } from '@ui/schema/models/Figure'
+import { FigureEnumeration } from '@ui/schema/support/figure'
+import { CadenceFrequency, DayOfWeek, RecurringCadence } from '@ui/schema/support/recurrence'
+import { DateView } from '@ui/schema/support/search/facet'
+import { ZiskDocument } from '@ui/schema/union/ZiskDocument'
 import dayjs from 'dayjs'
 import { getNthWeekdayOfMonthFromDate } from './date'
 import { generateJournalEntryId, generateTaskId } from './id'
@@ -76,7 +76,7 @@ export const calculateNetFigures = (entry: JournalEntry): FigureEnumeration => {
 
   return figures.reduce((acc: FigureEnumeration, figure: Figure) => {
     if (figure.currency in acc) {
-      ;(acc[figure.currency] as Figure).amount += figure.amount
+      ; (acc[figure.currency] as Figure).amount += figure.amount
     } else {
       acc[figure.currency] = {
         ...figure,
@@ -220,17 +220,17 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 
   switch (frequency) {
     case CadenceFrequency.enum.D:
-      for (;;) {
+      for (; ;) {
         date = date.add(interval, 'days')
         yield date
       }
     case CadenceFrequency.enum.Y:
-      for (;;) {
+      for (; ;) {
         date = date.add(interval, 'years')
         yield date
       }
     case CadenceFrequency.enum.W:
-      for (;;) {
+      for (; ;) {
         const weekDates = getWeekDates(date.add(interval, 'weeks'))
         for (const i in cadence.days) {
           date = weekDates[cadence.days[i]]
@@ -239,7 +239,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
       }
     case CadenceFrequency.enum.M:
       if ('day' in cadence.on) {
-        for (;;) {
+        for (; ;) {
           date = date.startOf('month').add(interval, 'months')
           if (cadence.on.day <= date.daysInMonth()) {
             yield date.date(cadence.on.day)
@@ -250,7 +250,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
         let month: dayjs.Dayjs = date.clone()
         let nthWeekday: dayjs.Dayjs | undefined
 
-        for (;;) {
+        for (; ;) {
           month = month.add(interval, 'months').startOf('month')
           nthWeekday = getNthWeekdayOfMonthFromDate(month, dayOfWeek, cadence.on.week)
           if (nthWeekday) {

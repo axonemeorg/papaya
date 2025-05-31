@@ -1,3 +1,4 @@
+import { Book, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
 import {
   Box,
   Collapse,
@@ -9,26 +10,23 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from '@mui/material'
-import { Controller, useFormContext, useWatch } from 'react-hook-form'
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { getJournalEntryWithAttachments } from '@ui/database/queries'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { StatusVariant } from '@ui/schema/models/EntryStatus'
+import { discriminateEntryTags } from '@ui/utils/journal'
 import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
+import AccountAutocomplete from '../input/AccountAutocomplete'
 import AmountField from '../input/AmountField'
 import CategorySelector from '../input/CategorySelector'
-import ChildJournalEntryForm from './ChildJournalEntryForm'
-import { useEffect } from 'react'
-import EntryArtifactsForm from './EntryArtifactsForm'
-import { getJournalEntryWithAttachments } from '@/database/queries'
 import EntryTagSelector from '../input/EntryTagSelector'
+import ChildJournalEntryForm from './ChildJournalEntryForm'
+import EntryArtifactsForm from './EntryArtifactsForm'
 import EntryNoteForm from './EntryNoteForm'
 import EntryTasksForm from './EntryTasksForm'
-import AccountAutocomplete from '../input/AccountAutocomplete'
-import { Book, InfoOutlined, TransferWithinAStation } from '@mui/icons-material'
-import RecurrenceSelect from '../input/RecurrenceSelect'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { EntryStatus, StatusVariant } from '@/schema/models/EntryStatus'
-import { EntryRecurrency } from '@/schema/models/EntryRecurrence'
-import { discriminateEntryTags } from '@/utils/journal'
 
 export default function JournalEntryForm() {
   const { setValue, control, register } = useFormContext<JournalEntry>()

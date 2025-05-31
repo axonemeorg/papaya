@@ -1,5 +1,5 @@
+import { Model } from '@ui/schema/support/orm/Model'
 import z from 'zod'
-import { Model } from '@/schema/support/orm/Model'
 
 export const AvatarVariant = z.enum(['TEXT', 'PICTORIAL', 'IMAGE'])
 export type AvatarVariant = z.output<typeof AvatarVariant>

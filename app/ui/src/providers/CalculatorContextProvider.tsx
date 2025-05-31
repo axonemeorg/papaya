@@ -1,6 +1,6 @@
+import { ScreenCalculator } from '@ui/components/ScreenCalculator'
+import { CalculatorContext } from '@ui/contexts/CalculatorContext'
 import { PropsWithChildren, useState } from 'react'
-import { CalculatorContext } from '@/contexts/CalculatorContext'
-import { ScreenCalculator } from '@/components/ScreenCalculator'
 
 export default function CalculatorContextProvider(props: PropsWithChildren) {
   const [_isOpen, setIsOpen] = useState(true)

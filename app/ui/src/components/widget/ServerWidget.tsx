@@ -1,6 +1,6 @@
-import { PLACEHOLDER_UNNAMED_ZISK_SERVER } from '@/constants/server'
-import { prettyPrintServerUrl } from '@/utils/server'
-import { Grow, Box, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { Box, Grow, Stack, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material'
+import { PLACEHOLDER_UNNAMED_ZISK_SERVER } from '@ui/constants/server'
+import { prettyPrintServerUrl } from '@ui/utils/server'
 import { ReactNode } from 'react'
 
 export interface ServerData {

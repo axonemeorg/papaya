@@ -28,9 +28,15 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": [
+      "@web/*": [
         "./src/*"
       ],
+      "@zisk/ui": [
+        "../ui/src"
+      ],
+      "@zisk/ui/*": [
+        "../ui/src/*"
+      ]
     }
   },
   "include": [

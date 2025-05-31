@@ -1,5 +1,5 @@
-import CategoryAutocomplete from '@/components/input/CategoryAutocomplete'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
+import CategoryAutocomplete from '@ui/components/input/CategoryAutocomplete'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
 import { useContext } from 'react'
 
 export default function CategoryFilter() {

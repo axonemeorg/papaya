@@ -1,11 +1,11 @@
-import { Button, Checkbox, IconButton, InputBase, Link, Stack, Typography } from '@mui/material'
 import { AddTask, CheckCircle, RadioButtonUnchecked } from '@mui/icons-material'
-import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { Button, Checkbox, IconButton, InputBase, Link, Stack, Typography } from '@mui/material'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { EntryTask } from '@ui/schema/models/EntryTask'
+import { makeEntryTask } from '@ui/utils/journal'
 import { useContext, useRef } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
-import { makeEntryTask } from '@/utils/journal'
-import { EntryTask } from '@/schema/models/EntryTask'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 export default function EntryTasksForm() {
   const { activeJournalId } = useContext(JournalContext)

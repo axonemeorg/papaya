@@ -1,6 +1,6 @@
-import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { EditNote } from '@mui/icons-material'
 import { Button, FormHelperText, Grow, Link, Stack, TextField, Typography } from '@mui/material'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
 import { useState } from 'react'
 import { Controller, useFormContext, useWatch } from 'react-hook-form'
 

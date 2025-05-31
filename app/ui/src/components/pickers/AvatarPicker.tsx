@@ -1,8 +1,8 @@
 import { Box, colors, Fade, Icon, Popover, Select, Tab, Tabs } from '@mui/material'
+import { Avatar, AvatarVariant } from '@ui/schema/models/Avatar'
 import { useState } from 'react'
 import IconPicker from './IconPicker'
 import ImageAvatarPicker, { ImageAvatar } from './ImageAvatarPicker'
-import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
 
 interface AvatarPickerProps {
   value: Avatar | null

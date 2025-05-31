@@ -1,8 +1,8 @@
-import { JournalContext } from '@/contexts/JournalContext'
-import { createCategory } from '@/database/actions'
-import { getCategories } from '@/database/queries'
-import { Category, CreateCategory } from '@/schema/documents/Category'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { createCategory } from '@ui/database/actions'
+import { getCategories } from '@ui/database/queries'
+import { Category, CreateCategory } from '@ui/schema/documents/Category'
 import { useContext } from 'react'
 
 export const useCategories = () => {

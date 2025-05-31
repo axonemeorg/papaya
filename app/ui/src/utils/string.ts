@@ -1,6 +1,6 @@
-import { SyncStatusEnum } from '@/contexts/RemoteContext'
-import { Figure } from '@/schema/models/Figure'
-import { Currency } from '@/schema/support/currency'
+import { SyncStatusEnum } from '@ui/contexts/RemoteContext'
+import { Figure } from '@ui/schema/models/Figure'
+import { Currency } from '@ui/schema/support/currency'
 
 export interface FormatCurrencyAmountOptions {
   minimumFractionDigits: number
@@ -58,9 +58,9 @@ export const getFigureString = (figure: Figure | undefined, options: Partial<Pri
   const price = figure?.amount ?? 0
   const formatOptions: Partial<FormatCurrencyAmountOptions> = combinedOptions.round
     ? {
-        maximumFractionDigits: 0,
-        minimumFractionDigits: 0,
-      }
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0,
+    }
     : {}
   const priceStringParts: string[] = []
 

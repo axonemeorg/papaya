@@ -1,6 +1,6 @@
+import { Mixin } from '@ui/schema/support/orm/Mixin'
+import { Model } from '@ui/schema/support/orm/Model'
 import { z } from 'zod'
-import { Model } from '@/schema/support/orm/Model'
-import { Mixin } from '@/schema/support/orm/Mixin'
 
 export const AttachmentMeta = z.object({
   content_type: z.string(),

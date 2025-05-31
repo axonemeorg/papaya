@@ -1,10 +1,10 @@
-import { createImageAvatar, getPaletteColors } from '@/utils/image'
 import { AddPhotoAlternate, RemoveCircle } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
-import { Avatar as MuiAvatar, AvatarProps, Box, Button, FormHelperText, Stack } from '@mui/material'
+import { AvatarProps, Box, Button, FormHelperText, Avatar as MuiAvatar, Stack } from '@mui/material'
+import { Avatar, AvatarVariant } from '@ui/schema/models/Avatar'
+import { createImageAvatar, getPaletteColors } from '@ui/utils/image'
 import { useMemo, useRef, useState } from 'react'
 import ColorPicker from './ColorPicker'
-import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
 
 interface ImageAvatarPicker {
   value: Avatar

@@ -1,7 +1,7 @@
+import { Avatar } from '@ui/schema/models/Avatar'
+import { Document } from '@ui/schema/support/orm/Document'
+import { Mixin } from '@ui/schema/support/orm/Mixin'
 import z from 'zod'
-import { Document } from '@/schema/support/orm/Document'
-import { Avatar } from '@/schema/models/Avatar'
-import { Mixin } from '@/schema/support/orm/Mixin'
 
 export const [CreateCategory, Category] = Document.fromSchemas([
   {

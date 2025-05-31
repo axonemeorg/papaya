@@ -1,4 +1,4 @@
-import { EntryStatus, StatusVariant } from '@/schema/models/EntryStatus'
+import { EntryStatus, StatusVariant } from '@ui/schema/models/EntryStatus'
 
 export const ZiskEntryStatus: EntryStatus[] = [
   {

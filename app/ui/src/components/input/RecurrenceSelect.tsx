@@ -1,15 +1,3 @@
-import {
-  dayOfWeekFromDate,
-  deserializeEntryRecurrency,
-  generateDeafultRecurringCadences,
-  getFrequencyLabel,
-  getMonthlyCadenceLabel,
-  getMonthlyRecurrencesFromDate,
-  getRecurrencyString,
-  serializeEntryRecurrency,
-  updateRecurrencyNewDate,
-} from '@/utils/recurrence'
-import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from '@/schema/support/recurrence'
 import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material'
 import {
   Button,
@@ -29,11 +17,23 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { EntryRecurrency } from '@ui/schema/models/EntryRecurrence'
+import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence } from '@ui/schema/support/recurrence'
+import {
+  dayOfWeekFromDate,
+  deserializeEntryRecurrency,
+  generateDeafultRecurringCadences,
+  getFrequencyLabel,
+  getMonthlyCadenceLabel,
+  getMonthlyRecurrencesFromDate,
+  getRecurrencyString,
+  serializeEntryRecurrency,
+  updateRecurrencyNewDate,
+} from '@ui/utils/recurrence'
+import { pluralize, sentenceCase } from '@ui/utils/string'
+import dayjs from 'dayjs'
 import { ChangeEvent, useEffect, useState } from 'react'
 import DaysOfWeekPicker from '../pickers/DaysOfWeekPicker'
-import dayjs from 'dayjs'
-import { pluralize, sentenceCase } from '@/utils/string'
-import { EntryRecurrency } from '@/schema/models/EntryRecurrence'
 
 enum RecurrenceDefaultOption {
   NON_RECURRING = 'NON_RECURRING',

@@ -1,8 +1,8 @@
-import { JournalContext } from '@/contexts/JournalContext'
-import { createEntryTag } from '@/database/actions'
-import { getEntryTags } from '@/database/queries'
-import { EntryTag, CreateEntryTag } from '@/schema/documents/EntryTag'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { createEntryTag } from '@ui/database/actions'
+import { getEntryTags } from '@ui/database/queries'
+import { CreateEntryTag, EntryTag } from '@ui/schema/documents/EntryTag'
 import { useContext } from 'react'
 
 export const useEntryTags = () => {

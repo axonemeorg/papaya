@@ -1,8 +1,8 @@
-import SyncIcon from '@/components/icon/SyncIcon'
-import SyncWidget from '@/components/widget/SyncWidget'
-import { RemoteContext, SyncStatusEnum } from '@/contexts/RemoteContext'
-import { getSyncStatusTitles } from '@/utils/string'
 import { Grow, IconButton, Popover, Stack, SvgIconOwnProps, Typography } from '@mui/material'
+import SyncIcon from '@ui/components/icon/SyncIcon'
+import SyncWidget from '@ui/components/widget/SyncWidget'
+import { RemoteContext, SyncStatusEnum } from '@ui/contexts/RemoteContext'
+import { getSyncStatusTitles } from '@ui/utils/string'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 type IconColor = SvgIconOwnProps['color']

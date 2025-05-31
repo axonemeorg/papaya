@@ -1,5 +1,4 @@
-import { useContext, useRef, useState } from 'react'
-import CategoryAutocomplete, { CategoryAutocompleteProps } from './CategoryAutocomplete'
+import { Close, Done, Settings } from '@mui/icons-material'
 import {
   AutocompleteCloseReason,
   Button,
@@ -15,15 +14,15 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { Close, Done, Settings } from '@mui/icons-material'
-import AvatarChip from '../icon/AvatarChip'
-import { JournalContext } from '@/contexts/JournalContext'
-import AvatarIcon from '../icon/AvatarIcon'
-import { createCategory } from '@/database/actions'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { useAddCategory, useCategories } from '@ui/hooks/queries/useCategories'
+import { Category } from '@ui/schema/documents/Category'
+import { generateRandomAvatar } from '@ui/utils/journal'
 import clsx from 'clsx'
-import { generateRandomAvatar } from '@/utils/journal'
-import { Category } from '@/schema/documents/Category'
-import { useAddCategory, useCategories } from '@/hooks/queries/useCategories'
+import { useContext, useRef, useState } from 'react'
+import AvatarChip from '../icon/AvatarChip'
+import AvatarIcon from '../icon/AvatarIcon'
+import CategoryAutocomplete, { CategoryAutocompleteProps } from './CategoryAutocomplete'
 
 type CategorySelectorProps = Omit<CategoryAutocompleteProps, 'renderInput'>
 

@@ -1,7 +1,7 @@
-import { createJournal } from '@/database/actions'
-import { getJournals } from '@/database/queries'
-import { Journal, CreateJournal } from '@/schema/documents/Journal'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createJournal } from '@ui/database/actions'
+import { getJournals } from '@ui/database/queries'
+import { CreateJournal, Journal } from '@ui/schema/documents/Journal'
 
 export const useJournals = () => {
   return useQuery<Record<string, Journal>>({

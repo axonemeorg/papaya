@@ -1,6 +1,6 @@
-import { DAYS_OF_WEEK_NAMES } from '@/constants/date'
-import { DayOfWeek } from '@/schema/support/recurrence'
 import { Stack, ToggleButton, Tooltip } from '@mui/material'
+import { DAYS_OF_WEEK_NAMES } from '@ui/constants/date'
+import { DayOfWeek } from '@ui/schema/support/recurrence'
 
 interface DaysOfWeekPickerProps {
   value: Set<DayOfWeek>

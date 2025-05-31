@@ -1,8 +1,8 @@
-import { getWeekOfMonth } from './date'
+import { DAYS_OF_WEEK_NAMES } from '@ui/constants/date'
+import { EntryRecurrency } from '@ui/schema/models/EntryRecurrence'
+import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, WeekNumber } from '@ui/schema/support/recurrence'
 import dayjs from 'dayjs'
-import { DAYS_OF_WEEK_NAMES } from '@/constants/date'
-import { CadenceFrequency, DayOfWeek, MonthlyCadence, RecurringCadence, WeekNumber } from '@/schema/support/recurrence'
-import { EntryRecurrency } from '@/schema/models/EntryRecurrence'
+import { getWeekOfMonth } from './date'
 
 const FREQUENCY_LABELS: Record<CadenceFrequency, { singular: string; plural: string; adverb: string }> = {
   D: { singular: 'day', plural: 'days', adverb: 'daily' },
@@ -154,8 +154,8 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
         isSetOfWeekdays(cadence.days)
           ? 'weekdays'
           : sortDaysOfWeek(cadence.days)
-              .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
-              .join(', '),
+            .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
+            .join(', '),
       )
       break
     case CadenceFrequency.enum.M:
@@ -245,9 +245,9 @@ export const updateRecurrencyNewDate = (
 
   return newCadence
     ? {
-        kind: 'zisk:recurrence',
-        cadence: newCadence,
-        ends: null, // TODO!!
-      }
+      kind: 'zisk:recurrence',
+      cadence: newCadence,
+      ends: null, // TODO!!
+    }
     : undefined
 }

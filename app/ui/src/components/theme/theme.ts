@@ -1,4 +1,4 @@
-// import { montserrat } from '@/fonts/montserrat'
+// import { montserrat } from '@ui/fonts/montserrat'
 import { createTheme } from '@mui/material'
 
 /**

@@ -1,6 +1,5 @@
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
@@ -10,9 +9,13 @@ export default defineConfig({
     react(),
   ],
   resolve: {
-    alias: {
-      '@/': `${path.resolve(__dirname, 'src')}/`
-    }
+    preserveSymlinks: true,
+    // alias: {
+    //   '@web/': `${path.resolve(__dirname, 'src')}/`,
+    //   '@ui/': '@zisk/ui/'
+    //   // '@zisk/ui': path.resolve(__dirname, '../ui/src'),
+    //   // '@zisk/ui/': `${path.resolve(__dirname, '../ui/src')}/`
+    // }
   },
   // root: path.resolve('./src/web'),
   // build: {

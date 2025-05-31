@@ -1,7 +1,6 @@
-import EntryTagAutocomplete from '@/components/input/EntryTagAutocomplete'
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { StatusVariant } from '@/schema/models/EntryStatus'
-import { discriminateEntryTags } from '@/utils/journal'
+import EntryTagAutocomplete from '@ui/components/input/EntryTagAutocomplete'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { discriminateEntryTags } from '@ui/utils/journal'
 import { useContext } from 'react'
 
 export default function TagsFilter() {

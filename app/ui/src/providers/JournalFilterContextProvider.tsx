@@ -1,6 +1,6 @@
+import { JournalFilterContext, MemoryFilters, RouterFilters } from '@ui/contexts/JournalFilterContext'
+import { SearchFacets } from '@ui/schema/support/search/facet'
 import { PropsWithChildren, useMemo, useState } from 'react'
-import { SearchFacets } from '@/schema/support/search/facet'
-import { JournalFilterContext, MemoryFilters, RouterFilters } from '@/contexts/JournalFilterContext'
 
 interface JournalFilterContextProviderProps extends PropsWithChildren {
   routerFilters: RouterFilters

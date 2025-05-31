@@ -1,14 +1,14 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Add } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
-import CategoryForm from '../form/CategoryForm'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { JournalContext } from '@ui/contexts/JournalContext'
+import { NotificationsContext } from '@ui/contexts/NotificationsContext'
+import { createCategory } from '@ui/database/actions'
+import { CreateCategory } from '@ui/schema/documents/Category'
 import { useContext } from 'react'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { createCategory } from '@/database/actions'
-import { JournalContext } from '@/contexts/JournalContext'
+import { FormProvider, useForm } from 'react-hook-form'
+import CategoryForm from '../form/CategoryForm'
 import { DEFAULT_AVATAR } from '../pickers/AvatarPicker'
-import { CreateCategory } from '@/schema/documents/Category'
 
 interface CreateCategoryModalProps {
   open: boolean

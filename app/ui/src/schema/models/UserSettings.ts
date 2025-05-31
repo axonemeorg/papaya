@@ -1,4 +1,4 @@
-import { Model } from '@/schema/support/orm/Model'
+import { Model } from '@ui/schema/support/orm/Model'
 import { z } from 'zod'
 import { SyncingStrategy, ZiskServer } from '../support/server'
 

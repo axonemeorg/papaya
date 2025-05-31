@@ -18,11 +18,11 @@
 // import RadioToggleButton from "../input/RadioToggleButton";
 // import { LoadingButton } from "@mui/lab";
 // import { LeakAdd, LeakRemove } from "@mui/icons-material";
-// import { getServerApiUrl, getServerDatabaseUrl, isValidUrl } from "@/utils/server";
-// import { NotificationsContext } from "@/contexts/NotificationsContext";
+// import { getServerApiUrl, getServerDatabaseUrl, isValidUrl } from "@ui/utils/server";
+// import { NotificationsContext } from "@ui/contexts/NotificationsContext";
 // import { DEFAULT_AVATAR } from "../pickers/AvatarPicker";
-// import { ZiskContext } from "@/contexts/ZiskContext";
-// import { ZiskSettings } from "@/types/schema";
+// import { ZiskContext } from "@ui/contexts/ZiskContext";
+// import { ZiskSettings } from "@ui/types/schema";
 
 // interface JoinServerModalProps {
 //     open: boolean

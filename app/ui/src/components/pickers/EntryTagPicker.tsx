@@ -12,7 +12,7 @@ import {
 import { useState } from 'react'
 import EntryTagAutocomplete, { EntryTagAutocompleteProps } from '../input/EntryTagAutocomplete'
 
-import { useAddEntryTag } from '@/hooks/queries/useEntryTags'
+import { useAddEntryTag } from '@ui/hooks/queries/useEntryTags'
 
 interface EntryTagPickerProps extends Omit<EntryTagAutocompleteProps, 'renderInput'> {
   anchorEl: HTMLElement | null

@@ -1,10 +1,10 @@
-import { JournalFilterContext } from '@/contexts/JournalFilterContext'
-import { CustomDateView, DateViewVariant } from '@/schema/support/search/facet'
+import { Stack, Typography } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
+import { CustomDateView, DateViewVariant } from '@ui/schema/support/search/facet'
 import dayjs from 'dayjs'
 import { useContext, useState } from 'react'
-import { Stack, Typography } from '@mui/material'
 
 export default function DateFilter() {
   const journalFilterContext = useContext(JournalFilterContext)

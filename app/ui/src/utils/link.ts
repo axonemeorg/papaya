@@ -1,5 +1,5 @@
-import { Account } from '@/schema/documents/Account'
-import { Category } from '@/schema/documents/Category'
+import { Account } from '@ui/schema/documents/Account'
+import { Category } from '@ui/schema/documents/Category'
 
 export const generateCategoryLink = (category: Category): string => {
   return `/journal/a?cs=${category._id}`

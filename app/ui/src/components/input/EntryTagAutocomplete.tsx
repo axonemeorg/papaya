@@ -1,9 +1,9 @@
-import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
 import { Close, Done } from '@mui/icons-material'
-import { ZiskEntryStatus } from '@/constants/status'
-import { EntryTag } from '@/schema/documents/EntryTag'
-import { EntryStatus } from '@/schema/models/EntryStatus'
-import { useEntryTags } from '@/hooks/queries/useEntryTags'
+import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
+import { ZiskEntryStatus } from '@ui/constants/status'
+import { useEntryTags } from '@ui/hooks/queries/useEntryTags'
+import { EntryTag } from '@ui/schema/documents/EntryTag'
+import { EntryStatus } from '@ui/schema/models/EntryStatus'
 
 export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 

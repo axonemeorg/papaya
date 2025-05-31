@@ -1,12 +1,12 @@
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { WeekNumber } from '@/schema/support/recurrence'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { WeekNumber } from '@ui/schema/support/recurrence'
 import {
   AnnualDateView,
   DateView,
   DateViewVariant,
   MonthlyDateView,
   WeeklyDateView,
-} from '@/schema/support/search/facet'
+} from '@ui/schema/support/search/facet'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'

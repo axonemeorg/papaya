@@ -1,14 +1,13 @@
-import { ThemeProvider } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import { PropsWithChildren } from 'react'
-import { CssBaseline } from '@mui/material'
-// import { montserrat } from '@/fonts/montserrat'
+// import { montserrat } from '@ui/fonts/montserrat'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import NotificationsProvider from '@/providers/NotificationsProvider'
-import appTheme from '@/components/theme/theme'
-import JournalContextProvider from '@/providers/JournalContextProvider'
-import ZiskContextProvider from '@/providers/ZiskContextProvider'
-import RemoteContextProvider from '@/providers/RemoteContextProvider'
-import CalculatorContextProvider from '@/providers/CalculatorContextProvider'
+import appTheme from '@ui/components/theme/theme'
+import CalculatorContextProvider from '@ui/providers/CalculatorContextProvider'
+import JournalContextProvider from '@ui/providers/JournalContextProvider'
+import NotificationsProvider from '@ui/providers/NotificationsProvider'
+import RemoteContextProvider from '@ui/providers/RemoteContextProvider'
+import ZiskContextProvider from '@ui/providers/ZiskContextProvider'
 
 interface ZiskProviders extends PropsWithChildren {
   queryClient: QueryClient

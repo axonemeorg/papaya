@@ -1,12 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Save } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
-import CategoryForm from '../form/CategoryForm'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { NotificationsContext } from '@ui/contexts/NotificationsContext'
+import { updateCategory } from '@ui/database/actions'
+import { Category } from '@ui/schema/documents/Category'
 import { useContext, useEffect } from 'react'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { updateCategory } from '@/database/actions'
-import { Category } from '@/schema/documents/Category'
+import { FormProvider, useForm } from 'react-hook-form'
+import CategoryForm from '../form/CategoryForm'
 
 interface EditCategoryModalProps {
   open: boolean

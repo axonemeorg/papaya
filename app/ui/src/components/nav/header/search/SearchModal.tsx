@@ -20,16 +20,16 @@
 // import { SearchLaunchButtonProps } from "./SearchLaunchButton";
 // import { ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
 // import { Cancel, Search } from "@mui/icons-material";
-// import { JournalContext } from "@/contexts/JournalContext";
-// import { getAllJournalObjects } from "@/database/actions";
+// import { JournalContext } from "@ui/contexts/JournalContext";
+// import { getAllJournalObjects } from "@ui/database/actions";
 // import Fuse, { FuseResult } from "fuse.js";
-// import { calculateNetAmount, documentIsCategory, documentIsChildJournalEntry, documentIsJournalEntry } from "@/utils/journal";
-// import { getPriceString } from "@/utils/string";
-// import AvatarChip from "@/components/icon/AvatarChip";
-// import AvatarIcon from "@/components/icon/AvatarIcon";
-// import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from "@/constants/journal";
-// import { formatJournalEntryDate } from "@/utils/date";
-// import { JournalEntry } from "@/schema/documents/JournalEntry";
+// import { calculateNetAmount, documentIsCategory, documentIsChildJournalEntry, documentIsJournalEntry } from "@ui/utils/journal";
+// import { getPriceString } from "@ui/utils/string";
+// import AvatarChip from "@ui/components/icon/AvatarChip";
+// import AvatarIcon from "@ui/components/icon/AvatarIcon";
+// import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from "@ui/constants/journal";
+// import { formatJournalEntryDate } from "@ui/utils/date";
+// import { JournalEntry } from "@ui/schema/documents/JournalEntry";
 
 // type SearchModalProps =
 //     & DialogProps

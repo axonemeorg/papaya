@@ -1,6 +1,6 @@
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { Analytics, BasicAnalytics } from '@/schema/support/analytics'
-import { DateView } from '@/schema/support/search/facet'
+import { JournalEntry } from '@ui/schema/documents/JournalEntry'
+import { Analytics, BasicAnalytics } from '@ui/schema/support/analytics'
+import { DateView } from '@ui/schema/support/search/facet'
 import dayjs from 'dayjs'
 import { getAbsoluteDateRangeFromDateView } from './date'
 

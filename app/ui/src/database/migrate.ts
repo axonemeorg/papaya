@@ -1,5 +1,5 @@
-// import { Journal } from "@/schema/documents/Journal";
-// import { ZiskDocument } from "@/schema/union/ZiskDocument";
+// import { Journal } from "@ui/schema/documents/Journal";
+// import { ZiskDocument } from "@ui/schema/union/ZiskDocument";
 
 // export type MigrationRun = (records: ZiskDocument[]) => Promise<[Journal, ...ZiskDocument[]]>
 
