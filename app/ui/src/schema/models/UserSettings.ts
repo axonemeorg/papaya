@@ -1,5 +1,5 @@
 import { Model } from '@ui/schema/support/orm/Model'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { SyncingStrategy, ZiskServer } from '../support/server'
 
 export const [CreateUserSettings, UserSettings] = Model.fromSchema({

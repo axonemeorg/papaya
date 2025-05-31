@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from 'zod/v4'
 import { Model } from '../support/orm/Model'
 
 export const [CreateQuickJournalEntry, QuickJournalEntry] = Model.fromSchema({

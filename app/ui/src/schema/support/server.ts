@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from 'zod/v4'
 import { Avatar } from '../models/Avatar'
 
 export const CloudZiskServer = z.object({

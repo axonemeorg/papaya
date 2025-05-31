@@ -1,5 +1,5 @@
 import { Document } from '@ui/schema/support/orm/Document'
-import z from 'zod'
+import { z } from 'zod/v4'
 import { Mixin } from '../support/orm/Mixin'
 
 export const [CreateEntryArtifact, EntryArtifact] = Document.fromSchemas([

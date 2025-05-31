@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Add } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
 import { JournalContext } from '@ui/contexts/JournalContext'
@@ -34,7 +34,7 @@ export default function CreateAccountModal(props: CreateAccountModalProps) {
 
   const createAccountForm = useForm<CreateAccount>({
     defaultValues: ACCOUNT_FORM_CREATE_VALUES,
-    resolver: zodResolver(CreateAccount),
+    resolver: standardSchemaResolver(CreateAccount),
   })
 
   const handleCreateAccount = async (formData: CreateAccount) => {

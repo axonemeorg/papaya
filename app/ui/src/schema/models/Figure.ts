@@ -1,6 +1,6 @@
 import { Currency } from '@ui/schema/support/currency'
 import { Model } from '@ui/schema/support/orm/Model'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 const [CreateBaseFigure, BaseFigure] = Model.fromSchema({
   kind: z.literal('zisk:figure'),

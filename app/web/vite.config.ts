@@ -11,8 +11,9 @@ export default defineConfig({
   resolve: {
     preserveSymlinks: true,
     // alias: {
-    //   '@web/': `${path.resolve(__dirname, 'src')}/`,
-    //   '@ui/': '@zisk/ui/'
+    //   // '@web/': `${path.resolve(__dirname, 'src')}/`,
+    //   '@ui': path.resolve(__dirname, '../ui/src')
+
     //   // '@zisk/ui': path.resolve(__dirname, '../ui/src'),
     //   // '@zisk/ui/': `${path.resolve(__dirname, '../ui/src')}/`
     // }

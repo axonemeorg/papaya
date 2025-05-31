@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Save } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material'
 import { NotificationsContext } from '@ui/contexts/NotificationsContext'
@@ -25,7 +25,7 @@ export default function EditAccountModal(props: EditAccountModalProps) {
     defaultValues: {
       ...props.initialValues,
     },
-    resolver: zodResolver(Account),
+    resolver: standardSchemaResolver(Account),
   })
 
   const handleUpdateAccount = async (formData: Account) => {

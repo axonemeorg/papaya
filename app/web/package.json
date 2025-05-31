@@ -12,7 +12,7 @@
     "routes": "tsr generate"
   },
   "dependencies": {
-    "@zisk/ui": "1.0.0",
+    "@zisk/ui": "*",
     "@tanstack/react-router": "^1.114.25"
   },
   "devDependencies": {

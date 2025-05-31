@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Delete, Flag, LocalOffer, Pending, Update } from '@mui/icons-material'
 import { DialogContent, DialogTitle, Grow, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { PLACEHOLDER_UNNAMED_JOURNAL_ENTRY_MEMO } from '@ui/constants/journal'
@@ -40,7 +40,7 @@ export default function JournalEntryModal() {
 
   const journalEntryForm = useForm<JournalEntry>({
     defaultValues: {},
-    resolver: zodResolver(JournalEntry),
+    resolver: standardSchemaResolver(JournalEntry),
   })
 
   useEffect(() => {

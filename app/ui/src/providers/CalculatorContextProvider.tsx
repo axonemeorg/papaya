@@ -1,4 +1,4 @@
-import { ScreenCalculator } from '@ui/components/ScreenCalculator'
+import { ScreenCalculator } from '@ui/components/other/ScreenCalculator'
 import { CalculatorContext } from '@ui/contexts/CalculatorContext'
 import { PropsWithChildren, useState } from 'react'
 

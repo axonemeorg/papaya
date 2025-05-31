@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from '@mui/material'
 import { createJournal } from '@ui/database/actions'
 import { useAddJournal } from '@ui/hooks/queries/useJournals'
@@ -28,7 +28,7 @@ export default function CreateJournalModal(props: CreateJournalModalProps) {
       },
       journalName: '',
     },
-    resolver: zodResolver(CreateJournal),
+    resolver: standardSchemaResolver(CreateJournal),
   })
 
   const handleSubmit = async (formData: CreateJournal) => {

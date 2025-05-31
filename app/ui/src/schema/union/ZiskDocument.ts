@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from 'zod/v4'
 import { Account } from '../documents/Account'
 import { Category } from '../documents/Category'
 import { EntryArtifact } from '../documents/EntryArtifact'

@@ -1,6 +1,6 @@
 import { Model } from '@ui/schema/support/orm/Model'
 import { RecurringCadence } from '@ui/schema/support/recurrence'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const [CreateEntryRecurrency, EntryRecurrency] = Model.fromSchema({
   kind: z.literal('zisk:recurrence'),

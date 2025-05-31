@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 class NaturalMixin {
   public static $ephemeral<E extends z.ZodRawShape>($ephemeral: E) {

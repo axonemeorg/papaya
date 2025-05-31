@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Add, Save } from '@mui/icons-material'
 import { Box, Button, Stack } from '@mui/material'
 import { NotificationsContext } from '@ui/contexts/NotificationsContext'
@@ -22,7 +22,7 @@ export default function QuickJournalEditor(props: QuickJournalEditorProps) {
       // category: undefined,
       amount: undefined,
     },
-    resolver: zodResolver(CreateQuickJournalEntry),
+    resolver: standardSchemaResolver(CreateQuickJournalEntry),
   })
 
   const handleCreateQuickJournalEntry = async (_formData: CreateQuickJournalEntry) => {

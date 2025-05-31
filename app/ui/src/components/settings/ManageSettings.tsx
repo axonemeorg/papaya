@@ -1,5 +1,5 @@
 import { Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { ReactNode } from 'react'
 import JournalSettings from './JournalSettings'
 import SyncingSettings from './SyncingSettings'
@@ -28,7 +28,7 @@ const SETTINGS_TABS: Record<SettingsTab, { label: string; component: ReactNode }
 }
 
 export default function ManageSettings() {
-  const section = useParams({ strict: false }).section ?? DEFAULT_SETTINGS_TAB
+  const section = DEFAULT_SETTINGS_TAB
 
   return (
     <>

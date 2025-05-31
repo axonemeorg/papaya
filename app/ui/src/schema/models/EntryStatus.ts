@@ -1,8 +1,9 @@
 import { Mixin } from '@ui/schema/support/orm/Mixin'
 import { Model } from '@ui/schema/support/orm/Model'
-import z from 'zod'
+import { z } from 'zod/v4'
 
-enum Status {
+// TODO no idea why but this has to be marked as exported else you get a buidl error
+export enum Status {
   FLAGGED = 'zisk.status.flagged',
   NEEDS_REVIEW = 'zisk.status.needsreview',
   WAS_REVIEWED = 'zisk.status.wasreview',

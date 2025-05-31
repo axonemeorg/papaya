@@ -1,12 +1,10 @@
 import { Badge, Button, Fade, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material'
 
 import { Add, FilterAltOff } from '@mui/icons-material'
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import { JournalFilterContext } from '@ui/contexts/JournalFilterContext'
 import { SearchFacetKey } from '@ui/schema/support/search/facet'
 import { enumerateFilters } from '@ui/utils/filtering'
 import { useContext, useRef, useState } from 'react'
-import { Route } from '../../../../web/routes/_mainLayout/journal.$view.$'
 import JournalDateActions from './JournalDateActions'
 import JournalEntrySelectionActions from './JournalEntrySelectionActions'
 import JournalFilterPicker from './JournalFilterPicker'
@@ -25,15 +23,6 @@ export default function JournalHeader() {
   const numFilters = activeFilterSlots.size
 
   const hideFilterButton = false
-
-  const { tab } = useSearch({ from: '/_mainLayout/journal/$view/$' })
-  const navigate = useNavigate({ from: Route.fullPath })
-
-  const handleChangeTab = (newTab: 'journal' | 'transfers') => {
-    navigate({
-      search: { tab: newTab },
-    })
-  }
 
   const clearAllFilters = () => {
     journalFilterContext?.updateJournalMemoryFilters(() => ({}))
@@ -99,7 +88,7 @@ export default function JournalHeader() {
         <JournalFilterRibbon />
 
         {/* TODO To be implemented in ZK-111 */}
-        <Tabs value={tab} onChange={(_event, newValue: 'journal' | 'transfers') => handleChangeTab(newValue)}>
+        <Tabs value={'journal'} onChange={(_event, _newValue: 'journal' | 'transfers') => { }}>
           <Tab value="journal" label="Journal Entries" />
           <Tab value="transfers" label="Account Transfers" />
           {/* <Tab value='ANALYSIS' label='Analysis' disabled /> */}

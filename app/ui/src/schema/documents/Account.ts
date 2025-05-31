@@ -1,7 +1,7 @@
 import { Avatar } from '@ui/schema/models/Avatar'
 import { Document } from '@ui/schema/support/orm/Document'
 import { Mixin } from '@ui/schema/support/orm/Mixin'
-import z from 'zod'
+import { z } from 'zod/v4'
 
 export const [CreateAccount, Account] = Document.fromSchemas([
   {

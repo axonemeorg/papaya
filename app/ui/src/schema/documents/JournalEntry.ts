@@ -1,5 +1,5 @@
 import { Document } from '@ui/schema/support/orm/Document'
-import z from 'zod'
+import { z } from 'zod/v4'
 import { StatusVariant } from '../models/EntryStatus'
 import { EntryTask } from '../models/EntryTask'
 import { Figure } from '../models/Figure'
