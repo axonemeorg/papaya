@@ -1,6 +1,6 @@
-import ManageSettings, { SettingsTab } from '@/components/settings/ManageSettings'
 import { Container } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
+import ManageSettings, { SettingsTab } from '@zisk/ui/components/settings/ManageSettings'
 
 export default function SettingsPage() {
   return (

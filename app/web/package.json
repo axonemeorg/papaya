@@ -1,0 +1,24 @@
+{
+  "name": "@zisk/web",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite serve",
+    "build": "tsc -b && vite build",
+    "routes": "tsr generate"
+  },
+  "dependencies": {
+    "@zisk/ui": "1.0.0",
+    "@tanstack/react-router": "^1.114.25"
+  },
+  "devDependencies": {
+    "@tanstack/router-plugin": "^1.114.25",
+    "@tanstack/router-cli": "^1.114.25",
+    "vite": "^6.2.0",
+    "@vitejs/plugin-react": "^4.3.4"
+  }
+}

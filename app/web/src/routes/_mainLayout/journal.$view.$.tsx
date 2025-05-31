@@ -1,9 +1,9 @@
-import JournalEditor from '@/components/journal/JournalEditor'
-import { DateView, DateViewVariant } from '@/schema/support/search/facet'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import JournalEditor from '@zisk/ui/components/journal/JournalEditor'
+import JournalFilterContextProvider from '@zisk/ui/providers/JournalFilterContextProvider'
+import { DateView, DateViewVariant } from '@zisk/ui/schema/support/search/facet'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import JournalFilterContextProvider from '@/providers/JournalFilterContextProvider'
 
 export const Route = createFileRoute('/_mainLayout/journal/$view/$')({
   component: JournalPage,

@@ -2,12 +2,12 @@ import { Box, Button, Icon, InputAdornment, Stack, TextField } from '@mui/materi
 import { FixedSizeGrid } from 'react-window'
 
 import icons from '@/constants/icons'
-import { useMemo, useState } from 'react'
-import ColorPicker from '../pickers/ColorPicker'
-import { Search, Shuffle } from '@mui/icons-material'
 import { useScrollbarWidth } from '@/hooks/useScrollbarWidth'
-import Fuse from 'fuse.js'
 import { Avatar, AvatarVariant } from '@/schema/models/Avatar'
+import { Search, Shuffle } from '@mui/icons-material'
+import Fuse from 'fuse.js'
+import { useMemo, useState } from 'react'
+import ColorPicker from './ColorPicker'
 
 // const DEFAULT_ICON = 'home'
 

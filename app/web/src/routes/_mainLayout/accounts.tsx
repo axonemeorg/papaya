@@ -1,6 +1,6 @@
-import ManageAccounts from '@/components/journal/accounts/ManageAccounts'
 import { Container } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
+import ManageAccounts from 'zisk@zisk/ui/ui/components/journal/accounts/ManageAccounts'
 
 const AccountsPage = () => {
   return (

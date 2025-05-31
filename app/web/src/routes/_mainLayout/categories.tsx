@@ -1,6 +1,6 @@
-import ManageCategories from '@/components/journal/categories/ManageCategories'
 import { Container } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
+import ManageCategories from '@zisk/ui/components/journal/categories/ManageCategories'
 
 const CategoriesPage = () => {
   return (

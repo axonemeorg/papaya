@@ -1,5 +1,5 @@
-import { DateViewVariant } from '@/schema/support/search/facet'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { DateViewVariant } from '@zisk/ui/schema/support/search/facet'
 
 export const Route = createFileRoute('/_mainLayout/journal/')({
   loader: () => {

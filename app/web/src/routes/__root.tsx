@@ -1,6 +1,6 @@
-import ZiskProviders from '@/providers'
 import { QueryClient } from '@tanstack/react-query'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
+import ZiskProviders from '@zisk/ui/providers'
 
 const queryClient = new QueryClient({
   defaultOptions: {
