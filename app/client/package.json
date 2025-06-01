@@ -6,14 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite serve",
-    "build": "tsc -b && vite build",
+    "build": "npm run routes && tsc -b && vite build",
     "routes": "tsr generate",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
     "format:fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\"",
-    "preview": "vite preview --port 9476",
-    "prepare": "npm run build"
+    "preview": "vite preview --port 9476"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
