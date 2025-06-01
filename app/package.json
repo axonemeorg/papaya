@@ -4,5 +4,8 @@
     "workspaces": [
         "server",
         "client"
-    ]
+    ],
+    "scripts": {
+        "server": "node server/dist/index.js"
+    }
 }

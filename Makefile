@@ -24,42 +24,42 @@ db-clean: db-stop
 db: db-build db-run
 
 # Web Server
-web-build:
+app-build:
 	DOCKER_BUILDKIT=1 docker build \
 		--secret id=env_file,src=.env \
-		-t zisk-web \
-		-f packaging/web/web.Dockerfile \
+		-t zisk-app \
+		-f packaging/app/app.Dockerfile \
 		.
 
-web-run:
+app-run:
 	docker run \
 		-d \
-		--name zisk-web \
+		--name zisk-app \
 		--env-file .env \
 		-p 9475:9475 \
-		zisk-web
+		zisk-app
 
-web-stop:
-	docker stop zisk-web || true
+app-stop:
+	docker stop zisk-app || true
 
-web-clean: web-stop
-	docker rm zisk-web || true
-	docker image rm zisk-web || true
+app-clean: app-stop
+	docker rm zisk-app || true
+	docker image rm zisk-app || true
 
-web: web-build web-run
+app: app-build app-run
 
 # View logs
 logs-db:
 	docker logs -f zisk-couchdb
 
-logs-web:
-	docker logs -f zisk-web
+logs-app:
+	docker logs -f zisk-app
 
 # Clean
-clean: web-clean db-clean
+clean: app-clean db-clean
 	docker volume rm zisk-couchdb-data || true
 
 .PHONY: \
 	db-build db-run db db-stop db-clean \
-	web-build web-run web web-stop web-clean \
-	logs-db logs-web clean
+	app-build app-run app app-stop app-clean \
+	logs-db logs-app clean

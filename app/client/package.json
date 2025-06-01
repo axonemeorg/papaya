@@ -12,7 +12,8 @@
     "lint:fix": "eslint --fix ./src",
     "format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,css,scss}\"",
     "format:fix": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss}\"",
-    "preview": "vite preview --port 9476"
+    "preview": "vite preview --port 9476",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
