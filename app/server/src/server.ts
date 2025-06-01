@@ -4,7 +4,6 @@ import express, { type Request, type RequestHandler, type Response } from 'expre
 import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import AuthController from './controllers/AuthController.js'
 import {
   AUTH_ACCESS_TOKEN_HMAC_KID,
@@ -247,13 +246,10 @@ app.use('/api', apiRouter);
 // ============ Static ================
 
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const viteIndexPath = import.meta.resolve('@zisk/client/dist/index.html').replace(/^file:\/\//, "")
+const viteDistPath = path.dirname(viteIndexPath)
 
-
-
-// const viteDistPath = path.resolve(__dirname, '../node_modules/vite-app/dist')
-const viteDistPath = path.dirname(import.meta.resolve('@zisk/client/dist/index.html'))
+console.log(`Vite dist path: ${viteDistPath}`)
 
 // Serve static assets like CSS, JS, images, etc.
 app.use(express.static(viteDistPath))
@@ -261,7 +257,7 @@ app.use(express.static(viteDistPath))
 // Serve index.html for any non-API route
 app.get('*', (req, res) => {
 
-  res.sendFile(path.join(viteDistPath, 'index.html'))
+  res.sendFile(viteIndexPath)
 })
 
 
