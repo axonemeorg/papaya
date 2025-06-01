@@ -6,7 +6,7 @@ COPY app ./
 WORKDIR /usr/src/app/client
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 WORKDIR /usr/src/app/server
 

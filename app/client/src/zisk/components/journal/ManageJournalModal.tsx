@@ -1,5 +1,10 @@
 import AvatarIcon from '@/components/icon/AvatarIcon'
+import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
+import { NotificationsContext } from '@/contexts/NotificationsContext'
+import { deleteJournal, exportJournal, resetJournal } from '@/database/actions'
+import { Journal } from '@/schema/documents/Journal'
 import { getRelativeTime } from '@/utils/date'
+import { formatFileSize } from '@/utils/string'
 import {
   Box,
   Button,
@@ -7,7 +12,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Grid2 as Grid,
+  Grid,
   Stack,
   Tab,
   Tabs,
@@ -15,13 +20,7 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import { useContext, useMemo, useState } from 'react'
-import { formatFileSize } from '@/utils/string'
-import { PLACEHOLDER_UNNAMED_JOURNAL_NAME } from '@/constants/journal'
 import JournalActions from './JournalActions'
-import { deleteJournal, exportJournal, resetJournal } from '@/database/actions'
-import { NotificationsContext } from '@/contexts/NotificationsContext'
-import { JournalContext } from '@/contexts/JournalContext'
-import { Journal } from '@/schema/documents/Journal'
 
 interface JournalDetailsAndActivityProps {
   journal: Journal | null

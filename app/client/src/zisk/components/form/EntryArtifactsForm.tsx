@@ -1,15 +1,15 @@
-import { Button, Checkbox, Grid2 as Grid, IconButton, Link, Stack, TextField, Tooltip, Typography } from '@mui/material'
+import { JournalContext } from '@/contexts/JournalContext'
+import { useFilePrompt } from '@/hooks/useFilePrompt'
+import { EntryArtifact } from '@/schema/documents/EntryArtifact'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
+import { AttachmentMeta } from '@/schema/support/orm/Document'
+import { makeEntryArtifact } from '@/utils/journal'
 import { Add, Delete, Download } from '@mui/icons-material'
+import { Button, Checkbox, Grid, IconButton, Link, Stack, TextField, Tooltip, Typography } from '@mui/material'
+import { useContext, useRef, useState } from 'react'
 import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import FilePreview from '../file/FilePreview'
-import { useContext, useRef, useState } from 'react'
-import { JournalContext } from '@/contexts/JournalContext'
-import { makeEntryArtifact } from '@/utils/journal'
 import SelectionActionModal from '../modal/SelectionActionModal'
-import { useFilePrompt } from '@/hooks/useFilePrompt'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { EntryArtifact } from '@/schema/documents/EntryArtifact'
-import { AttachmentMeta } from '@/schema/support/orm/Document'
 
 export default function EntryArtifactsForm() {
   const [selectedRows, setSelectedRows] = useState<string[]>([])

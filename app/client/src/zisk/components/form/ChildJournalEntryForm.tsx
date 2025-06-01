@@ -1,15 +1,15 @@
-import { Button, Checkbox, Grid2 as Grid, Grow, IconButton, Link, Stack, TextField, Typography } from '@mui/material'
-import AmountField from '../input/AmountField'
-import CategoryAutocomplete from '../input/CategoryAutocomplete'
-import { Add, DeleteOutline, EditNote, LocalOffer, LocalOfferOutlined } from '@mui/icons-material'
-import { useCallback, useContext, useRef, useState } from 'react'
-import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
-import SelectionActionModal from '../modal/SelectionActionModal'
 import { JournalContext } from '@/contexts/JournalContext'
-import { discriminateEntryTags, makeJournalEntry } from '@/utils/journal'
-import { EntryTagPicker } from '../pickers/EntryTagPicker'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { StatusVariant } from '@/schema/models/EntryStatus'
+import { discriminateEntryTags, makeJournalEntry } from '@/utils/journal'
+import { Add, DeleteOutline, EditNote, LocalOffer, LocalOfferOutlined } from '@mui/icons-material'
+import { Button, Checkbox, Grid, Grow, IconButton, Link, Stack, TextField, Typography } from '@mui/material'
+import { useCallback, useContext, useRef, useState } from 'react'
+import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import AmountField from '../input/AmountField'
+import CategoryAutocomplete from '../input/CategoryAutocomplete'
+import SelectionActionModal from '../modal/SelectionActionModal'
+import { EntryTagPicker } from '../pickers/EntryTagPicker'
 
 export default function ChildJournalEntryForm() {
   const [selectedRows, setSelectedRows] = useState<string[]>([])
@@ -88,9 +88,9 @@ export default function ChildJournalEntryForm() {
         value={
           childEntryTaggingIndex >= 0 && children[childEntryTaggingIndex]
             ? [
-                ...(children[childEntryTaggingIndex].tagIds ?? []),
-                ...(children[childEntryTaggingIndex].statusIds ?? []),
-              ]
+              ...(children[childEntryTaggingIndex].tagIds ?? []),
+              ...(children[childEntryTaggingIndex].statusIds ?? []),
+            ]
             : undefined
         }
         onChange={(_event, newValue) => {

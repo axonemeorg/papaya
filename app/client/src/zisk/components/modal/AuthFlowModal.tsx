@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react'
 
-import { alpha, Box, Container, IconButton, Paper, Stack, Typography } from '@mui/material'
-import Grid from '@mui/material/Grid2'
 import { Close } from '@mui/icons-material'
+import { alpha, Box, Container, IconButton, Paper, Stack, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid'
 
 type AuthFlowModalProps = PropsWithChildren<{
   title: string
