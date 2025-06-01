@@ -11,6 +11,7 @@ import {
   AUTH_ACCESS_TOKEN_SECRET,
   NODE_ENV,
   SERVER_NAME,
+  ZISK_APP_ENTRYPOINT,
   ZISK_COUCHDB_URL,
   ZISK_SERVER_PORT
 } from './support/env.js'
@@ -246,14 +247,17 @@ app.use('/api', apiRouter);
 // Serve static files from the built Vite app
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const distPath = path.resolve(__dirname, '../../app/dist');
+const distPath = path.resolve(__dirname, ZISK_APP_ENTRYPOINT);
+
+console.log('ZISK_APP_ENTRYPOINT:', ZISK_APP_ENTRYPOINT);
+console.log('distPath:', distPath);
 
 // Serve static files from the Vite build output
 app.use(express.static(distPath));
 
-// Catch-all route to serve index.html for client-side routing with Tanstack Router
+// Catch-all route to serve index.html for client-side routing
 app.get('*', (req: Request, res: Response, next) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+  res.sendFile(distPath);
 });
 
 app.listen(ZISK_SERVER_PORT, () => {

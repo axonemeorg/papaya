@@ -2,7 +2,7 @@
 
 # Build stage for the Vite app
 FROM node:20-alpine AS app-builder
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy app package files
 COPY app/package*.json ./
@@ -16,7 +16,7 @@ RUN npm run build
 
 # Build stage for the Express server
 FROM node:20-alpine AS server-builder
-WORKDIR /server
+WORKDIR /usr/src/app
 
 # Copy server package files
 COPY server/package*.json ./
@@ -28,16 +28,20 @@ COPY server/ ./
 # Build the server
 RUN npm run build
 
+
 # Production stage
 FROM node:20-alpine
-WORKDIR /usr/src/app
-
-# Copy built server files
-COPY --from=server-builder /server/dist ./dist
-COPY --from=server-builder /server/package*.json ./
 
 # Copy built Vite app to the server's expected location
-COPY --from=app-builder /app/dist ./app/dist
+WORKDIR /usr/src/app/web
+COPY --from=app-builder /usr/src/app/dist ./dist
+
+ENV ZISK_APP_ENTRYPOINT="/usr/src/app/web/dist/index.html"
+
+# Copy built server files
+WORKDIR /usr/src/app/server
+COPY --from=server-builder /usr/src/app/dist ./dist
+COPY --from=server-builder /usr/src/app/package*.json .
 
 # Install production dependencies only
 RUN npm ci --omit=dev
