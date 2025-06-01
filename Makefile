@@ -58,6 +58,7 @@ logs-app:
 # Clean
 clean: app-clean db-clean
 	docker volume rm zisk-couchdb-data || true
+	rm -rf app/node_modules app/client/node_modules app/client/dist app/server/node_modules app/server/dist
 
 .PHONY: \
 	db-build db-run db db-stop db-clean \
