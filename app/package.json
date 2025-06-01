@@ -1,4 +1,8 @@
 {
     "private": true,
-    "name": "@zisk/app"
+    "name": "@zisk/app",
+    "workspaces": [
+        "server",
+        "client"
+    ]
 }

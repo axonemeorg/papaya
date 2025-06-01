@@ -1,9 +1,13 @@
 {
-  "name": "api",
+  "name": "@zisk/server",
   "version": "1.0.0",
   "description": "",
   "type": "module",
   "main": "server.js",
+  "private": true,
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx watch src/server.ts",
@@ -16,6 +20,7 @@
   "dependencies": {
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "@zisk/client": "*",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
