@@ -3,8 +3,8 @@ db-build:
 	DOCKER_BUILDKIT=1 docker build \
 		--secret id=env_file,src=.env \
 		-t zisk-couchdb \
-		-f docker/database/database.Dockerfile \
-		docker/database
+		-f packaging/database/database.Dockerfile \
+		packaging/database
 
 db-run:
 	docker run \
@@ -28,7 +28,7 @@ web-build:
 	DOCKER_BUILDKIT=1 docker build \
 		--secret id=env_file,src=.env \
 		-t zisk-web \
-		-f docker/web/web.Dockerfile \
+		-f packaging/web/web.Dockerfile \
 		.
 
 web-run:

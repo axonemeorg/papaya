@@ -1,0 +1,6 @@
+dist/
+node_modules/
+bun.lockb
+.env.local
+__zisk__db*/
+src/web/**/*.gen.ts
