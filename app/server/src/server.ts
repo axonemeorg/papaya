@@ -243,18 +243,32 @@ apiRouter.post("/logout", async (req: Request, res: Response, next): Promise<voi
 // Mount the API router
 app.use('/api', apiRouter);
 
-// Serve static files from the built Vite app
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const distPath = path.resolve(__dirname, '../../client/dist/index.html');
 
-// Serve static files from the Vite build output
-app.use(express.static(distPath));
+// ============ Static ================
 
-// Catch-all route to serve index.html for client-side routing
-app.get('*', (req: Request, res: Response, next) => {
-  res.sendFile(distPath);
-});
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+
+
+// const viteDistPath = path.resolve(__dirname, '../node_modules/vite-app/dist')
+const viteDistPath = path.dirname(import.meta.resolve('@zisk/client/dist/index.html'))
+
+// Serve static assets like CSS, JS, images, etc.
+app.use(express.static(viteDistPath))
+
+// Serve index.html for any non-API route
+app.get('*', (req, res) => {
+
+  res.sendFile(path.join(viteDistPath, 'index.html'))
+})
+
+
+
+
+// ============ Serve ================
+
 
 app.listen(ZISK_SERVER_PORT, () => {
   console.log(`Server running on port ${ZISK_SERVER_PORT}`);
