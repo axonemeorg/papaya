@@ -1,6 +1,3 @@
-dist/
-node_modules/
+node_modules
 bun.lockb
-.env.local
-__zisk__db*/
-src/web/**/*.gen.ts
+**/bun.lockb
