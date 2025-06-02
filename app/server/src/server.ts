@@ -5,15 +5,19 @@ import { createProxyMiddleware, type Options } from 'http-proxy-middleware'
 import jwt from 'jsonwebtoken'
 import path from 'path'
 import AuthController from './controllers/AuthController.js'
-import {
+import ConfigController from './controllers/ConfigController.js'
+import ConfigService, {
   AUTH_ACCESS_TOKEN_HMAC_KID,
   AUTH_ACCESS_TOKEN_SECRET,
   NODE_ENV,
   SERVER_NAME,
   ZISK_COUCHDB_URL,
   ZISK_SERVER_PORT
-} from './support/env.js'
+} from './support/ConfigService.js'
 import { UserClaims } from './support/types'
+
+// Initialize ConfigService
+const configService = ConfigService.getInstance();
 
 // CORS
 const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
@@ -27,8 +31,9 @@ const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 const ACCESS_TOKEN_COOKIE = 'AccessToken'
 const REFRESH_TOKEN_COOKIE = 'RefreshToken'
 
-// Initialize the AuthController
+// Initialize controllers
 const authController = new AuthController()
+const configController = new ConfigController()
 
 const app = express();
 
@@ -62,6 +67,16 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
   const accessToken = req.cookies[ACCESS_TOKEN_COOKIE];
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
 
+  // Extract user from access token if present
+  if (accessToken) {
+    try {
+      const decoded = jwt.verify(accessToken, AUTH_ACCESS_TOKEN_SECRET()) as UserClaims;
+      req.user = decoded;
+    } catch (error) {
+      // Token is invalid, will be handled below
+    }
+  }
+
   if (!refreshToken) {
     return next();
   }
@@ -78,12 +93,12 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
     // Set the new refresh token cookie
     res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure: NODE_ENV() === 'production',
       maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
     });
 
     // Check if access token is expired or absent
-    if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET as string)) {
+    if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET())) {
       // Create new access token using the refresh token
       const newAccessToken = await authController.createAccessTokenFromRefreshToken(newRefreshToken);
 
@@ -92,7 +107,7 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
 
       res.cookie(ACCESS_TOKEN_COOKIE, newAccessToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production',
+        secure: NODE_ENV() === 'production',
         maxAge: JWT_EXPIRATION_SECONDS * 1000,
       });
     }
@@ -106,9 +121,24 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
   next();
 };
 
+// Admin role check middleware
+const adminRoleMiddleware: RequestHandler = (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  if (!req.user.roles.includes('zisk:admin')) {
+    res.status(403).json({ error: 'Forbidden' });
+    return;
+  }
+
+  next();
+};
+
 // Create the proxy middleware with proper typing
 const proxyMiddlewareOptions: Options = {
-  target: ZISK_COUCHDB_URL, // e.g. 'http://localhost:5984'
+  target: ZISK_COUCHDB_URL(), // e.g. 'http://localhost:5984'
   changeOrigin: true,
   pathRewrite: {
     '^/proxy': '', // Remove the 'proxy' prefix when forwarding
@@ -149,7 +179,7 @@ apiRouter.get('/', (req: Request, res: Response) => {
   res.json({
     zisk: 'Welcome',
     version: '0.3.0',
-    serverName: SERVER_NAME,
+    serverName: SERVER_NAME(),
     status: 'ok',
     initialized: true,
   });
@@ -177,12 +207,12 @@ apiRouter.post("/login", async (req: Request, res: Response): Promise<void> => {
       // Create access token
       const accessToken = jwt.sign(
         userClaims,
-        AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
+        AUTH_ACCESS_TOKEN_SECRET() as jwt.Secret,
         {
           expiresIn: JWT_EXPIRATION_SECONDS,
           subject: username,
           algorithm: 'HS256',
-          keyid: AUTH_ACCESS_TOKEN_HMAC_KID
+          keyid: AUTH_ACCESS_TOKEN_HMAC_KID()
         }
       );
 
@@ -192,13 +222,13 @@ apiRouter.post("/login", async (req: Request, res: Response): Promise<void> => {
       // Set cookies
       res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production',
+        secure: NODE_ENV() === 'production',
         maxAge: JWT_EXPIRATION_SECONDS * 1000,
       });
 
       res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
         httpOnly: true,
-        secure: NODE_ENV === 'production',
+        secure: NODE_ENV() === 'production',
         maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
       });
 
@@ -218,14 +248,14 @@ apiRouter.post("/logout", async (req: Request, res: Response, next): Promise<voi
   // Clear auth token cookie
   res.cookie(ACCESS_TOKEN_COOKIE, '', {
     httpOnly: true,
-    secure: NODE_ENV === 'production',
+    secure: NODE_ENV() === 'production',
     maxAge: 0,
   });
 
   // Clear refresh token cookie
   res.cookie(REFRESH_TOKEN_COOKIE, '', {
     httpOnly: true,
-    secure: NODE_ENV === 'production',
+    secure: NODE_ENV() === 'production',
     maxAge: 0,
   });
 
@@ -237,6 +267,33 @@ apiRouter.post("/logout", async (req: Request, res: Response, next): Promise<voi
   }
 
   res.status(200).json({ ok: true });
+});
+
+// Configuration management endpoints
+// Apply token middleware to ensure user is authenticated, then check for admin role
+apiRouter.get("/admin/config", tokenMiddlewareHandler, adminRoleMiddleware, (req: Request, res: Response) => {
+  res.json(configService.getConfig());
+});
+
+apiRouter.put("/admin/config", tokenMiddlewareHandler, adminRoleMiddleware, async (req: Request, res: Response) => {
+  try {
+    await configService.updateConfig(req.body);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to update configuration:', error);
+    res.status(500).json({ error: 'Failed to update configuration' });
+  }
+});
+
+apiRouter.post("/admin/restart", tokenMiddlewareHandler, adminRoleMiddleware, (req: Request, res: Response) => {
+  // Send a response before restarting
+  res.json({ success: true, message: 'Server restarting...' });
+
+  // Wait a moment to ensure the response is sent
+  setTimeout(() => {
+    console.log('Restarting server...');
+    process.exit(0);
+  }, 1000);
 });
 
 // Mount the API router
@@ -256,16 +313,27 @@ app.use(express.static(viteDistPath))
 
 // Serve index.html for any non-API route
 app.get('*', (req, res) => {
-
   res.sendFile(viteIndexPath)
 })
 
 
-
-
 // ============ Serve ================
 
+// Initialize ConfigService before starting the server
+const startServer = async () => {
+  try {
+    // Initialize ConfigService with CouchDB connection
+    await configService.initialize();
 
-app.listen(ZISK_SERVER_PORT, () => {
-  console.log(`Server running on port ${ZISK_SERVER_PORT}`);
-});
+    // Start the server
+    app.listen(ZISK_SERVER_PORT(), () => {
+      console.log(`Server running on port ${ZISK_SERVER_PORT()}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();

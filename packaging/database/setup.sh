@@ -1,12 +1,27 @@
 #!/bin/bash
 
-# Source environment variables from mounted secret
-source /run/secrets/env_file
+# Path to the YAML configuration file
+CONFIG_FILE="/etc/zisk/config.yaml"
+
+# Create directory for zisk config if it doesn't exist
+mkdir -p /etc/zisk
+
+# Function to extract values from YAML using yq
+get_yaml_value() {
+  local key=$1
+  yq eval ".$key" "$CONFIG_FILE"
+}
+
+# Extract configuration values
+ZISK_COUCHDB_ADMIN_USER=$(get_yaml_value "couchdb.admin_user")
+ZISK_COUCHDB_ADMIN_PASS=$(get_yaml_value "couchdb.admin_pass")
+AUTH_ACCESS_TOKEN_SECRET=$(get_yaml_value "auth.access_token_secret")
+AUTH_ACCESS_TOKEN_HMAC_KID=$(get_yaml_value "auth.access_token_hmac_kid")
 
 INI_FILE="/opt/couchdb/etc/local.d/couchdb.ini"
 
 if [ -z "$ZISK_COUCHDB_ADMIN_USER" ] || [ -z "$ZISK_COUCHDB_ADMIN_PASS" ]; then
-  echo "Error: ZISK_COUCHDB_ADMIN_USER or ZISK_COUCHDB_ADMIN_PASS not set."
+  echo "Error: couchdb.admin_user or couchdb.admin_pass not set in $CONFIG_FILE."
   exit 1
 fi
 
@@ -29,7 +44,6 @@ while [ $ATTEMPT -lt 10 ]; do
     break
   fi
   ATTEMPT=$((ATTEMPT + 1))
-#   echo "Attempt $ATTEMPT/10: waiting 1 second..."
   sleep 1
 done
 
