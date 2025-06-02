@@ -13,8 +13,8 @@ This is the mono-repo source for services used to run Zisk.
 
 ## Services
 
-### App
-This is the frontend for Zisk. Core dependencies include:
+### Client
+This is the web frontend for Zisk. Core dependencies include:
  - PouchDB
  - React
  - Material-UI
@@ -25,11 +25,13 @@ This is the frontend for Zisk. Core dependencies include:
  - Zod
  - Zustand
 
-Please see `app/README.md` for more info.
+Please see `app/client/README.md` for more info.
 
 ### Server
 
-Please see `server/README.md` for more info.
+This is the server for hosting Zisk. It serves a backend API and the app frontend, as well as a proxy to your CouchDB instance.
+
+Please see `app/server/README.md` for more info.
 
 ## Docker Setup
 
@@ -61,13 +63,8 @@ The CouchDB container will be accessible at the port specified in your `.env` fi
 
 #### Web Server Container
 
-- `make web` - Build and run the web server container
-- `make web-stop` - Stop the web server container
-- `make web-clean` - Clean up the web server container and image
-- `make logs-web` - View web server logs
+- `make app` - Build and run the web server container
+- `make app-stop` - Stop the web server container
+- `make app-clean` - Clean up the web server container and image
 
 The web server container will use the environment variables from your `.env` file, including the `ZISK_COUCHDB_URL` to connect to your CouchDB instance.
-
-### Cleaning Up
-
-- `make clean` - Clean up all containers, images, and volumes
