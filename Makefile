@@ -12,20 +12,13 @@ db-build:
 		-f packaging/database/database.Dockerfile \
 		.
 
-# Extract port from config
-db-port:
-	@echo "Extracting CouchDB port from config..."
-	@DB_PORT=$$(yq eval '.couchdb.port // 5984' config/docker.yaml); \
-	echo "CouchDB port: $$DB_PORT"
-
-db-run: network-create db-port
-	@DB_PORT=$$(yq eval '.couchdb.port // 5984' config/docker.yaml); \
-	echo "Running CouchDB container on port $$DB_PORT..."; \
+db-run: network-create
+	@echo "Running CouchDB container on port 5984..."; \
 	docker run \
 		-d \
 		--name zisk-couchdb \
 		--network zisk-network \
-		-p $$DB_PORT:$$DB_PORT \
+		-p 5984:5984 \
 		-v zisk-couchdb-data:/opt/couchdb/data \
 		zisk-couchdb
 
@@ -45,20 +38,13 @@ app-build:
 		-f packaging/app/app.Dockerfile \
 		.
 
-# Extract port from config
-app-port:
-	@echo "Extracting server port from config..."
-	@SERVER_PORT=$$(yq eval '.server.port // 9475' config/docker.yaml); \
-	echo "Server port: $$SERVER_PORT"
-
-app-run: network-create app-port
-	@SERVER_PORT=$$(yq eval '.server.port // 9475' config/docker.yaml); \
-	echo "Running app container on port $$SERVER_PORT..."; \
+app-run: network-create
+	@echo "Running app container on port 9475..."; \
 	docker run \
 		-d \
 		--name zisk-app \
 		--network zisk-network \
-		-p $$SERVER_PORT:$$SERVER_PORT \
+		-p 9475:9475 \
 		zisk-app
 
 app-stop:

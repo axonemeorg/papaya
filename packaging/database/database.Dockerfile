@@ -16,21 +16,21 @@ RUN mkdir -p /etc/zisk
 # Copy YAML configuration file
 COPY config/docker.yaml /etc/zisk/config.yaml
 
-# Extract port from config
-RUN export DB_PORT=$(/usr/local/bin/yq eval '.couchdb.port // 5984' /etc/zisk/config.yaml) && \
-    echo "Exposing port $DB_PORT" && \
-    echo "EXPOSE $DB_PORT" > /etc/zisk/expose.docker
-
-# Expose the port from config (default to 5984 if not specified)
-EXPOSE ${DB_PORT:-5984}
+# Use fixed port
+EXPOSE 5984
 
 # Copy baseline configuration file
-COPY packaging/database/couchdb.ini /opt/couchdb/etc/local.d/couchdb.ini
+COPY packaging/database/zisk.ini /opt/couchdb/etc/default.d/zisk.ini
 
-# Copy and run setup script during build
-COPY packaging/database/setup.sh /usr/local/bin/setup.sh
-RUN chmod +x /usr/local/bin/setup.sh && \
-    /usr/local/bin/setup.sh
+# Extract configuration values and update the ini file directly
+RUN ZISK_COUCHDB_ADMIN_USER=$(/usr/local/bin/yq eval '.couchdb.admin_user' /etc/zisk/config.yaml) && \
+    ZISK_COUCHDB_ADMIN_PASS=$(/usr/local/bin/yq eval '.couchdb.admin_pass' /etc/zisk/config.yaml) && \
+    AUTH_ACCESS_TOKEN_SECRET=$(/usr/local/bin/yq eval '.auth.access_token_secret' /etc/zisk/config.yaml) && \
+    AUTH_ACCESS_TOKEN_HMAC_KID=$(/usr/local/bin/yq eval '.auth.access_token_hmac_kid' /etc/zisk/config.yaml) && \
+    ENCODED_SECRET=$(echo -n "$AUTH_ACCESS_TOKEN_SECRET" | base64) && \
+    echo -e "\n[admins]\n${ZISK_COUCHDB_ADMIN_USER} = ${ZISK_COUCHDB_ADMIN_PASS}" >> /opt/couchdb/etc/default.d/zisk.ini && \
+    echo -e "\n[jwt_keys]\nhmac:${AUTH_ACCESS_TOKEN_HMAC_KID} = ${ENCODED_SECRET}" >> /opt/couchdb/etc/default.d/zisk.ini && \
+    echo "CouchDB configuration completed successfully."
 
 # Use default CouchDB entrypoint and command
 CMD ["couchdb"]
