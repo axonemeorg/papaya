@@ -14,7 +14,7 @@ RUN apt-get update && \
 RUN mkdir -p /etc/zisk
 
 # Copy YAML configuration file
-COPY ../../config/docker.yaml /etc/zisk/config.yaml
+COPY config/docker.yaml /etc/zisk/config.yaml
 
 # Extract port from config
 RUN export DB_PORT=$(/usr/local/bin/yq eval '.couchdb.port // 5984' /etc/zisk/config.yaml) && \
@@ -25,10 +25,10 @@ RUN export DB_PORT=$(/usr/local/bin/yq eval '.couchdb.port // 5984' /etc/zisk/co
 EXPOSE ${DB_PORT:-5984}
 
 # Copy baseline configuration file
-COPY couchdb.ini /opt/couchdb/etc/local.d/couchdb.ini
+COPY packaging/database/couchdb.ini /opt/couchdb/etc/local.d/couchdb.ini
 
 # Copy and run setup script during build
-COPY setup.sh /usr/local/bin/setup.sh
+COPY packaging/database/setup.sh /usr/local/bin/setup.sh
 RUN chmod +x /usr/local/bin/setup.sh && \
     /usr/local/bin/setup.sh
 

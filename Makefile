@@ -10,7 +10,7 @@ db-build:
 	DOCKER_BUILDKIT=1 docker build \
 		-t zisk-couchdb \
 		-f packaging/database/database.Dockerfile \
-		packaging/database
+		.
 
 # Extract port from config
 db-port:
