@@ -67,7 +67,7 @@ export const getServerDatabaseUrl = (url: string | null): string => {
   try {
     // Parse the URL and return the database URL
     const parsedUrl = new URL(url)
-    return `${parsedUrl.origin}/database`
+    return `${parsedUrl.origin}/proxy`
   } catch {
     return ''
   }
