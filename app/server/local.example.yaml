@@ -1,0 +1,16 @@
+# Default configuration for Zisk
+
+couchdb:
+  url: http://localhost:5984
+  port: 5984
+  admin_user: admin
+  admin_pass: surfboard
+
+auth:
+  access_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
+  refresh_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
+  access_token_hmac_kid: zisk
+
+server:
+  port: 9475
+  name: myserver
