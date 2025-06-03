@@ -64,11 +64,13 @@ logs-app:
 	docker logs -f zisk-app
 
 # Clean
-clean: app-clean db-clean
+clean: app-clean db-clean network-remove
 	docker volume rm zisk-couchdb-data || true
+
+rm:
 	rm -rf app/node_modules app/client/node_modules app/client/dist app/server/node_modules app/server/dist
 
 .PHONY: \
 	db-build db-run db db-stop db-clean \
 	app-build app-run app app-stop app-clean \
-	logs-db logs-app clean
+	logs-db logs-app clean rm

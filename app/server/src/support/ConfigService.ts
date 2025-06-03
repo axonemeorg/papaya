@@ -1,6 +1,6 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
-import path, { dirname } from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Get the directory name of the current module
@@ -224,24 +224,10 @@ export default class ConfigService {
       }
     }
 
-    // Fall back to local development configuration
-    const configDir = path.resolve(__dirname, '../../../../config');
-
-    // Load default config
-    let defaultConfig: ZiskConfig;
-    try {
-      const defaultConfigPath = path.join(configDir, 'default.yaml');
-      const defaultConfigContent = fs.readFileSync(defaultConfigPath, 'utf8');
-      defaultConfig = yaml.load(defaultConfigContent) as ZiskConfig;
-    } catch (error) {
-      console.error('Failed to load default config:', error);
-      throw new Error('Failed to load default configuration');
-    }
-
     // Try to load local config
     let localConfig = {};
     try {
-      const localConfigPath = path.join(configDir, 'local.yaml');
+      const localConfigPath = 'local.yaml'
       if (fs.existsSync(localConfigPath)) {
         const localConfigContent = fs.readFileSync(localConfigPath, 'utf8');
         localConfig = yaml.load(localConfigContent) || {};
@@ -250,8 +236,7 @@ export default class ConfigService {
       console.warn('No local config found or error loading it:', error);
     }
 
-    // Merge configs with local overriding default
-    return this.deepMerge(defaultConfig, localConfig as Partial<ZiskConfig>) as ZiskConfig;
+    return localConfig as ZiskConfig;
   }
 
   /**
