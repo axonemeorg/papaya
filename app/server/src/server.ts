@@ -313,7 +313,14 @@ app.use(express.static(viteDistPath))
 
 // Serve index.html for any non-API route
 app.get('*', (req, res) => {
-  res.sendFile(viteIndexPath)
+  // If the path starts with /api/, it means the API router didn't handle it
+  // So we should return a 404 for API routes that don't exist
+  if (req.path.startsWith('/api/')) {
+    res.status(404).json({ error: 'API endpoint not found' });
+  } else {
+    // For all other routes, serve the SPA index.html
+    res.sendFile(viteIndexPath);
+  }
 })
 
 

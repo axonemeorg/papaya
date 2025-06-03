@@ -113,9 +113,11 @@ export default class ConfigService {
           // Merge with file-based config, with DB config taking precedence
           this.config = this.deepMerge(this.config, dbConfig) as ZiskConfig;
           console.log('Loaded configuration from database');
+        } else {
+          console.log("No config.")
         }
       } catch (error) {
-        console.error('Failed to load configuration from database:', error);
+        console.error('Failed to load configuration from database during init:', error);
         // If loading fails, save the current configuration to the database
         await this.saveConfigToDb(this.config);
       }
@@ -195,15 +197,10 @@ export default class ConfigService {
 
     const db = this.couchDbConnection.db.use(this.configDbName);
 
-    try {
-      const doc = await db.get(this.configDocId);
-      // Remove CouchDB specific fields
-      const { _id, _rev, ...config } = doc;
-      return config as ZiskConfig;
-    } catch (error) {
-      console.error('Failed to load configuration from database:', error);
-      return null;
-    }
+    const doc = await db.get(this.configDocId);
+    // Remove CouchDB specific fields
+    const { _id, _rev, ...config } = doc;
+    return config as ZiskConfig;
   }
 
   /**
