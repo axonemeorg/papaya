@@ -1,31 +1,50 @@
 import { createContext } from 'react'
 
+export enum OnlineStatusEnum {
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+}
+
+export enum AuthStatusEnum {
+  UNAUTHENTICATED = 'UNAUTHENTICATED',
+  AUTHENTICATING = 'AUTHENTICATING',
+  AUTHENTICATED = 'AUTHENTICATED',
+}
+
 export enum SyncStatusEnum {
-  SAVING = 'SAVING',
-  CONNECTING_TO_REMOTE = 'CONNECTING_TO_REMOTE',
-  FAILED_TO_CONNECT = 'FAILED_TO_CONNECT',
-  SAVED_TO_REMOTE = 'SAVED_TO_REMOTE',
-  WORKING_OFFLINE = 'WORKING_OFFLINE',
-  WORKING_LOCALLY = 'WORKING_LOCALLY',
-  SAVED_TO_THIS_DEVICE = 'SAVED_TO_THIS_DEVICE',
-  FAILED_TO_SAVE = 'FAILED_TO_SAVE',
+  /**
+   * Syncing has not started
+   */
   IDLE = 'IDLE',
-  INITIALIZING = 'INITIALIZING',
+  /**
+   * Currently syncing
+   */
+  SYNCING = 'SYNCING',
+  /**
+   * Previous sync was successful
+   */
+  SAVED = 'SAVED',
+  /**
+   * Syncing was paused, likely do to connection loss
+   */
+  PAUSED = 'PAUSED',
+  /**
+   * Sync error occurred
+   */
+  ERROR = 'ERROR'
 }
 
 export enum SyncErrorEnum {
-  MISSING_USER_CONTEXT = 'MISSING_USER_CONTEXT',
   MISSING_DATABASE = 'MISSING_DATABASE',
-  UNAUTHENTICATED = 'UNAUTHENTICATED',
-  MISSING_SERVER_URL_IN_CONFIG = 'MISSING_SERVER_URL_IN_CONFIG',
-  ZISK_CLOUD_DISABLED = 'ZISK_CLOUD_DISABLED',
 }
 
 export interface RemoteContext {
-  syncError: SyncErrorEnum | null
-  syncStatus: SyncStatusEnum
-  syncSupported: boolean
-  sync: () => Promise<void>
+  authStatus: AuthStatusEnum,
+  onlineStatus: OnlineStatusEnum
+  syncStatus: SyncStatusEnum,
+  // syncError: SyncErrorEnum,
+  syncEnabled: boolean
+  // sync: () => Promise<void>
 }
 
 export const RemoteContext = createContext<RemoteContext>({} as RemoteContext)

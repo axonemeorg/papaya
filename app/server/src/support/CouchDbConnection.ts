@@ -1,5 +1,5 @@
 import nano from "nano";
-import { ZISK_COUCHDB_ADMIN_PASS, ZISK_COUCHDB_ADMIN_USER, ZISK_COUCHDB_URL } from "./env.js";
+import { ZISK_COUCHDB_ADMIN_PASS, ZISK_COUCHDB_ADMIN_USER, ZISK_COUCHDB_URL } from "./ConfigService.js";
 
 /**
  * Singleton class for managing CouchDB connection
@@ -12,7 +12,11 @@ export default class CouchDbConnection {
    * Private constructor to prevent direct instantiation
    */
   private constructor() {
-    this._couch = nano(`http://${ZISK_COUCHDB_ADMIN_USER}:${ZISK_COUCHDB_ADMIN_PASS}@${ZISK_COUCHDB_URL.split('//')[1]}`);
+    const url = ZISK_COUCHDB_URL();
+    const adminUser = ZISK_COUCHDB_ADMIN_USER();
+    const adminPass = ZISK_COUCHDB_ADMIN_PASS();
+
+    this._couch = nano(`http://${adminUser}:${adminPass}@${url.split('//')[1]}`);
   }
 
   /**

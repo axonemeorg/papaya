@@ -1,7 +1,7 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
+import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, ZISK_COUCHDB_URL } from "../support/ConfigService.js";
 import Controller from "../support/Controller.js";
-import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, ZISK_COUCHDB_URL } from "../support/env.js";
 import { CouchDBUserDocument, Credentials, RefreshTokenClaims, SessionResponse, UserClaims } from "../support/types";
 import UserController from "./UserController.js";
 
@@ -23,7 +23,7 @@ export default class AuthController extends Controller {
     const { username, password } = credentials;
     const basicCredentialBuffer = Buffer.from(`${username}:${password}`).toString('base64');
 
-    const response = await axios.get<SessionResponse>(`${ZISK_COUCHDB_URL}/_session`, {
+    const response = await axios.get<SessionResponse>(`${ZISK_COUCHDB_URL()}/_session`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${basicCredentialBuffer}`
@@ -118,7 +118,7 @@ export default class AuthController extends Controller {
     // Sign the refresh token
     const refreshToken = jwt.sign(
       refreshClaims,
-      AUTH_REFRESH_TOKEN_SECRET as jwt.Secret,
+      AUTH_REFRESH_TOKEN_SECRET() as jwt.Secret,
       { expiresIn: REFRESH_EXPIRATION_SECONDS }
     );
 
@@ -156,7 +156,7 @@ export default class AuthController extends Controller {
    */
   public async decodeRefreshToken(token: string): Promise<RefreshTokenClaims> {
     try {
-      const decoded = jwt.verify(token, AUTH_REFRESH_TOKEN_SECRET as jwt.Secret) as jwt.JwtPayload;
+      const decoded = jwt.verify(token, AUTH_REFRESH_TOKEN_SECRET() as jwt.Secret) as jwt.JwtPayload;
 
       return {
         name: decoded.name
@@ -215,12 +215,12 @@ export default class AuthController extends Controller {
       // Sign and return the access token
       return jwt.sign(
         userClaims,
-        AUTH_ACCESS_TOKEN_SECRET as jwt.Secret,
+        AUTH_ACCESS_TOKEN_SECRET() as jwt.Secret,
         {
           expiresIn: JWT_EXPIRATION_SECONDS,
           subject: refreshTokenClaims.name,
           algorithm: 'HS256',
-          keyid: AUTH_ACCESS_TOKEN_HMAC_KID
+          keyid: AUTH_ACCESS_TOKEN_HMAC_KID()
         }
       );
     } catch (error) {

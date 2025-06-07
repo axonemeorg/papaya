@@ -1,3 +1,6 @@
+import { UserSettings } from "@/schema/models/UserSettings"
+import { SyncStrategy } from "@/schema/support/syncing"
+
 export const isValidUrl = (url: string): boolean => {
   try {
     new URL(url)
@@ -20,7 +23,7 @@ export const parseServerUrl = (url: string | null): string => {
     return ''
   }
   try {
-    // Parse the URL by adding http if it's absent, and removing trailing slashes
+    // Parse the URL
     const parsedUrl = new URL(url)
     return parsedUrl.toString()
   } catch {
@@ -67,8 +70,15 @@ export const getServerDatabaseUrl = (url: string | null): string => {
   try {
     // Parse the URL and return the database URL
     const parsedUrl = new URL(url)
-    return `${parsedUrl.origin}/database`
+    return `${parsedUrl.origin}/proxy`
   } catch {
     return ''
   }
+}
+
+export const getSyncStrategy = (settings: UserSettings | null): SyncStrategy => {
+  if (!settings?.syncStrategy) {
+    return { syncType: 'LOCAL' }
+  }
+  return settings.syncStrategy
 }

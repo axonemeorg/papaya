@@ -1,157 +1,148 @@
-import { RemoteContext, SyncErrorEnum, SyncStatusEnum } from '@/contexts/RemoteContext'
+import { AuthStatusEnum, OnlineStatusEnum, RemoteContext, SyncErrorEnum, SyncStatusEnum } from '@/contexts/RemoteContext'
 import { getDatabaseClient } from '@/database/client'
 import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
-import { usernameToDbName } from '@/utils/database'
-import { getServerDatabaseUrl } from '@/utils/server'
+import { ServerSyncStrategy } from '@/schema/support/syncing'
+import { getSyncStrategy } from '@/utils/server'
 import PouchDB from 'pouchdb'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-
-const ZISK_CLOUD_HOST = '' // process.env.NEXT_PUBLIC_ZISK_CLOUD_HOST
-const ENABLE_ZISK_CLOUD = false // process.env.NEXT_PUBLIC_F_ENABLE_ZISK_CLOUD === 'true'
-
-interface UserContext {
-  name: string | null
-  roles: string[]
-}
 
 export default function RemoteContextProvider(props: PropsWithChildren) {
   const [syncError, setSyncError] = useState<SyncErrorEnum | null>(null)
   const [syncStatus, setSyncStatus] = useState<SyncStatusEnum>(SyncStatusEnum.IDLE)
-  // const [customServerUserContext, setCustomServerUserContext] = useState<UserContext | null>(null);
+  const [onlineStatus, setOnlineStatus] = useState<OnlineStatusEnum>(OnlineStatusEnum.ONLINE)
+  const [authStatus, setAuthStatus] = useState<AuthStatusEnum>(AuthStatusEnum.AUTHENTICATING)
 
   const remoteDb = useRef<PouchDB.Database | null>(null)
+  const remoteDbSyncHandler = useRef<PouchDB.Replication.Sync<{}> | null>(null)
 
   const getZiskMetaQuery = useZiskMeta()
 
   const settings: UserSettings | null = getZiskMetaQuery.data?.userSettings ?? null
 
-  const sync = async () => {
-    if (!remoteDb.current) {
-      return
-    }
-    setSyncStatus(SyncStatusEnum.SAVING)
-    setSyncError(null)
-    try {
-      // Perform sync
-      const db = getDatabaseClient()
-      await db.sync(remoteDb.current)
-    } catch (_error: any) {
-      // setSyncError(error.message)
-      setSyncStatus(SyncStatusEnum.FAILED_TO_SAVE)
-      return
-    }
-    setSyncStatus(SyncStatusEnum.SAVED_TO_REMOTE)
-  }
+  const syncStrategy = getSyncStrategy(settings);
+  const { syncType } = syncStrategy
 
-  const getCustomServerUserContext = async (serverUrl: string): Promise<UserContext | null> => {
-    let response
-    const databaseUrl = getServerDatabaseUrl(serverUrl)
-    const sessionUrl = [databaseUrl, '_session'].filter(Boolean).join('/')
-    try {
-      response = await fetch(sessionUrl, { credentials: 'include' })
-    } catch {
-      return null
+  useEffect(() => {
+    if (syncType === 'LOCAL' || syncType === 'NONE') {
+      // Set sync to idle
+      setSyncStatus(SyncStatusEnum.IDLE)
+      closeRemoteConnection()
+      return;
+    }
+    if (syncType === 'SERVER') {
+      authenticate()
+        .then(() => {
+          initRemoteConnectionFromServerStrategy(syncStrategy)
+        })
+        .catch() // Do nothing
     }
 
-    if (!response.ok) {
-      return null
-    }
-    const jsonData = await response.json()
-    return jsonData.userCtx
-  }
+  }, [syncType])
 
-  const couchDbDatabaseExists = async (syncUrl: string): Promise<boolean> => {
-    let response
-    try {
-      response = await fetch(syncUrl, { credentials: 'include' })
-    } catch {
-      return false
-    }
+  // Event listeners
+  useEffect(() => {
+    // Perform initial auth
+    authenticate()
 
-    if (!response.ok) {
-      return false
+    const wentOnline = () => {
+      setOnlineStatus(OnlineStatusEnum.ONLINE)
+    }
+    const wentOffline = () => {
+      setOnlineStatus(OnlineStatusEnum.OFFLINE)
     }
 
-    return true
-  }
+    window.addEventListener('online', wentOnline);
+    window.addEventListener('offline', wentOffline);
 
-  const initRemoteConnectionFromConfig = async (settings: UserSettings) => {
-    console.log('Initializing remote connection from config')
+    return () => {
+      window.removeEventListener('online', wentOnline);
+      window.removeEventListener('offline', wentOffline);
+    }
+  }, [])
 
-    const { syncingStrategy, server } = settings
+  /**
+   * Hits the _session endpoint to check authentication
+   * @returns true if the user is currently signed in
+   */
+  const authenticate = async (): Promise<boolean> => {
+    let status: AuthStatusEnum = AuthStatusEnum.UNAUTHENTICATED
 
-    if (syncingStrategy.strategyType === 'LOCAL') {
-      setSyncStatus(SyncStatusEnum.WORKING_LOCALLY)
-      return
-    } else if (syncingStrategy.strategyType === 'COUCH_DB') {
-      remoteDb.current = new PouchDB(syncingStrategy.couchDbUrl)
-    } else if (syncingStrategy.strategyType === 'CUSTOM_SERVER_OR_ZISK_CLOUD') {
-      if (server.serverType === 'NONE') {
-        setSyncError(SyncErrorEnum.MISSING_SERVER_URL_IN_CONFIG)
-        setSyncStatus(SyncStatusEnum.FAILED_TO_CONNECT)
-        return
-      } else if (server.serverType === 'ZISK_CLOUD') {
-        if (!ENABLE_ZISK_CLOUD || !ZISK_CLOUD_HOST) {
-          setSyncError(SyncErrorEnum.ZISK_CLOUD_DISABLED)
-          setSyncStatus(SyncStatusEnum.FAILED_TO_CONNECT)
-          return
-        }
-        setSyncStatus(SyncStatusEnum.CONNECTING_TO_REMOTE)
-        // TODO
-      } else if (server.serverType === 'CUSTOM') {
-        if (!server.serverUrl) {
-          setSyncError(SyncErrorEnum.MISSING_SERVER_URL_IN_CONFIG)
-          setSyncStatus(SyncStatusEnum.FAILED_TO_CONNECT)
-          return
-        }
+    if (syncType === 'SERVER') {
+      setAuthStatus(AuthStatusEnum.AUTHENTICATING)
+      const { connection } = syncStrategy
+      const response = await fetch(`${connection.databaseUrl}/_session`, {
+        method: 'GET',
+        credentials: 'include',
+      })
 
-        // Get session data
-        const userContext = await getCustomServerUserContext(server.serverUrl)
-        if (!userContext?.name) {
-          setSyncError(SyncErrorEnum.UNAUTHENTICATED)
-          setSyncStatus(SyncStatusEnum.FAILED_TO_CONNECT)
-          return
-        }
-
-        const syncUrl = [getServerDatabaseUrl(server.serverUrl), usernameToDbName(userContext.name)]
-          .filter(Boolean)
-          .join('/')
-
-        const databaseExists = await couchDbDatabaseExists(syncUrl)
-        if (!databaseExists) {
-          setSyncError(SyncErrorEnum.MISSING_DATABASE)
-          setSyncStatus(SyncStatusEnum.FAILED_TO_CONNECT)
-          return
-        }
-
-        remoteDb.current = new PouchDB(syncUrl)
+      if (response.ok) {
+        setAuthStatus(AuthStatusEnum.AUTHENTICATED)
+        return true
       }
     }
 
-    setSyncStatus(SyncStatusEnum.IDLE)
-    return sync()
+    setAuthStatus(AuthStatusEnum.UNAUTHENTICATED)
+    return false
   }
 
-  const syncSupported = useMemo(() => {
-    if (!settings) {
-      return false
+  const closeRemoteConnection = () => {
+    // Cancel existing sync handling and close existing database
+    if (remoteDbSyncHandler.current) {
+      remoteDbSyncHandler.current.cancel()
     }
-    return settings.syncingStrategy.strategyType !== 'LOCAL'
-  }, [settings])
-
-  useEffect(() => {
-    if (!settings) {
-      return
+    // Close connection
+    if (remoteDb.current) {
+      remoteDb.current.close()
     }
-    initRemoteConnectionFromConfig(settings)
-  }, [settings])
+  }
 
-  const remoteContext = {
-    syncError,
+  const initRemoteConnectionFromServerStrategy = async (serverSyncStrategy: ServerSyncStrategy) => {
+    console.log('Initializing remote syncing connection from config')
+    setSyncStatus(SyncStatusEnum.IDLE)
+
+    const { connection } = serverSyncStrategy
+    remoteDb.current = new PouchDB(connection.databaseUrl)
+    const db = getDatabaseClient()
+    remoteDbSyncHandler.current = db
+      .sync(remoteDb.current, {
+        live: true,
+        retry: true
+      })
+      .on('change', function (_change) {
+        setSyncStatus(SyncStatusEnum.IDLE)
+      })
+      .on('paused', function () {
+        // replication was paused, usually because of a lost connection
+        setSyncStatus(SyncStatusEnum.PAUSED)
+      })
+      .on('active', function () {
+        // replication was resumed
+        setSyncStatus(SyncStatusEnum.SYNCING)
+      })
+      .on('error', function (err) {
+        console.error('Sync error:', err)
+        setSyncStatus(SyncStatusEnum.ERROR)
+      })
+      .on('complete', function () {
+        setSyncStatus(SyncStatusEnum.SAVED)
+      })
+  }
+
+  const syncEnabled: boolean = useMemo(() => {
+    return [
+      syncType === 'SERVER',
+      authStatus !== AuthStatusEnum.UNAUTHENTICATED,
+      onlineStatus === OnlineStatusEnum.ONLINE
+    ].every(Boolean)
+  }, [syncType, onlineStatus])
+
+  const remoteContext: RemoteContext = {
+    // syncError,
     syncStatus,
-    syncSupported,
-    sync,
+    authStatus,
+    onlineStatus,
+    syncEnabled,
   }
 
   return <RemoteContext.Provider value={remoteContext}>{props.children}</RemoteContext.Provider>

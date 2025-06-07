@@ -33,3 +33,12 @@ export interface CouchDBUserDocument {
   refreshTokens?: string[];
   [key: string]: any;
 }
+
+// Extend Express Request to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: UserClaims;
+    }
+  }
+}

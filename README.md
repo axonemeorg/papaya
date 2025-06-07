@@ -33,22 +33,28 @@ This is the server for hosting Zisk. It serves a backend API and the app fronten
 
 Please see `app/server/README.md` for more info.
 
+## Configuration
+
+Zisk uses a YAML-based configuration system. Configuration files are stored in the `/config` directory:
+
+- `default.yaml`: Default configuration values
+- `local.yaml`: Local development overrides (gitignored)
+- `docker.yaml`: Docker-specific configuration
+
+See `config/README.md` for more details on the configuration system.
+
 ## Docker Setup
 
-Zisk can be run using Docker containers for both the web server and CouchDB database. The containers are configured to use environment variables from the `.env` file.
+Zisk can be run using Docker containers for both the web server and CouchDB database. The containers are configured using the YAML configuration files.
 
 ### Setup
 
-1. Create a `.env` file based on `.env.example`:
+1. Review and modify the configuration files in the `/config` directory as needed:
    ```bash
-   cp .env.example .env
+   # For local development
+   cp config/default.yaml config/local.yaml
+   # Edit config/local.yaml with your settings
    ```
-
-2. Edit the `.env` file to set your desired configuration, including:
-   - `ZISK_SERVER_PORT`: Port for the web server
-   - `ZISK_COUCHDB_URL`: URL for the CouchDB database
-   - `ZISK_COUCHDB_ADMIN_USER`: CouchDB admin username
-   - `ZISK_COUCHDB_ADMIN_PASS`: CouchDB admin password
 
 ### Container Management
 
@@ -59,7 +65,7 @@ Zisk can be run using Docker containers for both the web server and CouchDB data
 - `make db-clean` - Clean up the CouchDB container and image
 - `make logs-db` - View CouchDB logs
 
-The CouchDB container will be accessible at the port specified in your `.env` file (default: 5984).
+The CouchDB container will be accessible at the port specified in your configuration (default: 5984).
 
 #### Web Server Container
 
@@ -67,4 +73,14 @@ The CouchDB container will be accessible at the port specified in your `.env` fi
 - `make app-stop` - Stop the web server container
 - `make app-clean` - Clean up the web server container and image
 
-The web server container will use the environment variables from your `.env` file, including the `ZISK_COUCHDB_URL` to connect to your CouchDB instance.
+The web server container will use the configuration from the YAML files, including the CouchDB connection details.
+
+## Administration
+
+Zisk provides a set of API endpoints for configuration management:
+
+- `GET /api/admin/config`: Get the current configuration
+- `PUT /api/admin/config`: Update the configuration
+- `POST /api/admin/restart`: Restart the server
+
+These endpoints require authentication and the `zisk:admin` role. See `config/README.md` for details on how to add this role to a user.
