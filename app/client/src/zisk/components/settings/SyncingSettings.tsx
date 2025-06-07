@@ -4,9 +4,12 @@ import { Alert, Button, Link, Paper, Stack, Typography } from '@mui/material'
 import { useContext, useState } from 'react'
 import SettingsSectionHeader from './SettingsSectionHeader'
 // import JoinServerModal from "../modal/JoinServerModal"
+import { RemoteContext } from '@/contexts/RemoteContext'
 import { __purgeAllLocalDatabases } from '@/database/actions'
 import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
-import { getServerApiUrl } from '@/utils/server'
+import { UserSettings } from '@/schema/models/UserSettings'
+import { ServerSyncStrategy } from '@/schema/support/syncing'
+import { getServerApiUrl, getSyncStrategy } from '@/utils/server'
 import JoinServerModal from '../modal/JoinServerModal'
 import ServerWidget from '../widget/ServerWidget'
 import SyncWidget from '../widget/SyncWidget'
@@ -21,6 +24,7 @@ export default function SyncingSettings() {
   const [showChangeSyncStrategyModal, setShowChangeSyncStrategyModal] = useState<boolean>(false)
 
   const ziskContext = useContext(ZiskContext)
+  const remoteContext = useContext(RemoteContext)
   const getZiskMetaQuery = useZiskMeta()
   // const { snackbar } = useContext(NotificationsContext)
 
@@ -28,8 +32,10 @@ export default function SyncingSettings() {
     return <></>
   }
 
-  const ziskServer = getZiskMetaQuery.data.userSettings.server
-  const syncStrategy: SyncingStrategy = ziskServer ? 'ZISK_SERVER' : 'NONE'
+  const settings: UserSettings = getZiskMetaQuery.data.userSettings
+  const syncStrategy = getSyncStrategy(settings);
+  const { syncType } = syncStrategy
+  const ziskServerStrategy: ServerSyncStrategy | null = syncType === 'SERVER' ? syncStrategy : null
 
   const handleDisconnectFromServer = async () => {
     const confirmDisconnect = window.confirm(
@@ -40,19 +46,22 @@ export default function SyncingSettings() {
       return
     }
 
-    if (ziskServer && syncStrategy === 'ZISK_SERVER') {
-      const apiUrl = getServerApiUrl(ziskServer.url)
+    if (syncType === 'SERVER') {
+      const serverApiUrl = getServerApiUrl(syncStrategy.server.url)
 
       try {
-        await fetch(`${apiUrl}/logout`, {
+        await fetch(`${serverApiUrl}/logout`, {
           method: 'POST',
           credentials: 'include',
         })
       } catch {
-        //
+        // Do nothing
       }
+
       ziskContext.updateSettings({
-        server: null,
+        syncStrategy: {
+          syncType: 'LOCAL' // Switch to local sync strategy
+        }
       })
     } else {
       throw new Error('Disconnecting from Zisk Cloud is not implemented')
@@ -83,7 +92,7 @@ export default function SyncingSettings() {
             automatically implemented using CouchDB, but you can host your own instance of CouchDB. You may also choose
             not to connect to a server, and your data will only persist on your device.
           </Typography>
-          {ziskServer ? (
+          {ziskServerStrategy ? (
             <Stack gap={2}>
               <Alert severity="success">You are connected to a Zisk Server.</Alert>
               <Paper
@@ -94,14 +103,12 @@ export default function SyncingSettings() {
                   alignSelf: 'flex-start',
                 })}>
                 <ServerWidget
-                  serverUrl={ziskServer.url}
-                  serverName={ziskServer.displayName}
-                  // serverNickname={ziskServer.serverNickname}
-                  userName={ziskServer.connection?.username}
+                  serverUrl={ziskServerStrategy.server.url}
+                  serverName={ziskServerStrategy.server.displayName}
+                  userName={ziskServerStrategy.connection.username}
                   actions={
                     <Button
                       onClick={() => handleDisconnectFromServer()}
-                      // color='error'
                       startIcon={<LeakRemove />}>
                       Sign Out
                     </Button>
@@ -145,6 +152,11 @@ export default function SyncingSettings() {
               sx={(theme) => ({ background: 'none', borderRadius: theme.shape.borderRadius, alignSelf: 'flex-start' })}>
               <SyncWidget />
             </Paper>
+            <Stack direction='row' gap={1}>
+              <pre>Auth:{remoteContext.authStatus}</pre>
+              <pre>Online:{remoteContext.onlineStatus}</pre>
+              <pre>Sync:{remoteContext.syncStatus}</pre>
+            </Stack>
             {/* <Button
               variant="contained"
               startIcon={<Shuffle />}

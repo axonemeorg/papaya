@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z, ZodType } from 'zod'
 
 class NaturalMixin {
   public static $ephemeral<E extends z.ZodRawShape>($ephemeral: E) {
@@ -13,9 +13,9 @@ class NaturalMixin {
     }
   }
 
-  public static _id() {
+  public static _id(schema: ZodType = z.string()) {
     return {
-      _id: z.string(),
+      _id: schema,
     }
   }
 }

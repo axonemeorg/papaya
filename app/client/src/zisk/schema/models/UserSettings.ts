@@ -1,5 +1,5 @@
-import { ZiskServer } from '@/schema/models/ZiskServer'
 import { Model } from '@/schema/support/orm/Model'
+import { SyncStrategy } from '@/schema/support/syncing'
 import { z } from 'zod'
 
 export const [CreateUserSettings, UserSettings] = Model.fromSchema({
@@ -10,7 +10,7 @@ export const [CreateUserSettings, UserSettings] = Model.fromSchema({
     // animations: z.union([z.literal('NORMAL'), z.literal('FAST'), z.literal('OFF')]),
     menuExpanded: z.boolean(),
   }),
-  server: ZiskServer.nullable(),
+  syncStrategy: SyncStrategy,
 })
 
 export type CreateUserSettings = z.output<typeof CreateUserSettings>
