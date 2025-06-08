@@ -1,6 +1,6 @@
 import { ZiskMeta } from '@/schema/documents/ZiskMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
-import { generateGenericUniqueId } from './id'
+import { generateGenericZiskUniqueId } from './id'
 
 export const makeDefaultUserSettings = (): UserSettings => {
   return {
@@ -17,7 +17,7 @@ export const makeDefaultUserSettings = (): UserSettings => {
 export const makeDefaultZiskMeta = (): ZiskMeta => {
   return {
     kind: 'zisk:meta',
-    _id: generateGenericUniqueId(),
+    _id: generateGenericZiskUniqueId(),
     activeJournalId: null,
     userSettings: makeDefaultUserSettings(),
     createdAt: new Date().toISOString(),

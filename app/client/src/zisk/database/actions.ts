@@ -1,18 +1,18 @@
-import { getDatabaseClient, initializeDatabaseClient } from './client'
-import { generateAccountId, generateCategoryId, generateEntryTagId, generateJournalId } from '@/utils/id'
-import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
-import JSZip from 'jszip'
-import FileSaver from 'file-saver'
-import dayjs from 'dayjs'
-import { cementJournalEntry } from '@/utils/journal'
-import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { Category, CreateCategory } from '@/schema/documents/Category'
 import { Account, CreateAccount } from '@/schema/documents/Account'
-import { DocumentObject } from '@/schema/support/orm/Document'
-import { CreateJournal, Journal } from '@/schema/documents/Journal'
-import { ZiskDocument } from '@/schema/union/ZiskDocument'
+import { Category, CreateCategory } from '@/schema/documents/Category'
 import { CreateEntryTag, EntryTag } from '@/schema/documents/EntryTag'
+import { CreateJournal, Journal } from '@/schema/documents/Journal'
+import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { UserSettings } from '@/schema/models/UserSettings'
+import { DocumentObject } from '@/schema/support/orm/Document'
+import { ZiskDocument } from '@/schema/union/ZiskDocument'
+import { generateGenericZiskUniqueId } from '@/utils/id'
+import { cementJournalEntry } from '@/utils/journal'
+import dayjs from 'dayjs'
+import FileSaver from 'file-saver'
+import JSZip from 'jszip'
+import { getDatabaseClient, initializeDatabaseClient } from './client'
+import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
 // import { MigrationEngine } from './migrate'
 
 const db = getDatabaseClient()
@@ -77,7 +77,7 @@ export const createCategory = async (formData: CreateCategory, journalId: string
   const category: Category = {
     ...formData,
     kind: 'zisk:category',
-    _id: generateCategoryId(),
+    _id: generateGenericZiskUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
@@ -91,7 +91,7 @@ export const createAccount = async (formData: CreateAccount, journalId: string) 
   const account: Account = {
     ...formData,
     kind: 'zisk:account',
-    _id: generateAccountId(),
+    _id: generateGenericZiskUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
@@ -142,7 +142,7 @@ export const createJournal = async (journal: CreateJournal): Promise<Journal> =>
     ...journal,
     kind: 'zisk:journal',
     // journalVersion: MigrationEngine.latestVersion,
-    _id: generateJournalId(),
+    _id: generateGenericZiskUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
   }
@@ -187,7 +187,7 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
     label: formData.label,
     description: formData.description,
     kind: 'zisk:tag',
-    _id: generateEntryTagId(),
+    _id: generateGenericZiskUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
