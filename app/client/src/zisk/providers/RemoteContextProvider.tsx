@@ -71,7 +71,7 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
     if (syncType === 'SERVER') {
       setAuthStatus(AuthStatusEnum.AUTHENTICATING)
       const { connection } = syncStrategy
-      const response = await fetch(`${connection.databaseUrl}/_session`, {
+      const response = await fetch(`${connection.couchDbUrl}/_session`, {
         method: 'GET',
         credentials: 'include',
       })
@@ -102,12 +102,14 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
     setSyncStatus(SyncStatusEnum.IDLE)
 
     const { connection } = serverSyncStrategy
-    remoteDb.current = new PouchDB(connection.databaseUrl)
+    const databaseUrl = `${connection.couchDbUrl}/${connection.databaseName}`
+    console.log('Creating connection to couch DB database:', databaseUrl)
+    remoteDb.current = new PouchDB(databaseUrl)
     const db = getDatabaseClient()
     remoteDbSyncHandler.current = db
       .sync(remoteDb.current, {
         live: true,
-        retry: true
+        retry: false,
       })
       .on('change', function (_change) {
         setSyncStatus(SyncStatusEnum.IDLE)

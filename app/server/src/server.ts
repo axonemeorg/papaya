@@ -24,7 +24,7 @@ const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'ht
 const ENABLE_CORS = true
 
 // Token expiration times
-const JWT_EXPIRATION_SECONDS = 15;
+const JWT_EXPIRATION_SECONDS = 60;
 const REFRESH_EXPIRATION_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 // Cookies

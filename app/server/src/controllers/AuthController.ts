@@ -64,20 +64,26 @@ export default class AuthController extends Controller {
    * @returns A promise that resolves when the token has been invalidated
    */
   public async invalidateRefreshToken(refreshToken: string): Promise<void> {
-    const user = await this.findUserByRefreshToken(refreshToken);
+    try {
+      const user = await this.findUserByRefreshToken(refreshToken);
 
-    if (!user) {
-      return;
+      if (!user) {
+        return;
+      }
+
+      // Filter out the token to be invalidated
+      const updatedTokens = (user.refreshTokens || []).filter(token => token !== refreshToken);
+
+      // Update the user document with the new tokens array
+      const update = {
+        ...user,
+        refreshTokens: updatedTokens,
+      } as CouchDBUserDocument
+      await this.couch.db.use('_users').insert(update, user._id);
+    } catch (error) {
+      console.error("Failed to invalidate single refresh token.")
+      throw error;
     }
-
-    // Filter out the token to be invalidated
-    const updatedTokens = (user.refreshTokens || []).filter(token => token !== refreshToken);
-
-    // Update the user document with the new tokens array
-    await this.couch.db.use('_users').insert({
-      ...user,
-      refreshTokens: updatedTokens
-    } as CouchDBUserDocument, user._id);
   }
 
   /**
@@ -96,12 +102,13 @@ export default class AuthController extends Controller {
       }
 
       // Update the user document to clear all refresh tokens
-      await this.couch.db.use('_users').insert({
+      const update = {
         ...user,
-        refreshTokens: []
-      } as CouchDBUserDocument, user._id);
+        refreshTokens: [],
+      } as CouchDBUserDocument;
+      await this.couch.db.use('_users').insert(update, user._id);
     } catch (error) {
-      console.error(`Failed to invalidate tokens for user ${name}:`, error);
+      console.error(`Failed to invalidate all refresh tokens for user ${name}:`, error);
       throw error;
     }
   }
@@ -135,10 +142,11 @@ export default class AuthController extends Controller {
       refreshTokens.push(refreshToken);
 
       // Update the user document
-      await this.couch.db.use('_users').insert({
+      const update = {
         ...user,
-        refreshTokens: refreshTokens
-      } as CouchDBUserDocument, user._id);
+        refreshTokens,
+      } as CouchDBUserDocument
+      await this.couch.db.use('_users').insert(update, user._id);
 
       return refreshToken;
     } catch (error) {
@@ -175,16 +183,22 @@ export default class AuthController extends Controller {
    * @returns A new refresh token if successful, or null if token reuse is detected
    */
   public async rotateRefreshToken(token: string): Promise<string | null> {
-    const userForRefreshToken = await this.findUserByRefreshToken(token)
-    const refreshTokenClaims = await this.decodeRefreshToken(token);
-    if (!userForRefreshToken) {
-      // Reuse detected
-      this.invalidateAllRefreshTokensForUser(refreshTokenClaims.name)
-      return null
-    }
+    try {
+      const userForRefreshToken = await this.findUserByRefreshToken(token)
+      const refreshTokenClaims = await this.decodeRefreshToken(token);
+      if (!userForRefreshToken) {
+        // Reuse detected
+        console.log('Token reuse detected.')
+        this.invalidateAllRefreshTokensForUser(refreshTokenClaims.name)
+        return null
+      }
 
-    await this.invalidateRefreshToken(token);
-    return this.createRefreshTokenForUser(refreshTokenClaims.name)
+      await this.invalidateRefreshToken(token);
+      return this.createRefreshTokenForUser(refreshTokenClaims.name)
+    } catch (error) {
+      console.error('Failed to rotate refresh token.')
+      throw error
+    }
   }
 
   /**

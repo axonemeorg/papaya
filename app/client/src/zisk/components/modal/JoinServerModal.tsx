@@ -97,7 +97,8 @@ export default function JoinServerModal(props: JoinServerModalProps) {
       syncType: 'SERVER',
       server,
       connection: {
-        databaseUrl: `${parsedServerUrl}proxy/${usernameToDbName(username)}`,
+        couchDbUrl: `${parsedServerUrl}proxy`,
+        databaseName: usernameToDbName(username),
         username,
       }
     }
