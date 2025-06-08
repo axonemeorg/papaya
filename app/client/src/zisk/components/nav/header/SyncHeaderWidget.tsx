@@ -1,8 +1,8 @@
 import SyncIcon from '@/components/icon/SyncIcon'
 import SyncWidget from '@/components/widget/SyncWidget'
-import { RemoteContext, SyncStatusEnum } from '@/contexts/RemoteContext'
-import { getSyncStatusTitles } from '@/utils/string'
-import { Grow, IconButton, Popover, Stack, SvgIconOwnProps, Typography } from '@mui/material'
+import { RemoteContext } from '@/contexts/RemoteContext'
+import { SyncIndicatorEnum } from '@/utils/syncing'
+import { Grow, IconButton, Popover, Stack, SvgIconOwnProps, Tooltip, Typography } from '@mui/material'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 type IconColor = SvgIconOwnProps['color']
@@ -13,57 +13,52 @@ export default function SyncHeaderWidget() {
   const buttonAnchorRef = useRef<HTMLDivElement>(null)
 
   const remoteContext = useContext(RemoteContext)
-  const { syncStatus } = remoteContext
-  const isIdle = syncStatus === SyncStatusEnum.IDLE
-
-  const { syncStatusTitle } = useMemo(() => {
-    return getSyncStatusTitles(syncStatus)
-  }, [syncStatus])
+  const { syncIndication, } = remoteContext
+  const isIdle = syncIndication.indicator === SyncIndicatorEnum.WORKING_LOCALLY_NO_SYNC
 
   const syncIconVerboseColor: IconColor = useMemo(() => {
-    switch (syncStatus) {
-      case SyncStatusEnum.SAVED_TO_REMOTE:
+    switch (syncIndication.indicator) {
+      case SyncIndicatorEnum.DONE_SUCCESS:
         return 'success'
-      case SyncStatusEnum.WORKING_OFFLINE:
+      case SyncIndicatorEnum.LOST_CONNECTION:
+      case SyncIndicatorEnum.ERROR_ACTION_REQUIRED:
         return 'warning'
-      case SyncStatusEnum.FAILED_TO_SAVE:
-      case SyncStatusEnum.FAILED_TO_CONNECT:
+      case SyncIndicatorEnum.SYNC_ERROR:
         return 'error'
-      case SyncStatusEnum.CONNECTING_TO_REMOTE:
-      case SyncStatusEnum.SAVED_TO_THIS_DEVICE:
-      case SyncStatusEnum.WORKING_LOCALLY:
-      case SyncStatusEnum.IDLE:
-      case SyncStatusEnum.SAVING:
       default:
         return undefined
     }
-  }, [syncStatus])
+  }, [syncIndication.indicator])
 
   useEffect(() => {
     // Whenever sync status changes, set verbose to true, then 3s later set it to false
     setVerbose(true)
     const timeout = setTimeout(() => {
       setVerbose(false)
-    }, 5000)
+    }, 3_000)
     return () => {
       clearTimeout(timeout)
     }
-  }, [syncStatus])
+  }, [syncIndication.indicator, modalOpen])
 
   const handleOpen = () => {
-    setVerbose(true)
     setModalOpen(true)
   }
 
-  const showButton = !isIdle
+  const handleClose = () => {
+    setModalOpen(false)
+  }
+
+  const showButton = true
   const showCaption = verbose || modalOpen
+  const displayVerbose = verbose || modalOpen
 
   return (
     <>
       <Popover
         anchorEl={buttonAnchorRef.current}
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
@@ -76,29 +71,33 @@ export default function SyncHeaderWidget() {
       </Popover>
       <Stack direction="row" alignItems="center" gap={0} ref={buttonAnchorRef}>
         <Grow in={showButton}>
-          <IconButton
-            onClick={handleOpen}
-            sx={(theme) => ({
-              color: theme.palette.text.secondary,
-            })}>
-            <SyncIcon
-              syncStatus={syncStatus}
-              fontSize="small"
-              color={verbose ? syncIconVerboseColor : 'inherit'}
-              sx={{ transition: 'all 0.3s' }}
-            />
-          </IconButton>
+          <Tooltip title={syncIndication.title}>
+            <IconButton
+              onClick={handleOpen}
+              sx={(theme) => ({
+                color: theme.palette.text.secondary,
+              })}>
+              <SyncIcon
+                indicator={syncIndication.indicator}
+                fontSize="small"
+                color={displayVerbose ? syncIconVerboseColor : 'inherit'}
+                sx={{ transition: 'all 0.3s' }}
+              />
+            </IconButton>
+          </Tooltip>
         </Grow>
-        <Grow in={showCaption}>
-          <Typography
-            component="a"
-            onClick={handleOpen}
-            variant="caption"
-            sx={{ mr: 1, userSelect: 'none', cursor: 'pointer' }}>
-            {syncStatusTitle}
-            {/* <Shortcut>Ctrl</Shortcut> */}
-          </Typography>
-        </Grow>
+        {showCaption && (
+          <Grow in>
+            <Typography
+              component="a"
+              onClick={handleOpen}
+              variant="caption"
+              sx={{ mr: 1, userSelect: 'none', cursor: 'pointer' }}
+            >
+              {syncIndication.title}
+            </Typography>
+          </Grow>
+        )}
       </Stack>
     </>
   )

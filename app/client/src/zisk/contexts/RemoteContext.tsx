@@ -1,4 +1,5 @@
 import { createContext } from 'react'
+import { SyncIndication } from '../utils/syncing'
 
 export enum OnlineStatusEnum {
   ONLINE = 'ONLINE',
@@ -43,8 +44,10 @@ export interface RemoteContext {
   onlineStatus: OnlineStatusEnum
   syncStatus: SyncStatusEnum,
   // syncError: SyncErrorEnum,
-  syncEnabled: boolean
-  // sync: () => Promise<void>
+  syncDisabled: boolean
+  syncSupported: boolean
+  syncIndication: SyncIndication
+  sync: () => Promise<void>
 }
 
 export const RemoteContext = createContext<RemoteContext>({} as RemoteContext)

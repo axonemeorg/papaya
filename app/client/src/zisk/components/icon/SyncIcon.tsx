@@ -1,33 +1,34 @@
-import { SyncStatusEnum } from '@/contexts/RemoteContext'
-import { Bedtime, CloudDone, CloudOff, Computer, Sync, SyncProblem } from '@mui/icons-material'
-import { CircularProgress } from '@mui/material'
+import { SyncIndicatorEnum } from '@/utils/syncing'
+import { Announcement, Bedtime, CloudDone, CloudOff, Computer, Sync, SyncProblem } from '@mui/icons-material'
 
 interface SyncIconProps extends Record<any, any> {
-  syncStatus: SyncStatusEnum
+  indicator: SyncIndicatorEnum
 }
 
 export default function SyncIcon(props: SyncIconProps) {
-  const { syncStatus, ...rest } = props
+  const { indicator, ...rest } = props
 
-  switch (syncStatus) {
-    case SyncStatusEnum.SAVING:
-    case SyncStatusEnum.CONNECTING_TO_REMOTE:
+  switch (indicator) {
+    case SyncIndicatorEnum.LOADING:
       return <Sync {...rest} />
-    case SyncStatusEnum.SAVED_TO_REMOTE:
-      return <CloudDone {...rest} />
-    case SyncStatusEnum.WORKING_OFFLINE:
-      return <CloudOff {...rest} />
-    case SyncStatusEnum.WORKING_LOCALLY:
-    case SyncStatusEnum.SAVED_TO_THIS_DEVICE:
-      return <Computer {...rest} />
-    case SyncStatusEnum.FAILED_TO_SAVE:
-    case SyncStatusEnum.FAILED_TO_CONNECT:
-      return <SyncProblem {...rest} />
-    case SyncStatusEnum.IDLE:
-      return <Bedtime />
-    default:
-      break
-  }
 
-  return <CircularProgress size={16} />
+    case SyncIndicatorEnum.DONE_SUCCESS:
+      return <CloudDone {...rest} />
+
+    case SyncIndicatorEnum.LOST_CONNECTION:
+      return <CloudOff {...rest} />
+
+    case SyncIndicatorEnum.ERROR_ACTION_REQUIRED:
+      return <Announcement />
+
+    case SyncIndicatorEnum.SYNC_ERROR:
+      return <SyncProblem {...rest} />
+
+    case SyncIndicatorEnum.ONLINE_IDLE:
+      return <Bedtime />
+
+    case SyncIndicatorEnum.WORKING_LOCALLY_NO_SYNC:
+    default:
+      return <Computer {...rest} />
+  }
 }
