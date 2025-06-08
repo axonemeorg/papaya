@@ -82,25 +82,52 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
   }
 
   try {
-    // Rotate the refresh token (sliding window)
-    const newRefreshToken: string | null = await authController.rotateRefreshToken(refreshToken);
+    // Find the user by refresh token - we'll do this only once
+    const user = await authController.findUserByRefreshToken(refreshToken);
 
-    if (!newRefreshToken) {
-      // Token reuse detected, invalidation already happened in rotateRefreshToken
+    if (!user) {
+      // Token not found or reuse detected
+      console.log('Token not found or reuse detected.');
+      // Try to get the username from the token to invalidate all tokens
+      try {
+        const claims = await authController.decodeRefreshToken(refreshToken);
+        if (claims?.name) {
+          await authController.invalidateAllRefreshTokensForUser(claims.name);
+        }
+      } catch (error) {
+        console.error("Failed to decode refresh token:", error);
+      }
       return next();
     }
 
-    // Set the new refresh token cookie
-    res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
-      httpOnly: true,
-      secure: NODE_ENV() === 'production',
-      maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
-    });
+    let updatedUser = user;
+    let newRefreshToken = refreshToken;
 
     // Check if access token is expired or absent
-    if (!accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET())) {
+    const needNewAccessToken = !accessToken || isTokenExpired(accessToken, AUTH_ACCESS_TOKEN_SECRET());
+
+    // Only rotate the refresh token if we need a new access token
+    if (needNewAccessToken) {
+      // Rotate the refresh token (sliding window)
+      const rotationResult = await authController.rotateRefreshToken(refreshToken, user);
+
+      if (!rotationResult) {
+        // Something went wrong with token rotation
+        return next();
+      }
+
+      newRefreshToken = rotationResult.newToken;
+      updatedUser = rotationResult.updatedUser;
+
+      // Set the new refresh token cookie
+      res.cookie(REFRESH_TOKEN_COOKIE, newRefreshToken, {
+        httpOnly: true,
+        secure: NODE_ENV() === 'production',
+        maxAge: REFRESH_EXPIRATION_SECONDS * 1000,
+      });
+
       // Create new access token using the refresh token
-      const newAccessToken = await authController.createAccessTokenFromRefreshToken(newRefreshToken);
+      const newAccessToken = await authController.createAccessTokenFromRefreshToken(newRefreshToken, updatedUser);
 
       // Store the new token in res.locals for immediate use
       res.locals.authToken = newAccessToken;
@@ -110,6 +137,11 @@ const tokenMiddlewareHandler: RequestHandler = async (req, res, next) => {
         secure: NODE_ENV() === 'production',
         maxAge: JWT_EXPIRATION_SECONDS * 1000,
       });
+    }
+
+    // Save any changes to the user record
+    if (updatedUser !== user) {
+      await authController.updateUserRecord(updatedUser);
     }
   } catch (error) {
     console.error("Error in token middleware:", error);
