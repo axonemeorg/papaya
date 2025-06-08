@@ -1,20 +1,15 @@
 import { ZiskMeta } from '@/schema/documents/ZiskMeta'
-import { generateGenericUniqueId } from './id'
 import { UserSettings } from '@/schema/models/UserSettings'
+import { generateGenericUniqueId } from './id'
 
 export const makeDefaultUserSettings = (): UserSettings => {
   return {
     kind: 'zisk:usersettings',
     appearance: {
-      // theme: 'DARK',
-      // animations: 'NORMAL',
       menuExpanded: true,
     },
-    server: {
-      serverType: 'NONE',
-    },
-    syncingStrategy: {
-      strategyType: 'LOCAL',
+    syncStrategy: {
+      syncType: 'LOCAL',
     },
   }
 }
@@ -30,12 +25,18 @@ export const makeDefaultZiskMeta = (): ZiskMeta => {
 }
 
 export const dbNameToUsername = (prefixedHexName: string) => {
-  return Buffer.from(prefixedHexName.replace('userdb-', ''), 'hex').toString('utf8')
-}
+  const hex = prefixedHexName.replace('userdb-', '');
+  const bytes = new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+  const decoder = new TextDecoder();
+  return decoder.decode(bytes);
+};
 
 export const usernameToDbName = (name: string) => {
-  return 'userdb-' + Buffer.from(name).toString('hex')
-}
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(name);
+  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `userdb-${hex}`;
+};
 
 export const getUrlPartsFromCouchDbConnectionString = (couchDbConnectionString: string) => {
   try {

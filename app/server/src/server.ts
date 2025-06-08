@@ -20,8 +20,8 @@ import { UserClaims } from './support/types'
 const configService = ConfigService.getInstance();
 
 // CORS
-const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475'];
-const ENABLE_CORS = false
+const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475', 'http://192.168.68.68:9476'];
+const ENABLE_CORS = true
 
 // Token expiration times
 const JWT_EXPIRATION_SECONDS = 15;
@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 if (ENABLE_CORS) {
   app.use(cors({
     origin: (origin, callback) => {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      if (!origin || ALLOWED_ORIGINS.some((allowed) => [origin, '*'].includes(allowed))) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
