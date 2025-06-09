@@ -2,5 +2,5 @@ dist/
 node_modules/
 bun.lockb
 .env.local
-__zisk__db*/
+__papaya__db*/
 src/web/**/*.gen.ts

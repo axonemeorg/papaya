@@ -6,11 +6,11 @@ WORKDIR /usr/src/app
 # Copy application code
 COPY app ./
 
-# Create directory for zisk config
-RUN mkdir -p /etc/zisk
+# Create directory for papaya config
+RUN mkdir -p /etc/papaya
 
 # Copy configuration files
-COPY config/docker.yaml /etc/zisk/config.yaml
+COPY config/docker.yaml /etc/papaya/config.yaml
 
 # Install yq for YAML parsing
 RUN apk add --no-cache yq

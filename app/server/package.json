@@ -1,5 +1,5 @@
 {
-  "name": "@zisk/server",
+  "name": "@papaya/server",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -20,7 +20,7 @@
   "dependencies": {
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "@zisk/client": "*",
+    "@papaya/client": "*",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

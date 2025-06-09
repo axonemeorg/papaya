@@ -1,20 +1,20 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./app/public/images/logo/logo-w.svg">
-  <img width="250px" alt="Zisk logo" src="./app/public/images/logo/logo-b.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./app/client/public/images/papaya/papaya-dark.png">
+  <img width="250px" alt="Papaya logo" src="./app/client/public/images/papaya/papaya-light.png">
 </picture>
 
 The open-source, local-first personal finance app.
 
 > [!IMPORTANT]
-> Zisk is in a pre-alpha state, and only suitable for use by developers
+> Papaya is in a pre-alpha state, and only suitable for use by developers
 >
 
-This is the mono-repo source for services used to run Zisk.
+This is the mono-repo source for services used to run Papaya.
 
 ## Services
 
 ### Client
-This is the web frontend for Zisk. Core dependencies include:
+This is the web frontend for Papaya. Core dependencies include:
  - PouchDB
  - React
  - Material-UI
@@ -29,13 +29,13 @@ Please see `app/client/README.md` for more info.
 
 ### Server
 
-This is the server for hosting Zisk. It serves a backend API and the app frontend, as well as a proxy to your CouchDB instance.
+This is the server for hosting Papaya. It serves a backend API and the app frontend, as well as a proxy to your CouchDB instance.
 
 Please see `app/server/README.md` for more info.
 
 ## Configuration
 
-Zisk uses a YAML-based configuration system. Configuration files are stored in the `/config` directory:
+Papaya uses a YAML-based configuration system. Configuration files are stored in the `/config` directory:
 
 - `default.yaml`: Default configuration values
 - `local.yaml`: Local development overrides (gitignored)
@@ -45,7 +45,7 @@ See `config/README.md` for more details on the configuration system.
 
 ## Docker Setup
 
-Zisk can be run using Docker containers for both the web server and CouchDB database. The containers are configured using the YAML configuration files.
+Papaya can be run using Docker containers for both the web server and CouchDB database. The containers are configured using the YAML configuration files.
 
 ### Setup
 
@@ -77,10 +77,10 @@ The web server container will use the configuration from the YAML files, includi
 
 ## Administration
 
-Zisk provides a set of API endpoints for configuration management:
+Papaya provides a set of API endpoints for configuration management:
 
 - `GET /api/admin/config`: Get the current configuration
 - `PUT /api/admin/config`: Update the configuration
 - `POST /api/admin/restart`: Restart the server
 
-These endpoints require authentication and the `zisk:admin` role. See `config/README.md` for details on how to add this role to a user.
+These endpoints require authentication and the `papaya:admin` role. See `config/README.md` for details on how to add this role to a user.

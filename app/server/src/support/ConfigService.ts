@@ -42,7 +42,7 @@ export type ConfigValue<T extends ConfigPath | NestedConfigPath<ConfigPath>> =
   : never;
 
 // Configuration interface
-export type ZiskConfig = {
+export type PapayaConfig = {
   [K in keyof typeof CONFIG_SCHEMA]: {
     [P in keyof typeof CONFIG_SCHEMA[K]]: typeof CONFIG_SCHEMA[K][P] extends string
     ? string
@@ -57,12 +57,12 @@ export type ZiskConfig = {
 import nano from 'nano';
 
 /**
- * Singleton class for managing Zisk configuration
+ * Singleton class for managing Papaya configuration
  */
 export default class ConfigService {
   private static instance: ConfigService;
-  private config: ZiskConfig;
-  private configDbName = 'zisk_config';
+  private config: PapayaConfig;
+  private configDbName = 'papaya_config';
   private configDocId = 'current';
   private couchDbConnection: nano.ServerScope | null = null;
   private isInitialized = false;
@@ -111,7 +111,7 @@ export default class ConfigService {
         const dbConfig = await this.loadConfigFromDb();
         if (dbConfig) {
           // Merge with file-based config, with DB config taking precedence
-          this.config = this.deepMerge(this.config, dbConfig) as ZiskConfig;
+          this.config = this.deepMerge(this.config, dbConfig) as PapayaConfig;
           console.log('Loaded configuration from database');
         } else {
           console.log("No config.")
@@ -155,7 +155,7 @@ export default class ConfigService {
    * Save configuration to the database
    * @param config The configuration to save
    */
-  private async saveConfigToDb(config: ZiskConfig): Promise<void> {
+  private async saveConfigToDb(config: PapayaConfig): Promise<void> {
     if (!this.couchDbConnection) {
       throw new Error('CouchDB connection not initialized');
     }
@@ -190,7 +190,7 @@ export default class ConfigService {
    * Load configuration from the database
    * @returns The configuration from the database
    */
-  private async loadConfigFromDb(): Promise<ZiskConfig | null> {
+  private async loadConfigFromDb(): Promise<PapayaConfig | null> {
     if (!this.couchDbConnection) {
       throw new Error('CouchDB connection not initialized');
     }
@@ -200,20 +200,20 @@ export default class ConfigService {
     const doc = await db.get(this.configDocId);
     // Remove CouchDB specific fields
     const { _id, _rev, ...config } = doc;
-    return config as ZiskConfig;
+    return config as PapayaConfig;
   }
 
   /**
    * Load configuration from YAML files
    * @returns The merged configuration
    */
-  private loadConfigFromFiles(): ZiskConfig {
+  private loadConfigFromFiles(): PapayaConfig {
     // Check for Docker environment first
-    const dockerConfigPath = '/etc/zisk/config.yaml';
+    const dockerConfigPath = '/etc/papaya/config.yaml';
     if (fs.existsSync(dockerConfigPath)) {
       try {
         const dockerConfigContent = fs.readFileSync(dockerConfigPath, 'utf8');
-        const dockerConfig = yaml.load(dockerConfigContent) as ZiskConfig;
+        const dockerConfig = yaml.load(dockerConfigContent) as PapayaConfig;
         console.log('Loaded configuration from Docker environment');
         return dockerConfig;
       } catch (error) {
@@ -233,7 +233,7 @@ export default class ConfigService {
       console.warn('No local config found or error loading it:', error);
     }
 
-    return localConfig as ZiskConfig;
+    return localConfig as PapayaConfig;
   }
 
   /**
@@ -296,7 +296,7 @@ export default class ConfigService {
    * Get the entire configuration
    * @returns The entire configuration
    */
-  public getConfig(): ZiskConfig {
+  public getConfig(): PapayaConfig {
     return { ...this.config };
   }
 
@@ -304,9 +304,9 @@ export default class ConfigService {
    * Update the configuration
    * @param newConfig The new configuration
    */
-  public async updateConfig(newConfig: Partial<ZiskConfig>): Promise<void> {
+  public async updateConfig(newConfig: Partial<PapayaConfig>): Promise<void> {
     // Update in-memory configuration
-    this.config = this.deepMerge(this.config, newConfig) as ZiskConfig;
+    this.config = this.deepMerge(this.config, newConfig) as PapayaConfig;
 
     // Save to database if initialized
     if (this.isInitialized) {
@@ -328,13 +328,13 @@ export default class ConfigService {
 }
 
 // Export configuration getters for backward compatibility
-export const getConfig = (): ZiskConfig => ConfigService.getInstance().getConfig();
-export const ZISK_COUCHDB_URL = (): string => ConfigService.getInstance().get<string>('couchdb.url');
-export const ZISK_COUCHDB_ADMIN_USER = (): string => ConfigService.getInstance().get<string>('couchdb.admin_user');
-export const ZISK_COUCHDB_ADMIN_PASS = (): string => ConfigService.getInstance().get<string>('couchdb.admin_pass');
+export const getConfig = (): PapayaConfig => ConfigService.getInstance().getConfig();
+export const PAPAYA_COUCHDB_URL = (): string => ConfigService.getInstance().get<string>('couchdb.url');
+export const PAPAYA_COUCHDB_ADMIN_USER = (): string => ConfigService.getInstance().get<string>('couchdb.admin_user');
+export const PAPAYA_COUCHDB_ADMIN_PASS = (): string => ConfigService.getInstance().get<string>('couchdb.admin_pass');
 export const AUTH_REFRESH_TOKEN_SECRET = (): string => ConfigService.getInstance().get<string>('auth.refresh_token_secret');
 export const AUTH_ACCESS_TOKEN_SECRET = (): string => ConfigService.getInstance().get<string>('auth.access_token_secret');
 export const AUTH_ACCESS_TOKEN_HMAC_KID = (): string => ConfigService.getInstance().get<string>('auth.access_token_hmac_kid');
-export const ZISK_SERVER_PORT = (): number => ConfigService.getInstance().get<number>('server.port');
+export const PAPAYA_SERVER_PORT = (): number => ConfigService.getInstance().get<number>('server.port');
 export const SERVER_NAME = (): string => ConfigService.getInstance().get<string>('server.name');
 export const NODE_ENV = (): string | undefined => process.env.NODE_ENV;

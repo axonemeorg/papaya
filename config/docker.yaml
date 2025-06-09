@@ -1,8 +1,8 @@
-# Docker-specific configuration for Zisk
+# Docker-specific configuration for Papaya
 
 couchdb:
   # Use the service name from the Docker network
-  url: http://zisk-couchdb:5984
+  url: http://papaya-couchdb:5984
   port: 5984
   admin_user: admin
   admin_pass: surfboard
@@ -10,8 +10,8 @@ couchdb:
 auth:
   access_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
   refresh_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
-  access_token_hmac_kid: zisk
+  access_token_hmac_kid: papaya
 
 server:
   port: 9475
-  name: zisk-docker
+  name: papaya-docker

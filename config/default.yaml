@@ -1,4 +1,4 @@
-# Default configuration for Zisk
+# Default configuration for Papaya
 
 couchdb:
   url: http://localhost:5984
@@ -9,7 +9,7 @@ couchdb:
 auth:
   access_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
   refresh_token_secret: a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5e5
-  access_token_hmac_kid: zisk
+  access_token_hmac_kid: papaya
 
 server:
   port: 9475

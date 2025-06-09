@@ -1,13 +1,13 @@
-import type { PropsWithChildren } from 'react'
-import { Box, CssBaseline, Stack, ThemeProvider } from '@mui/material'
-import appTheme from '../theme'
-import { unbounded } from '../fonts/unbounded'
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import type { PropsWithChildren } from 'react';
+import { unbounded } from '../fonts/unbounded';
+import appTheme from '../theme';
 
 import '../main.scss';
 
 export const metadata = {
-  title: 'Zisk',
-  description: 'The open-source, local-first personal finance app',
+	title: 'Papaya',
+	description: 'The open-source, local-first personal finance app',
 }
 
 export default async (props: PropsWithChildren) => {
@@ -24,7 +24,7 @@ export default async (props: PropsWithChildren) => {
 			</head>
 			<body className={unbounded.className}>
 				<ThemeProvider theme={appTheme}>
-          			<CssBaseline />
+					<CssBaseline />
 					{props.children}
 				</ThemeProvider>
 			</body>

@@ -2,7 +2,7 @@ import ConfigService from "../support/ConfigService.js";
 import Controller from "../support/Controller.js";
 
 /**
- * Controller for managing Zisk configuration
+ * Controller for managing Papaya configuration
  */
 export default class ConfigController extends Controller {
   private configService: ConfigService;
