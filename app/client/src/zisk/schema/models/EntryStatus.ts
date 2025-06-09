@@ -3,11 +3,11 @@ import { Model } from '@/schema/support/orm/Model'
 import { Mixin } from '@/schema/support/orm/Mixin'
 
 enum Status {
-  FLAGGED = 'zisk.status.flagged',
-  NEEDS_REVIEW = 'zisk.status.needsreview',
-  WAS_REVIEWED = 'zisk.status.wasreview',
-  APPROXIMATE = 'zisk.status.approximate',
-  PENDING = 'zisk.status.pending',
+  FLAGGED = 'papaya.status.flagged',
+  NEEDS_REVIEW = 'papaya.status.needsreview',
+  WAS_REVIEWED = 'papaya.status.wasreview',
+  APPROXIMATE = 'papaya.status.approximate',
+  PENDING = 'papaya.status.pending',
 }
 
 export const StatusVariant = z.enum(Status)
@@ -15,7 +15,7 @@ export const StatusVariant = z.enum(Status)
 export type StatusVariant = z.output<typeof StatusVariant>
 
 export const [CreateEntryStatus, EntryStatus] = Model.fromSchema({
-  kind: z.literal('zisk:status'),
+  kind: z.literal('papaya:status'),
   ...Mixin.derived.natural._id(),
   label: z.string(),
   description: z.string(),

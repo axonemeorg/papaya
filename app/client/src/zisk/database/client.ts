@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb'
 import PouchDBFind from 'pouchdb-find'
 
-const POUCH_DB_NAME = '__zisk__db'
+const POUCH_DB_NAME = '__papaya__db'
 
 PouchDB.plugin(PouchDBFind)
 

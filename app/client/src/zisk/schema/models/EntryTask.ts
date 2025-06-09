@@ -4,7 +4,7 @@ import { Mixin } from '../support/orm/Mixin'
 
 export const [CreateEntryTask, EntryTask] = Model.fromSchemas([
   {
-    kind: z.literal('zisk:task'),
+    kind: z.literal('papaya:task'),
     memo: z.string(),
     completedAt: z.string().nullable(),
   },

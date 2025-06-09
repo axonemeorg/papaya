@@ -1,11 +1,11 @@
-import { getOrCreateZiskMeta } from '@/database/queries'
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { getOrCreatePapayaMeta } from '@/database/queries'
+import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { useQuery } from '@tanstack/react-query'
 
-export const useZiskMeta = () =>
-  useQuery<ZiskMeta | null>({
-    queryKey: ['ziskMeta'],
-    queryFn: getOrCreateZiskMeta,
+export const usePapayaMeta = () =>
+  useQuery<PapayaMeta | null>({
+    queryKey: ['papayaMeta'],
+    queryFn: getOrCreatePapayaMeta,
     enabled: true,
     initialData: null,
   })

@@ -76,7 +76,7 @@ const CreateEntryButton = (props: CreateEntryButtonProps) => {
   )
 }
 
-const LOCAL_STORAGE_KEY = 'ZISK_APP_MENU_OPEN_STATE'
+const LOCAL_STORAGE_KEY = 'PAPAYA_APP_MENU_OPEN_STATE'
 
 export default function AppMenu(props: AppMenuProps) {
   const { view } = props

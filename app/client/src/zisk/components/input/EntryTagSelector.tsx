@@ -1,14 +1,13 @@
-import { useContext, useRef, useState } from 'react'
-import { Button, ButtonBase, Chip, IconButton, Link, Stack, Typography } from '@mui/material'
-import { Settings } from '@mui/icons-material'
-import { JournalContext } from '@/contexts/JournalContext'
-import clsx from 'clsx'
-import { EntryTagAutocompleteProps } from './EntryTagAutocomplete'
-import { EntryTagPicker } from '../pickers/EntryTagPicker'
-import { EntryStatus } from '@/schema/models/EntryStatus'
-import { ZiskEntryStatus } from '@/constants/status'
-import { EntryTag } from '@/schema/documents/EntryTag'
+import { PapayaEntryStatus } from '@/constants/status'
 import { useEntryTags } from '@/hooks/queries/useEntryTags'
+import { EntryTag } from '@/schema/documents/EntryTag'
+import { EntryStatus } from '@/schema/models/EntryStatus'
+import { Settings } from '@mui/icons-material'
+import { Button, ButtonBase, Chip, IconButton, Link, Stack, Typography } from '@mui/material'
+import clsx from 'clsx'
+import { useRef, useState } from 'react'
+import { EntryTagPicker } from '../pickers/EntryTagPicker'
+import { EntryTagAutocompleteProps } from './EntryTagAutocomplete'
 
 type EntryTagSelectorProps = Omit<EntryTagAutocompleteProps, 'renderInput'>
 
@@ -21,7 +20,7 @@ export default function EntryTagSelector(props: EntryTagSelectorProps) {
   const value = props.value ?? []
 
   const tags: Record<string, EntryTag | EntryStatus> = {
-    ...Object.fromEntries(ZiskEntryStatus.map((status) => [status._id, status])),
+    ...Object.fromEntries(PapayaEntryStatus.map((status) => [status._id, status])),
     ...entryTags,
   }
 

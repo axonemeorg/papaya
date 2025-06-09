@@ -1,16 +1,16 @@
 import z from 'zod'
 import { Model } from '../support/orm/Model'
 
-export const [CreateZiskServer, ZiskServer] = Model.fromSchemas([
+export const [CreatePapayaServer, PapayaServer] = Model.fromSchemas([
   {
-    kind: z.literal('zisk:server'),
+    kind: z.literal('papaya:server'),
     displayName: z.string(),
     url: z.string(),
   },
   {
     // ...Mixin.derived.natural._id(
     //   z.templateLiteral([
-    //     z.literal('zisk:server:'),
+    //     z.literal('papaya:server:'),
     //     z.url(),
     //   ])
     // ),
@@ -18,5 +18,5 @@ export const [CreateZiskServer, ZiskServer] = Model.fromSchemas([
   },
 ])
 
-export type CreateZiskServer = z.output<typeof CreateZiskServer>
-export type ZiskServer = z.output<typeof ZiskServer>
+export type CreatePapayaServer = z.output<typeof CreatePapayaServer>
+export type PapayaServer = z.output<typeof PapayaServer>

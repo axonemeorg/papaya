@@ -8,7 +8,7 @@ export async function createImageAvatar(file: File): Promise<Avatar> {
   const resizedBase64 = resizeImage(image, 64, 64)
 
   return {
-    kind: 'zisk:avatar',
+    kind: 'papaya:avatar',
     content: resizedBase64, // `data:image/png;base64,${resizedBase64}`,
     variant: 'IMAGE',
     primaryColor: '',

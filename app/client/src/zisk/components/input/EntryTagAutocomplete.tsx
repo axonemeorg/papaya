@@ -1,9 +1,9 @@
-import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
-import { Close, Done } from '@mui/icons-material'
-import { ZiskEntryStatus } from '@/constants/status'
+import { PapayaEntryStatus } from '@/constants/status'
+import { useEntryTags } from '@/hooks/queries/useEntryTags'
 import { EntryTag } from '@/schema/documents/EntryTag'
 import { EntryStatus } from '@/schema/models/EntryStatus'
-import { useEntryTags } from '@/hooks/queries/useEntryTags'
+import { Close, Done } from '@mui/icons-material'
+import { Autocomplete, AutocompleteProps, ListItem, ListItemText, TextField } from '@mui/material'
 
 export type EntryTagAutocompleteProps = Partial<Omit<AutocompleteProps<string, true, false, false>, 'options'>>
 
@@ -17,7 +17,7 @@ export default function EntryTagAutocomplete(props: EntryTagAutocompleteProps) {
 
   const tags: Record<string, EntryTag | EntryStatus> = {
     ...Object.fromEntries(
-      ZiskEntryStatus.filter((status) => !status.archived || props.value?.includes(status._id)).map((status) => [
+      PapayaEntryStatus.filter((status) => !status.archived || props.value?.includes(status._id)).map((status) => [
         status._id,
         status,
       ]),

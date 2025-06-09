@@ -10,7 +10,7 @@ interface AvatarPickerProps {
 }
 
 export const DEFAULT_AVATAR: Avatar = {
-  kind: 'zisk:avatar',
+  kind: 'papaya:avatar',
   content: 'layers',
   variant: AvatarVariant.enum.PICTORIAL,
   primaryColor: colors.grey[500],

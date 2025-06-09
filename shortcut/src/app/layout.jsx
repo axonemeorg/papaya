@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Zisk",
+  title: "Papaya",
   description: "The open-source, local-first personal finance app",
 };
 

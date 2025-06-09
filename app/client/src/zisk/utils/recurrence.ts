@@ -154,8 +154,8 @@ export const getRecurrencyString = (recurrency: EntryRecurrency, date: string): 
         isSetOfWeekdays(cadence.days)
           ? 'weekdays'
           : sortDaysOfWeek(cadence.days)
-              .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
-              .join(', '),
+            .map((day: DayOfWeek) => DAYS_OF_WEEK_NAMES[day])
+            .join(', '),
       )
       break
     case CadenceFrequency.enum.M:
@@ -245,9 +245,9 @@ export const updateRecurrencyNewDate = (
 
   return newCadence
     ? {
-        kind: 'zisk:recurrence',
-        cadence: newCadence,
-        ends: null, // TODO!!
-      }
+      kind: 'papaya:recurrence',
+      cadence: newCadence,
+      ends: null, // TODO!!
+    }
     : undefined
 }

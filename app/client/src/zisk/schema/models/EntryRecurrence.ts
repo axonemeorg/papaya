@@ -3,7 +3,7 @@ import { RecurringCadence } from '@/schema/support/recurrence'
 import { z } from 'zod'
 
 export const [CreateEntryRecurrency, EntryRecurrency] = Model.fromSchema({
-  kind: z.literal('zisk:recurrence'),
+  kind: z.literal('papaya:recurrence'),
 
   /**
    * Encodes the cadence of the recurrence, e.g. every four weeks,

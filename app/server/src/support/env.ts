@@ -12,12 +12,12 @@ dotenv.config({
 });
 
 // Export environment variables
-export const ZISK_COUCHDB_URL = process.env.ZISK_COUCHDB_URL ?? 'http://localhost:5984';
-export const ZISK_COUCHDB_ADMIN_USER = process.env.ZISK_COUCHDB_ADMIN_USER;
-export const ZISK_COUCHDB_ADMIN_PASS = process.env.ZISK_COUCHDB_ADMIN_PASS;
+export const PAPAYA_COUCHDB_URL = process.env.PAPAYA_COUCHDB_URL ?? 'http://localhost:5984';
+export const PAPAYA_COUCHDB_ADMIN_USER = process.env.PAPAYA_COUCHDB_ADMIN_USER;
+export const PAPAYA_COUCHDB_ADMIN_PASS = process.env.PAPAYA_COUCHDB_ADMIN_PASS;
 export const AUTH_REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET;
 export const AUTH_ACCESS_TOKEN_SECRET = process.env.AUTH_ACCESS_TOKEN_SECRET;
 export const AUTH_ACCESS_TOKEN_HMAC_KID = process.env.AUTH_ACCESS_TOKEN_HMAC_KID;
-export const ZISK_SERVER_PORT = process.env.ZISK_SERVER_PORT || 9000;
+export const PAPAYA_SERVER_PORT = process.env.PAPAYA_SERVER_PORT || 9000;
 export const SERVER_NAME = process.env.SERVER_NAME || '';
 export const NODE_ENV = process.env.NODE_ENV;

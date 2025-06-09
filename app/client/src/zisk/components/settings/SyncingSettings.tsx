@@ -1,4 +1,4 @@
-import { ZiskContext } from '@/contexts/ZiskContext'
+import { PapayaContext } from '@/contexts/PapayaContext'
 import { LeakAdd, LeakRemove } from '@mui/icons-material'
 import { Alert, Button, Link, Paper, Stack, Typography } from '@mui/material'
 import { useContext, useState } from 'react'
@@ -6,7 +6,7 @@ import SettingsSectionHeader from './SettingsSectionHeader'
 // import JoinServerModal from "../modal/JoinServerModal"
 import { RemoteContext } from '@/contexts/RemoteContext'
 import { __purgeAllLocalDatabases } from '@/database/actions'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
+import { usePapayaMeta } from '@/hooks/queries/usePapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { ServerSyncStrategy } from '@/schema/support/syncing'
 import { getServerApiUrl, getSyncStrategy } from '@/utils/server'
@@ -15,27 +15,27 @@ import ServerWidget from '../widget/ServerWidget'
 import SyncWidget from '../widget/SyncWidget'
 
 const POUCH_DB_DOCS_URL = 'https://pouchdb.com/'
-// const ZISK_SERVER_DOCS_URL = 'https://github.com/curtisupshall/zisk/tree/master/server'
+// const PAPAYA_SERVER_DOCS_URL = 'https://github.com/curtisupshall/papaya/tree/master/server'
 
-type SyncingStrategy = 'NONE' | 'ZISK_SERVER'
+type SyncingStrategy = 'NONE' | 'PAPAYA_SERVER'
 
 export default function SyncingSettings() {
   const [showJoinServerModal, setShowJoinServerModal] = useState<boolean>(false)
   const [showChangeSyncStrategyModal, setShowChangeSyncStrategyModal] = useState<boolean>(false)
 
-  const ziskContext = useContext(ZiskContext)
+  const papayaContext = useContext(PapayaContext)
   const remoteContext = useContext(RemoteContext)
-  const getZiskMetaQuery = useZiskMeta()
+  const getPapayaMetaQuery = usePapayaMeta()
   // const { snackbar } = useContext(NotificationsContext)
 
-  if (!getZiskMetaQuery.data) {
+  if (!getPapayaMetaQuery.data) {
     return <></>
   }
 
-  const settings: UserSettings = getZiskMetaQuery.data.userSettings
+  const settings: UserSettings = getPapayaMetaQuery.data.userSettings
   const syncStrategy = getSyncStrategy(settings);
   const { syncType } = syncStrategy
-  const ziskServerStrategy: ServerSyncStrategy | null = syncType === 'SERVER' ? syncStrategy : null
+  const papayaServerStrategy: ServerSyncStrategy | null = syncType === 'SERVER' ? syncStrategy : null
 
   const handleDisconnectFromServer = async () => {
     const confirmDisconnect = window.confirm(
@@ -58,13 +58,13 @@ export default function SyncingSettings() {
         // Do nothing
       }
 
-      ziskContext.updateSettings({
+      papayaContext.updateSettings({
         syncStrategy: {
           syncType: 'LOCAL' // Switch to local sync strategy
         }
       })
     } else {
-      throw new Error('Disconnecting from Zisk Cloud is not implemented')
+      throw new Error('Disconnecting from Papaya Cloud is not implemented')
     }
   }
 
@@ -88,13 +88,13 @@ export default function SyncingSettings() {
         <section>
           <SettingsSectionHeader title="Your Server" />
           <Typography variant="body2" color="textSecondary" mb={2}>
-            Zisk Server is an optional web server for syncing and analyzing your Zisk journal. Data replication is
+            Papaya Server is an optional web server for syncing and analyzing your Papaya journal. Data replication is
             automatically implemented using CouchDB, but you can host your own instance of CouchDB. You may also choose
             not to connect to a server, and your data will only persist on your device.
           </Typography>
-          {ziskServerStrategy ? (
+          {papayaServerStrategy ? (
             <Stack gap={2}>
-              <Alert severity="success">You are connected to a Zisk Server.</Alert>
+              <Alert severity="success">You are connected to a Papaya Server.</Alert>
               <Paper
                 variant="outlined"
                 sx={(theme) => ({
@@ -103,9 +103,9 @@ export default function SyncingSettings() {
                   alignSelf: 'flex-start',
                 })}>
                 <ServerWidget
-                  serverUrl={ziskServerStrategy.server.url}
-                  serverName={ziskServerStrategy.server.displayName}
-                  userName={ziskServerStrategy.connection.username}
+                  serverUrl={papayaServerStrategy.server.url}
+                  serverName={papayaServerStrategy.server.displayName}
+                  userName={papayaServerStrategy.connection.username}
                   actions={
                     <Button
                       onClick={() => handleDisconnectFromServer()}
@@ -118,7 +118,7 @@ export default function SyncingSettings() {
             </Stack>
           ) : (
             <Stack gap={2}>
-              <Alert severity="info">You are not connected to a Zisk Server.</Alert>
+              <Alert severity="info">You are not connected to a Papaya Server.</Alert>
               <Button
                 variant="contained"
                 startIcon={<LeakAdd />}
@@ -132,20 +132,20 @@ export default function SyncingSettings() {
         <section>
           <SettingsSectionHeader title="Syncing Strategy" />
           <Typography variant="body2" color="textSecondary" mb={2}>
-            Zisk uses <Link target='_blank' href={POUCH_DB_DOCS_URL}>PouchDB</Link> to store your journals. If you are connected to a
-            Zisk Server, it can be used to sync your journals. You can also sync your journals using your own CouchDB
+            Papaya uses <Link target='_blank' href={POUCH_DB_DOCS_URL}>PouchDB</Link> to store your journals. If you are connected to a
+            Papaya Server, it can be used to sync your journals. You can also sync your journals using your own CouchDB
             server, or just store them on this device only.
           </Typography>
           <Stack gap={2}>
             {/* {syncStrategy.strategyType === 'LOCAL' && (
-              <Alert severity={ziskServer.serverType === 'NONE' ? 'info' : 'warning'}>
-                {ziskServer.serverType === 'NONE'
+              <Alert severity={papayaServer.serverType === 'NONE' ? 'info' : 'warning'}>
+                {papayaServer.serverType === 'NONE'
                   ? 'You are using the local syncing strategy. Your journals will only be stored on this device.'
-                  : "You're connected to a Zisk Server, but you're not using it to sync your journals. You can connect to your server to sync your journals."}
+                  : "You're connected to a Papaya Server, but you're not using it to sync your journals. You can connect to your server to sync your journals."}
               </Alert>
             )}
-            {syncStrategy.strategyType === 'CUSTOM_SERVER_OR_ZISK_CLOUD' && (
-              <Alert severity="success">You are using a Zisk Server to sync your journals.</Alert>
+            {syncStrategy.strategyType === 'CUSTOM_SERVER_OR_PAPAYA_CLOUD' && (
+              <Alert severity="success">You are using a Papaya Server to sync your journals.</Alert>
             )} */}
             <Paper
               variant="outlined"

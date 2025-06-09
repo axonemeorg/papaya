@@ -1,5 +1,5 @@
 ### App
-This is the frontend for Zisk. Core dependencies include:
+This is the frontend for Papaya. Core dependencies include:
  - PouchDB
  - React
  - Material-UI

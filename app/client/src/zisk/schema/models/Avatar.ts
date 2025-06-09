@@ -5,7 +5,7 @@ export const AvatarVariant = z.enum(['TEXT', 'PICTORIAL', 'IMAGE'])
 export type AvatarVariant = z.output<typeof AvatarVariant>
 
 export const [CreateAvatar, Avatar] = Model.fromSchema({
-  kind: z.literal('zisk:avatar'),
+  kind: z.literal('papaya:avatar'),
   content: z.string(),
   variant: AvatarVariant,
   primaryColor: z.string(),

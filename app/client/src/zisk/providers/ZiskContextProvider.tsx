@@ -1,17 +1,17 @@
-import { ZiskContext } from '@/contexts/ZiskContext'
+import { PapayaContext } from '@/contexts/PapayaContext'
 import { updateSettings } from '@/database/actions'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { usePapayaMeta } from '@/hooks/queries/usePapayaMeta'
+import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { PropsWithChildren, useState } from 'react'
 
-export default function ZiskContextProvider(props: PropsWithChildren) {
-  const [ziskMeta, setZiskMeta] = useState<ZiskMeta | null>(null)
+export default function PapayaContextProvider(props: PropsWithChildren) {
+  const [papayaMeta, setPapayaMeta] = useState<PapayaMeta | null>(null)
 
-  const getZiskMetaQuery = useZiskMeta()
+  const getPapayaMetaQuery = usePapayaMeta()
 
-  const updateZiskSettings = async (newSettings: Partial<UserSettings>): Promise<void> => {
-    setZiskMeta((prev) => {
+  const updatePapayaSettings = async (newSettings: Partial<UserSettings>): Promise<void> => {
+    setPapayaMeta((prev) => {
       if (!prev) {
         return null
       }
@@ -26,10 +26,10 @@ export default function ZiskContextProvider(props: PropsWithChildren) {
     await updateSettings(newSettings)
   }
 
-  const context: ZiskContext = {
-    ziskMeta: getZiskMetaQuery.data,
-    updateSettings: updateZiskSettings,
+  const context: PapayaContext = {
+    papayaMeta: getPapayaMetaQuery.data,
+    updateSettings: updatePapayaSettings,
   }
 
-  return <ZiskContext.Provider value={context}>{props.children}</ZiskContext.Provider>
+  return <PapayaContext.Provider value={context}>{props.children}</PapayaContext.Provider>
 }

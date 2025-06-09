@@ -5,7 +5,7 @@ import { Mixin } from '@/schema/support/orm/Mixin'
 
 export const [CreateAccount, Account] = Document.fromSchemas([
   {
-    kind: z.literal('zisk:account'),
+    kind: z.literal('papaya:account'),
 
     label: z.string(),
     description: z.string(),

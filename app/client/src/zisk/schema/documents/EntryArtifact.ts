@@ -4,7 +4,7 @@ import { Mixin } from '../support/orm/Mixin'
 
 export const [CreateEntryArtifact, EntryArtifact] = Document.fromSchemas([
   {
-    kind: z.literal('zisk:artifact'),
+    kind: z.literal('papaya:artifact'),
     originalFileName: z.string(),
     size: z.number(),
     contentType: z.string(),

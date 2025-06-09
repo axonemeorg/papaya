@@ -1,1 +1,1 @@
-export const PLACEHOLDER_UNNAMED_ZISK_SERVER = 'Unnamed Zisk Server'
+export const PLACEHOLDER_UNNAMED_PAPAYA_SERVER = 'Unnamed Papaya Server'

@@ -5,14 +5,14 @@ import { CreateJournal, Journal } from '@/schema/documents/Journal'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { DocumentObject } from '@/schema/support/orm/Document'
-import { ZiskDocument } from '@/schema/union/ZiskDocument'
-import { generateGenericZiskUniqueId } from '@/utils/id'
+import { PapayaDocument } from '@/schema/union/PapayaDocument'
+import { generateGenericPapayaUniqueId } from '@/utils/id'
 import { cementJournalEntry } from '@/utils/journal'
 import dayjs from 'dayjs'
 import FileSaver from 'file-saver'
 import JSZip from 'jszip'
 import { getDatabaseClient, initializeDatabaseClient } from './client'
-import { ARBITRARY_MAX_FIND_LIMIT, getOrCreateZiskMeta } from './queries'
+import { ARBITRARY_MAX_FIND_LIMIT, getOrCreatePapayaMeta } from './queries'
 // import { MigrationEngine } from './migrate'
 
 const db = getDatabaseClient()
@@ -24,7 +24,7 @@ export const createJournalEntry = async (formData: JournalEntry, journalId: stri
     ...cementJournalEntry({
       ...formData,
       journalId,
-      kind: 'zisk:entry',
+      kind: 'papaya:entry',
     }),
     createdAt: now,
   }
@@ -76,8 +76,8 @@ export const undeleteJournalEntry = async (journalEntry: JournalEntry) => {
 export const createCategory = async (formData: CreateCategory, journalId: string): Promise<Category> => {
   const category: Category = {
     ...formData,
-    kind: 'zisk:category',
-    _id: generateGenericZiskUniqueId(),
+    kind: 'papaya:category',
+    _id: generateGenericPapayaUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
@@ -90,8 +90,8 @@ export const createCategory = async (formData: CreateCategory, journalId: string
 export const createAccount = async (formData: CreateAccount, journalId: string) => {
   const account: Account = {
     ...formData,
-    kind: 'zisk:account',
-    _id: generateGenericZiskUniqueId(),
+    kind: 'papaya:account',
+    _id: generateGenericPapayaUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
@@ -140,9 +140,9 @@ export const undeleteCategory = async (category: Category) => {
 export const createJournal = async (journal: CreateJournal): Promise<Journal> => {
   const newJournal: Journal = {
     ...journal,
-    kind: 'zisk:journal',
+    kind: 'papaya:journal',
     // journalVersion: MigrationEngine.latestVersion,
-    _id: generateGenericZiskUniqueId(),
+    _id: generateGenericPapayaUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
   }
@@ -153,21 +153,21 @@ export const createJournal = async (journal: CreateJournal): Promise<Journal> =>
 }
 
 export const updateActiveJournal = async (activeJournalId: string | null) => {
-  const meta = await getOrCreateZiskMeta()
+  const meta = await getOrCreatePapayaMeta()
   await db.put({
     ...meta,
     activeJournalId,
   })
 }
 
-export const getAllJournalObjects = async (journalId: string): Promise<ZiskDocument[]> => {
+export const getAllJournalObjects = async (journalId: string): Promise<PapayaDocument[]> => {
   const result = await db.find({
     selector: {
       journalId,
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })
-  return result.docs as ZiskDocument[]
+  return result.docs as PapayaDocument[]
 }
 
 export const resetJournal = async (journalId: string) => {
@@ -186,8 +186,8 @@ export const createEntryTag = async (formData: CreateEntryTag, journalId: string
   const tag: EntryTag = {
     label: formData.label,
     description: formData.description,
-    kind: 'zisk:tag',
-    _id: generateGenericZiskUniqueId(),
+    kind: 'papaya:tag',
+    _id: generateGenericPapayaUniqueId(),
     createdAt: new Date().toISOString(),
     updatedAt: null,
     journalId,
@@ -220,7 +220,7 @@ export const exportJournal = async (journalId: string, compress: boolean) => {
   FileSaver.saveAs(content, fileName)
 }
 
-export const importJournal = async (archive: File): Promise<[Journal, ZiskDocument[]]> => {
+export const importJournal = async (archive: File): Promise<[Journal, PapayaDocument[]]> => {
   const compressed = archive.name.endsWith('.zip')
   let journalJsonString: string
 
@@ -235,14 +235,14 @@ export const importJournal = async (archive: File): Promise<[Journal, ZiskDocume
     journalJsonString = await archive.text()
   }
 
-  let journalObjects: ZiskDocument[]
+  let journalObjects: PapayaDocument[]
   try {
     journalObjects = JSON.parse(journalJsonString)
   } catch (err) {
     throw new Error('Failed to parse journal JSON: ' + err)
   }
 
-  const journal = journalObjects.find((obj: ZiskDocument) => 'kind' in obj && obj.kind === 'zisk:journal') as
+  const journal = journalObjects.find((obj: PapayaDocument) => 'kind' in obj && obj.kind === 'papaya:journal') as
     | Journal
     | undefined
   if (!journal) {
@@ -262,7 +262,7 @@ export const importJournal = async (archive: File): Promise<[Journal, ZiskDocume
 }
 
 export const updateSettings = async (newSettings: Partial<UserSettings>) => {
-  return getOrCreateZiskMeta().then((meta) => {
+  return getOrCreatePapayaMeta().then((meta) => {
     return db.put({
       ...meta,
       userSettings: {

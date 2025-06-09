@@ -1,33 +1,32 @@
-import { ThemeProvider } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import { PropsWithChildren } from 'react'
-import { CssBaseline } from '@mui/material'
 // import { montserrat } from '@/fonts/montserrat'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import NotificationsProvider from '@/providers/NotificationsProvider'
 import appTheme from '@/components/theme/theme'
-import JournalContextProvider from '@/providers/JournalContextProvider'
-import ZiskContextProvider from '@/providers/ZiskContextProvider'
-import RemoteContextProvider from '@/providers/RemoteContextProvider'
 import CalculatorContextProvider from '@/providers/CalculatorContextProvider'
+import JournalContextProvider from '@/providers/JournalContextProvider'
+import NotificationsProvider from '@/providers/NotificationsProvider'
+import PapayaContextProvider from '@/providers/PapayaContextProvider'
+import RemoteContextProvider from '@/providers/RemoteContextProvider'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-interface ZiskProviders extends PropsWithChildren {
+interface PapayaProviders extends PropsWithChildren {
   queryClient: QueryClient
 }
 
-export default function ZiskProviders(props: ZiskProviders) {
+export default function PapayaProviders(props: PapayaProviders) {
   return (
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
       <main>
         <NotificationsProvider>
           <QueryClientProvider client={props.queryClient}>
-            <ZiskContextProvider>
+            <PapayaContextProvider>
               <RemoteContextProvider>
                 <JournalContextProvider>
                   <CalculatorContextProvider>{props.children}</CalculatorContextProvider>
                 </JournalContextProvider>
               </RemoteContextProvider>
-            </ZiskContextProvider>
+            </PapayaContextProvider>
           </QueryClientProvider>
         </NotificationsProvider>
       </main>

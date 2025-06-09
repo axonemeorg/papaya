@@ -156,7 +156,7 @@ function CustomRecurrenceModal(props: CustomRecurrenceModalProps) {
         break
     }
     onSubmit({
-      kind: 'zisk:recurrence',
+      kind: 'papaya:recurrence',
       cadence,
       ends,
       exceptions: undefined,
@@ -425,7 +425,7 @@ const getRecurrencySelectOptions = (date: string, additional: (EntryRecurrency |
   generateDeafultRecurringCadences(date ?? today).forEach((cadence) => {
     options.push(
       serializeEntryRecurrency({
-        kind: 'zisk:recurrence',
+        kind: 'papaya:recurrence',
         cadence,
         ends: null,
       }),

@@ -9,10 +9,10 @@ import { Figure } from '@/schema/models/Figure'
 import { FigureEnumeration } from '@/schema/support/figure'
 import { CadenceFrequency, DayOfWeek, RecurringCadence } from '@/schema/support/recurrence'
 import { DateView } from '@/schema/support/search/facet'
-import { ZiskDocument } from '@/schema/union/ZiskDocument'
+import { PapayaDocument } from '@/schema/union/PapayaDocument'
 import dayjs from 'dayjs'
 import { getNthWeekdayOfMonthFromDate } from './date'
-import { generateGenericZiskUniqueId } from './id'
+import { generateGenericPapayaUniqueId } from './id'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -53,7 +53,7 @@ export const parseJournalEntryAmount = (amount: string | undefined): Figure | un
   const parsedNetAmount = amount.startsWith('+') ? parsedAmount : -parsedAmount
 
   return {
-    kind: 'zisk:figure',
+    kind: 'papaya:figure',
     amount: parsedNetAmount,
     currency: 'CAD',
   }
@@ -91,8 +91,8 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
   const now = new Date().toISOString()
 
   const entry: JournalEntry = {
-    _id: formData._id ?? generateGenericZiskUniqueId(),
-    kind: 'zisk:entry',
+    _id: formData._id ?? generateGenericPapayaUniqueId(),
+    kind: 'papaya:entry',
     createdAt: now,
     date: formData.date ?? dayjs(now).format('YYYY-MM-DD'),
     memo: formData.memo ?? '',
@@ -132,8 +132,8 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
   const now = new Date().toISOString()
 
   const entryArtifact: EntryArtifact = {
-    _id: formData._id ?? generateGenericZiskUniqueId(),
-    kind: 'zisk:artifact',
+    _id: formData._id ?? generateGenericPapayaUniqueId(),
+    kind: 'papaya:artifact',
     originalFileName: formData.originalFileName ?? '',
     contentType: formData.contentType ?? '',
     size: formData.size ?? 0,
@@ -146,8 +146,8 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
 
 export const makeEntryTask = (formData: Partial<CreateEntryTask>): EntryTask => {
   const newTask: EntryTask = {
-    _id: formData._id ?? generateGenericZiskUniqueId(),
-    kind: 'zisk:task',
+    _id: formData._id ?? generateGenericPapayaUniqueId(),
+    kind: 'papaya:task',
     memo: formData.memo ?? '',
     completedAt: formData.completedAt ?? null,
   }
@@ -171,15 +171,15 @@ export const journalEntryHasTags = (entry: JournalEntry): boolean => {
 /**
  * @deprecated infer directly via `kind` discriminator
  */
-export const documentIsJournalEntry = (doc: ZiskDocument): doc is JournalEntry => {
-  return 'kind' in doc && doc.kind === 'zisk:entry'
+export const documentIsJournalEntry = (doc: PapayaDocument): doc is JournalEntry => {
+  return 'kind' in doc && doc.kind === 'papaya:entry'
 }
 
 /**
  * @deprecated infer directly via `kind` discriminator
  */
-export const documentIsCategory = (doc: ZiskDocument): doc is Category => {
-  return 'kind' in doc && doc.kind === 'zisk:category'
+export const documentIsCategory = (doc: PapayaDocument): doc is Category => {
+  return 'kind' in doc && doc.kind === 'papaya:category'
 }
 
 export const generateRandomAvatar = (): Avatar => {

@@ -55,7 +55,7 @@
 // export default function SearchModal(props: SearchModalProps) {
 //     const { placeholderText, ...rest } = props
 //     const [query, setQuery] = useState<string>('')
-//     const [results, setResults] = useState<FuseResult<ZiskDocument>[]>([])
+//     const [results, setResults] = useState<FuseResult<PapayaDocument>[]>([])
 //     const inputRef = useRef<HTMLInputElement>(null)
 //     const fuseRef = useRef<Fuse<any> | null>(null)
 //     const journalContext = useContext(JournalContext)
@@ -69,7 +69,7 @@
 //         inputRef.current?.focus()
 //     }
 
-//     const renderResult = useCallback((result: FuseResult<ZiskDocument>, index: number) => {
+//     const renderResult = useCallback((result: FuseResult<PapayaDocument>, index: number) => {
 //         const key = [result.item['_id'], index].filter(Boolean).join('-')
 
 //         let primaryTextFirstPart: ReactNode | undefined = undefined

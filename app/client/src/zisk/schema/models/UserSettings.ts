@@ -3,7 +3,7 @@ import { SyncStrategy } from '@/schema/support/syncing'
 import { z } from 'zod'
 
 export const [CreateUserSettings, UserSettings] = Model.fromSchema({
-  kind: z.literal('zisk:usersettings'),
+  kind: z.literal('papaya:usersettings'),
 
   appearance: z.object({
     // theme: z.union([z.literal('LIGHT'), z.literal('DARK'), z.literal('SYSTEM')]),

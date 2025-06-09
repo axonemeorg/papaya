@@ -10,9 +10,9 @@ import ConfigService, {
   AUTH_ACCESS_TOKEN_HMAC_KID,
   AUTH_ACCESS_TOKEN_SECRET,
   NODE_ENV,
-  SERVER_NAME,
-  ZISK_COUCHDB_URL,
-  ZISK_SERVER_PORT
+  PAPAYA_COUCHDB_URL,
+  PAPAYA_SERVER_PORT,
+  SERVER_NAME
 } from './support/ConfigService.js'
 import { UserClaims } from './support/types'
 
@@ -20,7 +20,7 @@ import { UserClaims } from './support/types'
 const configService = ConfigService.getInstance();
 
 // CORS
-const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.tryzisk.com', 'http://192.168.68.68:9475', 'http://192.168.68.68:9476'];
+const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.trypapaya.com', 'http://192.168.68.68:9475', 'http://192.168.68.68:9476'];
 const ENABLE_CORS = true
 
 // Token expiration times
@@ -160,7 +160,7 @@ const adminRoleMiddleware: RequestHandler = (req, res, next) => {
     return;
   }
 
-  if (!req.user.roles.includes('zisk:admin')) {
+  if (!req.user.roles.includes('papaya:admin')) {
     res.status(403).json({ error: 'Forbidden' });
     return;
   }
@@ -170,7 +170,7 @@ const adminRoleMiddleware: RequestHandler = (req, res, next) => {
 
 // Create the proxy middleware with proper typing
 const proxyMiddlewareOptions: Options = {
-  target: ZISK_COUCHDB_URL(), // e.g. 'http://localhost:5984'
+  target: PAPAYA_COUCHDB_URL(), // e.g. 'http://localhost:5984'
   changeOrigin: true,
   pathRewrite: {
     '^/proxy': '', // Remove the 'proxy' prefix when forwarding
@@ -209,7 +209,7 @@ const apiRouter = express.Router();
 // Health check endpoint
 apiRouter.get('/', (req: Request, res: Response) => {
   res.json({
-    zisk: 'Welcome',
+    papaya: 'Welcome',
     version: '0.3.0',
     serverName: SERVER_NAME(),
     status: 'ok',
@@ -335,7 +335,7 @@ app.use('/api', apiRouter);
 // ============ Static ================
 
 
-const viteIndexPath = import.meta.resolve('@zisk/client/dist/index.html').replace(/^file:\/\//, "")
+const viteIndexPath = import.meta.resolve('@papaya/client/dist/index.html').replace(/^file:\/\//, "")
 const viteDistPath = path.dirname(viteIndexPath)
 
 console.log(`Vite dist path: ${viteDistPath}`)
@@ -365,8 +365,8 @@ const startServer = async () => {
     await configService.initialize();
 
     // Start the server
-    app.listen(ZISK_SERVER_PORT(), () => {
-      console.log(`Server running on port ${ZISK_SERVER_PORT()}`);
+    app.listen(PAPAYA_SERVER_PORT(), () => {
+      console.log(`Server running on port ${PAPAYA_SERVER_PORT()}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

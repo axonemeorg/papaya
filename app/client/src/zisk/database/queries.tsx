@@ -4,10 +4,10 @@ import { EntryArtifact } from '@/schema/documents/EntryArtifact'
 import { EntryTag } from '@/schema/documents/EntryTag'
 import { Journal } from '@/schema/documents/Journal'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { SearchFacets } from '@/schema/support/search/facet'
 import { FacetedSearchUpstreamFilters } from '@/schema/support/search/filter'
-import { makeDefaultZiskMeta } from '@/utils/database'
+import { makeDefaultPapayaMeta } from '@/utils/database'
 import { getDatabaseClient } from './client'
 
 const db = getDatabaseClient()
@@ -17,7 +17,7 @@ export const ARBITRARY_MAX_FIND_LIMIT = 10000 as const
 export const getCategories = async (journalId: string): Promise<Record<string, Category>> => {
   const result = await db.find({
     selector: {
-      $and: [{ kind: 'zisk:category' }, { journalId }],
+      $and: [{ kind: 'papaya:category' }, { journalId }],
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })
@@ -28,7 +28,7 @@ export const getCategories = async (journalId: string): Promise<Record<string, C
 export const getAccounts = async (journalId: string): Promise<Record<string, Account>> => {
   const result = await db.find({
     selector: {
-      $and: [{ kind: 'zisk:account' }, { journalId }],
+      $and: [{ kind: 'papaya:account' }, { journalId }],
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })
@@ -40,7 +40,7 @@ export const getJournalEntriesByUpstreamFilters = async (
   journalId: string,
   facets: Partial<SearchFacets>,
 ): Promise<JournalEntry[]> => {
-  const selectorClauses: any[] = [{ kind: 'zisk:entry' }, { journalId }]
+  const selectorClauses: any[] = [{ kind: 'papaya:entry' }, { journalId }]
 
   Object.entries(facets)
     .filter(([, props]) => Boolean(props))
@@ -77,7 +77,7 @@ export const getJournalEntriesByUpstreamFilters = async (
 export const getEntryTags = async (journalId: string): Promise<Record<string, EntryTag>> => {
   const result = await db.find({
     selector: {
-      $and: [{ kind: 'zisk:tag' }, { journalId }],
+      $and: [{ kind: 'papaya:tag' }, { journalId }],
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })
@@ -85,18 +85,18 @@ export const getEntryTags = async (journalId: string): Promise<Record<string, En
   return Object.fromEntries((result.docs as EntryTag[]).map((tag) => [tag._id, tag]))
 }
 
-export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
+export const getOrCreatePapayaMeta = async (): Promise<PapayaMeta> => {
   // Attempt to fetch the meta document by its key
   const results = await db.find({
     selector: {
-      kind: 'zisk:meta',
+      kind: 'papaya:meta',
     },
   })
   if (results.docs.length > 0) {
-    return results.docs[0] as unknown as ZiskMeta
+    return results.docs[0] as unknown as PapayaMeta
   }
 
-  const meta: ZiskMeta = { ...makeDefaultZiskMeta() }
+  const meta: PapayaMeta = { ...makeDefaultPapayaMeta() }
   await db.put(meta)
   return meta
 }
@@ -104,7 +104,7 @@ export const getOrCreateZiskMeta = async (): Promise<ZiskMeta> => {
 export const getJournals = async (): Promise<Record<string, Journal>> => {
   const result = await db.find({
     selector: {
-      kind: 'zisk:journal',
+      kind: 'papaya:journal',
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })
@@ -115,7 +115,7 @@ export const getJournals = async (): Promise<Record<string, Journal>> => {
 export const getArtifacts = async (journalId: string): Promise<Record<string, EntryArtifact>> => {
   const result = await db.find({
     selector: {
-      $and: [{ kind: 'zisk:artifact' }, { journalId }],
+      $and: [{ kind: 'papaya:artifact' }, { journalId }],
     },
     limit: ARBITRARY_MAX_FIND_LIMIT,
   })

@@ -1,13 +1,13 @@
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { createContext } from 'react'
 
-export interface ZiskContext {
-  ziskMeta: ZiskMeta | null
+export interface PapayaContext {
+  papayaMeta: PapayaMeta | null
   updateSettings: (settings: Partial<UserSettings>) => Promise<void>
 }
 
-export const ZiskContext = createContext<ZiskContext>({
-  ziskMeta: null,
+export const PapayaContext = createContext<PapayaContext>({
+  papayaMeta: null,
   updateSettings: () => Promise.resolve(),
 })

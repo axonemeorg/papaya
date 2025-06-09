@@ -3,7 +3,7 @@ import { Model } from '@/schema/support/orm/Model'
 import { z } from 'zod'
 
 const [CreateBaseFigure, BaseFigure] = Model.fromSchema({
-  kind: z.literal('zisk:figure'),
+  kind: z.literal('papaya:figure'),
   currency: Currency,
   amount: z.number(),
 })

@@ -2,7 +2,7 @@ import z from 'zod'
 import { Model } from '../support/orm/Model'
 
 export const [CreateQuickJournalEntry, QuickJournalEntry] = Model.fromSchema({
-  kind: z.literal('zisk:quickentry'),
+  kind: z.literal('papaya:quickentry'),
   amount: z.string(),
   memo: z.string().optional(),
   categoryId: z.string().optional(),

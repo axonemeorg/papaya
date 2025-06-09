@@ -11,7 +11,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@/': `${path.resolve(__dirname, 'src/zisk')}/`
+      '@/': `${path.resolve(__dirname, 'src/papaya')}/`
     }
   },
   // root: path.resolve('./src/web'),

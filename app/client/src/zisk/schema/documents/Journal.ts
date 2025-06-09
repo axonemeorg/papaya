@@ -5,7 +5,7 @@ import { Mixin } from '@/schema/support/orm/Mixin'
 
 export const [CreateJournal, Journal] = Document.fromSchemas([
   {
-    kind: z.literal('zisk:journal'),
+    kind: z.literal('papaya:journal'),
     journalName: z.string(),
     description: z.string().optional(),
     avatar: Avatar,

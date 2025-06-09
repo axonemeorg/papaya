@@ -1,5 +1,5 @@
 import { v6 as uuidv6 } from 'uuid'
 
-export const generateGenericZiskUniqueId = () => {
+export const generateGenericPapayaUniqueId = () => {
   return uuidv6()
 }

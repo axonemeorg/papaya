@@ -24,7 +24,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": [
-        "./src/zisk/*"
+        "./src/papaya/*"
       ],
     }
   },

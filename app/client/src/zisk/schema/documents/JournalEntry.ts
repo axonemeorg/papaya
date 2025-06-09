@@ -11,7 +11,7 @@ import { FigureEnumeration } from '../support/figure'
 
 const [CreateJournalEntry, BaseJournalEntry] = Document.fromSchemas([
   {
-    kind: z.literal('zisk:entry'),
+    kind: z.literal('papaya:entry'),
     ...Mixin.intrinsic.natural.$ephemeral({
       amount: z.string(),
     }),

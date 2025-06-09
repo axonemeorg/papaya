@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export type KindTemplate = `zisk:${string}`
+export type KindTemplate = `papaya:${string}`
 
 export type KindShape<Kind extends KindTemplate> = {
   kind: z.ZodLiteral<Kind>

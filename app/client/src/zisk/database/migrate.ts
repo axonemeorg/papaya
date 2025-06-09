@@ -1,7 +1,7 @@
 // import { Journal } from "@/schema/documents/Journal";
-// import { ZiskDocument } from "@/schema/union/ZiskDocument";
+// import { PapayaDocument } from "@/schema/union/PapayaDocument";
 
-// export type MigrationRun = (records: ZiskDocument[]) => Promise<[Journal, ...ZiskDocument[]]>
+// export type MigrationRun = (records: PapayaDocument[]) => Promise<[Journal, ...PapayaDocument[]]>
 
 // enum JournalVersion {
 //     REPLACE_CATEGORY_IDS,
@@ -23,8 +23,8 @@
 //     }
 
 //     private static initialMigration: MigrationRun = async (records) => {
-//         return records.reduce((acc: ZiskDocument[], record: ZiskDocument) => {
-//             if (record.kind === 'zisk:journal') {
+//         return records.reduce((acc: PapayaDocument[], record: PapayaDocument) => {
+//             if (record.kind === 'papaya:journal') {
 //                 if (!record.journalVersion || typeof record.journalVersion !== 'string') {
 //                     record.journalVersion = JournalVersion.INITIAL_VERSION
 //                 }
@@ -32,7 +32,7 @@
 //             }
 //             acc.push(record)
 //             return acc
-//         }, []) as [Journal, ...ZiskDocument[]]
+//         }, []) as [Journal, ...PapayaDocument[]]
 //     }
 
 //     public static migrate: MigrationRun = async (records) => {

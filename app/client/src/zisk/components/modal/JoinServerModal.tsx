@@ -1,7 +1,7 @@
 import { NotificationsContext } from "@/contexts/NotificationsContext";
-import { ZiskContext } from "@/contexts/ZiskContext";
+import { PapayaContext } from "@/contexts/PapayaContext";
 import { useDebounce } from "@/hooks/useDebounce";
-import { ZiskServer } from "@/schema/models/ZiskServer";
+import { PapayaServer } from "@/schema/models/PapayaServer";
 import { ServerSyncStrategy } from "@/schema/support/syncing";
 import { usernameToDbName } from "@/utils/database";
 import { parseServerUrl } from "@/utils/server";
@@ -33,14 +33,14 @@ const INITIAL_SERVER_URL = ''
 export default function JoinServerModal(props: JoinServerModalProps) {
   const [serverUrl, setServerUrl] = useState<string>(INITIAL_SERVER_URL)
   const [parsedServerUrl, setParsedServerUrl] = useState<string | null>(null)
-  const [serverCheckLookup, setServerCheckLookup] = useState<Record<string, ZiskServer | null>>({})
+  const [serverCheckLookup, setServerCheckLookup] = useState<Record<string, PapayaServer | null>>({})
   const [loggingIn, setLoggingIn] = useState<boolean>(false)
   const [loginFailed, setLoginFailed] = useState<boolean>(false)
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
   const { snackbar } = useContext(NotificationsContext)
-  const ziskContext = useContext(ZiskContext)
+  const papayaContext = useContext(PapayaContext)
 
   const handleCheckLogin = async () => {
     setLoggingIn(true)
@@ -86,8 +86,8 @@ export default function JoinServerModal(props: JoinServerModalProps) {
       return
     }
 
-    const server: ZiskServer = {
-      kind: 'zisk:server',
+    const server: PapayaServer = {
+      kind: 'papaya:server',
       displayName: jsonData.serverName as string,
       managedBy: null,
       url: parsedServerUrl
@@ -103,7 +103,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
       }
     }
 
-    await ziskContext.updateSettings({
+    await papayaContext.updateSettings({
       syncStrategy,
     })
     props.onClose()
@@ -121,7 +121,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
     try {
       const response = await fetch(healthCheckUrl)
       jsonData = await response.json()
-      healthCheckOk = Object.entries(jsonData).some(([key, value]) => key === 'zisk' && Boolean(value))
+      healthCheckOk = Object.entries(jsonData).some(([key, value]) => key === 'papaya' && Boolean(value))
     } catch {
       healthCheckOk = false
     }
@@ -130,7 +130,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
       const next = { ...prev }
       next[url] = healthCheckOk
         ? {
-          kind: 'zisk:server',
+          kind: 'papaya:server',
           url,
           displayName: jsonData?.serverName as string,
           managedBy: null,
@@ -162,7 +162,7 @@ export default function JoinServerModal(props: JoinServerModalProps) {
     debouncedCheckServer(url)
   }
 
-  const server: ZiskServer | null | undefined = parsedServerUrl ? serverCheckLookup[parsedServerUrl] : undefined
+  const server: PapayaServer | null | undefined = parsedServerUrl ? serverCheckLookup[parsedServerUrl] : undefined
 
   const healthCheck: 'PENDING' | 'OK' | 'FAIL' = useMemo(() => {
     if (!parsedServerUrl) {

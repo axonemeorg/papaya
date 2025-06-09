@@ -4,7 +4,7 @@ import { Mixin } from '../support/orm/Mixin'
 
 export const [CreateEntryTag, EntryTag] = Document.fromSchemas([
   {
-    kind: z.literal('zisk:tag'),
+    kind: z.literal('papaya:tag'),
     label: z.string(),
     description: z.string(),
   },

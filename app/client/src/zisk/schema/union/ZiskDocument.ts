@@ -5,15 +5,15 @@ import { EntryArtifact } from '../documents/EntryArtifact'
 import { EntryTag } from '../documents/EntryTag'
 import { Journal } from '../documents/Journal'
 import { JournalEntry } from '../documents/JournalEntry'
-import { ZiskMeta } from '../documents/ZiskMeta'
+import { PapayaMeta } from '../documents/PapayaMeta'
 
-export const ZiskDocument = z.discriminatedUnion('kind', [
+export const PapayaDocument = z.discriminatedUnion('kind', [
   Account,
   Category,
   EntryArtifact,
   EntryTag,
   Journal,
   JournalEntry,
-  ZiskMeta,
+  PapayaMeta,
 ])
-export type ZiskDocument = z.infer<typeof ZiskDocument>
+export type PapayaDocument = z.infer<typeof PapayaDocument>

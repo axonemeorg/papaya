@@ -1,6 +1,6 @@
 import { AuthStatusEnum, OnlineStatusEnum, RemoteContext, SyncErrorEnum, SyncStatusEnum } from '@/contexts/RemoteContext'
 import { getDatabaseClient } from '@/database/client'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
+import { usePapayaMeta } from '@/hooks/queries/usePapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { ServerSyncStrategy } from '@/schema/support/syncing'
 import { getSyncStrategy } from '@/utils/server'
@@ -17,9 +17,9 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
   const remoteDb = useRef<PouchDB.Database | null>(null)
   const remoteDbSyncHandler = useRef<PouchDB.Replication.Sync<{}> | null>(null)
 
-  const getZiskMetaQuery = useZiskMeta()
+  const getPapayaMetaQuery = usePapayaMeta()
 
-  const settings: UserSettings | null = getZiskMetaQuery.data?.userSettings ?? null
+  const settings: UserSettings | null = getPapayaMetaQuery.data?.userSettings ?? null
 
   const syncStrategy = getSyncStrategy(settings);
   const { syncType } = syncStrategy

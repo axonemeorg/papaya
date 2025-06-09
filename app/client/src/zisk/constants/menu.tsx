@@ -40,7 +40,7 @@ export const APP_MENU: Record<string, NavMenuItem> = {
   '/settings': {
     icon: <Settings fontSize="small" />,
     label: 'Settings',
-    description: 'Manage journals and edit Zisk settings',
+    description: 'Manage journals and edit Papaya settings',
     pathPattern: /\/settings(\/.*)?$/,
   },
 }

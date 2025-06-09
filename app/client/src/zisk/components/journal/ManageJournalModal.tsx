@@ -43,7 +43,7 @@ interface ManageJournalModalProps {
 }
 
 const JOURNAL_TYPE_LABEL_MAP = {
-  'zisk:journal': 'Zisk Journal',
+  'papaya:journal': 'Papaya Journal',
 }
 
 function JournalDetailsAndActivity(props: JournalDetailsAndActivityProps) {

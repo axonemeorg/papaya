@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Path to the YAML configuration file
-CONFIG_FILE="/etc/zisk/config.yaml"
+CONFIG_FILE="/etc/papaya/config.yaml"
 
-# Create directory for zisk config if it doesn't exist
-mkdir -p /etc/zisk
+# Create directory for papaya config if it doesn't exist
+mkdir -p /etc/papaya
 
 # Function to extract values from YAML using yq
 get_yaml_value() {
@@ -13,15 +13,15 @@ get_yaml_value() {
 }
 
 # Extract configuration values
-ZISK_COUCHDB_ADMIN_USER=$(get_yaml_value "couchdb.admin_user")
-ZISK_COUCHDB_ADMIN_PASS=$(get_yaml_value "couchdb.admin_pass")
+PAPAYA_COUCHDB_ADMIN_USER=$(get_yaml_value "couchdb.admin_user")
+PAPAYA_COUCHDB_ADMIN_PASS=$(get_yaml_value "couchdb.admin_pass")
 AUTH_ACCESS_TOKEN_SECRET=$(get_yaml_value "auth.access_token_secret")
 AUTH_ACCESS_TOKEN_HMAC_KID=$(get_yaml_value "auth.access_token_hmac_kid")
 
-INI_FILE="/opt/couchdb/etc/default.d/zisk.ini"
+INI_FILE="/opt/couchdb/etc/default.d/papaya.ini"
 
 # Add admins section
-echo -e "\n[admins]\n${ZISK_COUCHDB_ADMIN_USER} = ${ZISK_COUCHDB_ADMIN_PASS}" >> "$INI_FILE"
+echo -e "\n[admins]\n${PAPAYA_COUCHDB_ADMIN_USER} = ${PAPAYA_COUCHDB_ADMIN_PASS}" >> "$INI_FILE"
 
 # Encode the JWT secret
 ENCODED_SECRET=$(echo -n "$AUTH_ACCESS_TOKEN_SECRET" | base64)

@@ -1,10 +1,10 @@
-import { ZiskMeta } from '@/schema/documents/ZiskMeta'
+import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
-import { generateGenericZiskUniqueId } from './id'
+import { generateGenericPapayaUniqueId } from './id'
 
 export const makeDefaultUserSettings = (): UserSettings => {
   return {
-    kind: 'zisk:usersettings',
+    kind: 'papaya:usersettings',
     appearance: {
       menuExpanded: true,
     },
@@ -14,10 +14,10 @@ export const makeDefaultUserSettings = (): UserSettings => {
   }
 }
 
-export const makeDefaultZiskMeta = (): ZiskMeta => {
+export const makeDefaultPapayaMeta = (): PapayaMeta => {
   return {
-    kind: 'zisk:meta',
-    _id: generateGenericZiskUniqueId(),
+    kind: 'papaya:meta',
+    _id: generateGenericPapayaUniqueId(),
     activeJournalId: null,
     userSettings: makeDefaultUserSettings(),
     createdAt: new Date().toISOString(),

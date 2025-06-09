@@ -1,5 +1,5 @@
 import z from "zod";
-import { ZiskServer } from "../models/ZiskServer";
+import { PapayaServer } from "../models/PapayaServer";
 
 /**
  * Fallback sync strategys
@@ -16,7 +16,7 @@ export type LocalSyncStrategy = z.output<typeof LocalSyncStrategy>
 
 export const ServerSyncStrategy = z.object({
   syncType: z.literal('SERVER'),
-  server: ZiskServer,
+  server: PapayaServer,
   connection: z.object({
     username: z.string(),
     couchDbUrl: z.string(),

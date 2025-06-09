@@ -5,7 +5,7 @@ import { getDatabaseClient } from '@/database/client'
 
 import { updateActiveJournal } from '@/database/actions'
 import { useJournals } from '@/hooks/queries/useJournals'
-import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
+import { usePapayaMeta } from '@/hooks/queries/usePapayaMeta'
 import { useJournalSelectorStatus, useSetJournalSelectorStatus } from '@/store/app/useJournalSelectorState'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
@@ -38,26 +38,26 @@ export default function JournalContextProvider(props: PropsWithChildren) {
   }
 
   const getJournalsQuery = useJournals()
-  const getZiskMetaQuery = useZiskMeta()
+  const getPapayaMetaQuery = usePapayaMeta()
 
   useEffect(() => {
     if (hasLoadedInitialActiveJournal) {
       return
     }
-    if (!getZiskMetaQuery.isFetched) {
+    if (!getPapayaMetaQuery.isFetched) {
       return
     }
-    if (!getZiskMetaQuery.data?.activeJournalId) {
-      // No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one
+    if (!getPapayaMetaQuery.data?.activeJournalId) {
+      // No active journal is set or active journaland papayaMeta active journal do not agree; prompt user to select one
       console.log(
-        'No active journal is set or active journaland ziskMeta active journal do not agree; prompt user to select one',
+        'No active journal is set or active journaland papayaMeta active journal do not agree; prompt user to select one',
       )
       setJournalSelectorStatus('SELECTING')
     } else {
-      setActiveJournalId(getZiskMetaQuery.data?.activeJournalId)
+      setActiveJournalId(getPapayaMetaQuery.data?.activeJournalId)
     }
     setHasLoadedInitialActiveJournal(true)
-  }, [getJournalsQuery.isFetched, getZiskMetaQuery.isFetched, hasLoadedInitialActiveJournal])
+  }, [getJournalsQuery.isFetched, getPapayaMetaQuery.isFetched, hasLoadedInitialActiveJournal])
 
   // useEffect(() => {
   // 	 else if (!getJournalsQuery.isFetched) {
@@ -67,7 +67,7 @@ export default function JournalContextProvider(props: PropsWithChildren) {
   // 		return
   // 	} else
   // 	setJournalSelectorStatus('SELECTING')
-  // }, [hasLoadedInitialActiveJournal, ziskMeta, journalContext.activeJournalId])
+  // }, [hasLoadedInitialActiveJournal, papayaMeta, journalContext.activeJournalId])
 
   return (
     <JournalContext.Provider
