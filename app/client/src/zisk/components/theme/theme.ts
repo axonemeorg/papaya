@@ -1,5 +1,6 @@
 // import { montserrat } from '@/fonts/montserrat'
 import { createTheme } from '@mui/material'
+import { lightGreen } from '@mui/material/colors'
 
 /**
  * The MUI app theme, which is consumed by the MUI ThemeProvider component.
@@ -7,9 +8,7 @@ import { createTheme } from '@mui/material'
 const appTheme = createTheme({
   palette: {
     mode: 'dark',
-    // primary:{
-    //     main: 'rgb(251, 202, 4)'
-    // }
+    primary: lightGreen,
 
     // forestGreen: {
     // 	main: green[700],  // Dark green

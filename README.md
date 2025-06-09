@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./app/public/images/logo/logo-w.svg">
-  <img width="250px" alt="Zisk logo" src="./app/public/images/logo/logo-b.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./app/client/public/images/papaya/papaya-dark.png">
+  <img width="250px" alt="Zisk logo" src="./app/client/public/images/papaya/papaya-light.png">
 </picture>
 
 The open-source, local-first personal finance app.
