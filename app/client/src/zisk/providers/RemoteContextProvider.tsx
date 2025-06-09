@@ -4,6 +4,7 @@ import { useZiskMeta } from '@/hooks/queries/useZiskMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
 import { ServerSyncStrategy } from '@/schema/support/syncing'
 import { getSyncStrategy } from '@/utils/server'
+import { getSyncInidication, SyncIndication } from '@/utils/syncing'
 import PouchDB from 'pouchdb'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -71,7 +72,7 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
     if (syncType === 'SERVER') {
       setAuthStatus(AuthStatusEnum.AUTHENTICATING)
       const { connection } = syncStrategy
-      const response = await fetch(`${connection.databaseUrl}/_session`, {
+      const response = await fetch(`${connection.couchDbUrl}/_session`, {
         method: 'GET',
         credentials: 'include',
       })
@@ -102,12 +103,14 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
     setSyncStatus(SyncStatusEnum.IDLE)
 
     const { connection } = serverSyncStrategy
-    remoteDb.current = new PouchDB(connection.databaseUrl)
+    const databaseUrl = `${connection.couchDbUrl}/${connection.databaseName}`
+    console.log('Creating connection to couch DB database:', databaseUrl)
+    remoteDb.current = new PouchDB(databaseUrl)
     const db = getDatabaseClient()
     remoteDbSyncHandler.current = db
       .sync(remoteDb.current, {
         live: true,
-        retry: true
+        retry: false,
       })
       .on('change', function (_change) {
         setSyncStatus(SyncStatusEnum.IDLE)
@@ -129,20 +132,42 @@ export default function RemoteContextProvider(props: PropsWithChildren) {
       })
   }
 
-  const syncEnabled: boolean = useMemo(() => {
+  const sync = async (): Promise<void> => {
+    if (!remoteDb.current) {
+      console.log('No remote database found, skipping sync')
+      return
+    }
+    const db = getDatabaseClient()
+    db.sync(remoteDb.current)
+  }
+
+  const syncIndication: SyncIndication = useMemo(() => {
+    return getSyncInidication({ authStatus, syncStatus, onlineStatus, syncStrategy })
+  }, [authStatus, syncStatus, onlineStatus, syncStrategy])
+
+  const syncSupported: boolean = useMemo(() => {
     return [
       syncType === 'SERVER',
-      authStatus !== AuthStatusEnum.UNAUTHENTICATED,
-      onlineStatus === OnlineStatusEnum.ONLINE
     ].every(Boolean)
-  }, [syncType, onlineStatus])
+  }, [syncType])
+
+  const syncDisabled: boolean = useMemo(() => {
+    return [
+      !syncSupported,
+      authStatus !== AuthStatusEnum.AUTHENTICATED,
+      onlineStatus !== OnlineStatusEnum.ONLINE
+    ].some(Boolean)
+  }, [authStatus, onlineStatus, syncSupported])
 
   const remoteContext: RemoteContext = {
     // syncError,
     syncStatus,
     authStatus,
     onlineStatus,
-    syncEnabled,
+    syncSupported,
+    syncDisabled,
+    syncIndication,
+    sync,
   }
 
   return <RemoteContext.Provider value={remoteContext}>{props.children}</RemoteContext.Provider>

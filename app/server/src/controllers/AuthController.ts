@@ -64,20 +64,26 @@ export default class AuthController extends Controller {
    * @returns A promise that resolves when the token has been invalidated
    */
   public async invalidateRefreshToken(refreshToken: string): Promise<void> {
-    const user = await this.findUserByRefreshToken(refreshToken);
+    try {
+      const user = await this.findUserByRefreshToken(refreshToken);
 
-    if (!user) {
-      return;
+      if (!user) {
+        return;
+      }
+
+      // Filter out the token to be invalidated
+      const updatedTokens = (user.refreshTokens || []).filter(token => token !== refreshToken);
+
+      // Update the user document with the new tokens array
+      const update = {
+        ...user,
+        refreshTokens: updatedTokens,
+      } as CouchDBUserDocument
+      await this.couch.db.use('_users').insert(update, user._id);
+    } catch (error) {
+      console.error("Failed to invalidate single refresh token.")
+      throw error;
     }
-
-    // Filter out the token to be invalidated
-    const updatedTokens = (user.refreshTokens || []).filter(token => token !== refreshToken);
-
-    // Update the user document with the new tokens array
-    await this.couch.db.use('_users').insert({
-      ...user,
-      refreshTokens: updatedTokens
-    } as CouchDBUserDocument, user._id);
   }
 
   /**
@@ -96,12 +102,13 @@ export default class AuthController extends Controller {
       }
 
       // Update the user document to clear all refresh tokens
-      await this.couch.db.use('_users').insert({
+      const update = {
         ...user,
-        refreshTokens: []
-      } as CouchDBUserDocument, user._id);
+        refreshTokens: [],
+      } as CouchDBUserDocument;
+      await this.couch.db.use('_users').insert(update, user._id);
     } catch (error) {
-      console.error(`Failed to invalidate tokens for user ${name}:`, error);
+      console.error(`Failed to invalidate all refresh tokens for user ${name}:`, error);
       throw error;
     }
   }
@@ -135,10 +142,11 @@ export default class AuthController extends Controller {
       refreshTokens.push(refreshToken);
 
       // Update the user document
-      await this.couch.db.use('_users').insert({
+      const update = {
         ...user,
-        refreshTokens: refreshTokens
-      } as CouchDBUserDocument, user._id);
+        refreshTokens,
+      } as CouchDBUserDocument
+      await this.couch.db.use('_users').insert(update, user._id);
 
       return refreshToken;
     } catch (error) {
@@ -172,44 +180,74 @@ export default class AuthController extends Controller {
    * This implements a sliding window refresh token strategy with token reuse detection.
    * 
    * @param token The refresh token to rotate
-   * @returns A new refresh token if successful, or null if token reuse is detected
+   * @param user The user record containing the refresh token (optional)
+   * @returns An object containing the new refresh token if successful and the updated user record, or null if token reuse is detected
    */
-  public async rotateRefreshToken(token: string): Promise<string | null> {
-    const userForRefreshToken = await this.findUserByRefreshToken(token)
-    const refreshTokenClaims = await this.decodeRefreshToken(token);
-    if (!userForRefreshToken) {
-      // Reuse detected
-      this.invalidateAllRefreshTokensForUser(refreshTokenClaims.name)
-      return null
-    }
+  public async rotateRefreshToken(token: string, user: CouchDBUserDocument | null = null): Promise<{ newToken: string, updatedUser: CouchDBUserDocument } | null> {
+    try {
+      // If user is not provided, find the user by refresh token
+      const userForRefreshToken = user || await this.findUserByRefreshToken(token);
+      const refreshTokenClaims = await this.decodeRefreshToken(token);
 
-    await this.invalidateRefreshToken(token);
-    return this.createRefreshTokenForUser(refreshTokenClaims.name)
+      if (!userForRefreshToken) {
+        // Reuse detected
+        console.log('Token reuse detected.');
+        if (refreshTokenClaims?.name) {
+          this.invalidateAllRefreshTokensForUser(refreshTokenClaims.name);
+        }
+        return null;
+      }
+
+      // Remove the old token from the user's refreshTokens array
+      const updatedTokens = (userForRefreshToken.refreshTokens || []).filter(t => t !== token);
+
+      // Create a new refresh token
+      const newToken = jwt.sign(
+        { name: userForRefreshToken.name } as RefreshTokenClaims,
+        AUTH_REFRESH_TOKEN_SECRET() as jwt.Secret,
+        { expiresIn: REFRESH_EXPIRATION_SECONDS }
+      );
+
+      // Add the new token to the user's refreshTokens array
+      updatedTokens.push(newToken);
+
+      // Create the updated user record
+      const updatedUser = {
+        ...userForRefreshToken,
+        refreshTokens: updatedTokens,
+      } as CouchDBUserDocument;
+
+      return { newToken, updatedUser };
+    } catch (error) {
+      console.error('Failed to rotate refresh token.');
+      throw error;
+    }
   }
 
   /**
    * Creates a new access token based on a valid refresh token.
    * 
    * @param refreshToken The refresh token to use for creating the access token
+   * @param user The user record to use for creating the access token (optional)
    * @returns The newly created access token
    * @throws Error if the refresh token is invalid or the user cannot be found
    */
-  public async createAccessTokenFromRefreshToken(refreshToken: string): Promise<string> {
+  public async createAccessTokenFromRefreshToken(refreshToken: string, user: CouchDBUserDocument | null = null): Promise<string> {
     try {
       // Decode the refresh token to get the user's name
       const refreshTokenClaims = await this.decodeRefreshToken(refreshToken);
 
-      // Find the user to get their roles using UserController
-      const user = await this.userController.getUserByName(refreshTokenClaims.name);
+      // If user is not provided, find the user
+      const userRecord = user || await this.userController.getUserByName(refreshTokenClaims.name);
 
-      if (!user) {
+      if (!userRecord) {
         throw new Error(`User ${refreshTokenClaims.name} not found`);
       }
 
       // Create user claims for the access token
       const userClaims: UserClaims = {
         name: refreshTokenClaims.name,
-        roles: user.roles || []
+        roles: userRecord.roles || []
       };
 
       // Sign and return the access token
@@ -225,6 +263,21 @@ export default class AuthController extends Controller {
       );
     } catch (error) {
       console.error('Failed to create access token from refresh token:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates a user record in the database.
+   * 
+   * @param user The user record to update
+   * @returns A promise that resolves when the user record has been updated
+   */
+  public async updateUserRecord(user: CouchDBUserDocument): Promise<void> {
+    try {
+      await this.couch.db.use('_users').insert(user, user._id);
+    } catch (error) {
+      console.error('Failed to update user record:', error);
       throw error;
     }
   }

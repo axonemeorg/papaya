@@ -12,7 +12,7 @@ import { DateView } from '@/schema/support/search/facet'
 import { ZiskDocument } from '@/schema/union/ZiskDocument'
 import dayjs from 'dayjs'
 import { getNthWeekdayOfMonthFromDate } from './date'
-import { generateJournalEntryId, generateTaskId } from './id'
+import { generateGenericZiskUniqueId } from './id'
 
 /**
  * Strips optional fields from a JournalEntry object
@@ -76,7 +76,7 @@ export const calculateNetFigures = (entry: JournalEntry): FigureEnumeration => {
 
   return figures.reduce((acc: FigureEnumeration, figure: Figure) => {
     if (figure.currency in acc) {
-      ;(acc[figure.currency] as Figure).amount += figure.amount
+      ; (acc[figure.currency] as Figure).amount += figure.amount
     } else {
       acc[figure.currency] = {
         ...figure,
@@ -91,7 +91,7 @@ export const makeJournalEntry = (formData: Partial<CreateJournalEntry>, journalI
   const now = new Date().toISOString()
 
   const entry: JournalEntry = {
-    _id: formData._id ?? generateJournalEntryId(),
+    _id: formData._id ?? generateGenericZiskUniqueId(),
     kind: 'zisk:entry',
     createdAt: now,
     date: formData.date ?? dayjs(now).format('YYYY-MM-DD'),
@@ -132,7 +132,7 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
   const now = new Date().toISOString()
 
   const entryArtifact: EntryArtifact = {
-    _id: formData._id ?? generateTaskId(),
+    _id: formData._id ?? generateGenericZiskUniqueId(),
     kind: 'zisk:artifact',
     originalFileName: formData.originalFileName ?? '',
     contentType: formData.contentType ?? '',
@@ -146,7 +146,7 @@ export const makeEntryArtifact = (formData: CreateEntryArtifact, journalId: stri
 
 export const makeEntryTask = (formData: Partial<CreateEntryTask>): EntryTask => {
   const newTask: EntryTask = {
-    _id: formData._id ?? generateTaskId(),
+    _id: formData._id ?? generateGenericZiskUniqueId(),
     kind: 'zisk:task',
     memo: formData.memo ?? '',
     completedAt: formData.completedAt ?? null,
@@ -220,17 +220,17 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
 
   switch (frequency) {
     case CadenceFrequency.enum.D:
-      for (;;) {
+      for (; ;) {
         date = date.add(interval, 'days')
         yield date
       }
     case CadenceFrequency.enum.Y:
-      for (;;) {
+      for (; ;) {
         date = date.add(interval, 'years')
         yield date
       }
     case CadenceFrequency.enum.W:
-      for (;;) {
+      for (; ;) {
         const weekDates = getWeekDates(date.add(interval, 'weeks'))
         for (const i in cadence.days) {
           date = weekDates[cadence.days[i]]
@@ -239,7 +239,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
       }
     case CadenceFrequency.enum.M:
       if ('day' in cadence.on) {
-        for (;;) {
+        for (; ;) {
           date = date.startOf('month').add(interval, 'months')
           if (cadence.on.day <= date.daysInMonth()) {
             yield date.date(cadence.on.day)
@@ -250,7 +250,7 @@ function* generateDatesFromRecurringCadence(startDate: dayjs.Dayjs, cadence: Rec
         let month: dayjs.Dayjs = date.clone()
         let nthWeekday: dayjs.Dayjs | undefined
 
-        for (;;) {
+        for (; ;) {
           month = month.add(interval, 'months').startOf('month')
           nthWeekday = getNthWeekdayOfMonthFromDate(month, dayOfWeek, cadence.on.week)
           if (nthWeekday) {

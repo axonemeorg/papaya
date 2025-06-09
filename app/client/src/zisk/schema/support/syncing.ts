@@ -19,7 +19,8 @@ export const ServerSyncStrategy = z.object({
   server: ZiskServer,
   connection: z.object({
     username: z.string(),
-    databaseUrl: z.string(),
+    couchDbUrl: z.string(),
+    databaseName: z.string(),
   })
 })
 export type ServerSyncStrategy = z.output<typeof ServerSyncStrategy>
