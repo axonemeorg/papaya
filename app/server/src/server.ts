@@ -20,7 +20,7 @@ import { UserClaims } from './support/types'
 const configService = ConfigService.getInstance();
 
 // CORS
-const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.trypapaya.com', 'http://192.168.68.68:9475', 'http://192.168.68.68:9476'];
+const ALLOWED_ORIGINS = ['http://localhost:9475', 'https://app.papaya.axoneme.org', 'http://192.168.68.68:9475', 'http://192.168.68.68:9476'];
 const ENABLE_CORS = true
 
 // Token expiration times
