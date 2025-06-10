@@ -1,6 +1,9 @@
 # Stage 1: Setup CouchDB
 FROM couchdb:latest as database-build
 
+# Install gettext which provides envsubst
+RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
+
 # Copy and process CouchDB configuration
 COPY database/papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
 

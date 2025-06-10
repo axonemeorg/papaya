@@ -17,6 +17,16 @@ build: web-build server-build server-web-assets
 image:
 	DOCKER_BUILDKIT=1 docker build -t papaya -f Dockerfile.build .
 
+image-run: image
+	# Uses BuildKit to run the image detached, and pass all secrets from the .env file
+	DOCKER_BUILDKIT=1 docker run -d --env-file .env -p 9475:9475 --name papaya papaya
+
+image-stop:	
+	docker stop papaya
+
+image-clean: image-stop
+	docker rm papaya || true
+
 # Docker compose commands for development
 dev:
 	docker-compose -f docker/docker-compose.dev.yaml up -d --build
