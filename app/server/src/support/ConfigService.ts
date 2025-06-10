@@ -334,7 +334,6 @@ export const PAPAYA_COUCHDB_ADMIN_USER = (): string => ConfigService.getInstance
 export const PAPAYA_COUCHDB_ADMIN_PASS = (): string => ConfigService.getInstance().get<string>('couchdb.admin_pass');
 export const AUTH_REFRESH_TOKEN_SECRET = (): string => ConfigService.getInstance().get<string>('auth.refresh_token_secret');
 export const AUTH_ACCESS_TOKEN_SECRET = (): string => ConfigService.getInstance().get<string>('auth.access_token_secret');
-export const AUTH_ACCESS_TOKEN_HMAC_KID = (): string => ConfigService.getInstance().get<string>('auth.access_token_hmac_kid');
 export const PAPAYA_SERVER_PORT = (): number => ConfigService.getInstance().get<number>('server.port');
 export const SERVER_NAME = (): string => ConfigService.getInstance().get<string>('server.name');
 export const NODE_ENV = (): string | undefined => process.env.NODE_ENV;

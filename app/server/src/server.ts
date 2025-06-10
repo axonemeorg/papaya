@@ -7,7 +7,6 @@ import path from 'path'
 import AuthController from './controllers/AuthController.js'
 import ConfigController from './controllers/ConfigController.js'
 import ConfigService, {
-  AUTH_ACCESS_TOKEN_HMAC_KID,
   AUTH_ACCESS_TOKEN_SECRET,
   NODE_ENV,
   PAPAYA_COUCHDB_URL,
@@ -244,7 +243,7 @@ apiRouter.post("/login", async (req: Request, res: Response): Promise<void> => {
           expiresIn: JWT_EXPIRATION_SECONDS,
           subject: username,
           algorithm: 'HS256',
-          keyid: AUTH_ACCESS_TOKEN_HMAC_KID()
+          keyid: 'papaya'
         }
       );
 

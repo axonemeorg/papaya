@@ -1,6 +1,6 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { AUTH_ACCESS_TOKEN_HMAC_KID, AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, PAPAYA_COUCHDB_URL } from "../support/ConfigService.js";
+import { AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, PAPAYA_COUCHDB_URL } from "../support/ConfigService.js";
 import Controller from "../support/Controller.js";
 import { CouchDBUserDocument, Credentials, RefreshTokenClaims, SessionResponse, UserClaims } from "../support/types";
 import UserController from "./UserController.js";
@@ -258,7 +258,7 @@ export default class AuthController extends Controller {
           expiresIn: JWT_EXPIRATION_SECONDS,
           subject: refreshTokenClaims.name,
           algorithm: 'HS256',
-          keyid: AUTH_ACCESS_TOKEN_HMAC_KID()
+          keyid: 'papaya'
         }
       );
     } catch (error) {

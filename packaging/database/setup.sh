@@ -16,7 +16,6 @@ get_yaml_value() {
 PAPAYA_COUCHDB_ADMIN_USER=$(get_yaml_value "couchdb.admin_user")
 PAPAYA_COUCHDB_ADMIN_PASS=$(get_yaml_value "couchdb.admin_pass")
 AUTH_ACCESS_TOKEN_SECRET=$(get_yaml_value "auth.access_token_secret")
-AUTH_ACCESS_TOKEN_HMAC_KID=$(get_yaml_value "auth.access_token_hmac_kid")
 
 INI_FILE="/opt/couchdb/etc/default.d/papaya.ini"
 
@@ -27,6 +26,6 @@ echo -e "\n[admins]\n${PAPAYA_COUCHDB_ADMIN_USER} = ${PAPAYA_COUCHDB_ADMIN_PASS}
 ENCODED_SECRET=$(echo -n "$AUTH_ACCESS_TOKEN_SECRET" | base64)
 
 # Add JWT section
-echo -e "\n[jwt_keys]\nhmac:${AUTH_ACCESS_TOKEN_HMAC_KID} = ${ENCODED_SECRET}" >> "$INI_FILE"
+echo -e "\n[jwt_keys]\nhmac:papaya = ${ENCODED_SECRET}" >> "$INI_FILE"
 
 echo "CouchDB configuration completed successfully."
