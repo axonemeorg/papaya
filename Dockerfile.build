@@ -1,34 +1,34 @@
 # Stage 1: Setup CouchDB
-FROM couchdb:3.3 as couchdb-stage
+FROM couchdb:latest as database-build
 
 # Copy and process CouchDB configuration
-COPY papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
+COPY database/papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
 
 # Replace environment variables in the config file and copy to CouchDB
 RUN envsubst < /tmp/papaya.couchdb.ini.template > /opt/couchdb/etc/default.d/papaya.ini
 
-# Stage 2: Build the client
-FROM node:18-alpine as client-build
+# Stage 2: Build the web
+FROM node:20-alpine as web-build
 
-WORKDIR /app/client
-COPY papaya-web/package*.json ./
+WORKDIR /app/web
+COPY packages/papaya-web/package*.json ./
 RUN npm ci
 
-COPY papaya-web/ ./
+COPY packages/papaya-web/ ./
 RUN npm run build
 
 # Stage 3: Build the server and final image
-FROM node:18-alpine as server-build
+FROM node:20-alpine as server-build
 
 WORKDIR /app/server
-COPY papaya-server/package*.json ./
+COPY packages/papaya-server/package*.json ./
 RUN npm ci
 
-COPY papaya-server/ ./
+COPY packages/papaya-server/ ./
 RUN npm run build
 
 # Final stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -37,12 +37,12 @@ COPY --from=server-build /app/server/dist ./dist
 COPY --from=server-build /app/server/package*.json ./
 COPY --from=server-build /app/server/node_modules ./node_modules
 
-# Copy client build artifacts to web-assets
-COPY --from=client-build /app/client/dist ./web-assets
+# Copy web build artifacts to web-assets
+COPY --from=web-build /app/web/dist ./web-assets
 
 # Copy CouchDB setup from first stage
-COPY --from=couchdb-stage /opt/couchdb/etc/default.d/papaya.ini /opt/couchdb/etc/default.d/papaya.ini
+COPY --from=database-build /opt/couchdb/etc/default.d/papaya.ini /opt/couchdb/etc/default.d/papaya.ini
 
-EXPOSE 3000
+EXPOSE 9475
 
-CMD ["npm", "start"] 
+CMD ["npm", "run", "start"]

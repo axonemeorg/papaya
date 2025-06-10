@@ -4,7 +4,7 @@ FROM couchdb:latest
 RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
 
 # Copy the CouchDB configuration template
-COPY dev/database/papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
+COPY database/papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
 
 # Create a script to process the config at runtime
 RUN echo '#!/bin/bash\n\
