@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./app/client/public/images/papaya/papaya-dark.png">
-  <img width="250px" alt="Papaya logo" src="./app/client/public/images/papaya/papaya-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="./packages/papaya-web/public/images/papaya/papaya-dark.png">
+  <img width="250px" alt="Papaya logo" src="./packages/papaya-web/public/images/papaya/papaya-light.png">
 </picture>
 
 The open-source, local-first personal finance app.
@@ -11,76 +11,177 @@ The open-source, local-first personal finance app.
 
 This is the mono-repo source for services used to run Papaya.
 
-## Services
+## ?? Overview
 
-### Client
-This is the web frontend for Papaya. Core dependencies include:
- - PouchDB
- - React
- - Material-UI
- - Emotion
- - Tanstack Router
- - Tanstack Query
- - React-Hook-Form
- - Zod
- - Zustand
+Papaya is a modern, local-first personal finance application built with privacy and user control in mind. It leverages CouchDB's robust synchronization capabilities to provide seamless data access across devices while keeping your financial data under your control.
 
-Please see `app/client/README.md` for more info.
+### Key Features
 
-### Server
+- ?? **Privacy-First**: Your data stays local and syncs only with your chosen CouchDB instance
+- ?? **Local-First Architecture**: Works offline, syncs when online
+- ?? **Modern UI**: Built with React and Material-UI for a sleek, responsive experience
+- ?? **Secure Authentication**: JWT-based authentication with CouchDB integration
+- ?? **Multi-Device Sync**: Seamless synchronization across all your devices
+- ??? **Developer-Friendly**: Open source with a modular architecture
 
-This is the server for hosting Papaya. It serves a backend API and the app frontend, as well as a proxy to your CouchDB instance.
+## ??? Architecture
 
-Please see `app/server/README.md` for more info.
+Papaya consists of four main packages:
 
-## Configuration
+```
+papaya/
+??? packages/
+?   ??? papaya-web/       # React frontend application
+?   ??? papaya-server/    # Node.js backend API server
+?   ??? papaya-docs/      # Next.js documentation site
+?   ??? papaya-shortcut/  # Quick access landing page
+```
 
-Papaya uses a YAML-based configuration system. Configuration files are stored in the `/config` directory:
+### Technology Stack
 
-- `default.yaml`: Default configuration values
-- `local.yaml`: Local development overrides (gitignored)
-- `docker.yaml`: Docker-specific configuration
+**Frontend (papaya-web):**
+- React 19 with TypeScript
+- Material-UI v7 for components
+- TanStack Router for routing
+- TanStack Query for data fetching
+- PouchDB for local data storage
+- Zustand for state management
+- React Hook Form + Zod for form validation
 
-See `config/README.md` for more details on the configuration system.
+**Backend (papaya-server):**
+- Node.js with Express
+- CouchDB integration via Nano
+- JWT authentication
+- TypeScript
+- CORS and proxy middleware
 
-## Docker Setup
+**Database:**
+- CouchDB with `couch_peruser` feature
+- Database-per-user architecture
+- Built-in replication and sync
 
-Papaya can be run using Docker containers for both the web server and CouchDB database. The containers are configured using the YAML configuration files.
+## ?? Quick Start
 
-### Setup
+### Prerequisites
 
-1. Review and modify the configuration files in the `/config` directory as needed:
+- Node.js 18+ and npm
+- CouchDB instance (local or remote)
+- Docker (optional, for containerized deployment)
+
+### Development Setup
+
+1. **Clone the repository**
    ```bash
-   # For local development
-   cp config/default.yaml config/local.yaml
-   # Edit config/local.yaml with your settings
+   git clone https://github.com/your-org/papaya.git
+   cd papaya
    ```
 
-### Container Management
+2. **Install dependencies**
+   ```bash
+   make install
+   ```
 
-#### Database Container
+3. **Start CouchDB**
+   ```bash
+   # Option 1: Using Docker
+   make docker-dev
+   
+   # Option 2: Local CouchDB instance
+   # Make sure CouchDB is running on localhost:5984
+   ```
 
-- `make db` - Build and run the CouchDB container
-- `make db-stop` - Stop the CouchDB container
-- `make db-clean` - Clean up the CouchDB container and image
-- `make logs-db` - View CouchDB logs
+4. **Start development servers**
+   ```bash
+   # Terminal 1: Start the backend
+   make dev-server
+   
+   # Terminal 2: Start the frontend
+   make dev-client
+   ```
 
-The CouchDB container will be accessible at the port specified in your configuration (default: 5984).
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:3000
+   - CouchDB Admin: http://localhost:5984/_utils
 
-#### Web Server Container
+### Production Deployment
 
-- `make app` - Build and run the web server container
-- `make app-stop` - Stop the web server container
-- `make app-clean` - Clean up the web server container and image
+#### Docker (Recommended)
 
-The web server container will use the configuration from the YAML files, including the CouchDB connection details.
+```bash
+# Build production image
+make docker-build-prod
 
-## Administration
+# Run with Docker Compose
+make docker-dev-detached
+```
 
-Papaya provides a set of API endpoints for configuration management:
+#### Manual Deployment
 
-- `GET /api/admin/config`: Get the current configuration
-- `PUT /api/admin/config`: Update the configuration
-- `POST /api/admin/restart`: Restart the server
+```bash
+# Build all packages
+make build
 
-These endpoints require authentication and the `papaya:admin` role. See `config/README.md` for details on how to add this role to a user.
+# Deploy server package
+cd packages/papaya-server
+npm start
+```
+
+## ?? Documentation
+
+- **[Web App Documentation](./packages/papaya-web/README.md)** - Frontend development guide
+- **[Server Documentation](./packages/papaya-server/README.md)** - Backend API and configuration
+- **[Documentation Site](./packages/papaya-docs/README.md)** - User and developer docs
+- **[Quick Access](./packages/papaya-shortcut/README.md)** - Landing page service
+
+## ??? Development
+
+### Available Commands
+
+```bash
+# Development
+make dev-client          # Start frontend dev server
+make dev-server          # Start backend dev server
+
+# Building
+make build              # Build all packages
+make web-build          # Build web package only
+make build-server       # Build server package only
+
+# Docker
+make docker-dev         # Start development environment
+make docker-stop        # Stop Docker services
+make docker-clean       # Clean up Docker resources
+
+# Maintenance
+make clean              # Clean all build artifacts
+make install            # Install all dependencies
+```
+
+### Project Structure
+
+```
+papaya/
+??? packages/
+?   ??? papaya-web/           # Frontend React application
+?   ?   ??? src/             # Source code
+?   ?   ??? public/          # Static assets
+?   ?   ??? dist/            # Built assets
+?   ??? papaya-server/       # Backend Express server
+?   ?   ??? src/             # Source code
+?   ?   ??? web-assets/      # Frontend assets for serving
+?   ?   ??? dist/            # Compiled JavaScript
+?   ??? papaya-docs/         # Documentation site (Next.js)
+?   ??? papaya-shortcut/     # Landing page (Next.js)
+??? docker/                  # Docker configuration
+??? Makefile                 # Build automation
+??? README.md               # This file
+```
+
+## ?? Configuration
+
+Papaya uses a flexible YAML-based configuration system. See the [server documentation](./packages/papaya-server/README.md) for detailed configuration options.
+
+## ?? Contributing
+
+https://axoneme.org/contributing
