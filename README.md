@@ -11,30 +11,30 @@ The open-source, local-first personal finance app.
 
 This is the mono-repo source for services used to run Papaya.
 
-## ?? Overview
+## 🌟 Overview
 
 Papaya is a modern, local-first personal finance application built with privacy and user control in mind. It leverages CouchDB's robust synchronization capabilities to provide seamless data access across devices while keeping your financial data under your control.
 
 ### Key Features
 
-- ?? **Privacy-First**: Your data stays local and syncs only with your chosen CouchDB instance
-- ?? **Local-First Architecture**: Works offline, syncs when online
-- ?? **Modern UI**: Built with React and Material-UI for a sleek, responsive experience
-- ?? **Secure Authentication**: JWT-based authentication with CouchDB integration
-- ?? **Multi-Device Sync**: Seamless synchronization across all your devices
-- ??? **Developer-Friendly**: Open source with a modular architecture
+- 🔒 **Privacy-First**: Your data stays local and syncs only with your chosen CouchDB instance
+- 🌐 **Local-First Architecture**: Works offline, syncs when online
+- 📱 **Modern UI**: Built with React and Material-UI for a sleek, responsive experience
+- 🔐 **Secure Authentication**: JWT-based authentication with CouchDB integration
+- 📊 **Multi-Device Sync**: Seamless synchronization across all your devices
+- 🛠️ **Developer-Friendly**: Open source with a modular architecture
 
-## ??? Architecture
+## 🏗️ Architecture
 
 Papaya consists of four main packages:
 
 ```
 papaya/
-??? packages/
-?   ??? papaya-web/       # React frontend application
-?   ??? papaya-server/    # Node.js backend API server
-?   ??? papaya-docs/      # Next.js documentation site
-?   ??? papaya-shortcut/  # Quick access landing page
+├── packages/
+│   ├── papaya-web/       # React frontend application
+│   ├── papaya-server/    # Node.js backend API server
+│   ├── papaya-docs/      # Next.js documentation site
+│   └── papaya-shortcut/  # Quick access landing page
 ```
 
 ### Technology Stack
@@ -60,7 +60,7 @@ papaya/
 - Database-per-user architecture
 - Built-in replication and sync
 
-## ?? Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -127,14 +127,14 @@ cd packages/papaya-server
 npm start
 ```
 
-## ?? Documentation
+## 📖 Documentation
 
 - **[Web App Documentation](./packages/papaya-web/README.md)** - Frontend development guide
 - **[Server Documentation](./packages/papaya-server/README.md)** - Backend API and configuration
 - **[Documentation Site](./packages/papaya-docs/README.md)** - User and developer docs
 - **[Quick Access](./packages/papaya-shortcut/README.md)** - Landing page service
 
-## ??? Development
+## 🛠️ Development
 
 ### Available Commands
 
@@ -162,26 +162,26 @@ make install            # Install all dependencies
 
 ```
 papaya/
-??? packages/
-?   ??? papaya-web/           # Frontend React application
-?   ?   ??? src/             # Source code
-?   ?   ??? public/          # Static assets
-?   ?   ??? dist/            # Built assets
-?   ??? papaya-server/       # Backend Express server
-?   ?   ??? src/             # Source code
-?   ?   ??? web-assets/      # Frontend assets for serving
-?   ?   ??? dist/            # Compiled JavaScript
-?   ??? papaya-docs/         # Documentation site (Next.js)
-?   ??? papaya-shortcut/     # Landing page (Next.js)
-??? docker/                  # Docker configuration
-??? Makefile                 # Build automation
-??? README.md               # This file
+├── packages/
+│   ├── papaya-web/           # Frontend React application
+│   │   ├── src/             # Source code
+│   │   ├── public/          # Static assets
+│   │   └── dist/            # Built assets
+│   ├── papaya-server/       # Backend Express server
+│   │   ├── src/             # Source code
+│   │   ├── web-assets/      # Frontend assets for serving
+│   │   └── dist/            # Compiled JavaScript
+│   ├── papaya-docs/         # Documentation site (Next.js)
+│   └── papaya-shortcut/     # Landing page (Next.js)
+├── docker/                  # Docker configuration
+├── Makefile                 # Build automation
+└── README.md               # This file
 ```
 
-## ?? Configuration
+## 🔧 Configuration
 
 Papaya uses a flexible YAML-based configuration system. See the [server documentation](./packages/papaya-server/README.md) for detailed configuration options.
 
-## ?? Contributing
+## 🤝 Contributing
 
 https://axoneme.org/contributing
