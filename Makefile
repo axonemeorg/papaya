@@ -1,76 +1,60 @@
-# Create Docker network
-network-create:
-	docker network create papaya-network || true
 
-network-remove:
-	docker network rm papaya-network || true
+web-build:
+	cd papaya-web && npm ci && npm run build
 
-# Database
-db-build:
-	DOCKER_BUILDKIT=1 docker build \
-		-t papaya-couchdb \
-		-f packaging/database/database.Dockerfile \
-		.
+server-assets: web-build
+	rm -rf packages/papaya-server/web-assets/*
+	cp -r packages/papaya-web/dist/* packages/papaya-server/web-assets/
+	@echo "Web assets populated successfully"
 
-db-run: network-create
-	@echo "Running CouchDB container on port 5984..."; \
-	docker run \
-		-d \
-		--name papaya-couchdb \
-		--network papaya-network \
-		-p 5984:5984 \
-		-v papaya-couchdb-data:/opt/couchdb/data \
-		papaya-couchdb
+# Build server
+build-server:
+	cd packages/papaya-server && npm ci && npm run build
 
-db-stop:
-	docker stop papaya-couchdb || true
+# Build both client and server
+build: web-build server-assets build-server
 
-db-clean: db-stop
-	docker rm papaya-couchdb || true
-	docker image rm papaya-couchdb || true
+# Development commands
+dev-client:
+	cd packages/papaya-web && npm run dev
 
-db: db-build db-run
+dev-server:
+	cd packages/papaya-server && npm run dev
 
-# Web Server
-app-build:
-	DOCKER_BUILDKIT=1 docker build \
-		-t papaya-app \
-		-f packaging/app/app.Dockerfile \
-		.
+# Docker commands for production build
+docker-build-prod:
+	DOCKER_BUILDKIT=1 docker build -t papaya -f docker/Dockerfile.build .
 
-app-run: network-create
-	@echo "Running app container on port 9475..."; \
-	docker run \
-		-d \
-		--name papaya-app \
-		--network papaya-network \
-		-p 9475:9475 \
-		papaya-app
+# Docker compose commands for development
+docker-dev:
+	docker-compose -f docker/docker-compose.dev.yaml up --build
 
-app-stop:
-	docker stop papaya-app || true
+docker-dev-detached:
+	docker-compose -f docker/docker-compose.dev.yaml up -d --build
 
-app-clean: app-stop
-	docker rm papaya-app || true
-	docker image rm papaya-app || true
+docker-stop:
+	docker-compose -f docker/docker-compose.dev.yaml down
 
-app: app-build app-run
+docker-clean: docker-stop
+	docker-compose -f docker/docker-compose.dev.yaml down -v
+	docker system prune -f
 
-# View logs
-logs-db:
-	docker logs -f papaya-couchdb
+# Clean commands
+clean-client:
+	rm -rf packages/papaya-web/node_modules packages/papaya-web/dist
 
-logs-app:
-	docker logs -f papaya-app
+clean-server:
+	rm -rf packages/papaya-server/node_modules packages/papaya-server/dist packages/papaya-server/web-assets/*
 
-# Clean
-clean: app-clean db-clean network-remove
-	docker volume rm papaya-couchdb-data || true
+clean: clean-client clean-server
 
-rm:
-	rm -rf app/node_modules app/client/node_modules app/client/dist app/server/node_modules app/server/dist
+# Install dependencies
+install:
+	cd packages/papaya-web && npm ci
+	cd packages/papaya-server && npm ci
 
 .PHONY: \
-	db-build db-run db db-stop db-clean \
-	app-build app-run app app-stop app-clean \
-	logs-db logs-app clean rm
+	build-client populate-web-assets build-server build \
+	dev-client dev-server \
+	docker-build-prod docker-dev docker-dev-detached docker-stop docker-clean \
+	clean-client clean-server clean install

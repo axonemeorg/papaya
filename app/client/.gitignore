@@ -1,6 +1,0 @@
-dist/
-node_modules/
-bun.lockb
-.env.local
-__papaya__db*/
-src/web/**/*.gen.ts

@@ -1,0 +1,48 @@
+# Stage 1: Setup CouchDB
+FROM couchdb:3.3 as couchdb-stage
+
+# Copy and process CouchDB configuration
+COPY papaya.couchdb.ini /tmp/papaya.couchdb.ini.template
+
+# Replace environment variables in the config file and copy to CouchDB
+RUN envsubst < /tmp/papaya.couchdb.ini.template > /opt/couchdb/etc/default.d/papaya.ini
+
+# Stage 2: Build the client
+FROM node:18-alpine as client-build
+
+WORKDIR /app/client
+COPY papaya-web/package*.json ./
+RUN npm ci
+
+COPY papaya-web/ ./
+RUN npm run build
+
+# Stage 3: Build the server and final image
+FROM node:18-alpine as server-build
+
+WORKDIR /app/server
+COPY papaya-server/package*.json ./
+RUN npm ci
+
+COPY papaya-server/ ./
+RUN npm run build
+
+# Final stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy server build artifacts
+COPY --from=server-build /app/server/dist ./dist
+COPY --from=server-build /app/server/package*.json ./
+COPY --from=server-build /app/server/node_modules ./node_modules
+
+# Copy client build artifacts to web-assets
+COPY --from=client-build /app/client/dist ./web-assets
+
+# Copy CouchDB setup from first stage
+COPY --from=couchdb-stage /opt/couchdb/etc/default.d/papaya.ini /opt/couchdb/etc/default.d/papaya.ini
+
+EXPOSE 3000
+
+CMD ["npm", "start"] 

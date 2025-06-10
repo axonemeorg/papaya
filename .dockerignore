@@ -1,2 +1,14 @@
 **/node_modules
 **/dist
+packages/papaya-web/dist
+packages/papaya-server/dist
+.git
+.env
+papaya.couchdb.ini
+packages/papaya-docs/
+packages/papaya-shortcut/
+.vscode/
+README.md
+LICENSE
+.git-blame-ignore-revs
+dev/docker-compose.dev.yaml
