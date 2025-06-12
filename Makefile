@@ -29,13 +29,22 @@ image-clean: image-stop
 
 # Docker compose commands for development
 dev:
-	docker-compose -f docker/docker-compose.dev.yaml up -d --build
+	docker compose -f dev/docker-compose.dev.yaml up -d --build
+
+dev-server-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-server
+
+dev-web-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-web
+
+dev-db-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-db
 
 dev-stop:
-	docker-compose -f docker/docker-compose.dev.yaml down
+	docker compose -f dev/docker-compose.dev.yaml down
 
 dev-clean: dev-stop
-	docker-compose -f docker/docker-compose.dev.yaml down -v
+	docker compose -f dev/docker-compose.dev.yaml down -v
 	docker system prune -f
 
 # Clean commands
