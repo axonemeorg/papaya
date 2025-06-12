@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: papaya-dev
+
 services:
   couchdb:
     build:
@@ -19,7 +21,7 @@ services:
     volumes:
       - couchdb_data:/opt/couchdb/data
 
-  papaya-server:
+  server:
     build:
       context: ..
       dockerfile: dev/server/Dockerfile.dev
@@ -34,11 +36,11 @@ services:
     depends_on:
       - couchdb
     volumes:
-      - ../papaya-server:/app
+      - ../packages/papaya-server:/app
       - /app/node_modules
     command: npm run dev
 
-  papaya-web:
+  web:
     build:
       context: ..
       dockerfile: dev/client/Dockerfile.dev
@@ -49,7 +51,7 @@ services:
     env_file:
       - ../.env
     volumes:
-      - ../papaya-web:/app
+      - ../packages/papaya-web:/app
       - /app/node_modules
     command: npm run dev
 

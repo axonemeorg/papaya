@@ -1,3 +1,5 @@
+env:
+	@if [ ! -f .env ]; then cp .env.example .env; fi
 
 web-build:
 	cd papaya-web && npm ci && npm run build
@@ -45,7 +47,6 @@ dev-stop:
 
 dev-clean: dev-stop
 	docker compose -f dev/docker-compose.dev.yaml down -v
-	docker system prune -f
 
 # Clean commands
 client-clean:
@@ -58,8 +59,8 @@ clean: client-clean server-clean
 
 # Install dependencies
 install:
-	cd packages/papaya-web && npm ci
-	cd packages/papaya-server && npm ci
+	cd ./packages/papaya-web && npm install
+	cd ./packages/papaya-server && npm install
 
 .PHONY: \
 	web-build server-build server-web-assets \
