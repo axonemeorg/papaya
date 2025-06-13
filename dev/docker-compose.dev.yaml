@@ -37,7 +37,7 @@ services:
       - couchdb
     volumes:
       - ../packages/papaya-server:/app
-      - /app/node_modules
+      - server_node_modules:/app/node_modules
     command: npm run dev
 
   web:
@@ -52,8 +52,10 @@ services:
       - ../.env
     volumes:
       - ../packages/papaya-web:/app
-      - /app/node_modules
+      - web_node_modules:/app/node_modules
     command: npm run dev
 
 volumes:
-  couchdb_data: 
+  couchdb_data:
+  server_node_modules:
+  web_node_modules: 
