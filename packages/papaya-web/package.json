@@ -5,7 +5,7 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "dev": "vite serve",
+    "dev": "vite serve --host",
     "build": "npm run routes && tsc -b && vite build",
     "routes": "tsr generate",
     "lint": "eslint ./src",
