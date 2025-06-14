@@ -1,3 +1,5 @@
+env:
+	@if [ ! -f .env ]; then cp .env.example .env; fi
 
 web-build:
 	cd papaya-web && npm ci && npm run build
@@ -29,14 +31,22 @@ image-clean: image-stop
 
 # Docker compose commands for development
 dev:
-	docker-compose -f docker/docker-compose.dev.yaml up -d --build
+	docker compose -f dev/docker-compose.dev.yaml up -d --build
+
+dev-server-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-server
+
+dev-web-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-web
+
+dev-db-logs:
+	docker compose -f dev/docker-compose.dev.yaml logs -f papaya-db
 
 dev-stop:
-	docker-compose -f docker/docker-compose.dev.yaml down
+	docker compose -f dev/docker-compose.dev.yaml down
 
 dev-clean: dev-stop
-	docker-compose -f docker/docker-compose.dev.yaml down -v
-	docker system prune -f
+	docker compose -f dev/docker-compose.dev.yaml down -v
 
 # Clean commands
 client-clean:
@@ -49,8 +59,8 @@ clean: client-clean server-clean
 
 # Install dependencies
 install:
-	cd packages/papaya-web && npm ci
-	cd packages/papaya-server && npm ci
+	cd ./packages/papaya-web && npm install
+	cd ./packages/papaya-server && npm install
 
 .PHONY: \
 	web-build server-build server-web-assets \

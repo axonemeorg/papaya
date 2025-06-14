@@ -1,4 +1,5 @@
 {
+    "files.encoding": "utf8",
     "files.readonlyInclude": {
         "**/routeTree.gen.ts": true
     },
