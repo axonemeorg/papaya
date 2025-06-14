@@ -1,5 +1,5 @@
 import { AlertProps } from '@mui/material'
-import { createContext } from 'react'
+import { createContext, ReactNode } from 'react'
 
 interface Notification {
   message: string
@@ -21,8 +21,8 @@ export interface DialogNotification extends Notification {
 
 export interface Alert {
   id: string
-  title: string
-  description: string
+  title: string | ReactNode
+  description: string | ReactNode
   confirmationMessage?: string
   severity?: AlertProps['severity']
 }
