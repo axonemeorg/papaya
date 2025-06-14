@@ -4,7 +4,7 @@ import { updateSettings } from '@/database/actions'
 import { usePapayaMeta } from '@/hooks/queries/usePapayaMeta'
 import { PapayaMeta } from '@/schema/documents/PapayaMeta'
 import { UserSettings } from '@/schema/models/UserSettings'
-import { PropsWithChildren, useContext, useState } from 'react'
+import { PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 export default function PapayaContextProvider(props: PropsWithChildren) {
   const [papayaMeta, setPapayaMeta] = useState<PapayaMeta | null>(null)
@@ -13,13 +13,14 @@ export default function PapayaContextProvider(props: PropsWithChildren) {
 
   const notificationsContext = useContext(NotificationsContext)
 
-  // useEffect(() => {
-  //   notificationsContext.alert({
-  //     title: 'Test Alert',
-  //     description: 'This is a test alert.',
-  //     promptDismissal: true,
-  //   })
-  // }, [])
+  useEffect(() => {
+    notificationsContext.alert({
+      title: 'Test Alert',
+      description: 'This is a test alert.',
+      confirmationMessage: 'Are you sure you want to dismiss this test alert?',
+      severity: 'error',
+    })
+  }, [])
 
   const updatePapayaSettings = async (newSettings: Partial<UserSettings>): Promise<void> => {
     setPapayaMeta((prev) => {

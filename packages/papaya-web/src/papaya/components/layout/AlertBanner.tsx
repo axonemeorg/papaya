@@ -8,22 +8,31 @@ interface AlertBannerProps {
     onDismiss: (id: string) => void
 }
 
-const AlertBannerItem = ({ alert, onDismiss }: AlertBannerProps) => {
+const AlertBannerItem = (props: AlertBannerProps) => {
+    const { alert, onDismiss } = props
+    const handleDismiss = () => {
+        if (alert.confirmationMessage) {
+            if (confirm(alert.confirmationMessage)) {
+                onDismiss(alert.id)
+            }
+        } else {
+            onDismiss(alert.id)
+        }
+    }
+
     return (
         <MuiAlert
-            severity="warning"
+            severity={props.alert.severity}
             icon={<Warning />}
             action={
-                alert.promptDismissal ? (
-                    <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                        onClick={() => onDismiss(alert.id)}
-                    >
-                        <Close fontSize="inherit" />
-                    </IconButton>
-                ) : undefined
+                <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={handleDismiss}
+                >
+                    <Close fontSize="inherit" />
+                </IconButton>
             }
             sx={{
                 width: '100%',
@@ -46,7 +55,7 @@ export default function AlertBanner() {
     }
 
     return (
-        <Stack spacing={1} sx={{ width: '100%' }}>
+        <Stack gap={1} sx={{ width: '100%' }}>
             {activeAlerts.map((alert) => (
                 <AlertBannerItem
                     key={alert.id}

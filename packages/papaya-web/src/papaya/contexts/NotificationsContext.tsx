@@ -1,3 +1,4 @@
+import { AlertProps } from '@mui/material'
 import { createContext } from 'react'
 
 interface Notification {
@@ -22,7 +23,8 @@ export interface Alert {
   id: string
   title: string
   description: string
-  promptDismissal: boolean
+  confirmationMessage?: string
+  severity?: AlertProps['severity']
 }
 
 export interface NotificationsContext {
