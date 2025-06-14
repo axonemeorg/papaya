@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 export default function SettingsPage() {
   return (
-    <Container maxWidth="md" disableGutters sx={{ pt: 1, pl: 1, pr: 3, mx: 2 }}>
+    <Container maxWidth="md" disableGutters sx={{ mx: 2 }}>
       <ManageSettings />
     </Container>
   )
