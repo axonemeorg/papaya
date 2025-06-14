@@ -1,17 +1,17 @@
-import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
-import JournalHeader from './ribbon/JournalHeader'
-import JournalEntryCard from './JournalEntryCard'
-import { deleteJournalEntry } from '@/database/actions'
 import { NotificationsContext } from '@/contexts/NotificationsContext'
-import JournalEntryList from './JournalEntryList'
+import { deleteJournalEntry } from '@/database/actions'
 import { getDatabaseClient } from '@/database/client'
+import { Box, Collapse, Divider, Paper, Stack } from '@mui/material'
+import { MouseEvent, useContext, useEffect, useMemo, useState } from 'react'
+import JournalEntryCard from './JournalEntryCard'
+import JournalEntryList from './JournalEntryList'
+import JournalHeader from './ribbon/JournalHeader'
 // import SpendChart from '../chart/SpendChart'
 // import CategorySpreadChart from '../chart/CategorySpreadChart'
-import { useSearch } from '@tanstack/react-router'
+import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
 import { JournalEntry } from '@/schema/documents/JournalEntry'
 import { useBeginEditingJournalEntry } from '@/store/app/useJournalEntryEditModalState'
-import { useFilteredJournalEntries } from '@/hooks/queries/useFilteredJournalEntries'
+import { useSearch } from '@tanstack/react-router'
 
 export interface JournalEntrySelection {
   entry: JournalEntry | null
@@ -129,23 +129,28 @@ export default function JournalEditor() {
           onDelete={() => handleDeleteEntry(selectedEntry.entry)}
         />
       )}
-      <Stack direction="row" sx={{ gap: 2, overflow: 'hidden', flex: 1, pr: 2, pb: { sm: 0, md: 2 } }}>
+      <Stack
+        direction="row"
+        sx={{
+          gap: 2,
+          height: '100%',
+          width: '100%',
+          pb: { sm: 0, md: 2 },
+        }}
+      >
         <Stack
           sx={{
-            overflow: 'hidden',
-            flex: 2,
+            flex: 1,
             gap: 0,
+            height: '100%',
+            width: '100%',
           }}>
-          {/* <Grid columns={12} container>
-						<Grid size={4}> */}
           <Collapse in={false}>
             <Stack direction="row" gap={2} mb={2}>
               {/* <SpendChart />
 							<CategorySpreadChart /> */}
             </Stack>
           </Collapse>
-          {/* </Grid>
-					</Grid> */}
 
           <Stack
             component={Paper}
@@ -155,7 +160,9 @@ export default function JournalEditor() {
               borderTopRightRadius: theme.spacing(2),
               borderBottomLeftRadius: { sm: 0, md: theme.spacing(2) },
               borderBottomRightRadius: { sm: 0, md: theme.spacing(2) },
-              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0, // Allow flex item to shrink
             })}>
             <JournalHeader />
             <Divider />
@@ -163,6 +170,7 @@ export default function JournalEditor() {
               sx={{
                 flex: 1,
                 overflowY: 'auto',
+                minHeight: 0, // Allow flex item to shrink
               }}>
               <JournalEntryList
                 journalRecordGroups={tab === 'journal' ? journalGroups : {}}

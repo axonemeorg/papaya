@@ -1,12 +1,15 @@
 import ManageSettings, { SettingsTab } from '@/components/settings/ManageSettings'
+import LayoutContainer from '@/layouts/LayoutContainer'
 import { Container } from '@mui/material'
 import { createFileRoute } from '@tanstack/react-router'
 
 export default function SettingsPage() {
   return (
-    <Container maxWidth="md" disableGutters sx={{ pt: 1, pl: 1, pr: 3, mx: 2 }}>
-      <ManageSettings />
-    </Container>
+    <LayoutContainer>
+      <Container maxWidth="md" disableGutters sx={{ mx: 2 }}>
+        <ManageSettings />
+      </Container>
+    </LayoutContainer>
   )
 }
 

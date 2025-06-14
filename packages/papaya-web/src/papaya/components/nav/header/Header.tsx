@@ -1,11 +1,11 @@
-import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
-import AppLogo from './AppLogo'
-import { Menu, MenuOpen, Settings } from '@mui/icons-material'
 import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
+import { Menu, MenuOpen, Settings } from '@mui/icons-material'
+import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
 import ActiveJournal from './ActiveJournal'
+import AppLogo from './AppLogo'
 import SearchWidget from './search/SearchWidget'
-import UserWidget from './UserWidget'
 import SyncHeaderWidget from './SyncHeaderWidget'
+import UserWidget from './UserWidget'
 
 interface HeaderProps {
   view: 'desktop' | 'mobile'
