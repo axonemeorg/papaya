@@ -1,7 +1,9 @@
 import { Alert, NotificationsContext } from '@/contexts/NotificationsContext'
 import { Close, Warning } from '@mui/icons-material'
-import { AlertTitle, IconButton, Alert as MuiAlert, Stack } from '@mui/material'
+import { AlertTitle, Grow, IconButton, Alert as MuiAlert, Stack } from '@mui/material'
 import { useContext } from 'react'
+
+const MAX_DISPLAY_ITEMS = 2
 
 interface AlertBannerProps {
     alert: Alert
@@ -54,14 +56,19 @@ export default function AlertBanner() {
         return null
     }
 
+    const displayedAlerts = activeAlerts.slice(0, MAX_DISPLAY_ITEMS)
+
     return (
         <Stack gap={1} sx={{ width: '100%' }}>
-            {activeAlerts.map((alert) => (
-                <AlertBannerItem
-                    key={alert.id}
-                    alert={alert}
-                    onDismiss={dismissAlert}
-                />
+            {displayedAlerts.map((alert) => (
+                <Grow key={alert.id} in={true}>
+                    <div>
+                        <AlertBannerItem
+                            alert={alert}
+                            onDismiss={dismissAlert}
+                        />
+                    </div>
+                </Grow>
             ))}
         </Stack>
     )
