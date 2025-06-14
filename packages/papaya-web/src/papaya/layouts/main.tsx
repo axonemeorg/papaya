@@ -1,3 +1,4 @@
+import AlertBanner from '@/components/layout/AlertBanner'
 import Header from '@/components/nav/header/Header'
 import AppMenu from '@/components/nav/menu/AppMenu'
 import { Container, Stack, useMediaQuery, useTheme } from '@mui/material'
@@ -28,20 +29,31 @@ export default function MainLayout(props: PropsWithChildren) {
         }}
       >
         <AppMenu view={view} />
-        <Container
-          maxWidth="xl"
-          disableGutters
+        <Stack
           sx={{
             pt: 1,
             pl: 1,
             pr: 3,
-            flex: 1, // Ensure container takes full width
+            pb: 1,
+            gap: 2,
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          {props.children}
-        </Container>
+          <AlertBanner />
+          <Container
+            maxWidth="xl"
+            disableGutters
+            sx={{
+              flex: 1, // Ensure container takes remaining space
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {props.children}
+          </Container>
+        </Stack>
       </Stack>
     </Stack>
   )

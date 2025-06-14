@@ -1,4 +1,5 @@
 import {
+  Alert,
   DialogNotification,
   NotificationsContext,
   SnackbarAction,
@@ -24,6 +25,7 @@ const renderAction = (action: SnackbarAction) => {
 const NotificationsProvider = (props: PropsWithChildren) => {
   const [dialogNotification, setDialogNotification] = useState<DialogNotification | null>(null)
   const [snackbarNotification, setSnackbarNotification] = useState<SnackbarNotification | null>(null)
+  const [alerts, setAlerts] = useState<Alert[]>([])
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false)
@@ -38,10 +40,22 @@ const NotificationsProvider = (props: PropsWithChildren) => {
     setDialogOpen(true)
   }, [])
 
+  const alert = useCallback((alertData: Omit<Alert, 'id'>) => {
+    const newAlert: Alert = {
+      ...alertData,
+      id: crypto.randomUUID(),
+    }
+    setAlerts(prevAlerts => [...prevAlerts, newAlert])
+  }, [])
+
+  const dismissAlert = useCallback((id: string) => {
+    setAlerts(prevAlerts => prevAlerts.filter(alert => alert.id !== id))
+  }, [])
+
   const handleCloseDialog = useCallback(() => {
     setDialogOpen(false)
     dialogNotification?.onClose?.()
-  }, [])
+  }, [dialogNotification])
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false)
@@ -51,8 +65,11 @@ const NotificationsProvider = (props: PropsWithChildren) => {
     () => ({
       snackbar,
       dialog,
+      alert,
+      activeAlerts: alerts,
+      dismissAlert,
     }),
-    [snackbar, dialog],
+    [snackbar, dialog, alert, alerts, dismissAlert],
   )
 
   return (

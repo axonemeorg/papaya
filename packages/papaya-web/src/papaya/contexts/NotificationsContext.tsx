@@ -18,12 +18,25 @@ export interface DialogNotification extends Notification {
   onClose?: () => void
 }
 
+export interface Alert {
+  id: string
+  title: string
+  description: string
+  promptDismissal: boolean
+}
+
 export interface NotificationsContext {
   snackbar: (notification: SnackbarNotification) => void
   dialog: (notification: DialogNotification) => void
+  alert: (alert: Omit<Alert, 'id'>) => void
+  activeAlerts: Alert[]
+  dismissAlert: (id: string) => void
 }
 
 export const NotificationsContext = createContext<NotificationsContext>({
-  snackbar: () => {},
-  dialog: () => {},
+  snackbar: () => { },
+  dialog: () => { },
+  alert: () => { },
+  activeAlerts: [],
+  dismissAlert: () => { },
 })

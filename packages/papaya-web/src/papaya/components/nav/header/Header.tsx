@@ -1,11 +1,13 @@
-import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
-import AppLogo from './AppLogo'
-import { Menu, MenuOpen, Settings } from '@mui/icons-material'
+import { NotificationsContext } from '@/contexts/NotificationsContext'
 import { useAppMenuStateStore } from '@/store/useAppMenuStateStore'
+import { Menu, MenuOpen, Settings } from '@mui/icons-material'
+import { IconButton, Stack, useMediaQuery, useTheme } from '@mui/material'
+import { useContext } from 'react'
 import ActiveJournal from './ActiveJournal'
+import AppLogo from './AppLogo'
 import SearchWidget from './search/SearchWidget'
-import UserWidget from './UserWidget'
 import SyncHeaderWidget from './SyncHeaderWidget'
+import UserWidget from './UserWidget'
 
 interface HeaderProps {
   view: 'desktop' | 'mobile'
@@ -14,6 +16,7 @@ interface HeaderProps {
 export default function Header(props: HeaderProps) {
   const theme = useTheme()
   const showLogo = !useMediaQuery(theme.breakpoints.down('md'))
+  const { alert } = useContext(NotificationsContext)
 
   // Get toggle menu function from zustand store
   const toggleExpanded = useAppMenuStateStore((state) => state.toggleExpanded)
@@ -27,6 +30,15 @@ export default function Header(props: HeaderProps) {
     } else {
       toggleExpanded()
     }
+  }
+
+  // Temporary test function - remove this after testing
+  const testAlert = () => {
+    alert({
+      title: 'Test Alert',
+      description: 'This is a test alert to demonstrate the functionality',
+      promptDismissal: true,
+    })
   }
 
   return (
@@ -54,7 +66,7 @@ export default function Header(props: HeaderProps) {
       </Stack>
       <Stack direction="row" gap={1} alignItems={'center'} sx={{ flex: 1, justifyContent: 'flex-end' }}>
         <SearchWidget />
-        <IconButton sx={(theme) => ({ color: theme.palette.text.secondary })}>
+        <IconButton onClick={testAlert} sx={(theme) => ({ color: theme.palette.text.secondary })}>
           <Settings />
         </IconButton>
         <UserWidget />
