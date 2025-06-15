@@ -48,7 +48,7 @@ function GettingStarted() {
   return (
     <WelcomePage
       formSlot={
-        <Container maxWidth='sm' disableGutters>
+        <Container maxWidth='md' disableGutters>
           <Stack gap={4}>
             <Stack gap={2}>
               <Typography variant='h5'>Get started with Papaya</Typography>
