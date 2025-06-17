@@ -22,6 +22,7 @@ import { Route as MainLayoutJournalIndexImport } from './routes/_mainLayout/jour
 import { Route as WelcomeLayoutWelcomeStartImport } from './routes/_welcomeLayout/welcome.start'
 import { Route as WelcomeLayoutWelcomeJournalImport } from './routes/_welcomeLayout/welcome.journal'
 import { Route as WelcomeLayoutWelcomeGettingStartedImport } from './routes/_welcomeLayout/welcome.getting-started'
+import { Route as WelcomeLayoutWelcomeCategoriesImport } from './routes/_welcomeLayout/welcome.categories'
 import { Route as MainLayoutSettingsSectionImport } from './routes/_mainLayout/settings.$section'
 import { Route as MainLayoutJournalViewSplatImport } from './routes/_mainLayout/journal.$view.$'
 
@@ -93,6 +94,13 @@ const WelcomeLayoutWelcomeGettingStartedRoute =
     getParentRoute: () => WelcomeLayoutRoute,
   } as any)
 
+const WelcomeLayoutWelcomeCategoriesRoute =
+  WelcomeLayoutWelcomeCategoriesImport.update({
+    id: '/welcome/categories',
+    path: '/welcome/categories',
+    getParentRoute: () => WelcomeLayoutRoute,
+  } as any)
+
 const MainLayoutSettingsSectionRoute = MainLayoutSettingsSectionImport.update({
   id: '/settings/$section',
   path: '/settings/$section',
@@ -152,6 +160,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/$section'
       preLoaderRoute: typeof MainLayoutSettingsSectionImport
       parentRoute: typeof MainLayoutImport
+    }
+    '/_welcomeLayout/welcome/categories': {
+      id: '/_welcomeLayout/welcome/categories'
+      path: '/welcome/categories'
+      fullPath: '/welcome/categories'
+      preLoaderRoute: typeof WelcomeLayoutWelcomeCategoriesImport
+      parentRoute: typeof WelcomeLayoutImport
     }
     '/_welcomeLayout/welcome/getting-started': {
       id: '/_welcomeLayout/welcome/getting-started'
@@ -230,6 +245,7 @@ const MainLayoutRouteWithChildren = MainLayoutRoute._addFileChildren(
 )
 
 interface WelcomeLayoutRouteChildren {
+  WelcomeLayoutWelcomeCategoriesRoute: typeof WelcomeLayoutWelcomeCategoriesRoute
   WelcomeLayoutWelcomeGettingStartedRoute: typeof WelcomeLayoutWelcomeGettingStartedRoute
   WelcomeLayoutWelcomeJournalRoute: typeof WelcomeLayoutWelcomeJournalRoute
   WelcomeLayoutWelcomeStartRoute: typeof WelcomeLayoutWelcomeStartRoute
@@ -237,6 +253,7 @@ interface WelcomeLayoutRouteChildren {
 }
 
 const WelcomeLayoutRouteChildren: WelcomeLayoutRouteChildren = {
+  WelcomeLayoutWelcomeCategoriesRoute: WelcomeLayoutWelcomeCategoriesRoute,
   WelcomeLayoutWelcomeGettingStartedRoute:
     WelcomeLayoutWelcomeGettingStartedRoute,
   WelcomeLayoutWelcomeJournalRoute: WelcomeLayoutWelcomeJournalRoute,
@@ -254,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/accounts': typeof MainLayoutAccountsRoute
   '/categories': typeof MainLayoutCategoriesRoute
   '/settings/$section': typeof MainLayoutSettingsSectionRoute
+  '/welcome/categories': typeof WelcomeLayoutWelcomeCategoriesRoute
   '/welcome/getting-started': typeof WelcomeLayoutWelcomeGettingStartedRoute
   '/welcome/journal': typeof WelcomeLayoutWelcomeJournalRoute
   '/welcome/start': typeof WelcomeLayoutWelcomeStartRoute
@@ -269,6 +287,7 @@ export interface FileRoutesByTo {
   '/accounts': typeof MainLayoutAccountsRoute
   '/categories': typeof MainLayoutCategoriesRoute
   '/settings/$section': typeof MainLayoutSettingsSectionRoute
+  '/welcome/categories': typeof WelcomeLayoutWelcomeCategoriesRoute
   '/welcome/getting-started': typeof WelcomeLayoutWelcomeGettingStartedRoute
   '/welcome/journal': typeof WelcomeLayoutWelcomeJournalRoute
   '/welcome/start': typeof WelcomeLayoutWelcomeStartRoute
@@ -286,6 +305,7 @@ export interface FileRoutesById {
   '/_mainLayout/accounts': typeof MainLayoutAccountsRoute
   '/_mainLayout/categories': typeof MainLayoutCategoriesRoute
   '/_mainLayout/settings/$section': typeof MainLayoutSettingsSectionRoute
+  '/_welcomeLayout/welcome/categories': typeof WelcomeLayoutWelcomeCategoriesRoute
   '/_welcomeLayout/welcome/getting-started': typeof WelcomeLayoutWelcomeGettingStartedRoute
   '/_welcomeLayout/welcome/journal': typeof WelcomeLayoutWelcomeJournalRoute
   '/_welcomeLayout/welcome/start': typeof WelcomeLayoutWelcomeStartRoute
@@ -303,6 +323,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/categories'
     | '/settings/$section'
+    | '/welcome/categories'
     | '/welcome/getting-started'
     | '/welcome/journal'
     | '/welcome/start'
@@ -317,6 +338,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/categories'
     | '/settings/$section'
+    | '/welcome/categories'
     | '/welcome/getting-started'
     | '/welcome/journal'
     | '/welcome/start'
@@ -332,6 +354,7 @@ export interface FileRouteTypes {
     | '/_mainLayout/accounts'
     | '/_mainLayout/categories'
     | '/_mainLayout/settings/$section'
+    | '/_welcomeLayout/welcome/categories'
     | '/_welcomeLayout/welcome/getting-started'
     | '/_welcomeLayout/welcome/journal'
     | '/_welcomeLayout/welcome/start'
@@ -386,6 +409,7 @@ export const routeTree = rootRoute
     "/_welcomeLayout": {
       "filePath": "_welcomeLayout.tsx",
       "children": [
+        "/_welcomeLayout/welcome/categories",
         "/_welcomeLayout/welcome/getting-started",
         "/_welcomeLayout/welcome/journal",
         "/_welcomeLayout/welcome/start",
@@ -403,6 +427,10 @@ export const routeTree = rootRoute
     "/_mainLayout/settings/$section": {
       "filePath": "_mainLayout/settings.$section.tsx",
       "parent": "/_mainLayout"
+    },
+    "/_welcomeLayout/welcome/categories": {
+      "filePath": "_welcomeLayout/welcome.categories.tsx",
+      "parent": "/_welcomeLayout"
     },
     "/_welcomeLayout/welcome/getting-started": {
       "filePath": "_welcomeLayout/welcome.getting-started.tsx",

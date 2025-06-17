@@ -8,13 +8,13 @@ const SHARED_AVATARS: Record<string, Avatar> = {
     kind: 'papaya:avatar',
     content: 'directions_car',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#e53e3e',
   },
   'FOOD': {
     kind: 'papaya:avatar',
     content: 'restaurant',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#fd9644',
   },
   'GROCERIES': {
     kind: 'papaya:avatar',
@@ -26,7 +26,7 @@ const SHARED_AVATARS: Record<string, Avatar> = {
     kind: 'papaya:avatar',
     content: 'directions_bus',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#4299e1',
   },
   'HOUSING': {
     kind: 'papaya:avatar',
@@ -38,97 +38,97 @@ const SHARED_AVATARS: Record<string, Avatar> = {
     kind: 'papaya:avatar',
     content: 'receipt',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#f6ad55',
   },
   'ENTERTAINMENT': {
     kind: 'papaya:avatar',
     content: 'movie',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#9f7aea',
   },
   'HEALTHCARE': {
     kind: 'papaya:avatar',
     content: 'local_hospital',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#fc8181',
   },
   'SHOPPING': {
     kind: 'papaya:avatar',
     content: 'shopping_cart',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#667eea',
   },
   'PERSONAL_CARE': {
     kind: 'papaya:avatar',
     content: 'face',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#f093fb',
   },
   'PETS': {
     kind: 'papaya:avatar',
     content: 'pets',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#d69e2e',
   },
   'RENT': {
     kind: 'papaya:avatar',
     content: 'apartment',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#805ad5',
   },
   'MORTGAGE': {
     kind: 'papaya:avatar',
     content: 'home',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#805ad5',
   },
   'HOME_INSURANCE': {
     kind: 'papaya:avatar',
     content: 'security',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#3182ce',
   },
   'TAKEOUT': {
     kind: 'papaya:avatar',
     content: 'takeout_dining',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#ff8a50',
   },
   'INTERNET': {
     kind: 'papaya:avatar',
     content: 'wifi',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#63b3ed',
   },
   'UTILITIES': {
     kind: 'papaya:avatar',
     content: 'electrical_services',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#fbd38d',
   },
   'TUITION': {
     kind: 'papaya:avatar',
     content: 'school',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#4fd1c7',
   },
   'TEXTBOOKS': {
     kind: 'papaya:avatar',
     content: 'menu_book',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#81e6d9',
   },
   'CHILDCARE': {
     kind: 'papaya:avatar',
     content: 'child_care',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#feb2b2',
   },
   'SCHOOL_SUPPLIES': {
     kind: 'papaya:avatar',
     content: 'backpack',
     variant: 'PICTORIAL',
-    primaryColor: '#a5d6a7',
+    primaryColor: '#90cdf4',
   }
 } as const
 
@@ -137,7 +137,7 @@ const SHARED_AVATARS: Record<string, Avatar> = {
  * opt in or out of certain categories. For example, not all users have pets or
  * a mortgage.
  */
-enum CategoryPresetGroup {
+export enum CategoryPresetGroup {
   PET = 'PET',
   RENT = 'RENT',
   HOME_OWNER = 'HOME_OWNER',
@@ -148,33 +148,40 @@ enum CategoryPresetGroup {
 
 interface CategoryPresetGroupDetails {
   label: string
+  description: string
   icon: ReactNode
 }
 
-const CATEGORY_PRESET_GROUPS: Record<CategoryPresetGroup, CategoryPresetGroupDetails> = {
+export const CATEGORY_PRESET_GROUPS: Record<CategoryPresetGroup, CategoryPresetGroupDetails> = {
   [CategoryPresetGroup.PET]: {
-    label: 'Pet',
+    label: 'Pet Expenses',
+    description: 'Categories for pet-related costs',
     icon: <Pets />,
   },
   [CategoryPresetGroup.RENT]: {
-    label: 'Rent',
+    label: 'Rental Housing',
+    description: 'Categories for renters',
     icon: <Apartment />,
   },
   [CategoryPresetGroup.HOME_OWNER]: {
-    label: 'Home Owner',
+    label: 'Home Ownership',
+    description: 'Categories for homeowners',
     icon: <Home />,
   },
   [CategoryPresetGroup.CAR]: {
-    label: 'Car',
+    label: 'Automotive',
+    description: 'Categories for car-related expenses',
     icon: <CarRental />,
   },
   [CategoryPresetGroup.STUDENT]: {
-    label: 'Student',
-    icon: <Home />, // TODO: Replace with appropriate student icon
+    label: 'Education',
+    description: 'Categories for students and education',
+    icon: <Home />,
   },
   [CategoryPresetGroup.PARENT]: {
-    label: 'Parent',
-    icon: <Home />, // TODO: Replace with appropriate parent/family icon
+    label: 'Parenting',
+    description: 'Categories for parents and children',
+    icon: <Home />,
   }
 }
 
@@ -182,52 +189,6 @@ const CATEGORY_PRESET_GROUPS: Record<CategoryPresetGroup, CategoryPresetGroupDet
  * Minimal set of categories, which covers the most common expenses into buckets.
  */
 export const PRESET_CATEGORIES_SIMPLE: Array<{ group: CategoryPresetGroup | null, categories: CreateCategory[] }> = [
-  {
-    // Catch-all group. These can't be opted in/out as a group.
-    group: null,
-    categories: [
-      {
-        label: 'Food',
-        description: 'Food and other grocery expenses',
-        avatar: SHARED_AVATARS['FOOD'],
-      },
-      {
-        label: 'Transportation',
-        description: 'Automotive or public transportation',
-        avatar: SHARED_AVATARS['TRANSPORTATION'],
-      },
-      {
-        label: 'Housing',
-        description: 'Housing-related expenses',
-        avatar: SHARED_AVATARS['HOUSING'],
-      },
-      {
-        label: 'Bills',
-        description: 'Utilities and recurring bills',
-        avatar: SHARED_AVATARS['BILLS'],
-      },
-      {
-        label: 'Entertainment',
-        description: 'Movies, games, and leisure activities',
-        avatar: SHARED_AVATARS['ENTERTAINMENT'],
-      },
-      {
-        label: 'Healthcare',
-        description: 'Medical and health-related expenses',
-        avatar: SHARED_AVATARS['HEALTHCARE'],
-      },
-      {
-        label: 'Shopping',
-        description: 'General shopping and purchases',
-        avatar: SHARED_AVATARS['SHOPPING'],
-      },
-      {
-        label: 'Personal Care',
-        description: 'Beauty, grooming, and personal items',
-        avatar: SHARED_AVATARS['PERSONAL_CARE'],
-      },
-    ]
-  },
   {
     group: CategoryPresetGroup.PET,
     categories: [
@@ -277,44 +238,34 @@ export const PRESET_CATEGORIES_SIMPLE: Array<{ group: CategoryPresetGroup | null
         avatar: SHARED_AVATARS['CHILDCARE'],
       }
     ]
-  }
-]
-
-/**
- * Typical set of categories, which breaks down common expenses into more specific categories.
- */
-export const PRESET_CATEGORIES_TYPICAL: Array<{ group: CategoryPresetGroup | null, categories: CreateCategory[] }> = [
+  },
   {
+    // Catch-all group. These can't be opted in/out as a group.
     group: null,
     categories: [
       {
-        label: 'Groceries',
+        label: 'Food',
         description: 'Food and other grocery expenses',
-        avatar: SHARED_AVATARS['GROCERIES'],
+        avatar: SHARED_AVATARS['FOOD'],
       },
       {
-        label: 'Takeout & Dining',
-        description: 'Restaurant meals and food delivery',
-        avatar: SHARED_AVATARS['TAKEOUT'],
-      },
-      {
-        label: 'Public Transportation',
-        description: 'Bus, train, and other public transit',
+        label: 'Transportation',
+        description: 'Automotive or public transportation',
         avatar: SHARED_AVATARS['TRANSPORTATION'],
       },
       {
-        label: 'Internet',
-        description: 'Internet and mobile phone bills',
-        avatar: SHARED_AVATARS['INTERNET'],
+        label: 'Housing',
+        description: 'Housing-related expenses',
+        avatar: SHARED_AVATARS['HOUSING'],
       },
       {
-        label: 'Utilities',
-        description: 'Electricity, gas, water, and other utilities',
-        avatar: SHARED_AVATARS['UTILITIES'],
+        label: 'Bills',
+        description: 'Utilities and recurring bills',
+        avatar: SHARED_AVATARS['BILLS'],
       },
       {
         label: 'Entertainment',
-        description: 'Movies, games, streaming, and leisure activities',
+        description: 'Movies, games, and leisure activities',
         avatar: SHARED_AVATARS['ENTERTAINMENT'],
       },
       {
@@ -334,6 +285,12 @@ export const PRESET_CATEGORIES_TYPICAL: Array<{ group: CategoryPresetGroup | nul
       },
     ]
   },
+]
+
+/**
+ * Typical set of categories, which breaks down common expenses into more specific categories.
+ */
+export const PRESET_CATEGORIES_TYPICAL: Array<{ group: CategoryPresetGroup | null, categories: CreateCategory[] }> = [
   {
     group: CategoryPresetGroup.PET,
     categories: [
@@ -403,19 +360,13 @@ export const PRESET_CATEGORIES_TYPICAL: Array<{ group: CategoryPresetGroup | nul
         avatar: SHARED_AVATARS['SCHOOL_SUPPLIES'],
       }
     ]
-  }
-]
-
-/**
- * Specific set of categories, which breaks down common expenses into even more specific categories.
- */
-export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | null, categories: CreateCategory[] }> = [
+  },
   {
     group: null,
     categories: [
       {
-        label: 'Food Essentials',
-        description: 'Essential groceries for daily life',
+        label: 'Groceries',
+        description: 'Food and other grocery expenses',
         avatar: SHARED_AVATARS['GROCERIES'],
       },
       {
@@ -434,54 +385,24 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
         avatar: SHARED_AVATARS['INTERNET'],
       },
       {
-        label: 'Electricity',
-        description: 'Electrical utility bills',
-        avatar: {
-          kind: 'papaya:avatar',
-          content: 'electrical_services',
-          variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
-        },
+        label: 'Utilities',
+        description: 'Electricity, gas, water, and other utilities',
+        avatar: SHARED_AVATARS['UTILITIES'],
       },
       {
-        label: 'Gas & Heating',
-        description: 'Gas, heating, and cooling bills',
-        avatar: {
-          kind: 'papaya:avatar',
-          content: 'local_fire_department',
-          variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
-        },
-      },
-      {
-        label: 'Water',
-        description: 'Water and sewer bills',
-        avatar: {
-          kind: 'papaya:avatar',
-          content: 'water_drop',
-          variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
-        },
-      },
-      {
-        label: 'Streaming & Entertainment',
-        description: 'Movies, games, streaming services',
+        label: 'Entertainment',
+        description: 'Movies, games, streaming, and leisure activities',
         avatar: SHARED_AVATARS['ENTERTAINMENT'],
       },
       {
         label: 'Healthcare',
-        description: 'Medical appointments and prescriptions',
+        description: 'Medical and health-related expenses',
         avatar: SHARED_AVATARS['HEALTHCARE'],
       },
       {
-        label: 'Clothing',
-        description: 'Clothing and accessories',
-        avatar: {
-          kind: 'papaya:avatar',
-          content: 'checkroom',
-          variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
-        },
+        label: 'Shopping',
+        description: 'General shopping and purchases',
+        avatar: SHARED_AVATARS['SHOPPING'],
       },
       {
         label: 'Personal Care',
@@ -490,6 +411,12 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
       },
     ]
   },
+]
+
+/**
+ * Specific set of categories, which breaks down common expenses into even more specific categories.
+ */
+export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | null, categories: CreateCategory[] }> = [
   {
     group: CategoryPresetGroup.PET,
     categories: [
@@ -505,7 +432,7 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'pets_outlined',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#fbb6ce',
         },
       }
     ]
@@ -550,7 +477,7 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'build',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#718096',
         },
       }
     ]
@@ -575,7 +502,7 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'account_balance',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#38b2ac',
         },
       },
       {
@@ -585,7 +512,7 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'school',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#68d391',
         },
       }
     ]
@@ -610,7 +537,7 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'sports_soccer',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#48bb78',
         },
       },
       {
@@ -620,11 +547,91 @@ export const PRESET_CATEGORIES_SPECIFIC: Array<{ group: CategoryPresetGroup | nu
           kind: 'papaya:avatar',
           content: 'baby_changing_station',
           variant: 'PICTORIAL',
-          primaryColor: '#a5d6a7',
+          primaryColor: '#fbb6ce',
         },
       }
     ]
-  }
+  },
+  {
+    group: null,
+    categories: [
+      {
+        label: 'Food Essentials',
+        description: 'Essential groceries for daily life',
+        avatar: SHARED_AVATARS['GROCERIES'],
+      },
+      {
+        label: 'Takeout & Dining',
+        description: 'Restaurant meals and food delivery',
+        avatar: SHARED_AVATARS['TAKEOUT'],
+      },
+      {
+        label: 'Public Transportation',
+        description: 'Bus, train, and other public transit',
+        avatar: SHARED_AVATARS['TRANSPORTATION'],
+      },
+      {
+        label: 'Internet',
+        description: 'Internet and mobile phone bills',
+        avatar: SHARED_AVATARS['INTERNET'],
+      },
+      {
+        label: 'Electricity',
+        description: 'Electrical utility bills',
+        avatar: {
+          kind: 'papaya:avatar',
+          content: 'electrical_services',
+          variant: 'PICTORIAL',
+          primaryColor: '#f6e05e',
+        },
+      },
+      {
+        label: 'Gas & Heating',
+        description: 'Gas, heating, and cooling bills',
+        avatar: {
+          kind: 'papaya:avatar',
+          content: 'local_fire_department',
+          variant: 'PICTORIAL',
+          primaryColor: '#ff6b6b',
+        },
+      },
+      {
+        label: 'Water',
+        description: 'Water and sewer bills',
+        avatar: {
+          kind: 'papaya:avatar',
+          content: 'water_drop',
+          variant: 'PICTORIAL',
+          primaryColor: '#4dabf7',
+        },
+      },
+      {
+        label: 'Streaming & Entertainment',
+        description: 'Movies, games, streaming services',
+        avatar: SHARED_AVATARS['ENTERTAINMENT'],
+      },
+      {
+        label: 'Healthcare',
+        description: 'Medical appointments and prescriptions',
+        avatar: SHARED_AVATARS['HEALTHCARE'],
+      },
+      {
+        label: 'Clothing',
+        description: 'Clothing and accessories',
+        avatar: {
+          kind: 'papaya:avatar',
+          content: 'checkroom',
+          variant: 'PICTORIAL',
+          primaryColor: '#a78bfa',
+        },
+      },
+      {
+        label: 'Personal Care',
+        description: 'Beauty, grooming, and personal items',
+        avatar: SHARED_AVATARS['PERSONAL_CARE'],
+      },
+    ]
+  },
 ]
 
 
